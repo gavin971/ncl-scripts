@@ -3,7 +3,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
 undef("histVarExtract")
-procedure histVarExtract(historyPattern:string, saveFile:file)
+procedure histVarExtract(historyPattern:string, saveFile:file, varList:string)
 
 local historyNames,history,saveFile
 
@@ -40,57 +40,48 @@ begin
   print("saving date...")
   date=addfiles_GetVar(history, historyNames, "date")
   saveFile->date=date
-  print("saving NOX...")
-  NOX =addfiles_GetVar(history, historyNames, "NOX")
-  saveFile->NOX = NOX
-  print("saving NOY...")
-  NOY =addfiles_GetVar(history, historyNames, "NOY")
-  saveFile->NOY = NOY
-  print("saving O3...")
-  O3  =addfiles_GetVar(history, historyNames, "O3")
-  saveFile->O3  = O3
-  print("saving PS...")
-  PS  =addfiles_GetVar(history, historyNames, "PS")
-  saveFile->PS  =PS
-  print("saving PSL...")
-  PSL =addfiles_GetVar(history, historyNames, "PSL")
-  saveFile->PSL =PSL
-  print("saving T...")
-  T   =addfiles_GetVar(history, historyNames, "T")
-  saveFile->T   =T
-  print("saving U...")
-  U   =addfiles_GetVar(history, historyNames, "U")
-  saveFile->U   =U
-  print("saving V...")
-  V   =addfiles_GetVar(history, historyNames, "V")
-  saveFile->V   =V
-  print("saving OMEGA...")
-  OMEGA   =addfiles_GetVar(history, historyNames, "OMEGA")
-  saveFile->OMEGA   =OMEGA
-  print("saving Z3...")
-  Z3  =addfiles_GetVar(history, historyNames, "Z3")
-  saveFile->Z3  =Z3
-  print("saving QSUM...")
-  QSUM  =addfiles_GetVar(history, historyNames, "QSUM")
-  saveFile->QSUM  =QSUM
-;  print("saving TS...")
-;  TS  =addfiles_GetVar(history, historyNames, "TS")
-;  saveFile->TS  =TS
+  
+  nVars = dimsizes(varList)
+  do i = 0, nVars -1
+    print("saving "+varList(i)+"...")
+    var =addfiles_GetVar(history, historyNames, varList(i))
+    saveFile->$varList(i)$ = var
+    delete(var)
+  end do
 
 end
 
 ;Main
 
-caseid="noaur_eco"
-htype="h3"
-path="run/"+caseid+"/"
+;caseid="noaur_eco"
+;branch="epp"
 
-do year=2027,2040
-  historyPattern=path+"*cam2."+htype+"."+year+"*.nc"
+caseid="expuT125E01"
+branch="dust-sulfur"
+
+htype="h3"
+
+if (isfilepresent("csm")) then
+  path="csm/"+caseid+"/atm/hist/"
+else
+  path="waccm/"+branch+"/run/"+caseid+"/"
+end if
+
+;do year=2027,2040
+;  historyPattern=path+"*cam2."+htype+"."+year+"*.nc"
 ;  historyPattern=path+"*cam2."+htype+".20[23]*.nc"
+year=1997
+do month=3,12
+  if (month.lt.10) then
+    monstr="0"+month
+  else
+    monstr=month
+  end if
+  historyPattern=path+"all.*cam2."+htype+"."+year+"-"+monstr+"*.nc"
+  
   print(historyPattern)
-  saveFileName=path+caseid+".vars."+htype+"."+year+".nc"
-;  saveFileName=path+caseid+".vars."+htype+".2025-39.nc"
+;  saveFileName=path+caseid+".vars."+htype+"."+year+".nc"
+  saveFileName=path+caseid+".vars."+htype+"."+year+"-"+monstr+".nc"
   print(saveFileName)
   saveFile=addfile(saveFileName,"c")
 
@@ -99,6 +90,10 @@ do year=2027,2040
 ;  plans to ever use the netCDF operators (NCO) to concatenate the file 
 ;  along the time/record dimension.  
   filedimdef(saveFile,"time",-1,True)
+  
+;  varList=(/"NOX","NOY","O3","PS","PSL","T","U","V","OMEGA","Z3","QSUM"/)
+  varList=(/"MIXSULNDBIN","DUSTNDBIN","SULFRAD","CORERAD"/)
 
-  histVarExtract(historyPattern,saveFile)
+  histVarExtract(historyPattern,saveFile,varList)
+  
 end do

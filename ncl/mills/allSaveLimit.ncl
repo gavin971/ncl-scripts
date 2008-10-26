@@ -8,10 +8,25 @@ procedure saveSizeLimit(historyRun:string,pattern:string)
 local historyNames, rmin, cpi, rmassmin, readfile, writefile, hrc, nhrc, allhist, time, nTimes, lev, nLevs, lat, nLats, lon, nLons, dustndbin, dustrad, mixsulndbin, sulfrad, mixsul05a, mixsul10a, mixsul13a, mixsul30a, dust05a, dust10a, dust13a, dust30a, dustnd
 
 begin
-;  allPattern=historyRun+"/all.*.cam2.h0."+year+"*.nc"
+
+; Determine the path to history files
+  if (isfilepresent("csm")) then
+    historyPath="csm/"+historyRun+"/atm/hist/"
+  else
+    if (isfilepresent("waccm")) then
+      historyPath="waccm/dust-sulfur/run/"+historyRun+"/"
+    else
+      if (isfilepresent("run")) then
+        historyPath="run/"+historyRun+"/"
+      else
+        if (isfilepresent(historyRun)) then
+          historyPath=historyRun+"/"
+        end if
+      end if
+    end if
+  end if
+  
 ; Create array of files matching pattern
-;  allNames = systemfunc("ls " + allPattern)
-  historyPath="run/"+historyRun+"/"
   allNames = systemfunc("ls " + historyPath + pattern)
   hrc=stringtochar(historyRun)
   nhrc=dimsizes(hrc)
@@ -175,5 +190,10 @@ end
 ;saveSizeLimit("JPL06_ncar","1995-10-08")
 ;saveSizeLimit("JPL06_ncar","1995-10-2")
 ;saveSizeLimit("JPL06_ncar","1995-11")
-saveSizeLimit("expuT125E01","all.expuT125E01.cam2.h3.*.nc")
+;saveSizeLimit("expuT125E01","all.expuT125E01.cam2.h3.*.nc")
 
+saveSizeLimit("expuT125E01","all.expuT125E01.cam2.h3.1997-10-17*") 
+saveSizeLimit("expuT125E01","all.expuT125E01.cam2.h3.1997-10-2*") 
+saveSizeLimit("expuT125E01","all.expuT125E01.cam2.h3.1997-11*") 
+saveSizeLimit("expuT125E01","all.expuT125E01.cam2.h3.1997-12*") 
+saveSizeLimit("expuT125E01","all.expuT125E01.cam2.h3.1998*") 

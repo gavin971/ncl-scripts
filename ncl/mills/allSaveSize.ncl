@@ -15,7 +15,10 @@ DG2RAD  = PI / 180.0              ; rad deg^-1
 RHO_H2SO4 = 1.923                 ; density of pure H2SO4 (l) at 200K [ g / cm3 ]
 RHO_DUST = 2.0                    ; density of meteoritic dust [ g / cm3 ]
 
-load "tests/core.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 ;  Set up the particle bins.
 ;
@@ -261,8 +264,23 @@ procedure saveSize(historyRun:string,prefix:string,skipbin:integer)
 local historyNames,rmin,cpi,rmassmin,writefile,hrc,nhrc,fc
 
 begin
-;  historyPath="csm/"+historyRun+"/atm/hist/"
-  historyPath=historyRun+"/"
+
+  if (isfilepresent("csm")) then
+    historyPath="csm/"+historyRun+"/atm/hist/"
+  else
+    if (isfilepresent("waccm")) then
+      historyPath="waccm/dust-sulfur/run/"+historyRun+"/"
+    else
+      if (isfilepresent("run")) then
+        historyPath="run/"+historyRun+"/"
+      else
+        if (isfilepresent(historyRun)) then
+          historyPath=historyRun+"/"
+        end if
+      end if
+    end if
+  end if
+  
 ; Create array of files matching pattern
   historyNames = systemfunc("ls " + historyPath + " | grep " + prefix)
   print(historyNames)

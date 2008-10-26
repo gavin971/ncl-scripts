@@ -2,6 +2,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"   
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
+;===========================================================================
+
 undef("createLubkenFile1999")
 procedure createLubkenFile1999()
 
@@ -35,6 +37,7 @@ begin
   f->T = T(time|:, z|:)
 end
 
+;===========================================================================
 
 undef("createLubkenFile2004")
 procedure createLubkenFile2004()
@@ -125,6 +128,7 @@ begin
   plot = gsn_csm_contour(wks, T(z|:, time|:), res)       ; contour the variable
 end
 
+;===========================================================================
 
 undef("plotTContours1999")
 procedure plotTContours1999()
@@ -132,7 +136,7 @@ procedure plotTContours1999()
 begin
 
   files = (/ "analysis/lubken1999jgr_table8.nc", \
-             "analysis/ep10rt02/tlub_1999.nc", \
+             "analysis/saber_T_wg_v1.nc", \
              "analysis/expuT125E01/tlub_1999.nc" \
 ;             "analysis/pmc_smin/tlub_1999.nc" \
 ;             "analysis/gw6_e125/tlub_1999.nc" \
@@ -142,9 +146,9 @@ begin
 ;            "tb*=2.00, eff=0.1250", \
 ;            "tb*=6.00, eff=0.1250" \
 ;          /)
-  names = (/ "Lubken [1999]", \
-            "WACCM 66 levels sqrt(cos)", \
-            "WACCM 66 levels cos" \
+  names = (/ " Lubken [1999]", \
+            " SABER, 2007", \
+            " WACCM 66 levels" \
 ;            "Previous" \
 ;            "Default" \
           /)
@@ -155,7 +159,7 @@ begin
 ;  timeOffset = (/ 0., 4., 1. /)
           
   timeScale = (/ 1., 30., 30. /)
-  timeOffset = (/ 0., 3., 3. /)
+  timeOffset = (/ 0., 1., 3. /)
 
   nFiles = dimsizes(files)
   plot = new(nFiles, "graphic")
@@ -165,7 +169,7 @@ begin
   gsn_define_colormap(wks, "rainbow")  ; choose a colormap
 
   resP                      = True    
-  resP@txString             = "WACCM vs. Lubken [1999], 70~S~o~N~N"
+  resP@txString             = "Temperature at 70~S~o~N~N, WACCM vs. observations,"
   resP@gsnMaximize          = True
   resP@gsnPanelLabelBar     = True
   resP@lbTitleString        =  "K"                ; turn on title
@@ -200,7 +204,25 @@ begin
     print("  " + files(i))
     history = addfile(files(i), "r")
     
-    T = history->T
+    if (isStrSubset(files(i),"saber")) then
+      Ttmp = dim_avg_Wrap(history->T(:, :, {70.}, :))
+      z = history->lev
+      timetmp = Ttmp&time
+      Ttmp!1 = "z"
+      Ttmp&z = z
+      
+      ; Temp array conforming to WACCM time dimensions, filled with missing value -999
+      T = new((/180,151/), float, -999)
+      T!0 = "time"
+      T&time = fspan(95,274,180)
+      T!1 = "z"
+      T&z = z
+      T({min(timetmp):max(timetmp)},:) = Ttmp(:,:)      
+    else
+      T = history->T
+    end if
+    
+;    print("    dims(T):"+dimsizes(T))
     
     print("    Tmin=" + sprintf("%5.1f", min(T)))
         
@@ -208,7 +230,9 @@ begin
     
     tmp = T(z|:, time|:)
     tmpTime = tmp&time
+;    print("   tmpTime:"+min(tmpTime)+" - "+max(tmpTime))
     tmp&time = (tmpTime / timeScale(i)) + timeOffset(i)
+;    print("   tmp&time:"+min(tmp&time)+" - "+max(tmp&time))
     tmp&time@long_name = "Month"
     
     plot(i) = gsn_csm_contour(wks, tmp({35.0:93.0}, {4.5:9.75}), res)       ; contour the variable
@@ -224,6 +248,7 @@ begin
   gsn_panel(wks, plot, (/ 1, 3 /), resP)
 end
 
+;===========================================================================
 
 undef("plotTContours2004")
 procedure plotTContours2004()
@@ -312,6 +337,233 @@ begin
   gsn_panel(wks, plot, (/ 1, 4 /), resP)
 end
 
+;===========================================================================
+
+undef("plotTatAlts1999")
+procedure plotTatAlts1999()
+
+begin
+
+  altitude = (/ 82.0, 84.0, 86.0, 88.0, 90.0, 92.0 /)
+
+  files = (/ "analysis/lubken1999jgr_table8.nc", \
+             "analysis/expuT125E01/tlub_1999.nc", \
+             "analysis/saber_T_wg_v1.nc" \
+;             "analysis/pmc_smin/tlub_1999.nc" \
+;             "analysis/gw6_e125/tlub_1999.nc" \
+          /)
+  names = (/ " Lubken [1999]", \
+            " WACCM 66 levels", \
+            " SABER, 2007" \
+;            "Default (tb*=6.00, eff=0.1250)" \
+          /)
+          
+;  timeScale = (/ 1., 30., 30., 30. /)
+;  timeOffset = (/ 0., 4., 4., 1. /)
+  timeScale = (/ 1., 30., 30. /)
+  timeOffset = (/ 0., 3., 1. /)
+          
+  lineColors = (/ "black", "red", "blue"/) ;, "green" /)
+  lineDashes = (/ 0, 0, 0 /)
+  lineThicknesses = (/ 6.0, 4.0, 4.0 /)
+  
+  nFiles = dimsizes(files)
+  plot = new(8, "graphic")
+    
+  ; Plot the data.
+;  wks  = gsn_open_wks("pdf", sprintf("images/lubken1999_%3.1fkm", altitude))    ; open a ncgm file
+  wks  = gsn_open_wks("pdf", "images/lubken1999_alts")    ; open a ncgm file
+  gsn_define_colormap(wks, "rainbow")  ; choose a colormap
+
+  resP                      = True    
+  resP@txString             = "WACCM vs. Lubken [1999], 70~S~o~N~N"
+;  resP@gsnDraw              = False
+  resP@gsnFrame             = False
+  resP@gsnMaximize          = True
+  resP@gsnPanelXWhiteSpacePercent = 5
+;  resP@gsnPanelYWhiteSpacePercent = 5
+
+  res                      = True
+  res@gsnDraw              = False
+  res@gsnFrame             = False
+  res@trXMinF              = 4.5
+  res@trXMaxF              = 9.5
+  res@vpYF                 = 0.85  ; Leave room for legend at the bottom.
+  res@vpHeightF            = 0.7  ; Leave room for legend at the bottom.
+  res@tmXBMode             = "Explicit"              ; explicit labels
+  res@tmXBValues           = (/ 4., 5., 6., 7., 8., 9., 10. /) ; location of labels 
+  res@tmXBLabels           = (/ 4, 5, 6, 7, 8, 9, 10 /)   ; labels themselves
+  res@tiXAxisString        = "Month"
+  
+  resT                     = res
+  resZ                     = res
+
+  res@tiMainString       = sprintf("Temperature at %3.1f km", altitude(0))
+  res@trYMinF              = 120.0
+  res@trYMaxF              = 220.0
+
+  res1                     = res
+  res2                     = res
+  res3                     = res
+  res4                     = res
+  res5                     = res
+
+  res@tiMainString       = sprintf("Temperature at %3.1f km", altitude(0))
+  res1@tiMainString       = sprintf("Temperature at %3.1f km", altitude(1))
+  res2@tiMainString       = sprintf("Temperature at %3.1f km", altitude(2))
+  res3@tiMainString       = sprintf("Temperature at %3.1f km", altitude(3))
+  res4@tiMainString       = sprintf("Temperature at %3.1f km", altitude(4))
+  res5@tiMainString       = sprintf("Temperature at %3.1f km", altitude(5))
+
+  resT@tiMainString       = "Mesopause Temperature"
+  resT@trYMinF              = 110.0
+  resT@trYMaxF              = 220.0
+
+  resZ@tiMainString       = "Mesopause Height"
+  resZ@trYMinF              = 70.0
+  resZ@trYMaxF              = 100.0
+
+  ; Get the T data from each run
+  print("Processing ...")
+  
+  do i = 0, nFiles - 1
+  
+    ; Open the file
+    print("  " + files(i))
+    history = addfile(files(i), "r")
+    
+    if (isStrSubset(files(i),"saber")) then
+      Ttmp = dim_avg_Wrap(history->T(:, :, {70.}, :))
+      z = history->lev
+      timetmp = Ttmp&time
+      Ttmp!1 = "z"
+      Ttmp&z = z
+      
+      ; Temp array conforming to WACCM time dimensions, filled with missing value -999
+      T = new((/180,151/), float, -999)
+      T!0 = "time"
+      T&time = fspan(95,274,180)
+      T!1 = "z"
+      T&z = z
+      T({min(timetmp):max(timetmp)},:) = Ttmp(:,:)      
+    else
+      T = history->T
+    end if
+    
+    print(i+" T "+dimsizes(T))
+    
+    print("    Tmin=" + min(T))
+        
+    
+    tmp = T(z|:, time|:)
+    tmpTime = tmp&time
+    tmp@long_name = "Temperature (K)"
+    tmp&time = (tmpTime / timeScale(i)) + timeOffset(i)    
+    tmp&time@long_name = "Month"
+    
+    ; Determine the location of the temperature minimum at each
+    ; time.
+    nTimes = dimsizes(tmp&time)
+    nZs = dimsizes(tmp&z)
+    imp = new(nTimes, "integer")
+    dataT = new(nTimes, "float")
+    Zmin = new(nTimes, "float")
+    
+    print(i+" nZs "+nZs)
+        
+    do j = 0, nTimes-1
+      imp(j) = nZs - 1 - minind(tmp(::-1, j))
+      if ismissing(imp(j)) then
+        dataT(j) = -999
+        Zmin(j) = -999
+      else
+        dataT(j) = tmp(imp(j), j)
+        Zmin(j) = tmp&z(imp(j))
+      end if
+    end do
+    
+    res@xyLineColor = lineColors(i)
+    res1@xyLineColor = lineColors(i)
+    res2@xyLineColor = lineColors(i)
+    res3@xyLineColor = lineColors(i)
+    res4@xyLineColor = lineColors(i)
+    res5@xyLineColor = lineColors(i)
+    resT@xyLineColor = lineColors(i)
+    resZ@xyLineColor = lineColors(i)
+    
+    res@xyDashPatterns = lineDashes(i)
+    res1@xyDashPatterns = lineDashes(i)
+    res2@xyDashPatterns = lineDashes(i)
+    res3@xyDashPatterns = lineDashes(i)
+    res4@xyDashPatterns = lineDashes(i)
+    res5@xyDashPatterns = lineDashes(i)
+    resT@xyDashPatterns = lineDashes(i)
+    resZ@xyDashPatterns = lineDashes(i)
+    
+    res@xyLineThicknessF = lineThicknesses(i)
+    res1@xyLineThicknessF = lineThicknesses(i)
+    res2@xyLineThicknessF = lineThicknesses(i)
+    res3@xyLineThicknessF = lineThicknesses(i)
+    res4@xyLineThicknessF = lineThicknesses(i)
+    res5@xyLineThicknessF = lineThicknesses(i)
+    resT@xyLineThicknessF = lineThicknesses(i)
+    resZ@xyLineThicknessF = lineThicknesses(i)
+
+    if (i .eq. 0) then
+      plot(0) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(0)}, :), res)
+      plot(1) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(1)}, :), res1)
+      plot(2) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(2)}, :), res2)
+      plot(3) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(3)}, :), res3)
+      plot(4) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(4)}, :), res4)
+      plot(5) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(5)}, :), res5)
+      plot(6) = gsn_csm_xy(wks, tmp&time(:), dataT(:), resT)
+      plot(7) = gsn_csm_xy(wks, tmp&time(:), tmp&z(imp), resZ)
+    else
+      overlay(plot(0), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(0)}, :), res))
+      overlay(plot(1), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(1)}, :), res))
+      overlay(plot(2), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(2)}, :), res))
+      overlay(plot(3), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(3)}, :), res))
+      overlay(plot(4), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(4)}, :), res))
+      overlay(plot(5), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(5)}, :), res))
+      overlay(plot(6), gsn_csm_xy(wks, tmp&time(:), dataT(:), resT))
+      overlay(plot(7), gsn_csm_xy(wks, tmp&time(:), Zmin(:), resZ))
+    end if
+
+    delete(T)
+    delete(tmp)
+    delete(tmpTime)
+    delete(imp)
+    delete(dataT)
+    delete(Zmin)
+  end do
+  
+  gsn_panel(wks, plot, (/ 2, 4 /), resP)
+
+  legend = create "Legend" legendClass wks 
+    "vpXF"                     : 0.1                    ; orientation on page
+    "vpYF"                     : 0.2
+    "vpWidthF"                 : 0.8                     ; width
+    "vpHeightF"                : 0.1                     ; height
+    "lgPerimOn"                : True                   ; no perimeter
+    "lgItemCount"              : nFiles                      ; how many
+    "lgLineLabelStrings"       : names
+    "lgLabelsOn"               : False                   ; no default lables
+    "lgMonoLineThickness"      : False
+    "lgLineThicknesses"        : (/ 6.0, 4.0, 4.0, 4.0, 4.0, 4.0 /)             ; line paters
+    "lgDashIndexes"            : lineDashes             ; line paters
+    "lgLineColors"             : lineColors
+    "lgMonoLineLabelFontColor" : True                    ; one label color
+    "lgAutoManage"             : False
+    "lgLabelPosition"          : "Center"
+    "lgLabelJust"              : "CenterLeft"
+  end create
+
+  draw(legend)  
+  frame(wks)
+
+end
+
+;===========================================================================
 
 undef("plotTatZ1999")
 procedure plotTatZ1999(altitude:float)
@@ -319,14 +571,14 @@ procedure plotTatZ1999(altitude:float)
 begin
 
   files = (/ "analysis/lubken1999jgr_table8.nc", \
-             "analysis/ep10rt02/tlub_1999.nc", \
+             "analysis/saber_T_wg_v1.nc", \
              "analysis/expuT125E01/tlub_1999.nc" \
 ;             "analysis/pmc_smin/tlub_1999.nc" \
 ;             "analysis/gw6_e125/tlub_1999.nc" \
           /)
-  names = (/ "Lubken [1999]", \
-            "WACCM 66 levels sqrt(cos)", \
-            "WACCM 66 levels cos" \
+  names = (/ " Lubken [1999]", \
+            " SABER, 2007", \
+            " WACCM 66 levels" \
 ;            "Default (tb*=6.00, eff=0.1250)" \
           /)
           
@@ -470,6 +722,7 @@ begin
 
 end
 
+;===========================================================================
 
 undef("plotTatZ2004")
 procedure plotTatZ2004(altitude:float)
@@ -632,18 +885,20 @@ begin
 
 end
 
+;===========================================================================
 
 ;createLubkenFile1999()
 ;createLubkenFile2004()
 
 ;plotLubkenFile1999()
 ;plotLubkenFile2004()
-plotTContours1999()
+;plotTContours1999()
 ;plotTContours2004()
-plotTatZ1999(82.0)
+;plotTatZ1999(82.0)
 ;plotTatZ2004(82.0)
-plotTatZ1999(86.0)
-plotTatZ1999(88.0)
-plotTatZ1999(90.0)
-plotTatZ1999(92.0)
+;plotTatZ1999(86.0)
+;plotTatZ1999(88.0)
+;plotTatZ1999(90.0)
+;plotTatZ1999(92.0)
+plotTatAlts1999()
 
