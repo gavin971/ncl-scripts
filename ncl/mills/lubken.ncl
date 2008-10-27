@@ -376,7 +376,7 @@ begin
   gsn_define_colormap(wks, "rainbow")  ; choose a colormap
 
   resP                      = True    
-  resP@txString             = "WACCM vs. Lubken [1999], 70~S~o~N~N"
+  resP@txString             = "WACCM vs. Observations, 70~S~o~N~N"
 ;  resP@gsnDraw              = False
   resP@gsnFrame             = False
   resP@gsnMaximize          = True
