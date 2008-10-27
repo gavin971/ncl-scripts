@@ -17,7 +17,7 @@ MWH2O   = 18.000                  ; molecular weight of water vapor
 PTOP    = 100.0                   ; pressure at the top of the model (non-zero) ~ Pa
 REARTH  = 6.37122e6               ; Earth's radius (m)
 
-load "tests/core.ncl"
+load "tests/common.ncl"
 
 ;  Set up the particle bins.
 ;
@@ -394,7 +394,7 @@ begin
   months = (/ "Dec", "January", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov" /)
 
   ; Open a workstation
-  wks = gsn_open_wks("pdf","images/paper/125")
+  wks = gsn_open_wks("pdf","images/125")
   gsn_define_colormap(wks,"gui_default")                ; choose colormap
   
   print("")
@@ -629,7 +629,7 @@ begin
   months = (/ "Dec", "January", "Feb", "Mar", "April", "May", "June", "July", "Aug", "September", "Oct", "Nov" /)
 
   ; Open a workstation
-  wks = gsn_open_wks("pdf","images/paper/125_polar")
+  wks = gsn_open_wks("pdf","images/125_polar")
   gsn_define_colormap(wks,"WhBlGrYeRe")                ; choose colormap
   
   print("")
@@ -653,5 +653,5 @@ begin
   gsn_panel(wks, plot, (/ 1, 3/), resP)
 end
 
-;monave_za()
-monave_polar()
+monave_za()
+;monave_polar()

@@ -88,7 +88,7 @@ begin
     sec2=stringtointeger(systemfunc("date +%s"))
     print("looping bins 0 to "+nBins+"...")
     do iBin = 0, nBins-1
-      print("bin "+iBin)
+;      print("bin "+iBin)
       dustnd(:, :, :, :) = dustnd(:, :, :, :) + dustndbin(:, :, :, :, iBin)
       if (dustrad(iBin).ge.5e-8) then
         dust05a(:, :, :, :) = dust05a(:, :, :, :) + dustndbin(:, :, :, :, iBin)
@@ -139,14 +139,16 @@ begin
     sec=sec2
     sec2=stringtointeger(systemfunc("date +%s"))
     sec=sec2-sec
-    print("bin "+iBin+": "+sec+" seconds")
+    print("bin "+iBin+": "+sec+" sec")
     end do ; iBin
-        
+    
+    print("writing output for MIXSUL..."
     allhist->MIXSUL05A=mixsul05a
     allhist->MIXSUL10A=mixsul10a
     allhist->MIXSUL13A=mixsul13a
     allhist->MIXSUL30A=mixsul30a
     
+    print("writing output for DUST..."
     allhist->DUST05A=dust05a
     allhist->DUST10A=dust10a
     allhist->DUST13A=dust13a
