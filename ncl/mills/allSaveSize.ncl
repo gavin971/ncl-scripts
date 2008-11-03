@@ -34,6 +34,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 ;
 ; NOTE: This logic is from CARMA setupbins.f.
 
+;=========================================
+
 undef("setupbins")
 procedure setupbins(nbin:integer, rmin:float, rmrat:float, rho:float, rmass[*]:float, r[*]:float, dr[*]:float, rmassup[*]:float, dm[*]:float, vol[*]:float, rup[*]:float, rlow[*]:float)
 
@@ -75,6 +77,7 @@ begin
   end do
 end
 
+;=========================================
 
 ; Calculate parameters of the air based upon the data in the history file.
 ;
@@ -98,6 +101,7 @@ begin
   arho(:,:,:,:)  = P(:,:,:,:) / (RDAIR * T(:,:,:,:))
 end
 
+;=========================================
 
 ; Get the number density for each bin.
 undef("getN")
@@ -149,7 +153,7 @@ begin
  
 end 
 
-
+;=========================================
 
 ; Compute sulfate mass density
 undef("calcSulfDens")
@@ -203,9 +207,10 @@ begin
   delete(i)
 end
 
+;=========================================
 
 undef("calcSulfRad")
-procedure calcSulfRad(history:file, mixsulnd:float, wtpct:float, sulfDens:float, coreName:string, rmass:float, arho:float, sulfRad:float, coreRad:float, skipbin:integer)
+procedure calcSulfRad(history:file, mixsulnd:float, wtpct:float, sulfDens:float, coreName:string, rmass:float, arho:float, sulfRad:float, coreRad:float, pureRad:float, skipbin:integer)
 
 local b, binName, nBins, mmr, coremass, cpi, voltot
 
@@ -224,35 +229,48 @@ begin
   do b = 0, nBins-1
 ;    print("bin "+b)
     if (b.ne.skipbin) then
-      binName = coreName + sprinti("%2.2i", b+1)
+      if (.not.(isfilevar(history,"SULFRAD")).or..not.(isfilevar(history,"CORERAD"))) then
+        binName = coreName + sprinti("%2.2i", b+1)
 
-      ; Get the mass mixing ratio.
-      mmr = history->$binName$
+        ; Get the mass mixing ratio.
+        mmr = history->$binName$
 
-      ; Compute core mass (g/particle)
-      coremass = (mmr * arho) / (mixsulnd (:, :, :, :, b)>1e-30)
-      corevol = coremass/RHO_DUST
-      coreRad(:, :, :, :, b) = (corevol/cpi)^(1./3.)
+        ; Compute core mass (g/particle)
+        coremass = (mmr * arho) / (mixsulnd (:, :, :, :, b)>1e-30)
+        corevol = coremass/RHO_DUST
+        coreRad(:, :, :, :, b) = (corevol/cpi)^(1./3.)
+        print("bin "+b+", coreRad max="+max(coreRad(:, :, :, :, b))+" min="+min(coreRad(:, :, :, :, b)))
 
-      if (.not.(isfilevar(history,"SULFRAD"))) then
-        voltot = corevol + (rmass(b)-coremass) * 100.0/wtpct / sulfDens
+        if (.not.(isfilevar(history,"SULFRAD"))) then
+          voltot = corevol + (rmass(b)-coremass) * 100.0/wtpct / sulfDens
 
-        sulfRad(:, :, :, :, b) = (voltot/cpi)^(1./3.)
-        print("bin "+b+", sulfrad max="+max(sulfRad(:, :, :, :, b))+" min="+min(sulfRad(:, :, :, :, b)))
+          sulfRad(:, :, :, :, b) = (voltot/cpi)^(1./3.)
+          print("bin "+b+", sulfRad max="+max(sulfRad(:, :, :, :, b))+" min="+min(sulfRad(:, :, :, :, b)))
 
-        delete(mmr)
+          delete(mmr)
+        end if
       end if
+      
+      if (.not.(isfilevar(history,"PURERAD"))) then
+        voltot = rmass(b) * 100.0/wtpct / sulfDens
+
+        pureRad(:, :, :, :, b) = (voltot/cpi)^(1./3.)
+        print("bin "+b+", pureRad max="+max(pureRad(:, :, :, :, b))+" min="+min(pureRad(:, :, :, :, b)))      
+      end if     
+      
     end if
     
     if (skipbin.gt.0) then 
       sulfRad(:, :, :, :, skipbin) = sqrt(sulfRad(:, :, :, :, skipbin-1)*sulfRad(:, :, :, :, skipbin+1))
       coreRad(:, :, :, :, skipbin) = sqrt(coreRad(:, :, :, :, skipbin-1)*coreRad(:, :, :, :, skipbin+1))
+      pureRad(:, :, :, :, skipbin) = sqrt(pureRad(:, :, :, :, skipbin-1)*pureRad(:, :, :, :, skipbin+1))
     end if
     
   end do
   
 end
 
+;=========================================
 
 undef("saveSize")
 procedure saveSize(historyRun:string,prefix:string,skipbin:integer)
@@ -332,7 +350,8 @@ begin
   nFiles=dimsizes(historyNames)
   do ifile = 0, nFiles-1
     print("")
-    print("    " + ifile + " :  " + (/ historyNames(ifile) /))
+    print("file " + (ifile+1) + " of " + nFiles + " :"
+    print("   " + (/ historyNames(ifile) /))
     
     
     ; copy history file:
@@ -366,7 +385,7 @@ begin
       sulfDens=wtpct
       sulfDens@long_name="sulfate aerosol mass density"
       sulfDens@units="g/cm3"
-      print("      Calculating sulfate density ...")
+      print("Calculating sulfate density ...")
       calcSulfDens(wtpct,temp,sulfDens)
       writefile->SULDEN=sulfDens
     end if
@@ -409,6 +428,7 @@ begin
     end if
     
     if (.not.(isfilevar(writefile,"SOY"))) then
+      print("reading sulfur constituents ...")
       soy = writefile->OCS    
       s = writefile->S    
       so = writefile->SO
@@ -421,7 +441,7 @@ begin
         mixsulvmr = writefile->MIXSULVMR
       else
         mixsulvmr = writefile->MIXSULMD
-        print("      Calculating the mixed sulfate vmr ...")
+        print("Calculating the mixed sulfate vmr ...")
   ; (mol/mol)=(g/cm3)/(g/cm3)*(g/mol Air)/(g/mol H2SO4)
   ;   (28.964 g/mol Air)/(98.0734 g/mol H2SO4) =0.2953
         mixsulvmr=mixsulvmr(:,:,:,:)/arho(:,:,:,:)*0.2953
@@ -439,6 +459,7 @@ begin
           pursulvmr = writefile->PURSULVMR
         else
           pursulvmr = writefile->PURSULMD    
+          print("Calculating the pure sulfate vmr ...")
           pursulvmr = pursulvmr(:,:,:,:)/arho(:,:,:,:)*0.2953
           pursulvmr@units = "mol/mol"
           pursulvmr@long_name = "pure sulfates equivalent vmr"
@@ -447,6 +468,7 @@ begin
         soy=soy+pursulvmr
       end if
 
+      print("writing SOY ...")
       writefile->SOY=soy
 
     end if        
@@ -454,7 +476,7 @@ begin
     ; Get the Number density (#/cm-3) for each bin at the 
     ; specified time and location.
     if (isfilevar(writefile,"MIXSUL01") .and. (.not.(isfilevar(writefile,"MIXSULNDBIN")))) then
-      print("      Calculating the mixed sulfate number density ...")
+      print("Calculating the mixed sulfate number density ...")
       mixsulndbin = new((/ nFTimes, nLevs, nLats, nLons, nBins /), float)
       mixsulndbin!0="time"
       mixsulndbin&time=time
@@ -472,7 +494,7 @@ begin
     end if
  
     if (isfilevar(writefile,"DUST01") .and. (.not.(isfilevar(writefile,"DUSTNDBIN")))) then
-      print("      Calculating the dust number density ...")
+      print("Calculating the dust number density ...")
       dustndbin = new((/ nFTimes, nLevs, nLats, nLons, nBins /), float)
       dustndbin!0="time"
       dustndbin&time=time
@@ -488,10 +510,29 @@ begin
       getN(writefile, "DUST", rmass, arho, dustndbin, skipbin)
       writefile->DUSTNDBIN=dustndbin
     end if
- 
-    if ((.not.(isfilevar(writefile,"SULFRAD"))) .or. (.not.(isfilevar(writefile,"CORERAD")))) then
     
-      print("      Calculating SULFRAD and CORERAD...")
+    if (isfilevar(writefile,"PURSUL01") .and. (.not.(isfilevar(writefile,"PURSULNDBIN")))) then
+      print("Calculating the pure sulfate number density ...")
+      pursulndbin = new((/ nFTimes, nLevs, nLats, nLons, nBins /), float)
+      pursulndbin!0="time"
+      pursulndbin&time=time
+      pursulndbin!1="lev"
+      pursulndbin&lev=lev
+      pursulndbin!2="lat"
+      pursulndbin&lat=lat
+      pursulndbin!3="lon"
+      pursulndbin&lon=lon
+      pursulndbin!4="bins"   
+      pursulndbin@long_name="mixed sulfate number density per bin"
+      pursulndbin@units="/cm3"
+      getN(writefile, "PURSUL", rmass, arho, pursulndbin, skipbin)
+      writefile->PURSULNDBIN=pursulndbin
+    end if
+ 
+    if ((.not.(isfilevar(writefile,"SULFRAD"))) .or. (.not.(isfilevar(writefile,"CORERAD"))) \
+       .or. (.not.(isfilevar(writefile,"PURERAD")))) then
+    
+      print("Calculating SULFRAD, CORERAD, and PURERAD...")
       
       sulfRad = new((/ nFTimes, nLevs, nLats, nLons, nBins /), float)
       sulfRad!0="time"
@@ -519,15 +560,37 @@ begin
       coreRad@long_name="sulfate dust core radius"
       coreRad@units="cm"
       
+      pureRad = new((/ nFTimes, nLevs, nLats, nLons, nBins /), float)
+      pureRad!0="time"
+      pureRad&time=time
+      pureRad!1="lev"
+      pureRad&lev=lev
+      pureRad!2="lat"
+      pureRad&lat=lat
+      pureRad!3="lon"
+      pureRad&lon=lon
+      pureRad!4="bins"   
+      pureRad@long_name="mixed sulfate radius"
+      pureRad@units="cm"
+      
 ;      if (.not.(isvar(mixsulndbin))) then
-        mixsulndbin = writefile->MIXSULNDBIN
+;        mixsulndbin = writefile->MIXSULNDBIN
 ;      end if
       
-      calcSulfRad(writefile, mixsulndbin, wtpct, sulfDens, "DUSSUL", rmass, arho, sulfRad, coreRad, skipbin)
+      calcSulfRad(writefile, mixsulndbin, wtpct, sulfDens, "DUSSUL", rmass, arho, \
+        sulfRad, coreRad, pureRad, skipbin)
       if (.not.(isfilevar(writefile,"SULFRAD"))) then
+        print("saving SULFRAD")
         writefile->SULFRAD=sulfRad
       end if
-      writefile->CORERAD=coreRad
+      if (.not.(isfilevar(writefile,"CORERAD"))) then
+         print("saving CORERAD")
+       writefile->CORERAD=coreRad
+      end if
+      if (.not.(isfilevar(writefile,"PURERAD"))) then
+         print("saving PURERAD")
+        writefile->PURERAD=pureRad
+      end if
     end if
             
     delete(time)
@@ -536,11 +599,7 @@ end
 
 ; Main
 
-;saveSize("ds_expuT15E01d","all.ds_expuT15E01d.cam2.h3.",-1) 
-;saveSize("expuT125E01","all.expuT125E01.cam2.h3",-1) 
-;saveSize("expuT125E01","expuT125E01.cam2.h3.1997-10-17",-1) 
-;saveSize("expuT125E01","expuT125E01.cam2.h3.1997-10-2",-1) 
-;saveSize("expuT125E01","expuT125E01.cam2.h3.1997-11",-1) 
-;saveSize("expuT125E01","expuT125E01.cam2.h3.1997-12",-1) 
-;saveSize("expuT125E01","expuT125E01.cam2.h3.1998",-1) 
-saveSize("expuT125E01","expuT125E01.cam2.h3.1998-03-16",-1) 
+;saveSize("125expuT15","125expuT15.cam2.h3.",-1) 
+;saveSize("125expuT15","125expuT15.cam2.h3.1997-07-[123]",-1) 
+;saveSize("125expuT15","125expuT15.cam2.h3.1997-08",-1) 
+saveSize("125expuT15","125expuT15.cam2.h3.1997-08-19",-1) 

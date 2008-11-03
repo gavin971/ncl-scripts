@@ -34,7 +34,8 @@ begin
   nFiles=dimsizes(allNames)
   do ifile = 0, nFiles-1
     print("")
-    print("file " + ifile + "of " + nFiles + " :  " + (/ allNames(ifile) /))
+    print("file " + (ifile+1) + " of " + nFiles + " :")
+    print("   " + (/ allNames(ifile) /))
 
     allhist = addfile(allNames(ifile), "w")
     
@@ -86,7 +87,7 @@ begin
     cross_thresh=False  ; Flag for when smallest sulfates are greater than largest threshold
     
     sec2=stringtointeger(systemfunc("date +%s"))
-    print("looping bins 0 to "+nBins+"...")
+    print("looping bins 0 to "+(nBins-1)+"...")
     do iBin = 0, nBins-1
 ;      print("bin "+iBin)
       dustnd(:, :, :, :) = dustnd(:, :, :, :) + dustndbin(:, :, :, :, iBin)
@@ -142,13 +143,13 @@ begin
     print("bin "+iBin+": "+sec+" sec")
     end do ; iBin
     
-    print("writing output for MIXSUL..."
+    print("writing output for MIXSUL...")
     allhist->MIXSUL05A=mixsul05a
     allhist->MIXSUL10A=mixsul10a
     allhist->MIXSUL13A=mixsul13a
     allhist->MIXSUL30A=mixsul30a
     
-    print("writing output for DUST..."
+    print("writing output for DUST...")
     allhist->DUST05A=dust05a
     allhist->DUST10A=dust10a
     allhist->DUST13A=dust13a
@@ -194,8 +195,7 @@ end
 ;saveSizeLimit("JPL06_ncar","1995-11")
 ;saveSizeLimit("expuT125E01","all.expuT125E01.cam2.h3.*.nc")
 
-saveSizeLimit("expuT125E01","all.expuT125E01.cam2.h3.1997-10-17*") 
-saveSizeLimit("expuT125E01","all.expuT125E01.cam2.h3.1997-10-2*") 
-saveSizeLimit("expuT125E01","all.expuT125E01.cam2.h3.1997-11*") 
-saveSizeLimit("expuT125E01","all.expuT125E01.cam2.h3.1997-12*") 
-saveSizeLimit("expuT125E01","all.expuT125E01.cam2.h3.1998*") 
+saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-0[4-7]*") 
+saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-08-0*") 
+saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-08-14*") 
+saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-08-19*") 
