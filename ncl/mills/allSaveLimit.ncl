@@ -1,3 +1,4 @@
+load "tests/getHistoryPath.ncl"
 
 undef("saveSizeLimit")
 procedure saveSizeLimit(historyRun:string,pattern:string)
@@ -13,21 +14,9 @@ local historyNames, rmin, cpi, rmassmin, readfile, writefile, hrc, nhrc, \
 begin
 
 ; Determine the path to history files
-  if (isfilepresent("csm")) then
-    historyPath="csm/"+historyRun+"/atm/hist/"
-  else
-    if (isfilepresent("waccm")) then
-      historyPath="waccm/dust-sulfur/run/"+historyRun+"/"
-    else
-      if (isfilepresent("run")) then
-        historyPath="run/"+historyRun+"/"
-      else
-        if (isfilepresent(historyRun)) then
-          historyPath=historyRun+"/"
-        end if
-      end if
-    end if
-  end if
+  historyPath = getHistoryPath(historyRun)
+  
+  historyPath = historyPath + "new/"
   
 ; Create array of files matching pattern
   allNames = systemfunc("ls " + historyPath + pattern)
@@ -230,21 +219,7 @@ procedure fixDustND(historyRun:string,pattern:string)
 begin
 
 ; Determine the path to history files
-  if (isfilepresent("csm")) then
-    historyPath="csm/"+historyRun+"/atm/hist/"
-  else
-    if (isfilepresent("waccm")) then
-      historyPath="waccm/dust-sulfur/run/"+historyRun+"/"
-    else
-      if (isfilepresent("run")) then
-        historyPath="run/"+historyRun+"/"
-      else
-        if (isfilepresent(historyRun)) then
-          historyPath=historyRun+"/"
-        end if
-      end if
-    end if
-  end if
+  historyPath = getHistoryPath(historyRun)
   
 ; Create array of files matching pattern
   allNames = systemfunc("ls " + historyPath + "all." + pattern)
@@ -269,11 +244,13 @@ end
 
 ; Main
 
-fixDustND("125expuT15","125expuT15.cam2.h3.1997-0[45]*")
-fixDustND("125expuT15","125expuT15.cam2.h3.1997-06-[01]*")
+;fixDustND("125expuT15","125expuT15.cam2.h3.1997-0[45]*")
+;fixDustND("125expuT15","125expuT15.cam2.h3.1997-06-[01]*")
 
-saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-06-3*") 
-saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-0[78]*") 
+;saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-06-3*") 
+;saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-0[78]*") 
 
-saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-0[45]*") 
-saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-06-[01]*") 
+;saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-0[45]*") 
+;saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-06-[01]*") 
+
+saveSizeLimit("125expuT15b","all.125expuT15b.cam2.h0*") 

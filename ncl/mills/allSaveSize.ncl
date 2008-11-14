@@ -19,6 +19,7 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
+load "tests/getHistoryPath.ncl"
 
 ;  Set up the particle bins.
 ;
@@ -283,21 +284,9 @@ local historyNames,rmin,cpi,rmassmin,writefile,hrc,nhrc,fc
 
 begin
 
-  if (isfilepresent("csm")) then
-    historyPath="csm/"+historyRun+"/atm/hist/"
-  else
-    if (isfilepresent("waccm")) then
-      historyPath="waccm/dust-sulfur/run/"+historyRun+"/"
-    else
-      if (isfilepresent("run")) then
-        historyPath="run/"+historyRun+"/"
-      else
-        if (isfilepresent(historyRun)) then
-          historyPath=historyRun+"/"
-        end if
-      end if
-    end if
-  end if
+  historyPath = getHistoryPath(historyRun)
+  
+  historyPath = historyPath + "new/"
   
 ; Create array of files matching pattern
   historyNames = systemfunc("ls " + historyPath + " | grep " + prefix)
@@ -350,7 +339,7 @@ begin
   nFiles=dimsizes(historyNames)
   do ifile = 0, nFiles-1
     print("")
-    print("file " + (ifile+1) + " of " + nFiles + " :"
+    print("file " + (ifile+1) + " of " + nFiles + " :")
     print("   " + (/ historyNames(ifile) /))
     
     
@@ -602,4 +591,5 @@ end
 ;saveSize("125expuT15","125expuT15.cam2.h3.",-1) 
 ;saveSize("125expuT15","125expuT15.cam2.h3.1997-07-[123]",-1) 
 ;saveSize("125expuT15","125expuT15.cam2.h3.1997-08",-1) 
-saveSize("125expuT15","125expuT15.cam2.h3.1997-08-19",-1) 
+saveSize("geo6","geo6.cam2",-1) 
+

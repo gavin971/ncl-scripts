@@ -1,6 +1,7 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
+load "tests/getHistoryPath.ncl"
 
 undef("LOxLatMean")
 function LOxLatMean(Rate[*][*]:float,j:integer)
@@ -25,19 +26,31 @@ end
 undef("plotO3Depletion")
 procedure plotO3Depletion(historyRun:string, controlRun:string)
 
+local historyPath, controlPath, historyPattern, controlPath
+
 begin
   print((/historyRun/))
-;  historyPattern = historyRun+"/"+historyRun+".mean.h3.1996.nc"
-  historyPattern = historyRun+"/"+historyRun+".mean.h0.199[67].nc"
+  historyPath = getHistoryPath(historyRun)
+  print((/historyPath/))
+  historyPattern = historyPath+historyRun+".mean.h0.1997.nc"
+  print((/historyPattern/))
+;  historyPattern = historyRun+"/"+historyRun+".mean.h0.199[67].nc"
   historyNames = systemfunc("ls " + historyPattern)
   history = addfiles(historyNames, "r")
   ListSetType(history, "cat")
  
-;  controlPattern = controlRun+"/"+controlRun+".mean.h3.1996.nc"
-  controlPattern = controlRun+"/"+controlRun+".mean.h0.199[67].nc"
+  print((/controlRun/))
+  controlPath = getHistoryPath(controlRun)
+  print((/controlPath/))
+  controlPattern = controlPath+controlRun+".mean.h0.1997.nc"
+  print((/controlPattern/))
+;  controlPattern = controlRun+"/"+controlRun+".mean.h0.199[67].nc"
   controlNames = systemfunc("ls " + controlPattern)
   control = addfiles(controlNames, "r")
   ListSetType(control, "cat")
+  
+  print(historyNames)
+  print(controlNames)
 
   O3_col_x=addfiles_GetVar(history, historyNames, "O3_col")
   O3_col_c=addfiles_GetVar(control, controlNames, "O3_col")
@@ -84,19 +97,22 @@ begin
 ; treating minor tickmarks like major tickmarks, and vice versa, since
 ; only the major tickmarks can actually be labeled.
 ;
-  year=1996
-  yearlast=1997
+;  year=1996
+  year=1997
+;  yearlast=1997
+  yearlast=1998
   nyears=yearlast-year
 ;  nmonths =12*nyears ;h3
-  nmonths =12*nyears+2
-  
+;  nmonths =12*nyears+2
+  nmonths = 12
+    
   months  = new(nmonths,integer)
   years  = new(nmonths,integer)
    
   months(0:11) = ispan(1,12,1)
   years(0:11) = year
-  months(12:13) = ispan(1,2,1)
-  years(12:13) = year+1
+;  months(12:13) = ispan(1,2,1)
+;  years(12:13) = year+1
   
 ;  months(0)=12 ;h0
   
@@ -260,4 +276,4 @@ end
 
 ;Main
 
-plotO3Depletion("geo2", "nongeo2")
+plotO3Depletion("geo6", "nongeo5")

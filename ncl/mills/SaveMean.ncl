@@ -1,7 +1,7 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-
+load "tests/getHistoryPath.ncl"
 
 undef("calcPress")
 function calcPress(history:list, historyNames[*]:string)
@@ -436,42 +436,52 @@ begin
 end
 
 undef("saveMeanFiles")
-procedure saveMeanFiles(historyRun:string)
+procedure saveMeanFiles(historyRun:string, pattern:string)
 
-local historyPattern1,historyNames1,history1,historyPattern2,historyNames2, history2,T,Tmean,pi,pm,press,temp,tmean,saveFile1, saveFile2
+local historyPattern1,historyNames1,history1,historyPattern2,historyNames2, \
+  history2,T,Tmean,pi,pm,press,temp,tmean,saveFile1,saveFile2
 
 begin
-  saveFile1 = addfile(historyRun+"/"+historyRun+".mean.h3.1995.nc", "c")
+
+  historyPath = getHistoryPath(historyRun)
+
+;  saveFile1 = addfile(historyRun+"/"+historyRun+".mean.h3.1995.nc", "c")
 ;  saveFile2 = addfile(historyRun+"/"+historyRun+".mean.h0.1996.nc", "c")
 ;  saveFile3 = addfile(historyRun+"/"+historyRun+".mean.h3.1997.nc", "c")
+  saveFile = addfile(historyPath+historyRun+".mean."+pattern+".nc", "c")
   
-  historyPattern1=historyRun+"/"+historyRun+".cam2.h3.1995*.nc"
+;  historyPattern1=historyRun+"/"+historyRun+".cam2.h3.1995*.nc"
 ;  historyPattern2=historyRun+"/"+historyRun+".cam2.h0.1996*.nc"
 ;  historyPattern3=historyRun+"/"+historyRun+".cam2.h3.1997*.nc"
+  historyPattern=historyPath+"*.cam2."+pattern+"*.nc"
   
-  saveMeanVars(historyRun, historyPattern1, saveFile1)
+;  saveMeanVars(historyRun, historyPattern1, saveFile1)
 ;  saveMeanVars(historyRun, historyPattern2, saveFile2)  
 ;  saveMeanVars(historyRun, historyPattern3, saveFile3)  
+  saveMeanVars(historyRun, historyPattern, saveFile)
   
-  saveMeanLOxCols(historyRun, historyPattern1, saveFile1)
+;  saveMeanLOxCols(historyRun, historyPattern1, saveFile1)
 ;  saveMeanLOxCols(historyRun, historyPattern2, saveFile2)
 ;  saveMeanLOxCols(historyRun, historyPattern3, saveFile3)
+  saveMeanLOxCols(historyRun, historyPattern, saveFile)
+  
 end
 
 undef("saveMeans")
-procedure saveMeans(historyRun:string, controlRun:string)
+procedure saveMeans(historyRun:string, controlRun:string, pattern:string)
 
 begin
 
   print((/historyRun/))  
-  saveMeanFiles(historyRun)
+  saveMeanFiles(historyRun, pattern)
   
   print((/controlRun/))  
-  saveMeanFiles(controlRun)
+  saveMeanFiles(controlRun, pattern)
 
 end
 
 ;Main
 
 ;saveMeans("geoengn4","carmasadn3")
-saveMeans("geo2","nongeo2")
+;saveMeans("geo2","nongeo2")
+saveMeanFiles("geo6","h0.1997")

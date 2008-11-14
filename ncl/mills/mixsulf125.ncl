@@ -18,23 +18,27 @@ begin
   print("  Plot monthly average mixed sulfate densities ...")
   
   ; Open the  history files
-  historyPattern="waccm/dust-sulfur/run/expuT125E01/all.expuT125E01.cam2.h3.1997-0[67]*"
+  historyPattern="waccm/dust-sulfur/run/125expuT15/all.125expuT15.cam2.h3.1997-0[67]*"
   historyNames = systemfunc("ls " + historyPattern)
   history = addfiles(historyNames, "r")
   ListSetType(history, "cat")
   print("historyNames:"+dimsizes(historyNames))
     
-  historyNames2 = "waccm/dust-sulfur/run/expuT125E01/all.expuT125E01.cam2.h3.199"+ \
-     (/"7-12-31-00000.nc","8-01-05-00000.nc","8-01-10-00000.nc","8-01-15-00000.nc", \
-     "8-01-20-00000.nc","8-01-25-00000.nc","8-01-30-00000.nc"/)
+;  "waccm/dust-sulfur/run/125expuT15/all.125expuT15.cam2.h3.199"+ \
+;     (/"7-12-31-00000.nc","8-01-05-00000.nc","8-01-10-00000.nc","8-01-15-00000.nc", \
+;     "8-01-20-00000.nc","8-01-25-00000.nc","8-01-30-00000.nc"/)
      
-  history2 = addfiles(historyNames2, "r")
+;  history2 = addfiles(historyNames2, "r")
+  historyNames2 = historyNames
+  history2 = history
+  
   ListSetType(history2, "cat")
   print("historyNames2:"+dimsizes(historyNames2))
 
  ; Compute the pressure levels ...
   time     = addfiles_GetVar(history, historyNames, "time")
-  time2    = addfiles_GetVar(history2, historyNames2, "time")
+;  time2    = addfiles_GetVar(history2, historyNames2, "time")
+  time2   = time
 
   lev     = history[4]->lev
   nLevs   = dimsizes(lev)
@@ -56,13 +60,18 @@ begin
   date = addfiles_GetVar(history, historyNames, "date")
   date2= addfiles_GetVar(history2, historyNames2, "date")
   mixsul10A = addfiles_GetVar(history, historyNames, "MIXSUL10A")
-  mixsul10A2 = addfiles_GetVar(history2, historyNames2, "MIXSUL10A")
+;  mixsul10A2 = addfiles_GetVar(history2, historyNames2, "MIXSUL10A")
+  mixsul10A2 = addfiles_GetVar(history2, historyNames2, "PURSUL10A")
   
   time0701=ind(date.eq."19970701")
   time0731=ind(date.eq."19970731")
  
-  time0101=ind(date2.eq."19980101")
-  time0131=ind(date2.eq."19980131")
+;  time0101=ind(date2.eq."19980101")
+;  time0131=ind(date2.eq."19980131")
+  
+  time0101=time0701
+  time0131=time0731
+
   print("time0101:"+time0101)
   print("time0131:"+time0131)
 
@@ -74,9 +83,11 @@ begin
   ;  control
   ;  test
   ;  difference
-  month = (/ 1, 7 /)
+;  month = (/ 1, 7 /)
+  month = (/ 7, 7 /)
   nMonths = dimsizes(month)
-  runs = (/ "January", "July" /)
+;  runs = (/ "January", "July" /)
+  runs = (/ "Pure Sulfates", "Mixed Sulfates" /)
   nRuns = dimsizes(runs)
   
   Ts = new((/ nRuns, nLevs, nLats /), float)
@@ -143,6 +154,7 @@ begin
 ;  resP@lbTitleDirection     = "Across"             ; title direction
   resP@gsnPanelXWhiteSpacePercent = 5
   resP@lbLabelStride        = 1
+  resP@lbLabelAngleF        = 60
         
   res                       = True
   res@gsnDraw               = False
@@ -189,7 +201,7 @@ begin
   months = (/ "Dec", "January", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov" /)
 
   ; Open a workstation
-  wks = gsn_open_wks("pdf","images/misxulf125")
+  wks = gsn_open_wks("pdf","images/mixsulf125")
   gsn_define_colormap(wks,"gui_default")                ; choose colormap
   
   print("")
@@ -207,21 +219,29 @@ begin
   
 ;  res@lbTitleString        = zonal@units
 ;  res@lbLabelStride         = 3
-  res@cnLevelSelectionMode  = "ManualLevels" 
 
-  print("      min :  " + min(zonal(:, {minP:maxP}, :)))
-  print("      max :  " + max(zonal(:, {minP:maxP}, :)))
-  res@cnLevelSpacingF       = 5.0                  ; contour interval
-  res@cnMinLevelValF        = 5.0                  ; contour interval
-  res@cnMaxLevelValF        = 100.0                 ; contour interval  
-  res@tiMainString          = runs(0)
+;  res@cnLevelSelectionMode  = "ManualLevels" 
+;  print("      min :  " + min(zonal(:, {minP:maxP}, :)))
+;  print("      max :  " + max(zonal(:, {minP:maxP}, :)))
+;  res@cnLevelSpacingF       = 5.0                  ; contour interval
+;  res@cnMinLevelValF        = 5.0                  ; contour interval
+;  res@cnMaxLevelValF        = 100.0                 ; contour interval  
+;  res@tiMainString          = runs(0)
+
+  res@cnLevelSelectionMode  = "ExplicitLevels"
+  res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
+      200, 300, 500, 750, 1000, 2000, 3000, 5000, 7500, 10000 /)
+  res@lbLabelAngleF = 60
   
-  res@tiMainString          = months(month(0))
-  plot(0) = gsn_csm_pres_hgt(wks, zonal(0, {minP:maxP}, {-90.0:-30.0}), res)
+;  res@tiMainString          = months(month(0))
+  res@tiMainString          = runs(0)
+;  plot(0) = gsn_csm_pres_hgt(wks, zonal(0, {minP:maxP}, {-90.0:-30.0}), res)
+  plot(0) = gsn_csm_pres_hgt(wks, zonal(0, {minP:maxP}, {30.0:90.0}), res)
 ;  plot(0) = gsn_csm_pres_hgt(wks, zonal(0, :, {-90.0:-30.0}), res)
   overlay(plot(0), plotT(0))
 
-  res@tiMainString          = months(month(1))
+;  res@tiMainString          = months(month(1))
+  res@tiMainString          = runs(1)
   plot(1) = gsn_csm_pres_hgt(wks, zonal(1, {minP:maxP}, {30.0:90.0}), res)
 ;  plot(1) = gsn_csm_pres_hgt(wks, zonal(1, :, {30.0:90.0}), res)
   overlay(plot(1), plotT(1))
