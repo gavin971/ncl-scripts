@@ -191,14 +191,15 @@ begin
   d1=min((/dc(0),dx(0)/))
 ;  d0=365+31+15
   d0=0
-  d1=dx(0)
+;  d1=dx(0)
   data= new((/5,d1-d0/),float)
 
 ; ClOx
   data_x=LOxLatMean(R_ClO_O_col_x(d0:d1-1,:),j)+ LOxLatMean(J_Cl2O2_col_x(d0:d1-1,:),j)
   if (d1.gt.dc(0)) then
     data_c=data_x
-    data_c(0:dc(d0)-1)=LOxLatMean(R_ClO_O_col_c(d0:dc(0)-1,:),j)+ LOxLatMean(J_Cl2O2_col_c(d0:dc(0)-1,:),j)
+    data_c(0:dc(d0)-1)=LOxLatMean(R_ClO_O_col_c(d0:dc(0)-1,:),j)+ \
+                       LOxLatMean(J_Cl2O2_col_c(d0:dc(0)-1,:),j)
     data_c(dc(0):d1-1)=data_c(0:d1-dc(0)-1)
   else
     data_c=LOxLatMean(R_ClO_O_col_c(d0:d1-1,:),j)+ LOxLatMean(J_Cl2O2_col_c(d0:d1-1,:),j)
@@ -384,8 +385,8 @@ begin
   res@xyDashPatterns  = (/0,0,0,0,0/)
 ;  res@xyLineColors      = (/"black","red","green"/); change line color
 ;  res@xyDashPatterns  = (/0,0,0/)
-  res@trXMinF = time(d0)
-  res@trXMaxF = time(d1-1)
+  res@trXMinF = time(d0)-15
+  res@trXMaxF = time(d1-1)+15
   
 ;  res@xyExplicitLegendLabels=(/"O~B~2~N~ + hv -> O(~S~1~N~D) + O control", "O~B~2~N~ + hv -> O(~S~1~N~D) + O soot", "2 x O~B~3~N~ + O control", "2 x O~B~3~N~ + O soot", "2 x NO~B~2~N~ + O control", "2 x NO~B~2~N~ + O soot" /)
  ; res@xyExplicitLegendLabels=(/"2 x ClO + O", "2 x O~B~3~N~ + O", "2 x NO~B~2~N~ + O", "2 x Cl~B~2~N~O~B~2~N~ + hv" /)
@@ -403,4 +404,5 @@ end
 ; Main
 
 ;plotRatesDiff("geo6","nongeo5",2) ; 82S
-plotRatesDiff("geo6","nongeo5",-1)
+;plotRatesDiff("geo6","nongeo5",-1) ; Global average
+plotRatesDiff("geo6","nongeo5",43) ; 82N
