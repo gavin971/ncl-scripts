@@ -6,8 +6,9 @@ load "tests/core.ncl"
   system("mkdir -p dyn")
   
   srcIcPath = "/home/mills/waccm/inputdata/wa319_smax/waccm319_8_smaxa.cam2.i.2025-01-01-00000.nc"
-  srcIcPath2 = "/home/mills/waccm/inputdata/atm/waccm/ic/carmasadn3.cam2.i.1997-11-01-00000.nc"
-  icPath    = "dyn/wa3_4x5_dustsulf.nopur.extSO2.nogeo.cam2.i.2025-01-01-00000.nc"
+;  srcIcPath2 = "/home/mills/waccm/inputdata/atm/waccm/ic/carmasadn3.cam2.i.1997-11-01-00000.nc"
+  srcIcPath2 = "/home/mills/waccm/inputdata/atm/waccm/ic/nongeo5.cam2.i.1999-01-01-00000.nc"
+  icPath    = "dyn/wa3_4x5_dustsulf.pur.extSO2.nogeo.cam2.i.2025-01-01-00000.nc"
   ; Copy the initial conditions file.
   print("  Creating " + icPath)
   print("    from " + srcIcPath)
@@ -33,82 +34,82 @@ load "tests/core.ncl"
   print("  Adding H2SO4 ic... ")
   icFile->H2SO4=srcIcFile2->H2SO4
   
-  print("  Adding DUSTSUL01 ic... ")
-  icFile->DUSTSUL01=srcIcFile2->DUSTSUL01
-  print("  Adding DUSTSUL02 ic... ")
-  icFile->DUSTSUL02=srcIcFile2->DUSTSUL02
-  print("  Adding DUSTSUL03 ic... ")
-  icFile->DUSTSUL03=srcIcFile2->DUSTSUL03
-  print("  Adding DUSTSUL04 ic... ")
-  icFile->DUSTSUL04=srcIcFile2->DUSTSUL04
-  print("  Adding DUSTSUL05 ic... ")
-  icFile->DUSTSUL05=srcIcFile2->DUSTSUL05
-  print("  Adding DUSTSUL06 ic... ")
-  icFile->DUSTSUL06=srcIcFile2->DUSTSUL06
-  print("  Adding DUSTSUL07 ic... ")
-  icFile->DUSTSUL07=srcIcFile2->DUSTSUL07
-  print("  Adding DUSTSUL08 ic... ")
-  icFile->DUSTSUL08=srcIcFile2->DUSTSUL08
-  print("  Adding DUSTSUL09 ic... ")
-  icFile->DUSTSUL09=srcIcFile2->DUSTSUL09
-  print("  Adding DUSTSUL10 ic... ")
-  icFile->DUSTSUL10=srcIcFile2->DUSTSUL10
-  print("  Adding DUSTSUL11 ic... ")
-  icFile->DUSTSUL11=srcIcFile2->DUSTSUL11
-  print("  Adding DUSTSUL12 ic... ")
-  icFile->DUSTSUL12=srcIcFile2->DUSTSUL12
-  print("  Adding DUSTSUL13 ic... ")
-  icFile->DUSTSUL13=srcIcFile2->DUSTSUL13
-  print("  Adding DUSTSUL14 ic... ")
-  icFile->DUSTSUL14=srcIcFile2->DUSTSUL14
-  print("  Adding DUSTSUL15 ic... ")
-  icFile->DUSTSUL15=srcIcFile2->DUSTSUL15
-  print("  Adding DUSTSUL16 ic... ")
-  icFile->DUSTSUL16=srcIcFile2->DUSTSUL16
-  print("  Adding DUSTSUL17 ic... ")
-  icFile->DUSTSUL17=srcIcFile2->DUSTSUL17
-  print("  Adding DUSTSUL18 ic... ")
-  icFile->DUSTSUL18=srcIcFile2->DUSTSUL18
-  print("  Adding DUSTSUL19 ic... ")
-  icFile->DUSTSUL19=srcIcFile2->DUSTSUL19
-  print("  Adding DUSTSUL20 ic... ")
-  icFile->DUSTSUL20=srcIcFile2->DUSTSUL20
-  print("  Adding DUSTSUL21 ic... ")
-  icFile->DUSTSUL21=srcIcFile2->DUSTSUL21
-  print("  Adding DUSTSUL22 ic... ")
-  icFile->DUSTSUL22=srcIcFile2->DUSTSUL22
-  print("  Adding DUSTSUL23 ic... ")
-  icFile->DUSTSUL23=srcIcFile2->DUSTSUL23
-  print("  Adding DUSTSUL24 ic... ")
-  icFile->DUSTSUL24=srcIcFile2->DUSTSUL24
-  print("  Adding DUSTSUL25 ic... ")
-  icFile->DUSTSUL25=srcIcFile2->DUSTSUL25
-  print("  Adding DUSTSUL26 ic... ")
-  icFile->DUSTSUL26=srcIcFile2->DUSTSUL26
-  print("  Adding DUSTSUL27 ic... ")
-  icFile->DUSTSUL27=srcIcFile2->DUSTSUL27
-  print("  Adding DUSTSUL28 ic... ")
-  icFile->DUSTSUL28=srcIcFile2->DUSTSUL28
-  print("  Adding DUSTSUL29 ic... ")
-  icFile->DUSTSUL29=srcIcFile2->DUSTSUL29
-  print("  Adding DUSTSUL20 ic... ")
-  icFile->DUSTSUL30=srcIcFile2->DUSTSUL30
-  print("  Adding DUSTSUL31 ic... ")
-  icFile->DUSTSUL31=srcIcFile2->DUSTSUL31
-  print("  Adding DUSTSUL32 ic... ")
-  icFile->DUSTSUL32=srcIcFile2->DUSTSUL32
-  print("  Adding DUSTSUL33 ic... ")
-  icFile->DUSTSUL33=srcIcFile2->DUSTSUL33
-  print("  Adding DUSTSUL34 ic... ")
-  icFile->DUSTSUL34=srcIcFile2->DUSTSUL34
-  print("  Adding DUSTSUL35 ic... ")
-  icFile->DUSTSUL35=srcIcFile2->DUSTSUL35
-  print("  Adding DUSTSUL36 ic... ")
-  icFile->DUSTSUL36=srcIcFile2->DUSTSUL36
-  print("  Adding DUSTSUL37 ic... ")
-  icFile->DUSTSUL37=srcIcFile2->DUSTSUL37
-  print("  Adding DUSTSUL38 ic... ")
-  icFile->DUSTSUL38=srcIcFile2->DUSTSUL38
+  print("  Adding DUSSUL01 ic... ")
+  icFile->DUSSUL01=srcIcFile2->DUSSUL01
+  print("  Adding DUSSUL02 ic... ")
+  icFile->DUSSUL02=srcIcFile2->DUSSUL02
+  print("  Adding DUSSUL03 ic... ")
+  icFile->DUSSUL03=srcIcFile2->DUSSUL03
+  print("  Adding DUSSUL04 ic... ")
+  icFile->DUSSUL04=srcIcFile2->DUSSUL04
+  print("  Adding DUSSUL05 ic... ")
+  icFile->DUSSUL05=srcIcFile2->DUSSUL05
+  print("  Adding DUSSUL06 ic... ")
+  icFile->DUSSUL06=srcIcFile2->DUSSUL06
+  print("  Adding DUSSUL07 ic... ")
+  icFile->DUSSUL07=srcIcFile2->DUSSUL07
+  print("  Adding DUSSUL08 ic... ")
+  icFile->DUSSUL08=srcIcFile2->DUSSUL08
+  print("  Adding DUSSUL09 ic... ")
+  icFile->DUSSUL09=srcIcFile2->DUSSUL09
+  print("  Adding DUSSUL10 ic... ")
+  icFile->DUSSUL10=srcIcFile2->DUSSUL10
+  print("  Adding DUSSUL11 ic... ")
+  icFile->DUSSUL11=srcIcFile2->DUSSUL11
+  print("  Adding DUSSUL12 ic... ")
+  icFile->DUSSUL12=srcIcFile2->DUSSUL12
+  print("  Adding DUSSUL13 ic... ")
+  icFile->DUSSUL13=srcIcFile2->DUSSUL13
+  print("  Adding DUSSUL14 ic... ")
+  icFile->DUSSUL14=srcIcFile2->DUSSUL14
+  print("  Adding DUSSUL15 ic... ")
+  icFile->DUSSUL15=srcIcFile2->DUSSUL15
+  print("  Adding DUSSUL16 ic... ")
+  icFile->DUSSUL16=srcIcFile2->DUSSUL16
+  print("  Adding DUSSUL17 ic... ")
+  icFile->DUSSUL17=srcIcFile2->DUSSUL17
+  print("  Adding DUSSUL18 ic... ")
+  icFile->DUSSUL18=srcIcFile2->DUSSUL18
+  print("  Adding DUSSUL19 ic... ")
+  icFile->DUSSUL19=srcIcFile2->DUSSUL19
+  print("  Adding DUSSUL20 ic... ")
+  icFile->DUSSUL20=srcIcFile2->DUSSUL20
+  print("  Adding DUSSUL21 ic... ")
+  icFile->DUSSUL21=srcIcFile2->DUSSUL21
+  print("  Adding DUSSUL22 ic... ")
+  icFile->DUSSUL22=srcIcFile2->DUSSUL22
+  print("  Adding DUSSUL23 ic... ")
+  icFile->DUSSUL23=srcIcFile2->DUSSUL23
+  print("  Adding DUSSUL24 ic... ")
+  icFile->DUSSUL24=srcIcFile2->DUSSUL24
+  print("  Adding DUSSUL25 ic... ")
+  icFile->DUSSUL25=srcIcFile2->DUSSUL25
+  print("  Adding DUSSUL26 ic... ")
+  icFile->DUSSUL26=srcIcFile2->DUSSUL26
+  print("  Adding DUSSUL27 ic... ")
+  icFile->DUSSUL27=srcIcFile2->DUSSUL27
+  print("  Adding DUSSUL28 ic... ")
+  icFile->DUSSUL28=srcIcFile2->DUSSUL28
+  print("  Adding DUSSUL29 ic... ")
+  icFile->DUSSUL29=srcIcFile2->DUSSUL29
+  print("  Adding DUSSUL20 ic... ")
+  icFile->DUSSUL30=srcIcFile2->DUSSUL30
+  print("  Adding DUSSUL31 ic... ")
+  icFile->DUSSUL31=srcIcFile2->DUSSUL31
+  print("  Adding DUSSUL32 ic... ")
+  icFile->DUSSUL32=srcIcFile2->DUSSUL32
+  print("  Adding DUSSUL33 ic... ")
+  icFile->DUSSUL33=srcIcFile2->DUSSUL33
+  print("  Adding DUSSUL34 ic... ")
+  icFile->DUSSUL34=srcIcFile2->DUSSUL34
+  print("  Adding DUSSUL35 ic... ")
+  icFile->DUSSUL35=srcIcFile2->DUSSUL35
+  print("  Adding DUSSUL36 ic... ")
+  icFile->DUSSUL36=srcIcFile2->DUSSUL36
+  print("  Adding DUSSUL37 ic... ")
+  icFile->DUSSUL37=srcIcFile2->DUSSUL37
+  print("  Adding DUSSUL38 ic... ")
+  icFile->DUSSUL38=srcIcFile2->DUSSUL38
   
   print("  Adding DUST01 ic... ")
   icFile->DUST01=srcIcFile2->DUST01
@@ -263,6 +264,83 @@ load "tests/core.ncl"
   icFile->MIXSUL37=srcIcFile2->MIXSUL37
   print("  Adding MIXSUL38 ic... ")
   icFile->MIXSUL38=srcIcFile2->MIXSUL38
+
+  print("  Adding PURSUL01 ic... ")
+  icFile->PURSUL01=srcIcFile2->PURSUL01
+  print("  Adding PURSUL02 ic... ")
+  icFile->PURSUL02=srcIcFile2->PURSUL02
+  print("  Adding PURSUL03 ic... ")
+  icFile->PURSUL03=srcIcFile2->PURSUL03
+  print("  Adding PURSUL04 ic... ")
+  icFile->PURSUL04=srcIcFile2->PURSUL04
+  print("  Adding PURSUL05 ic... ")
+  icFile->PURSUL05=srcIcFile2->PURSUL05
+  print("  Adding PURSUL06 ic... ")
+  icFile->PURSUL06=srcIcFile2->PURSUL06
+  print("  Adding PURSUL07 ic... ")
+  icFile->PURSUL07=srcIcFile2->PURSUL07
+  print("  Adding PURSUL08 ic... ")
+  icFile->PURSUL08=srcIcFile2->PURSUL08
+  print("  Adding PURSUL09 ic... ")
+  icFile->PURSUL09=srcIcFile2->PURSUL09
+  print("  Adding PURSUL10 ic... ")
+  icFile->PURSUL10=srcIcFile2->PURSUL10
+  print("  Adding PURSUL11 ic... ")
+  icFile->PURSUL11=srcIcFile2->PURSUL11
+  print("  Adding PURSUL12 ic... ")
+  icFile->PURSUL12=srcIcFile2->PURSUL12
+  print("  Adding PURSUL13 ic... ")
+  icFile->PURSUL13=srcIcFile2->PURSUL13
+  print("  Adding PURSUL14 ic... ")
+  icFile->PURSUL14=srcIcFile2->PURSUL14
+  print("  Adding PURSUL15 ic... ")
+  icFile->PURSUL15=srcIcFile2->PURSUL15
+  print("  Adding PURSUL16 ic... ")
+  icFile->PURSUL16=srcIcFile2->PURSUL16
+  print("  Adding PURSUL17 ic... ")
+  icFile->PURSUL17=srcIcFile2->PURSUL17
+  print("  Adding PURSUL18 ic... ")
+  icFile->PURSUL18=srcIcFile2->PURSUL18
+  print("  Adding PURSUL19 ic... ")
+  icFile->PURSUL19=srcIcFile2->PURSUL19
+  print("  Adding PURSUL20 ic... ")
+  icFile->PURSUL20=srcIcFile2->PURSUL20
+  print("  Adding PURSUL21 ic... ")
+  icFile->PURSUL21=srcIcFile2->PURSUL21
+  print("  Adding PURSUL22 ic... ")
+  icFile->PURSUL22=srcIcFile2->PURSUL22
+  print("  Adding PURSUL23 ic... ")
+  icFile->PURSUL23=srcIcFile2->PURSUL23
+  print("  Adding PURSUL24 ic... ")
+  icFile->PURSUL24=srcIcFile2->PURSUL24
+  print("  Adding PURSUL25 ic... ")
+  icFile->PURSUL25=srcIcFile2->PURSUL25
+  print("  Adding PURSUL26 ic... ")
+  icFile->PURSUL26=srcIcFile2->PURSUL26
+  print("  Adding PURSUL27 ic... ")
+  icFile->PURSUL27=srcIcFile2->PURSUL27
+  print("  Adding PURSUL28 ic... ")
+  icFile->PURSUL28=srcIcFile2->PURSUL28
+  print("  Adding PURSUL29 ic... ")
+  icFile->PURSUL29=srcIcFile2->PURSUL29
+  print("  Adding PURSUL20 ic... ")
+  icFile->PURSUL30=srcIcFile2->PURSUL30
+  print("  Adding PURSUL31 ic... ")
+  icFile->PURSUL31=srcIcFile2->PURSUL31
+  print("  Adding PURSUL32 ic... ")
+  icFile->PURSUL32=srcIcFile2->PURSUL32
+  print("  Adding PURSUL33 ic... ")
+  icFile->PURSUL33=srcIcFile2->PURSUL33
+  print("  Adding PURSUL34 ic... ")
+  icFile->PURSUL34=srcIcFile2->PURSUL34
+  print("  Adding PURSUL35 ic... ")
+  icFile->PURSUL35=srcIcFile2->PURSUL35
+  print("  Adding PURSUL36 ic... ")
+  icFile->PURSUL36=srcIcFile2->PURSUL36
+  print("  Adding PURSUL37 ic... ")
+  icFile->PURSUL37=srcIcFile2->PURSUL37
+  print("  Adding PURSUL38 ic... ")
+  icFile->PURSUL38=srcIcFile2->PURSUL38
 
   print("  IC Done.")
 
