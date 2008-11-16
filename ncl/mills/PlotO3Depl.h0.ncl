@@ -32,7 +32,7 @@ begin
   print((/historyRun/))
   historyPath = getHistoryPath(historyRun)
   print((/historyPath/))
-  historyPattern = historyPath+historyRun+".mean.h0.1997.nc"
+  historyPattern = historyPath+historyRun+".mean.h0.199[78].nc"
   print((/historyPattern/))
 ;  historyPattern = historyRun+"/"+historyRun+".mean.h0.199[67].nc"
   historyNames = systemfunc("ls " + historyPattern)
@@ -42,7 +42,7 @@ begin
   print((/controlRun/))
   controlPath = getHistoryPath(controlRun)
   print((/controlPath/))
-  controlPattern = controlPath+controlRun+".mean.h0.1997.nc"
+  controlPattern = controlPath+controlRun+".mean.h0.199[78].nc"
   print((/controlPattern/))
 ;  controlPattern = controlRun+"/"+controlRun+".mean.h0.199[67].nc"
   controlNames = systemfunc("ls " + controlPattern)
@@ -65,7 +65,9 @@ begin
   lat=O3_col_x&lat
   O3_col_pct_loss!1="lat"
   O3_col_pct_loss&lat=lat 
-     
+  print("time:")
+  print((/time/))
+  
   wks = gsn_open_wks("pdf", "O3Depletion.h0")
 
   res = True
@@ -100,17 +102,19 @@ begin
 ;  year=1996
   year=1997
 ;  yearlast=1997
-  yearlast=1998
+  yearlast=1999
   nyears=yearlast-year
 ;  nmonths =12*nyears ;h3
 ;  nmonths =12*nyears+2
-  nmonths = 12
+  nmonths = 12*nyears
     
   months  = new(nmonths,integer)
   years  = new(nmonths,integer)
    
   months(0:11) = ispan(1,12,1)
+  months(12:23) = ispan(1,12,1)
   years(0:11) = year
+  years(12:23) = year+1
 ;  months(12:13) = ispan(1,2,1)
 ;  years(12:13) = year+1
   
@@ -129,7 +133,8 @@ begin
   end do
 
   imonth      = 0
-  days_accum  = 365.+31. ; January average is dated Feb 1
+;  days_accum  = 365.+31. ; January average is dated Feb 1
+  days_accum  = 215.
   if (nmonths .lt. 60) then
     tk_per_mon  =2                                     ; Tickmarks per month.
     nticks       = nmonths * tk_per_mon ;h3
@@ -147,17 +152,19 @@ begin
     res@tmXBValues         = major_ticks
     res@tmXBLabels         = new(nticks,string)
     res@tmXBLabels(:)     = ""
-
+    
+    print("major_ticks:")
+    print((/major_ticks/))
     print("nticks="+nticks)
     monthnames=(/"J","F","M","A","M","J","J","A","S","O","N","D"/)
     print("monthnames:"+dimsizes(monthnames))
     print("labels:"+dimsizes(res@tmXBLabels(::tk_per_mon)))
     print("nticks/tk_per_mon="+nticks/tk_per_mon)
-    print("months: "+months)
+    print("months: "+(/months/))
     
    ; Label mid tickmark with the month label.
     res@tmXBLabels(0::tk_per_mon)  = monthnames(months-1)
-;    print("tmXBLabels:"+res@tmXBLabels)
+    print("tmXBLabels:"+(/res@tmXBLabels/))
     
   else
     tk_per_year=12
@@ -261,9 +268,9 @@ begin
   res@trXMinF = time(0)
   res@trXMaxF = time(dimsizes(time)-1)
 ;  res@trXMaxF = 365.*2.+31.
-  res@trYMaxF = 5 ; h0
+  res@trYMaxF = 20 ; h0
 ;  res@trYMaxF = 45 ; h3
-  res@trYMinF = -30  ; h0
+  res@trYMinF = -20  ; h0
 ;  res@trYMinF = -45  ; h3
   res@xyLineThicknessF = 3.0
   res@tmXBLabelFontHeightF = 0.02

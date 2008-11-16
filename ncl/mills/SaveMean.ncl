@@ -436,7 +436,7 @@ begin
 end
 
 undef("saveMeanFiles")
-procedure saveMeanFiles(historyRun:string, pattern:string)
+procedure saveMeanFiles(historyRun:string, pattern:string, subDir:string)
 
 local historyPattern1,historyNames1,history1,historyPattern2,historyNames2, \
   history2,T,Tmean,pi,pm,press,temp,tmean,saveFile1,saveFile2
@@ -453,7 +453,7 @@ begin
 ;  historyPattern1=historyRun+"/"+historyRun+".cam2.h3.1995*.nc"
 ;  historyPattern2=historyRun+"/"+historyRun+".cam2.h0.1996*.nc"
 ;  historyPattern3=historyRun+"/"+historyRun+".cam2.h3.1997*.nc"
-  historyPattern=historyPath+"*.cam2."+pattern+"*.nc"
+  historyPattern=historyPath+subDir+"/*.cam2."+pattern+"*.nc"
   
 ;  saveMeanVars(historyRun, historyPattern1, saveFile1)
 ;  saveMeanVars(historyRun, historyPattern2, saveFile2)  
@@ -468,15 +468,16 @@ begin
 end
 
 undef("saveMeans")
-procedure saveMeans(historyRun:string, controlRun:string, pattern:string)
+procedure saveMeans(historyRun:string, controlRun:string, \
+                     pattern:string, subDir:string)
 
 begin
 
   print((/historyRun/))  
-  saveMeanFiles(historyRun, pattern)
+  saveMeanFiles(historyRun, pattern, subDir)
   
   print((/controlRun/))  
-  saveMeanFiles(controlRun, pattern)
+  saveMeanFiles(controlRun, pattern, subDir)
 
 end
 
@@ -484,4 +485,5 @@ end
 
 ;saveMeans("geoengn4","carmasadn3")
 ;saveMeans("geo2","nongeo2")
-saveMeanFiles("geo6","h0.1997")
+saveMeanFiles("geo6","h3.1999","daily")
+;saveMeans("geo6","nongeo5","h3.1998","daily")

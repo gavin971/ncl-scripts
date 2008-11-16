@@ -1,7 +1,7 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-load "/ptmp/mills/tests/getHistoryPath.ncl"
+load "tests/getHistoryPath.ncl"
 
 undef("LOxLatMean")
 function LOxLatMean(Rate[*][*]:float,j:integer)
@@ -23,13 +23,13 @@ return(LOx)
 end
 
 undef("plotRatesDiff")
-procedure plotRatesDiff(historyRun:string, controlRun:string)
+procedure plotRatesDiff(historyRun:string, controlRun:string, j:integer)
 
 begin
   print((/historyRun/))
   historyPath = getHistoryPath(historyRun)
   print((/historyPath/))
-  historyPattern = historyPath+historyRun+".mean.h3.*.nc"
+  historyPattern = historyPath+historyRun+".mean.h0.*.nc"
   historyNames = systemfunc("ls " + historyPattern)
   print((/historyNames/))
   history = addfiles(historyNames, "r")
@@ -71,7 +71,7 @@ begin
   print((/controlPath/))
 ;  saveMeanVars(controlRun,False)
 ;  saveMeanLOxFiles(controlRun)
-  controlPattern = controlPath+controlRun+".mean.h3*.nc"
+  controlPattern = controlPath+controlRun+".mean.h0*.nc"
   controlNames = systemfunc("ls " + controlPattern)
   print((/controlNames/))
   control = addfiles(controlNames, "r")
@@ -143,15 +143,14 @@ begin
   lat=R_O3_O_col_x&lat
  
   print("")
-  j=-1
   res = True
   if (j.eq.-1) then
     print(" Plotting global mean...")
-    wks = gsn_open_wks("pdf", "RatesDiff_GlobAvg")
+    wks = gsn_open_wks("pdf", "RatesDiff.h0_GlobAvg")
     txString = "Global Mean"
   else
     print(" Plotting at latitude "+lat(j)+"...")
-    wks = gsn_open_wks("pdf", "RatesDiff_"+lat(j))
+    wks = gsn_open_wks("pdf", "RatesDiff.h0_"+lat(j))
     txString = "Latitude: "+lat(j)
   end if
   gsn_define_colormap(wks,"BlAqGrYeOrReVi200")
@@ -192,7 +191,7 @@ begin
   d1=min((/dc(0),dx(0)/))
 ;  d0=365+31+15
   d0=0
-  d1=d0+365+120 ; March 23
+  d1=dx(0)
   data= new((/5,d1-d0/),float)
 
 ; ClOx
@@ -205,7 +204,9 @@ begin
     data_c=LOxLatMean(R_ClO_O_col_c(d0:d1-1,:),j)+ LOxLatMean(J_Cl2O2_col_c(d0:d1-1,:),j)
   end if
   data(0,:)=2e-8*(data_x-data_c)
+  print("====================ClOx=============================")
   print((/data_x/)+" | "+(/data_c/)+" | "+(/data(0,:)/))
+  print("=====================================================")
 
 ; Ox    
   data_x=LOxLatMean(R_O3_O_col_x(d0:d1-1,:),j)
@@ -216,6 +217,9 @@ begin
     data_c=LOxLatMean(R_O3_O_col_c(d0:d1-1,:),j)
   end if
   data(1,:)=2e-8*(data_x-data_c)
+  print("=====================Ox==============================")
+  print((/data_x/)+" | "+(/data_c/)+" | "+(/data(1,:)/))
+  print("=====================================================")
 
 ; NOx   
   data_x=LOxLatMean(R_NO2_O_col_x(d0:d1-1,:),j)
@@ -226,6 +230,9 @@ begin
     data_c=LOxLatMean(R_NO2_O_col_c(d0:d1-1,:),j)
   end if
   data(2,:)=2e-8*(data_x-data_c)
+  print("====================NOx=============================")
+  print((/data_x/)+" | "+(/data_c/)+" | "+(/data(2,:)/))
+  print("=====================================================")
 
 ; HOx  
   data_x= LOxLatMean(R_OH_O_col_x(d0:d1-1,:),j)+ LOxLatMean(R_HO2_O_col_x(d0:d1-1,:),j)+ \
@@ -240,6 +247,9 @@ begin
             LOxLatMean(R_HO2_O3_col_c(d0:d1-1,:),j)
   end if
   data(3,:)=2e-8*(data_x-data_c)
+  print("====================HOx=============================")
+  print((/data_x/)+" | "+(/data_c/)+" | "+(/data(3,:)/))
+  print("=====================================================")
 
 ; Brox             
   data_x=LOxLatMean(J_NO3_b_col_x(d0:d1-1,:),j)+ LOxLatMean(R_BrO_ClOa_col_x(d0:d1-1,:),j)+ \
@@ -251,10 +261,14 @@ begin
            LOxLatMean(R_BrO_O_col_c(d0:dc(0)-1,:),j)+ LOxLatMean(R_BrO_BrO_col_c(d0:dc(0)-1,:),j)
     data_c(dc(0):d1-1)=data_c(d0:d1-dc(0)-1)
   else
-    data_c= LOxLatMean(R_OH_O_col_c(d0:d1-1,:),j)+ LOxLatMean(R_HO2_O_col_c(d0:d1-1,:),j)+ \
-            LOxLatMean(R_HO2_O3_col_c(d0:d1-1,:),j)
+    data_c= LOxLatMean(J_NO3_b_col_c(d0:d1-1,:),j)+ LOxLatMean(R_BrO_ClOa_col_c(d0:d1-1,:),j)+ \
+         LOxLatMean(J_HOBr_col_c(d0:d1-1,:),j)+ LOxLatMean(R_BrO_ClOb_col_c(d0:d1-1,:),j)+ \
+         LOxLatMean(R_BrO_O_col_c(d0:d1-1,:),j)+ LOxLatMean(R_BrO_BrO_col_c(d0:d1-1,:),j)
   end if    
   data(4,:)=2e-8*(data_x-data_c)
+  print("====================BrOx=============================")
+  print((/data_x/)+" | "+(/data_c/)+" | "+(/data(4,:)/))
+  print("=====================================================")
   
 ;===================================================================
 ; Do special labels on X axis. There will be 6 tickmarks per each
@@ -262,14 +276,13 @@ begin
 ; treating minor tickmarks like major tickmarks, and vice versa, since
 ; only the major tickmarks can actually be labeled.
 ;
+  nmonths =d1-d0+1
   year=1998
-  yearlast=1999
-  nyears=yearlast-year
-  xmn = 5
-  nmonths =12*nyears+xmn
-  
+  nyears=floattoint(nmonths/12)+1  
+  yearlast=year+nyears-1
   months  = new(nmonths,integer)
   years  = new(nmonths,integer)
+  xmn = mod(nmonths,12)
   
 ;  month1=1 ; Starts in January
   
@@ -281,8 +294,11 @@ begin
     years(i:i+11)=year
     months(i:i+11) =ispan(1,12,1) 
   end do
-  months(nmonths-xmn:nmonths-1)=ispan(1,xmn,1)
-  years(nmonths-xmn:nmonths-1)=yearlast
+
+  if (xmn.gt.0) then
+    months(nmonths-xmn:nmonths-1)=ispan(1,xmn,1)
+    years(nmonths-xmn:nmonths-1)=yearlast
+  end if
   
   day_in_mon  = new(nmonths,float)           ; Number of days in each month
   do i=0,nmonths-1
@@ -291,15 +307,16 @@ begin
 
   imonth      = 0
 ;  days_accum  = 31.
-  days_accum  = dble2flt((/time(d0)/)) - 17.
+  days_accum  = dble2flt((/time(d0)/))
   print(days_accum)
   if (nmonths .lt. 60) then
-    tk_per_mon  =4                                     ; Tickmarks per month.
+    tk_per_mon  = 2                                ; Tickmarks per month.
     nticks       = nmonths * tk_per_mon
     major_ticks = new(nticks,float)    ; Array to hold major tickmark values.
     ii5         = ispan(1,tk_per_mon-1,1)*1.
     do i=0,nticks-1,tk_per_mon
       major_ticks(i) = days_accum
+      print(i+" "+imonth+" "+days_accum+" "+nmonths)
       major_ticks(i+1:i+tk_per_mon-1) = major_ticks(i) + ii5*(day_in_mon(imonth)/tk_per_mon)
       days_accum     = days_accum + day_in_mon(imonth)
       imonth = imonth + 1
@@ -316,7 +333,8 @@ begin
     print("nticks/tk_per_mon="+nticks/tk_per_mon)
 
    ; Label mid tickmark with the month label.
-    res@tmXBLabels(4::tk_per_mon)  = monthnames(months(:nmonths-2)-1)
+    print((/months/))
+    res@tmXBLabels(0::tk_per_mon)  = monthnames(months-1)
 ;    print("tmXBLabels:")
 ;    print((/res@tmXBValues/)+":"+(/res@tmXBLabels/))
     
@@ -384,4 +402,5 @@ end
 
 ; Main
 
-plotRatesDiff("geo6","nongeo5")
+;plotRatesDiff("geo6","nongeo5",2) ; 82S
+plotRatesDiff("geo6","nongeo5",-1)
