@@ -38,7 +38,9 @@ load "tests/getHistoryPath.ncl"
 ;=========================================
 
 undef("setupbins")
-procedure setupbins(nbin:integer, rmin:float, rmrat:float, rho:float, rmass[*]:float, r[*]:float, dr[*]:float, rmassup[*]:float, dm[*]:float, vol[*]:float, rup[*]:float, rlow[*]:float)
+procedure setupbins(nbin:integer, rmin:float, rmrat:float, rho:float, \
+     rmass[*]:float, r[*]:float, dr[*]:float, rmassup[*]:float, dm[*]:float, \
+     vol[*]:float, rup[*]:float, rlow[*]:float)
 
 local cpi, i, vrfact
 
@@ -211,7 +213,9 @@ end
 ;=========================================
 
 undef("calcSulfRad")
-procedure calcSulfRad(history:file, mixsulnd:float, wtpct:float, sulfDens:float, coreName:string, rmass:float, arho:float, sulfRad:float, coreRad:float, pureRad:float, skipbin:integer)
+procedure calcSulfRad(history:file, mixsulnd:float, wtpct:float, sulfDens:float, \
+     coreName:string, rmass:float, arho:float, sulfRad:float, coreRad:float, \
+     pureRad:float, skipbin:integer)
 
 local b, binName, nBins, mmr, coremass, cpi, voltot
 
@@ -591,5 +595,5 @@ end
 ;saveSize("125expuT15","125expuT15.cam2.h3.",-1) 
 ;saveSize("125expuT15","125expuT15.cam2.h3.1997-07-[123]",-1) 
 ;saveSize("125expuT15","125expuT15.cam2.h3.1997-08",-1) 
-saveSize("geo6","geo6.cam2",-1) 
+saveSize("125smin","125smin.cam2",-1) 
 

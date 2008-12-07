@@ -485,5 +485,5 @@ end
 
 ;saveMeans("geoengn4","carmasadn3")
 ;saveMeans("geo2","nongeo2")
-saveMeanFiles("geo6","h0.1999","h0")
-;saveMeans("geo6","nongeo5","h3.1998","daily")
+saveMeanFiles("nogeoPurSpin1","h3.1995","daily")
+;saveMeans("geoPurSpin1","nogeoPurSpin1","h3.1995","daily")

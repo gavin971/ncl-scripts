@@ -17,6 +17,7 @@ PTOP    = 100.0                   ; pressure at the top of the model (non-zero) 
 REARTH  = 6.37122e6               ; Earth's radius (m)
 
 load "tests/core.ncl"
+load "tests/getHistoryPath.ncl"
 
 
 undef("getT_1999")
@@ -27,7 +28,8 @@ local files, nFiles, histories
 begin
 
   ; Get date from April thorugh October.
-  histPath = "run/" + WACCM_RUN + "/" + WACCM_RUN + "*cam2.h3.1997-0[456789]*.nc"
+  historyPath = getHistoryPath(WACCM_RUN)
+  histPath = historyPath + "daily/*cam2.h3.1997-0[456789]*.nc"
   files = systemfunc("ls " + histPath)
   nFiles = dimsizes(files)
   
@@ -219,7 +221,9 @@ end
 ;  WACCM_RUN = "results"
 ;end if
 ;WACCM_RUN = "expuT125E01"
-WACCM_RUN = "ep10rt02"
+;WACCM_RUN = "ep10rt02"
+;WACCM_RUN = "125smin"
+WACCM_RUN = "125expuT15"
 print("Using WACCM_RUN: " + WACCM_RUN)
 print("")
 
