@@ -516,7 +516,7 @@ begin
       pursulndbin!3="lon"
       pursulndbin&lon=lon
       pursulndbin!4="bins"   
-      pursulndbin@long_name="mixed sulfate number density per bin"
+      pursulndbin@long_name="pure sulfate number density per bin"
       pursulndbin@units="/cm3"
       getN(writefile, "PURSUL", rmass, arho, pursulndbin, skipbin)
       writefile->PURSULNDBIN=pursulndbin
@@ -563,7 +563,7 @@ begin
       pureRad!3="lon"
       pureRad&lon=lon
       pureRad!4="bins"   
-      pureRad@long_name="mixed sulfate radius"
+      pureRad@long_name="pure sulfate radius"
       pureRad@units="cm"
       
 ;      if (.not.(isvar(mixsulndbin))) then

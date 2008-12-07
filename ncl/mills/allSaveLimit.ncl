@@ -253,6 +253,6 @@ end
 ;saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-0[45]*") 
 ;saveSizeLimit("125expuT15","all.125expuT15.cam2.h3.1997-06-[01]*") 
 
-;saveSizeLimit("125smin","all.125smin.cam2.h3*") 
+saveSizeLimit("125smin","all.125smin.cam2.h0*") 
 ;saveSizeLimit("125expuT15b","all.125expuT15b.cam2.h3*") 
-saveSizeLimit("125expuT15b","all.125expuT15b.cam2.h3.1998-04-30*") 
+;saveSizeLimit("125expuT15b","all.125expuT15b.cam2.h3.1998-04-30*") 
