@@ -136,10 +136,11 @@ procedure plotTContours1999()
 begin
 
   files = (/ "analysis/lubken1999jgr_table8.nc", \
-             "analysis/saber_T_wg_v1.nc", \
-             "analysis/expuT125E01/tlub_1999.nc", \
-             "analysis/125expuT15/tlub_1999.nc", \
-             "analysis/125smin/tlub_1999.nc" \
+             "analysis/125smin/tlub_1999.nc", \
+             "analysis/saber_T_wg_v1.nc" \
+;             "analysis/expuT125E01/tlub_1999.nc", \
+;             "analysis/125expuT15/tlub_1999.nc", \
+;             "analysis/125smin/tlub_1999.nc" \
 ;             "analysis/gw6_e125/tlub_1999.nc" \
           /)
 ;  names = (/ "Lubken [1999]", \
@@ -148,10 +149,11 @@ begin
 ;            "tb*=6.00, eff=0.1250" \
 ;          /)
   names = (/ " Lubken [1999]", \
-            " SABER, 2007", \
-            " WACCM 66 levels, smax", \
-            " WACCM 125 levels, smax", \
-            " WACCM 125 levels, smin" \
+            " WACCM 125 levels, solar min", \
+            " SABER, 2007" \
+;            " WACCM 66 levels, smax", \
+;            " WACCM 125 levels, smax", \
+;            " WACCM 125 levels, solar min" \
           /)
           
 ;  timeScale = (/ 1., 30., 30., 30. /)
@@ -159,8 +161,9 @@ begin
 ;  timeScale = (/ 1., 30., 30. /)
 ;  timeOffset = (/ 0., 4., 1. /)
           
-  timeScale = (/ 1., 30., 30., 30., 30. /)
-  timeOffset = (/ 0., 1., 3., 4., 4. /)
+  timeScale = (/ 1., 30., 30./);, 30., 30. /)
+;  timeOffset = (/ 0., 1., 3., 4., 4. /)
+  timeOffset = (/ 0., 4., 1. /)
 
   nFiles = dimsizes(files)
   plot = new(nFiles, "graphic")
@@ -170,7 +173,7 @@ begin
   gsn_define_colormap(wks, "rainbow")  ; choose a colormap
 
   resP                      = True    
-  resP@txString             = "Temperature at 70~S~o~N~N, WACCM vs. observations,"
+  resP@txString             = "Temperature at 70~S~o~N~N, WACCM vs. observations"
   resP@gsnMaximize          = True
   resP@gsnPanelLabelBar     = True
   resP@lbTitleString        =  "K"                ; turn on title
@@ -348,27 +351,27 @@ begin
   altitude = (/ 82.0, 84.0, 86.0, 88.0, 90.0, 92.0 /)
 
   files = (/ "analysis/lubken1999jgr_table8.nc", \
-             "analysis/expuT125E01/tlub_1999.nc", \
+;             "analysis/expuT125E01/tlub_1999.nc", \
              "analysis/saber_T_wg_v1.nc", \
              "analysis/125expuT15/tlub_1999.nc", \
              "analysis/125smin/tlub_1999.nc" \
-;             "analysis/gw6_e125/tlub_1999.nc" \
           /)
   names = (/ " Lubken [1999]", \
-            " WACCM 66 levels", \
+;            " WACCM 66 levels", \
             " SABER, 2007", \
-            " WACCM 125 levels smin)", \
-            " WACCM 125 levels smax)" \
+            " WACCM, solar max", \
+            " WACCM, solar min" \
           /)
           
 ;  timeScale = (/ 1., 30., 30., 30. /)
 ;  timeOffset = (/ 0., 4., 4., 1. /)
-  timeScale = (/ 1., 30., 30., 30., 30. /)
-  timeOffset = (/ 0., 3., 1., 2., 2. /)
+  timeScale = (/ 1., 30., 30., 30. /);, 30. /)
+;  timeOffset = (/ 0., 3., 1., 2., 2. /)
+  timeOffset = (/ 0., 1., 4., 4. /)
           
-  lineColors = (/ "black", "red", "blue", "green", "orange" /)
-  lineDashes = (/ 0, 0, 0, 0 , 0/)
-  lineThicknesses = (/ 6.0, 4.0, 4.0, 4.0, 4.0 /)
+  lineColors = (/ "black", "red", "blue" , "green" /);, "orange" /)
+  lineDashes = (/ 0, 0, 0 , 0 /);, 0/)
+  lineThicknesses = (/ 6.0, 4.0, 4.0, 4.0 /);, 4.0 /)
   
   nFiles = dimsizes(files)
   plot = new(8, "graphic")
@@ -903,5 +906,5 @@ plotTContours1999()
 ;plotTatZ1999(88.0)
 ;plotTatZ1999(90.0)
 ;plotTatZ1999(92.0)
-;plotTatAlts1999()
+plotTatAlts1999()
 

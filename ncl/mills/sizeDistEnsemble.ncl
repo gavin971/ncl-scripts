@@ -8,7 +8,8 @@ load "tests/getHistoryPath.ncl"
 ;************************************************
 
 undef("sizeDistEnsemble")
-procedure sizeDistEnsemble(caseid:string, targetLat:float, targetDate:string, file1:string)
+procedure sizeDistEnsemble(caseid:string, targetLat:float, targetDate:string, \
+                           targetLev:float, file1:string, file2:string)
 
 begin
   print("")
@@ -16,19 +17,26 @@ begin
   historyPath=getHistoryPath(caseid)
   
   ifile=historyPath+"daily/"+file1
- ; Get the total number of times.
+ ; Open the sulfate file
   print("")
-  print("  Opening File ...")
+  print("  Opening sulfate file ...")
   print("    " + ifile)
   history = addfile(ifile, "r")
-;    ListSetType(histories, "cat")
-
-  P0    = history->P0
-  hyam  = history->hyam
-  hybm  = history->hybm
+  
+ ; Open the dust file
+  print("")
+  print("  Opening dust file ...")
+  print("    " + file2)
+  dustfile = addfile(file2, "r")
 
   time  = history->time
   date  = history->date
+  
+ ; vars(time, lev, lat, lon, bins)
+  print("  reading DUSTNDBIN")
+  dustndbin  = history->DUSTNDBIN
+  print("  reading DUSTRAD")
+  dustrad  = history->DUSTRAD
 
  ; vars(time, lev, lat, lon, bins)
   print("  reading MIXSULNDBIN")
@@ -49,9 +57,6 @@ begin
 
 ;    nBins=dimsizes(dustrad)
 
-;    targetLev=0.002404575    ; ~86 km at 78N (?)
-  targetLev=0.00584271015  ; 83 km at 78N
-
  ; ratio of mass in bin i to bin i+1:
   rmrat = 2.0
   dlog10r = (1./3.)*log10(rmrat)
@@ -68,13 +73,18 @@ begin
   
   data2   = pursulndbin(iTime,{targetLev},{targetLat},:,:)
   radius2 = purerad(iTime,{targetLev},{targetLat},:,:)
+  
+  data3   = dustndbin(iTime,{targetLev},{targetLat},:,:)
+  radius3 = dustrad(:)
 
  ; convert to dN/dlog10r
   data = data / dlog10r
   data2 = data2 / dlog10r
+  data3 = data3 / dlog10r
   
   print("mixsulf:"+min(data)+" | "+max(data))
   print("pursulf:"+min(data2)+" | "+max(data2))
+  print("dust:"+min(data3)+" | "+max(data3))
 
   data@long_name="dN/dlogr (# cm~S~-3~N~)"
   data@units="/cm3"
@@ -83,6 +93,10 @@ begin
   data2@long_name="dN/dlogr (# cm~S~-3~N~)"
   data2@units="/cm3"
   data2@_FillValue=0.0
+  
+  data3@long_name="dN/dlogr (# cm~S~-3~N~)"
+  data3@units="/cm3"
+  data3@_FillValue=0.0
 
   radius=radius*1e7  ; convert cm -> nm
   radius@long_name="sulfate radius (nm)"
@@ -92,8 +106,13 @@ begin
   radius2@long_name="sulfate radius (nm)"
   radius2@units="nm"
   
-  print("mixsulf:"+min(radius)+" | "+max(radius))
+  radius3=radius3*1e7  ; convert cm -> nm
+  radius3@long_name="dust radius (nm)"
+  radius3@units="nm"
+  
+  print("mixsulf:"+min(radius) +" | "+max(radius))
   print("pursulf:"+min(radius2)+" | "+max(radius2))
+  print("dust:   "+min(radius3)+" | "+max(radius3))
 
  ;************************************************
  ; plotting parameters
@@ -125,7 +144,7 @@ begin
   res@trYMinF = 1e-5
   res@trYMaxF = 1e5
 
-  res@trXMinF = 0.1  ; 0.1 to 100 nm range x-axis
+  res@trXMinF = 0.2  ; 0.2 to 100 nm range x-axis
   res@trXMaxF = 100
 
 ;    res@tmEqualizeXYSizes = True
@@ -138,15 +157,19 @@ begin
 
   res@vpXF=0.3  ; move left edge of viewport overs
     
-  resO = res
-  resO@xyLineColor = "red"
+  res2 = res
+  res2@xyLineColor = "red"
+    
+  res3 = res
+  res3@xyLineColor = "black"
   
 ;  nPlots = 2
 ;  plot = new((/ nPlots /), graphic)
 
-  plot2 = gsn_csm_xy (wks,radius2,data2,resO) ; draw second plot
+  plot2 = gsn_csm_xy (wks,radius2,data2,res2) ; draw second plot
+  plot3 = gsn_csm_xy (wks,radius,data,res)    ; draw third plot
   
-  plot  = gsn_csm_xy (wks,radius,data,res) ; create plot
+  plot  = gsn_csm_xy (wks,radius3,data3,res3) ; create plot
 ;  overlay(plot, plot2)
   
   resP                      = True
@@ -159,15 +182,28 @@ begin
   resP@gsnPanelXWhiteSpacePercent = 5
   resP@tiMainString          = caseid
   overlay(plot, plot2)
+  overlay(plot, plot3)
   
   gsn_panel(wks, plot, (/ 1, 1 /), resP)
 
 end ; procedure sizeDistEnsemble()
 
-caseid = "125smin"
 targetLat = 78
+;targetLat = 82
+;targetLev=0.002404575    ; ~86 km at 78N (?)
+targetLev=0.00230591145   ; 86.7 km at 78N
+;targetLev=0.0016106433  ; 88.1 km at 78N
+;targetLev=0.0011211287  ; 89.5 km at 78N
+;targetLev=0.00584271015  ; 83 km at 78N
+;targetLev=0.00395005   ; 84.3 km at 82N
+
+caseid = "125smin"
+
 ;targetDate = "19970701"
 ;file1 = "all.125smin.cam2.h3.1997-06-30-00000.nc"
+;targetDate = "19970709"
+;;file1 = "all.125smin.cam2.h3.1997-07-05-00000.nc"
+file2 = "/ptmp/bardeen/waccm/carma/run/125_lt_gw2_28/125_lt_gw2_28.cam2.h0.2028-06-15-00000.nc"
 
 ;targetDate = "19970715"
 ;file1 = "all.125smin.cam2.h3.1997-07-15-00000.nc"
@@ -175,10 +211,11 @@ targetLat = 78
 ;targetDate = "19970615"
 ;file1 = "all.125smin.cam2.h3.1997-06-15-00000.nc"
 
-;targetDate = "19970601"
-;file1 = "all.125smin.cam2.h3.1997-05-31-00000.nc"
+targetDate = "19970601"
+file1 = "all.125smin.cam2.h3.1997-05-31-00000.nc"
+file2 = "/ptmp/bardeen/waccm/carma/run/125_lt_gw2_28/125_lt_gw2_28.cam2.h0.2028-05-16-00000.nc"
 
-targetDate = "19970801"
-file1 = "all.125smin.cam2.h3.1997-07-30-00000.nc"
+;targetDate = "19970801"
+;file1 = "all.125smin.cam2.h3.1997-07-30-00000.nc"
 
-sizeDistEnsemble(caseid, targetLat, targetDate, file1)
+sizeDistEnsemble(caseid, targetLat, targetDate, targetLev, file1, file2)

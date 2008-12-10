@@ -14,8 +14,8 @@ procedure monave_za()
 local files, nFiles, historyFile
 
 begin
-  runname="Solar Max"
-;  runname="Solar Min"
+;  runname="Solar Max"
+  runname="Solar Min"
   
   print("")
   print(runname)
@@ -152,12 +152,16 @@ begin
   
  ; Calculate the zonal monthly average of particles r > 1 nm
   print("Averaging July N1 ...")
-  T_month=dim_avg_Wrap(totsul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
+;  T_month=dim_avg_Wrap(totsul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
+  T_month=dim_avg_Wrap(pursul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
+;  T_month=dim_avg_Wrap(mixsul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
   print("Zonally averaging July N1 ...")  
   N1s(lev|:,lat|:, run|1) = dim_avg(T_month(lev|:,lat|:,lon|:))
   
   print("Averaging January N1 ...")
-  T_month=dim_avg_Wrap(totsul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
+;  T_month=dim_avg_Wrap(totsul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
+  T_month=dim_avg_Wrap(pursul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
+;  T_month=dim_avg_Wrap(mixsul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
   print("Zonally averaging January N1 ...")  
   N1s(lev|:,lat|:, run|0) = dim_avg(T_month(lev|:,lat|:,lon|:))
   
@@ -249,18 +253,18 @@ begin
 ;  res@lbTitleString        = zonal@units
 ;  res@lbLabelStride         = 3
 
-  res@cnLevelSelectionMode  = "ManualLevels" 
+;  res@cnLevelSelectionMode  = "ManualLevels" 
 ;  print("      min :  " + min(zonal(:, {minP:maxP}, :)))
 ;  print("      max :  " + max(zonal(:, {minP:maxP}, :)))
-  res@cnLevelSpacingF       = 5.0                  ; contour interval
-  res@cnMinLevelValF        = 5.0                  ; contour interval
-  res@cnMaxLevelValF        = 100.0                 ; contour interval  
+;  res@cnLevelSpacingF       = 5.0                  ; contour interval
+;  res@cnMinLevelValF        = 5.0                  ; contour interval
+;  res@cnMaxLevelValF        = 100.0                 ; contour interval  
 ;  res@tiMainString          = runname
 
-;  res@cnLevelSelectionMode  = "ExplicitLevels"
-;  res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
-;      200, 300, 500, 750, 1000, 2000, 3000, 5000, 7500, 10000 /)
-;  res@lbLabelAngleF = 60
+  res@cnLevelSelectionMode  = "ExplicitLevels"
+  res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
+      200, 300, 500, 750, 1000, 2000, 3000, 5000 /);, 7500, 10000 /)
+  res@lbLabelAngleF = 60
   
   res@tiMainString          = months(month(0))
   
