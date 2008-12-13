@@ -153,15 +153,15 @@ begin
  ; Calculate the zonal monthly average of particles r > 1 nm
   print("Averaging July N1 ...")
 ;  T_month=dim_avg_Wrap(totsul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
-  T_month=dim_avg_Wrap(pursul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
-;  T_month=dim_avg_Wrap(mixsul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
+;  T_month=dim_avg_Wrap(pursul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
+  T_month=dim_avg_Wrap(mixsul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
   print("Zonally averaging July N1 ...")  
   N1s(lev|:,lat|:, run|1) = dim_avg(T_month(lev|:,lat|:,lon|:))
   
   print("Averaging January N1 ...")
 ;  T_month=dim_avg_Wrap(totsul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
-  T_month=dim_avg_Wrap(pursul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
-;  T_month=dim_avg_Wrap(mixsul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
+;  T_month=dim_avg_Wrap(pursul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
+  T_month=dim_avg_Wrap(mixsul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
   print("Zonally averaging January N1 ...")  
   N1s(lev|:,lat|:, run|0) = dim_avg(T_month(lev|:,lat|:,lon|:))
   
@@ -184,7 +184,8 @@ begin
 ;  resP@lbTitlePosition      = "Right"              ; title position
 ;  resP@lbTitleFontHeightF   = .015                ; make title smaller
 ;  resP@lbTitleDirection     = "Across"             ; title direction
-  resP@gsnPanelXWhiteSpacePercent = 5
+  resP@gsnPanelXWhiteSpacePercent = 0.5
+  resP@gsnPanelYWhiteSpacePercent = 0.5
   resP@lbLabelStride        = 1
   resP@lbLabelAngleF        = 60
   resP@tiMainString          = runname
@@ -210,6 +211,11 @@ begin
   res@tmYLValues    = (/0.1, 0.01, 0.001, 0.0001/)
   res@tmYLLabels    = (/"0.1", "0.01", "0.001", "0.0001"/)
   res@tmYLMinorOn   = True        ; No minor tick marks
+
+  res@tmXBLabelFontHeightF  = 0.03   ; increase tickmark font size
+  res@tmYRLabelFontHeightF  = 0.03   ; increase tickmark font size
+  res@tmYLLabelFontHeightF  = 0.03   ; increase tickmark font size
+  res@tmYLLabelAngleF      = 60
   
 ;  res@tmYRMode      = "Automatic" ; Define own tick mark labels.
 ;  res@tmYRLabelFont = 25         ; Change the font.
@@ -259,7 +265,7 @@ begin
 ;  res@cnLevelSpacingF       = 5.0                  ; contour interval
 ;  res@cnMinLevelValF        = 5.0                  ; contour interval
 ;  res@cnMaxLevelValF        = 100.0                 ; contour interval  
-;  res@tiMainString          = runname
+;;  res@tiMainString          = runname
 
   res@cnLevelSelectionMode  = "ExplicitLevels"
   res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
@@ -267,6 +273,7 @@ begin
   res@lbLabelAngleF = 60
   
   res@tiMainString          = months(month(0))
+  res@tiMainFontHeightF         = 0.04
   
   plot(0) = gsn_csm_pres_hgt(wks, zonal(0, {minP:maxP}, {-90.0:-30.0}), res)
 ;  plot(0) = gsn_csm_pres_hgt(wks, zonal(0, {minP:maxP}, {30.0:90.0}), res)

@@ -358,7 +358,8 @@ begin
 ;  resP@lbTitlePosition      = "Right"              ; title position
 ;  resP@lbTitleFontHeightF   = .015                ; make title smaller
 ;  resP@lbTitleDirection     = "Across"             ; title direction
-  resP@gsnPanelXWhiteSpacePercent = 5
+  resP@gsnPanelXWhiteSpacePercent = 0.5
+  resP@gsnPanelYWhiteSpacePercent = 0.5
   resP@lbLabelStride        = 1
         
   res                       = True
@@ -376,6 +377,10 @@ begin
 ;  res@lbTitlePosition       = "Right"              ; title position
 ;  res@lbTitleDirection      = "Across"             ; title direction
 ;  resP@lbTitleFontHeightF   = .015                ; make title smaller
+  res@tmXBLabelFontHeightF  = 0.03   ; increase tickmark font size
+  res@tmYRLabelFontHeightF  = 0.03   ; increase tickmark font size
+  res@tmYLLabelFontHeightF  = 0.03   ; increase tickmark font size
+  res@tmYLLabelAngleF      = 60
   
   resO                      = True
   resO@gsnDraw              = False
@@ -419,6 +424,7 @@ begin
   res@cnMinLevelValF        = 5.0                  ; contour interval
   res@cnMaxLevelValF        = 100.0                 ; contour interval  
   res@tiMainString          = runs(0)
+  res@tiMainFontHeightF         = 0.04
   
   res@tiMainString          = months(month(0))
   plot(0) = gsn_csm_pres_hgt(wks, zonal(0, {minP:maxP}, {-90.0:-30.0}), res)

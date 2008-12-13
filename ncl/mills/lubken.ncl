@@ -374,7 +374,7 @@ begin
   lineThicknesses = (/ 6.0, 4.0, 4.0, 4.0 /);, 4.0 /)
   
   nFiles = dimsizes(files)
-  plot = new(8, "graphic")
+  plot = new(4, "graphic")
     
   ; Plot the data.
 ;  wks  = gsn_open_wks("pdf", sprintf("images/lubken1999_%3.1fkm", altitude))    ; open a ncgm file
@@ -385,9 +385,10 @@ begin
   resP@txString             = "WACCM vs. Observations, 70~S~o~N~N"
 ;  resP@gsnDraw              = False
   resP@gsnFrame             = False
-  resP@gsnMaximize          = True
+  resP@gsnMaximize          = False
   resP@gsnPanelXWhiteSpacePercent = 5
 ;  resP@gsnPanelYWhiteSpacePercent = 5
+  resP@gsnPaperOrientation  = "landscape"
 
   res                      = True
   res@gsnDraw              = False
@@ -519,20 +520,20 @@ begin
       plot(0) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(0)}, :), res)
       plot(1) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(1)}, :), res1)
       plot(2) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(2)}, :), res2)
-      plot(3) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(3)}, :), res3)
-      plot(4) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(4)}, :), res4)
-      plot(5) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(5)}, :), res5)
-      plot(6) = gsn_csm_xy(wks, tmp&time(:), dataT(:), resT)
-      plot(7) = gsn_csm_xy(wks, tmp&time(:), tmp&z(imp), resZ)
+;      plot(3) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(3)}, :), res3)
+;      plot(4) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(4)}, :), res4)
+;      plot(5) = gsn_csm_xy(wks, tmp&time(:), tmp({altitude(5)}, :), res5)
+      plot(3) = gsn_csm_xy(wks, tmp&time(:), dataT(:), resT)
+;      plot(7) = gsn_csm_xy(wks, tmp&time(:), tmp&z(imp), resZ)
     else
       overlay(plot(0), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(0)}, :), res))
       overlay(plot(1), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(1)}, :), res))
       overlay(plot(2), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(2)}, :), res))
-      overlay(plot(3), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(3)}, :), res))
-      overlay(plot(4), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(4)}, :), res))
-      overlay(plot(5), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(5)}, :), res))
-      overlay(plot(6), gsn_csm_xy(wks, tmp&time(:), dataT(:), resT))
-      overlay(plot(7), gsn_csm_xy(wks, tmp&time(:), Zmin(:), resZ))
+;      overlay(plot(3), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(3)}, :), res))
+;      overlay(plot(4), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(4)}, :), res))
+;      overlay(plot(5), gsn_csm_xy(wks, tmp&time(:), tmp({altitude(5)}, :), res))
+      overlay(plot(3), gsn_csm_xy(wks, tmp&time(:), dataT(:), resT))
+;      overlay(plot(7), gsn_csm_xy(wks, tmp&time(:), Zmin(:), resZ))
     end if
 
     delete(T)
@@ -543,11 +544,11 @@ begin
     delete(Zmin)
   end do
   
-  gsn_panel(wks, plot, (/ 2, 4 /), resP)
+  gsn_panel(wks, plot, (/ 2, 2 /), resP)
 
   legend = create "Legend" legendClass wks 
     "vpXF"                     : 0.1                    ; orientation on page
-    "vpYF"                     : 0.2
+    "vpYF"                     : -0.275
     "vpWidthF"                 : 0.8                     ; width
     "vpHeightF"                : 0.1                     ; height
     "lgPerimOn"                : True                   ; no perimeter
@@ -561,7 +562,7 @@ begin
     "lgMonoLineLabelFontColor" : True                    ; one label color
     "lgAutoManage"             : False
     "lgLabelPosition"          : "Center"
-    "lgLabelJust"              : "CenterLeft"
+    "lgLabelJust"              : "CenterCenter"
   end create
 
   draw(legend)  
@@ -898,7 +899,7 @@ end
 
 ;plotLubkenFile1999()
 ;plotLubkenFile2004()
-plotTContours1999()
+;plotTContours1999()
 ;plotTContours2004()
 ;plotTatZ1999(82.0)
 ;plotTatZ2004(82.0)
