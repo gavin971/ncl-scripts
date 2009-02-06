@@ -1,6 +1,7 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
+load "tests/getHistoryPath.ncl"
 
 undef("plotSOy")
 procedure plotSOy(historyRun:string,year:string,day:integer)
@@ -9,7 +10,9 @@ local historyNames
 
 begin
 
-  historyPattern=historyRun+"/*.cam2."+year+"*.nc"
+  historyPath = getHistoryPath(historyRun)
+  
+  historyPattern=historyPath+"*.cam2."+year+"*.nc"
 ;  sizePattern=historyRun+"/all.*.cam2.h0."+year+"*.nc"
   historyNames = systemfunc("ls " + historyPattern)
 ;  sizeNames = systemfunc("ls " + sizePattern)
@@ -48,10 +51,10 @@ begin
 ;************************************************
 ; plotting parameters
 ;************************************************
-  wks   = gsn_open_wks ("pdf","SO2_30N_"+historyRun+"_d"+day)      ; open workstation
+  wks   = gsn_open_wks ("pdf","SOy_30N_"+historyRun+"_d"+day)      ; open workstation
 
   res                   = True                     ; plot mods desired
-  res@tiMainString      = "SO2 (pptv)"             ; add title
+;  res@tiMainString      = "SO2 (pptv)"             ; add title
   res@trYReverse        = True                     ; reverse Y-axis
   res@trYLog            = True                     ; log Y-axis
   res@trXLog            = True                     ; log X-axis
@@ -63,31 +66,80 @@ begin
   res@trXMaxF           = 1000.0
   res@tiYAxisString     ="Pressure (hPa)"
   res@tiXAxisString     ="Volume mixing ratio (pptv)"
-  res@xyLineThickness = 4.0
+  
+  res@tmYLMode   = "Explicit" ; Define own tick mark labels.
+  res@tmYLValues = (/1000.,  100.,  10., 1., 0.1, 0.01, 0.001, 0.0001/)
+  res@tmYLLabels = (/"1000","100", "10", "1", "0.1", "0.01", "0.001", "0.0001"/)
+  res@tmYLMinorOn= False        ; No minor tick marks.
+  
+; If the maximium height is greater than 85 km, then theheight estimates from
+; gsn_geop_hgt are not accurate. In this case, use a height axis which is just
+; a table of values every 10km from 0 - 200km based on the US Standard
+; Atmosphere.
 
-  data2      = new((/6,nlev/),float)
+  res@tmYRMode     = "Explicit"
+  res@tmYUseLeft   = False
+  res@tmYROn       = True
+  res@tmYRLabelsOn = True
+  res@tmYRValues   =  (/ 1013.25, 264.99, 55.293, 11.970, 2.8714, 0.79779, \
+               0.21958, 5.2209e-2, 1.0524e-2, 1.8359e-3, 3.2011e-4, \
+               7.1042e-5, 2.5382e-5, 1.2505e-5, 7.2028e-6, 4.5422e-6, \
+               3.0395e-6, 2.1210e-6, 1.5271e-6, 1.1266e-6, 8.4736e-7 /)
+  res@tmYRLabels   =  (/ "0", "10", "20", "30", "40", "50", \
+               "60", "70", "80", "90", "100", \
+               "110", "120", "130", "140", "150", \
+               "160", "170", "180", "190", "200" /)
 
-  data2(0,:) = dim_avg(SO2({day},:,{30},:))*1e12 ; longitudinal average
-  print("SO2:"+min(data2(0,:)))
-  data2(1,:) = dim_avg(H2SO4({day},:,{30},:))*1e12
-  print("H2SO4:"+min(data2(1,:)))
-  data2(2,:) = dim_avg(OCS({day},:,{30},:))*1e12
-  print("OCS:"+min(data2(2,:)))
-  data2(3,:) = dim_avg(SO3({day},:,{30},:))*1e12
-  print("SO3:"+min(data2(3,:)))
-  data2(4,:) = dim_avg(SOY({day},:,{30},:))*1e12
-  print("SOY:"+min(data2(4,:)))
-;  data2(5,:) = dim_avg(PURSULVMR({day},:,{30},:))*1e12
-  data2(5,:) = dim_avg(MIXSULVMR({day},:,{30},:))*1e12
-  print("MIXSULVMR:"+min(data2(5,:)))
+  res@xyLineThicknessF = 4.0
+
+  data      = new((/6,nlev/),float)
+
+  data(0,:) = dim_avg(SO2({day},:,{30},:))*1e12 ; longitudinal average
+  print("SO2:"+min(data(0,:)))
+  data(1,:) = dim_avg(H2SO4({day},:,{30},:))*1e12
+  print("H2SO4:"+min(data(1,:)))
+  data(2,:) = dim_avg(OCS({day},:,{30},:))*1e12
+  print("OCS:"+min(data(2,:)))
+  data(3,:) = dim_avg(SO3({day},:,{30},:))*1e12
+  print("SO3:"+min(data(3,:)))
+  data(4,:) = dim_avg(SOY({day},:,{30},:))*1e12
+  print("SOY:"+min(data(4,:)))
+;  data(5,:) = dim_avg(PURSULVMR({day},:,{30},:))*1e12
+  data(5,:) = dim_avg(MIXSULVMR({day},:,{30},:))*1e12
+  print("MIXSULVMR:"+min(data(5,:)))
   data = where (data.gt.0, data, data@_FillValue)
-  print("DATA:"+min(data2))
+  print("DATA:"+min(data))
 
   res@xyDashPattern = 0               ; Make curves all solid
   res@xyLineColors = (/"Red","Blue","Green","Brown","Black","Orange" /)
   
 ;  z=dim_avg(Z3({day},:,{30},:))
-  plot  = gsn_csm_xy (wks,data2,lev,res) ; create plot
+
+  res@gsnDraw   = False
+  res@gsnFrame  = False
+  
+  calldraw      = get_res_value(res,"gsnDraw", True)
+  callframe     = get_res_value(res,"gsnFrame",True)
+  maxbb         = get_bb_res(res)
+  
+  plot  = gsn_csm_xy (wks,data,lev,res) ; create plot
+  
+  rightaxis_string = create "right_axis" textItemClass wks
+    "txString"      : "Height (km)"
+    "txAngleF"      : 90.
+  end create
+
+  anno = NhlAddAnnotation(plot,rightaxis_string)
+  setvalues anno
+    "amZone"          : 3      ; Just outside plot area
+    "amJust"          : "centercenter"
+    "amSide"          : "right" 
+    "amParallelPosF"  : 0.5
+    "amOrthogonalPosF": 0.03
+    "amResizeNotify"  : True     ; Resize if plot resized.
+  end setvalues
+  
+  draw_and_frame(wks,plot,calldraw,callframe,0,maxbb)
 
 end
 
