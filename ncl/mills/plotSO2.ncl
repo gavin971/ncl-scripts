@@ -5,13 +5,13 @@ load "tests/getHistoryPath.ncl"
 load "tests/common.ncl"
 
 undef("plotSO2")
-procedure plotSO2(historyRun:string,year:string,day_offset:integer)
+procedure plotSO2(historyRun:string,year:string,month:string,day_offset:integer)
 
 local historyNames
 
 begin
 
-  historyPattern=getHistoryPath(historyRun)+"daily/*.cam2.h3."+year+"*.nc"
+  historyPattern=getHistoryPath(historyRun)+"daily/*.cam2.h3."+year+month+"*.nc"
   historyNames = systemfunc("ls " + historyPattern)
   print(historyNames)
   history = addfiles(historyNames, "r")
@@ -42,7 +42,7 @@ begin
 ;************************************************
 ; plotting parameters
 ;************************************************
-  wks   = gsn_open_wks ("pdf","images/SO2_30N_"+historyRun) ; open workstation
+  wks   = gsn_open_wks ("pdf","images/SO2_30N_"+historyRun+"_"+year) ; open workstation
 
   res                   = True                       ; plot mods desired
   res@gsnFrame               = False                     ; don't draw yet
@@ -60,7 +60,7 @@ begin
   res@tiYAxisString     ="Pressure (hPa)"
   res@tiXAxisString     ="SO2 (pptv)"
   res@xyLineThicknesses = (/2.0,8.0,2.0/)
-  res@xyLineColor       = "Blue"
+;  res@xyLineColor       = "Blue"
   res@xyMonoLineColor   = True
   res@gsnMaximize       = True
   res@gsnPaperOrientation = "portrait"
@@ -154,5 +154,6 @@ end
 ;plotSO2("coag04-2","1996-0[345]",365)
 ;plotSO2("nopur2_ncar","1995-0[45]",0)
 ;plotSO2("JPL06_ncar","1995-0[45]",0)
-plotSO2("125smin","1997-0[45]",-90)
+plotSO2("125smin","1997","-0[45]",-90)
+;plotSO2("125smin","1998","-0[45]",365-90)
 ;plotSO2("125expuT15","1997-0[45]",-90)

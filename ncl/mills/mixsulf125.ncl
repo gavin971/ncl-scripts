@@ -26,7 +26,7 @@ begin
   
   if (runname .eq. "Solar Min") then
   
-    historyPattern="waccm/dust-sulfur/run/125smin/daily/all.125smin.cam2.h3.1997-0[67]*"
+    historyPattern="waccm/dust-sulfur/run/125smin/daily/all.125smin.cam2.h3.1998-0[67]*"
     
     historyPattern2="waccm/dust-sulfur/run/125smin/daily/all.125smin.cam2.h3.1998-01*"
     historyNames2 = systemfunc("ls " + historyPattern2)
@@ -91,8 +91,10 @@ begin
   totsul10A2 = mixsul10A2 ; get dim wrappers
   totsul10A2 = totsul10A2 + pursul10A2
   
-  time0701=ind(date.eq."19970701")
-  time0731=ind(date.eq."19970731")
+;  time0701=ind(date.eq."19970701")
+;  time0731=ind(date.eq."19970731")
+  time0701=ind(date.eq."19980701")
+  time0731=ind(date.eq."19980731")
  
   time0101=ind(date2.eq."19980101")
   time0131=ind(date2.eq."19980131")
@@ -152,16 +154,16 @@ begin
   
  ; Calculate the zonal monthly average of particles r > 1 nm
   print("Averaging July N1 ...")
-;  T_month=dim_avg_Wrap(totsul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
+  T_month=dim_avg_Wrap(totsul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
 ;  T_month=dim_avg_Wrap(pursul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
-  T_month=dim_avg_Wrap(mixsul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
+;  T_month=dim_avg_Wrap(mixsul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
   print("Zonally averaging July N1 ...")  
   N1s(lev|:,lat|:, run|1) = dim_avg(T_month(lev|:,lat|:,lon|:))
   
   print("Averaging January N1 ...")
-;  T_month=dim_avg_Wrap(totsul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
+  T_month=dim_avg_Wrap(totsul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
 ;  T_month=dim_avg_Wrap(pursul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
-  T_month=dim_avg_Wrap(mixsul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
+;  T_month=dim_avg_Wrap(mixsul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
   print("Zonally averaging January N1 ...")  
   N1s(lev|:,lat|:, run|0) = dim_avg(T_month(lev|:,lat|:,lon|:))
   
@@ -240,7 +242,7 @@ begin
   months = (/ "Dec", "January", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov" /)
 
   ; Open a workstation
-  wks = gsn_open_wks("pdf","images/mixsulf125")
+  wks = gsn_open_wks("pdf","images/totsulf125")
   gsn_define_colormap(wks,"gui_default")                ; choose colormap
   
   print("")
@@ -259,12 +261,15 @@ begin
 ;  res@lbTitleString        = zonal@units
 ;  res@lbLabelStride         = 3
 
-;  res@cnLevelSelectionMode  = "ManualLevels" 
+  res@cnLevelSelectionMode  = "ManualLevels" 
 ;  print("      min :  " + min(zonal(:, {minP:maxP}, :)))
 ;  print("      max :  " + max(zonal(:, {minP:maxP}, :)))
-;  res@cnLevelSpacingF       = 5.0                  ; contour interval
-;  res@cnMinLevelValF        = 5.0                  ; contour interval
-;  res@cnMaxLevelValF        = 100.0                 ; contour interval  
+
+; Contours by 10 up to 200:
+;  res@cnLevelSpacingF       = 10.0                  ; contour interval
+;  res@cnMinLevelValF        = 10.0                  ; contour interval
+;  res@cnMaxLevelValF        = 200.0                 ; contour interval
+
 ;;  res@tiMainString          = runname
 
   res@cnLevelSelectionMode  = "ExplicitLevels"
