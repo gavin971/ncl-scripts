@@ -7,6 +7,8 @@ RGAS    = AVOGAD*BOLTZ            ; Universal gas constant ~ J/K/kmole
 MWDAIR  = 28.966                  ; molecular weight dry air ~ kg/kmole
 RDAIR   = RGAS/MWDAIR             ; Dry air gas constant ~ J/K/kg
 
+load "tests/getHistoryPath.ncl"
+
 ; Calculate parameters of the air based upon the data in the history file.
 ;
 undef("setupair")
@@ -30,19 +32,17 @@ begin
 end
 
 undef("saveSOy")
-procedure saveSOy(historyRun:string,prefix:string)
+procedure saveSOy(historyRun:string,pattern:string)
 
 ;  inputs: historyRun, i.e. "coag04"
-;          prefix, i.e. "nopur2.cam2.h0.1995"
+;          pattern, i.e. "nopur2.cam2.h0.1995"
 
 local historyNames,rmin,cpi,rmassmin,writefile,hrc,nhrc,fc
 
 begin
-  historyPath="run/"+historyRun+"/"
-;  historyPattern=historyPath+prefix+"*.nc"
-; Create array of files matching pattern
-;  historyNames = systemfunc("ls " + historyPattern)
-  historyNames = systemfunc("ls " + historyPath + " | grep " + prefix)
+  historyPath = getHistoryPath(historyRun)
+  historyNames = systemfunc("ls " + historyPath + " | grep " + pattern)
+  print(historyNames)
   hrc=stringtochar(historyRun)
   nhrc=dimsizes(hrc)
 
@@ -117,5 +117,6 @@ end
 ;saveSOy("geo2","geo2.cam2.h3.1996-1[12]")
 ;saveSOy("geo2","geo2.cam2.h3.1997")
 ;saveSOy("nongeo2","nongeo2.cam2.h3.1997")
-
-saveSOy("expuT125E01","expuT125E01.cam2.h3.1997-10-17") 
+;saveSOy("expuT125E01","expuT125E01.cam2.h3.1997-10-17") 
+saveSOy("nogeoPurSpin1","nogeoPurSpin1.cam2.h3.1995-09") 
+saveSOy("nogeoPurSpin1","nogeoPurSpin1.cam2.h3.1995-10") 

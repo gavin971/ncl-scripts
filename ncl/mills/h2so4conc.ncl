@@ -128,4 +128,5 @@ begin
   
 end
 
-h2so4conc("125smin","all.125smin.cam2.h3.1997-[01][09]") 
+;h2so4conc("125smin","all.125smin.cam2.h3.1997-[01][09]") 
+h2so4conc("nogeoPurSpin1","all.nogeoPurSpin1.cam2.h3.1995-[01][09]") 
