@@ -4,7 +4,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "tests/getHistoryPath.ncl"
 
 undef("plotSOy")
-procedure plotSOy(historyRun:string,year:string,day:integer)
+procedure plotSOy(historyRun:string,pattern:string,day:integer)
 
 local historyNames
 
@@ -12,7 +12,7 @@ begin
 
   historyPath = getHistoryPath(historyRun)
   
-  historyPattern=historyPath+"*.cam2."+year+"*.nc"
+  historyPattern=historyPath+pattern+"*.nc"
 ;  sizePattern=historyRun+"/all.*.cam2.h0."+year+"*.nc"
   historyNames = systemfunc("ls " + historyPattern)
 ;  sizeNames = systemfunc("ls " + sizePattern)
@@ -143,10 +143,13 @@ begin
 
 end
 
-plotSOy("nongeo2","h0.1996-05",151+365)
-;plotSOy("geo2","h0.1996-05",151+365q)
+;plotSOy("nongeo2","h0.1996-05",151+365)
+;plotSOy("geo2","h0.1996-05",151+365)
 
 ;plotSOy("coag04","1995-01-01",1)
 ;plotSOy("coag04-2","1995-12-31",365+1)
 ;plotSOy("coag04-2","1996-12-26",728)
 ;plotSOy("nopur2_ncar","1995-07-05",185)
+
+;plotSOy("125smin","monthly/*.cam2.h0.1997-11",244)
+plotSOy("125smin","monthly/*.cam2.h0.1997-05",61)
