@@ -12,11 +12,21 @@ load "tests/getDataPath.ncl"
 ;*************************************************
 
 begin
+
   dataPath=getDataPath()
+  
+;*************************************************
+;*************************************************  
   ATLAS08_20N = readAsciiTable(dataPath+"ATMOS/SPARC_Fig2.9/8-20N.txt", 4,"float",1)
   ATLAS20_30N = readAsciiTable(dataPath+"ATMOS/SPARC_Fig2.9/20-30N.txt",2,"float",1)
   ATLAS30_40N = readAsciiTable(dataPath+"ATMOS/SPARC_Fig2.9/30-40N.txt",2,"float",1)
   ATLAS40_49N = readAsciiTable(dataPath+"ATMOS/SPARC_Fig2.9/40-49N.txt",2,"float",1)
+  
+  Manitoba19960724 = readAsciiTable(dataPath+"Geoff Toon OCSvN2O/96.07.24Manitoba.txt",5,"float",2)
+  NewMexico19960928 = readAsciiTable(dataPath+"Geoff Toon OCSvN2O/96.09.28NewMexico.txt",5,"float",2)
+  Fairbanks19970508 = readAsciiTable(dataPath+"Geoff Toon OCSvN2O/97.05.08Fairbanks.txt",5,"float",2)
+  Fairbanks19970708a = readAsciiTable(dataPath+"Geoff Toon OCSvN2O/97.07.08FairbanksAscent.txt",5,"float",2)
+  Fairbanks19970708d = readAsciiTable(dataPath+"Geoff Toon OCSvN2O/97.07.08FairbanksDescent.txt",5,"float",2)
   
   historyRun="125smin"
   historyPattern=getHistoryPath(historyRun)+"daily/*.cam2.h3.1997-11*.nc"

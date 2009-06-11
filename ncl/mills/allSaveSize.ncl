@@ -433,8 +433,10 @@ begin
       if (isfilevar(writefile,"MIXSULVMR")) then
         mixsulvmr = writefile->MIXSULVMR
       else
-        mixsulvmr = writefile->MIXSULMD
         print("Calculating the mixed sulfate vmr ...")
+        mixsulvmr = writefile->MIXSULMD
+        dussulmd = writefile->DUSSULMD
+        mixsulvmr = mixsulvmr - dussulmd ; subtract core mass from sulfate (5/19/2009)
   ; (mol/mol)=(g/cm3)/(g/cm3)*(g/mol Air)/(g/mol H2SO4)
   ;   (28.964 g/mol Air)/(98.0734 g/mol H2SO4) =0.2953
         mixsulvmr=mixsulvmr(:,:,:,:)/arho(:,:,:,:)*0.2953
@@ -591,9 +593,12 @@ begin
 end
 
 ; Main
+; Files located in subdirectory "new" under filepath
 
 ;saveSize("125expuT15","125expuT15.cam2.h3.",-1) 
 ;saveSize("125expuT15","125expuT15.cam2.h3.1997-07-[123]",-1) 
 ;saveSize("125expuT15","125expuT15.cam2.h3.1997-08",-1) 
-saveSize("125smin","125smin.cam2",-1) 
+;saveSize("125smin","125smin.cam2",-1) 
+
+saveSize("nogeoPurSpin1","nogeoPurSpin1.cam2",-1) 
 

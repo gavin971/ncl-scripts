@@ -151,5 +151,5 @@ end
 ;plotSOy("coag04-2","1996-12-26",728)
 ;plotSOy("nopur2_ncar","1995-07-05",185)
 
-;plotSOy("125smin","monthly/*.cam2.h0.1997-11",244)
+plotSOy("125smin","monthly/*.cam2.h0.1997-11",244)
 plotSOy("125smin","monthly/*.cam2.h0.1997-05",61)

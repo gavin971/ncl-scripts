@@ -45,6 +45,8 @@ begin
   
   print("reading H2SO4")
   H2SO4    = addfiles_GetVar(history, historyNames, "H2SO4")
+  print("reading H2SO4eq")
+  H2SO4eq    = addfiles_GetVar(history, historyNames, "H2SO4EQ")
   print("reading P")
   P    = addfiles_GetVar(history, historyNames, "PRESSURE")
   print("reading T")
@@ -58,10 +60,13 @@ begin
   AIR = AIR / BOLTZ / T
   print("calculating H2SO4 conc")
   H2SO4conc = H2SO4 ; Get metadata
+  H2SO4eqconc = H2SO4eq ; Get metadata
   
   H2SO4conc = H2SO4conc * AIR 
+  H2SO4eqconc = H2SO4eqconc * AIR 
   
   H2SO4ave = dim_avg_Wrap(dim_avg_Wrap(dim_avg_Wrap(H2SO4conc(lev|:, time|:, {lat|38:46}, lon|:))))
+  H2SO4eqave = dim_avg_Wrap(dim_avg_Wrap(dim_avg_Wrap(H2SO4eqconc(lev|:, time|:, {lat|38:46}, lon|:))))
   Z        = dim_avg_Wrap(dim_avg_Wrap(dim_avg_Wrap(Z3(lev|:, time|:, {lat|38:46}, lon|:))))
   Z = Z / 1000. ; convert m -> km
   
@@ -70,13 +75,18 @@ begin
   H2SO4min = dim_min(dim_min(dim_min(H2SO4conc(lev|:, time|:, {lat|38:46}, lon|:))))
   H2SO4max = dim_max(dim_max(dim_max(H2SO4conc(lev|:, time|:, {lat|38:46}, lon|:))))
   
+  H2SO4eqmin = H2SO4eqave ; Get metadata
+  H2SO4eqmax = H2SO4eqave ; Get metadata
+  H2SO4eqmin = dim_min(dim_min(dim_min(H2SO4eqconc(lev|:, time|:, {lat|38:46}, lon|:))))
+  H2SO4eqmax = dim_max(dim_max(dim_max(H2SO4eqconc(lev|:, time|:, {lat|38:46}, lon|:))))
+  
 ; when v 5.1.1 comes out...
 ;  H2SO4min = dim_min_n(H2SO4conc(time|:, {lat|38:46}, lon|:, lev|:),(/0,1,2/))
 ;  H2SO4max = dim_max_n(H2SO4conc(time|:, {lat|38:46}, lon|:, lev|:),(/0,1,2/))
 ;  H2SO4ave = dim_avg_n_Wrap(H2SO4conc(time|:, {lat|38:46}, lon|:, lev|:),(/0,1,2/))
 ;  Z        = dim_avg_n_Wrap(Z3(time|:, {lat|38:46}, lon|:, lev|:),(/0,1,2/))
 
-  wks = gsn_open_wks("pdf", "H2SO4conc.h3")
+  wks = gsn_open_wks("pdf", "H2SO4conc.h3."+historyRun)
 
   res = True
   gsn_define_colormap(wks,"BlAqGrYeOrReVi200")
@@ -86,13 +96,14 @@ begin
 ;  res@gsnXYFillColors = "red" ; fill color to use between two adjacent curves in an XY plot (gsn_csm_xy), doesn't work for vertical plots
   
   res@xyMonoLineThickness = False
-  res@xyLineThicknesses = (/2.0,4.0,2.0/)
-  res@xyLineColors      = (/"red","brown","red"/); change line color
-  res@xyDashPatterns=(/0,0,0/)
+  res@xyLineThicknesses = (/2.0,4.0,2.0,2.0,4.0,2.0/)
+  res@xyLineColors      = (/"red","brown","red","green","green4","green"/); change line color
+  res@xyDashPatterns=(/0,0,0,0,0,0/)
   res@trXLog            = True                     ; log X-axis
   res@trYMaxF           = 100.0                    ; 100 km upper bound
 ;  res@xyComputeXMin     = True
-  res@trXMinF           = 1
+  res@trXMinF           = 0.1
+  res@trXMaxF           = 1e9
   res@tiYAxisString     ="Geopotential Height (km)"
   res@tiXAxisString     ="H~B~2~N~SO~B~4~N~ concentration (cm~S~-3~N~)"
 
@@ -102,10 +113,13 @@ begin
 ;  print("max:"+dimsizes(H2SO4max))
 ;  print("Z:"+dimsizes(Z))
   
-  data= new((/3,dimsizes(lev)/),float)
+  data= new((/6,dimsizes(lev)/),float)
   data(0,:)=H2SO4min(:)
   data(1,:)=H2SO4ave(:)
   data(2,:)=H2SO4max(:)
+  data(3,:)=H2SO4eqmin(:)
+  data(4,:)=H2SO4eqave(:)
+  data(5,:)=H2SO4eqmax(:)
   
   plot = gsn_csm_xy(wks, data, Z, res)
   
@@ -118,15 +132,15 @@ begin
 ;  plot  = fill_xy2(wks,plot(0),time,mnmx(0,:),mnmx(1,:),(/1.0,0.71,0.76/),\
 ;  (/1.0,0.71,0.76/))
 
-  a = addfile(historyPath+"H2SO4conc.nc","c")
-  a->lev=lev
-  a->date=date
-  a->Z=Z
-  a->H2SO4min=H2SO4min
-  a->H2SO4ave=H2SO4ave
-  a->H2SO4max=H2SO4max
+;  a = addfile(historyPath+"H2SO4conc.nc","c")
+;  a->lev=lev
+;  a->date=date
+;  a->Z=Z
+;  a->H2SO4min=H2SO4min
+;  a->H2SO4ave=H2SO4ave
+;  a->H2SO4max=H2SO4max
   
 end
 
-;h2so4conc("125smin","all.125smin.cam2.h3.1997-[01][09]") 
-h2so4conc("nogeoPurSpin1","all.nogeoPurSpin1.cam2.h3.1995-[01][09]") 
+h2so4conc("125smin","all.125smin.cam2.h3.1997-[01][09]") 
+;h2so4conc("nogeoPurSpin1","all.nogeoPurSpin1.cam2.h3.1995-[01][09]") 

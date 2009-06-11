@@ -169,7 +169,7 @@ begin
   print("calculating column")
 
   ; volume mixing ratios:
-  print("Reading vmr...")
+  print("Reading conc...")
   conc=addfiles_GetVar(history, historyNames, var)
   levcol=conc*zdel
   lat=conc&lat
@@ -313,91 +313,109 @@ begin
   
   print("J_HOBr")
   J_HOBr_col =calcCol_conc(history, historyNames, "J_HOBr", zdel)
+  J_HOBr_col@units="molec/cm2/s"
   saveFile->J_HOBr_col=J_HOBr_col
   delete(J_HOBr_col)
   
   print("J_HOCl")
   J_HOCl_col =calcCol_conc(history, historyNames, "J_HOCl", zdel)
+  J_HOCl_col@units="molec/cm2/s"
   saveFile->J_HOCl_col=J_HOCl_col
   delete(J_HOCl_col)
     
   print("J_NO")
   J_NO_col=calcCol_conc(history, historyNames, "J_NO", zdel)
+  J_NO_col@units="molec/cm2/s"
   saveFile->J_NO_col=J_NO_col
   delete(J_NO_col)
   
   print("J_NO3_b")
   J_NO3_b_col  =calcCol_conc(history, historyNames, "J_NO3_b", zdel)
+  J_NO3_b_col@units="molec/cm2/s"
   saveFile->J_NO3_b_col=J_NO3_b_col
   delete(J_NO3_b_col)
   
   print("J_O2_a")
   J_O2_a_col =calcCol_conc(history, historyNames, "J_O2_a", zdel)
+  J_O2_a_col@units="molec/cm2/s"
   saveFile->J_O2_a_col=J_O2_a_col
   delete(J_O2_a_col)
   
   print("J_O2_b")
   J_O2_b_col  =calcCol_conc(history, historyNames, "J_O2_b", zdel)
+  J_O2_b_col@units="molec/cm2/s"
   saveFile->J_O2_b_col=J_O2_b_col
   delete(J_O2_b_col)
   
   print("R_BrO_BrO")
   R_BrO_BrO_col  =calcCol_conc(history, historyNames, "R_BrO_BrO", zdel)
+  R_BrO_BrO_col@units="molec/cm2/s"
   saveFile->R_BrO_BrO_col=R_BrO_BrO_col
   delete(R_BrO_BrO_col)
   
   print("R_BrO_ClOa")
   R_BrO_ClOa_col   =calcCol_conc(history, historyNames, "R_BrO_ClOa", zdel)
+  R_BrO_ClOa_col@units="molec/cm2/s"
   saveFile->R_BrO_ClOa_col=R_BrO_ClOa_col
   delete(R_BrO_ClOa_col)
 
   print("R_BrO_ClOb")
   R_BrO_ClOb_col   =calcCol_conc(history, historyNames, "R_BrO_ClOb", zdel)
+  R_BrO_ClOb_col@units="molec/cm2/s"
   saveFile->R_BrO_ClOb_col=R_BrO_ClOb_col
   delete(R_BrO_ClOb_col)
 
   print("R_BrO_O")
   R_BrO_O_col   =calcCol_conc(history, historyNames, "R_BrO_O", zdel)
+  R_BrO_O_col@units="molec/cm2/s"
   saveFile->R_BrO_O_col=R_BrO_O_col
   delete(R_BrO_O_col)
 
   print("R_CH3O2_NO")
   R_CH3O2_NO_col   =calcCol_conc(history, historyNames, "R_CH3O2_NO", zdel)
+  R_CH3O2_NO_col@units="molec/cm2/s"
   saveFile->R_CH3O2_NO_col=R_CH3O2_NO_col
   delete(R_CH3O2_NO_col)
 
   print("R_CLO_O")
   R_CLO_O_col   =calcCol_conc(history, historyNames, "R_CLO_O", zdel)
+  R_CLO_O_col@units="molec/cm2/s"
   saveFile->R_CLO_O_col=R_CLO_O_col
   delete(R_CLO_O_col)
 
   print("R_HO2_O")
   R_HO2_O_col   =calcCol_conc(history, historyNames, "R_HO2_O", zdel)
+  R_HO2_O_col@units="molec/cm2/s"
   saveFile->R_HO2_O_col=R_HO2_O_col
   delete(R_HO2_O_col)
 
   print("R_HO2_O3")
   R_HO2_O3_col   =calcCol_conc(history, historyNames, "R_HO2_O3", zdel)
+  R_HO2_O3_col@units="molec/cm2/s"
   saveFile->R_HO2_O3_col=R_HO2_O3_col
   delete(R_HO2_O3_col)
 
   print("R_H_O3")
   R_H_O3_col   =calcCol_conc(history, historyNames, "R_H_O3", zdel)
+  R_H_O3_col@units="molec/cm2/s"
   saveFile->R_H_O3_col=R_H_O3_col
   delete(R_H_O3_col)
 
   print("R_NO2_O")
   R_NO2_O_col   =calcCol_conc(history, historyNames, "R_NO2_O", zdel)
+  R_NO2_O_col@units="molec/cm2/s"
   saveFile->R_NO2_O_col=R_NO2_O_col
   delete(R_NO2_O_col)
 
   print("R_NO_HO2")
   R_NO_HO2_col   =calcCol_conc(history, historyNames, "R_NO_HO2", zdel)
+  R_NO_HO2_col@units="molec/cm2/s"
   saveFile->R_NO_HO2_col=R_NO_HO2_col
   delete(R_NO_HO2_col)
 
   print("R_NO_ON")  ; note typo in model output
   R_NO_N_col   =calcCol_conc(history, historyNames, "R_NO_ON", zdel)
+  R_NO_N_col@units="molec/cm2/s"
   saveFile->R_NO_N_col=R_NO_N_col
   delete(R_NO_N_col)
 
@@ -408,30 +426,80 @@ begin
 
   print("R_O1D_H2O")
   R_O1D_H2O_col   =calcCol_conc(history, historyNames, "R_O1D_H2O", zdel)
+  R_O1D_H2O_col@units="molec/cm2/s"
   saveFile->R_O1D_H2O_col=R_O1D_H2O_col
   delete(R_O1D_H2O_col)
 
   print("R_O2_O")
   R_O2_O_col   =calcCol_conc(history, historyNames, "R_O2_O", zdel)
+  R_O2_O_col@units="molec/cm2/s"
   saveFile->R_O2_O_col=R_O2_O_col
   delete(R_O2_O_col)
 
   print("R_O3_O")
   R_O3_O_col   =calcCol_conc(history, historyNames, "R_O3_O", zdel)
+  R_O3_O_col@units="molec/cm2/s"
   saveFile->R_O3_O_col=R_O3_O_col
   delete(R_O3_O_col)
 
   print("R_OH_O")
   R_OH_O_col   =calcCol_conc(history, historyNames, "R_OH_O", zdel)
+  R_OH_O_col@units="molec/cm2/s"
   saveFile->R_OH_O_col=R_OH_O_col
   delete(R_OH_O_col)
 
   print("R_O_O")
   R_O_O_col   =calcCol_conc(history, historyNames, "R_O_O", zdel)
+  R_O_O_col@units="molec/cm2/s"
   saveFile->R_O_O_col=R_O_O_col
   delete(R_O_O_col)
 
   delete(zdel)
+  
+end
+
+
+undef("saveMeanSulfateCols")
+procedure saveMeanSulfateCols(historyRun:string, historyPattern:string, saveFile:file)
+
+local historyNames,history,saveFile
+
+begin
+
+  pi=acos(0.0)*2.0
+   
+  ; Open the set of history files.
+  ;
+  ; NOTE: We want to work with the entire set of history files, 
+  ; so we can do a time evolution.
+  print("  Reading data ...")
+  
+  historyNames = systemfunc("ls " + historyPattern)
+  history = addfiles(historyNames, "r")
+  ListSetType(history, "cat")
+  print("historyNames:"+dimsizes(historyNames))
+ ; print(historyNames1)
+      
+ ; Read in the fields we will need.
+  lev = history[0]->lev
+  lat = history[0]->lat
+  lon = history[0]->lon
+ 
+  print("calculating zdel")
+  zdel=calcZdel(history, historyNames)
+
+  ; Sulfate mass densities in g/cm3:
+  print("MIXSULMD")
+  MIXSULMD_col   =calcCol_conc(history, historyNames, "MIXSULMD", zdel)
+  MIXSULMD_col@units="g/cm2"
+  saveFile->MIXSULMD_col=MIXSULMD_col
+  delete(MIXSULMD_col)
+  
+  print("PURSULMD")
+  PURSULMD_col   =calcCol_conc(history, historyNames, "PURSULMD", zdel)
+  PURSULMD_col@units="g/cm2"
+  saveFile->PURSULMD_col=PURSULMD_col
+  delete(PURSULMD_col)
   
 end
 
@@ -448,6 +516,7 @@ begin
 ;  saveFile1 = addfile(historyRun+"/"+historyRun+".mean.h3.1995.nc", "c")
 ;  saveFile2 = addfile(historyRun+"/"+historyRun+".mean.h0.1996.nc", "c")
 ;  saveFile3 = addfile(historyRun+"/"+historyRun+".mean.h3.1997.nc", "c")
+;  saveFile = addfile(historyPath+historyRun+".mean."+pattern+".nc", "c")
   saveFile = addfile(historyPath+historyRun+".mean."+pattern+".nc", "c")
   
 ;  historyPattern1=historyRun+"/"+historyRun+".cam2.h3.1995*.nc"
@@ -464,6 +533,8 @@ begin
 ;  saveMeanLOxCols(historyRun, historyPattern2, saveFile2)
 ;  saveMeanLOxCols(historyRun, historyPattern3, saveFile3)
   saveMeanLOxCols(historyRun, historyPattern, saveFile)
+
+  saveMeanSulfateCols(historyRun, historyPattern, saveFile)
   
 end
 
@@ -485,5 +556,5 @@ end
 
 ;saveMeans("geoengn4","carmasadn3")
 ;saveMeans("geo2","nongeo2")
-saveMeanFiles("nogeoPurSpin1","h3.1995","daily")
+saveMeanFiles("nogeoPurSpin1","h3","daily")
 ;saveMeans("geoPurSpin1","nogeoPurSpin1","h3.1995","daily")
