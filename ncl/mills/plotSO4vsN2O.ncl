@@ -17,7 +17,7 @@ begin
   pattern="h0"
   subDir="allmonthly"
 
-  historyRun="125smin"
+  historyRun="nogeo400SO2"
   historyPath = getHistoryPath(historyRun)
   historyPattern=historyPath+subDir+"/*.cam2."+pattern+"*.nc"
   historyNames = systemfunc("ls " + historyPattern)
@@ -30,18 +30,18 @@ begin
   SULVMR=PURSULVMR ; get metadata
   SULVMR=SULVMR+MIXSULVMR
   
-  historyRun="nogeoPurSpin1"
-  historyPath = getHistoryPath(historyRun)
-  historyPattern=historyPath+subDir+"/*.cam2."+pattern+"*.nc"
-  historyNames2 = systemfunc("ls " + historyPattern)
-  history2 = addfiles(historyNames2, "r")
-  ListSetType(history2, "cat")
-  print("historyNames2:"+dimsizes(historyNames2))
-  N2O_2 = addfiles_GetVar(history2, historyNames2, "N2O")
-  PURSULVMR_2 = addfiles_GetVar(history2, historyNames2, "PURSULVMR")
-  MIXSULVMR_2 = addfiles_GetVar(history2, historyNames2, "MIXSULVMR")
-  SULVMR_2=PURSULVMR_2 ; get metadata
-  SULVMR_2=SULVMR_2+MIXSULVMR_2
+;  historyRun="nogeoPurSpin1"
+;  historyPath = getHistoryPath(historyRun)
+;  historyPattern=historyPath+subDir+"/*.cam2."+pattern+"*.nc"
+;  historyNames2 = systemfunc("ls " + historyPattern)
+;  history2 = addfiles(historyNames2, "r")
+;  ListSetType(history2, "cat")
+;  print("historyNames2:"+dimsizes(historyNames2))
+;  N2O_2 = addfiles_GetVar(history2, historyNames2, "N2O")
+;  PURSULVMR_2 = addfiles_GetVar(history2, historyNames2, "PURSULVMR")
+;  MIXSULVMR_2 = addfiles_GetVar(history2, historyNames2, "MIXSULVMR")
+;  SULVMR_2=PURSULVMR_2 ; get metadata
+;  SULVMR_2=SULVMR_2+MIXSULVMR_2
   
 ; [time | 13] x [lev | 125] x [lat | 46] x [lon | 72]
 
@@ -75,19 +75,19 @@ begin
   res@xyLineColor     = "Black"                    ; Line color
   
   plot  = gsn_csm_xy (wks,N2O(0,{3:1000},0,:)*1e9,SULVMR(0,{3:1000},0,:)*1e9,res) ; create plot
-  i = 12
+  i = 8
     do j = 0,45
       print(i+" "+j)
       overlay(plot,gsn_csm_xy (wks,N2O(i,{3:1000},j,:)*1e9,SULVMR(i,{3:1000},j,:)*1e9,res))
     end do
 ;  end do
   
-  res@xyLineColor     = "Chartreuse4"                    ; Line color
-  i = 15
-  do j = 0,45
-    print(i+" "+j)  
-    overlay(plot,gsn_csm_xy (wks,N2O_2(i,{3:1000},j,:)*1e9,SULVMR_2(i,{3:1000},j,:)*1e9,res))
-  end do
+;  res@xyLineColor     = "Chartreuse4"                    ; Line color
+;  i = 15
+;  do j = 0,45
+;    print(i+" "+j)  
+;    overlay(plot,gsn_csm_xy (wks,N2O_2(i,{3:1000},j,:)*1e9,SULVMR_2(i,{3:1000},j,:)*1e9,res))
+;  end do
   
 ;==========================
 ; Wilson data

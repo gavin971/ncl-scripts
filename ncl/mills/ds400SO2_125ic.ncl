@@ -2,11 +2,11 @@
 ;
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ; 
-; Start with Chuck's IC file for dust, 125 levels
-srcIcPath = "/Volumes/Data/Models/waccm/inputdata/ncdata/125_gw2_28_dif.cam2.i.1998-04-01-00000.nc"
+; Start with IC file for dust-sulfur, 125 levels (case 125smin)
+srcIcPath = "/ptmp/mmills/waccm/inputdata/atm/waccm/ic/125smin.cam2.i.1998-03-01-00000.nc"
 
 ; Copy it to create new IC file:
-icPath = "/Volumes/Data/Models/waccm/inputdata/ncdata/125_gw2_28_dif_sulf.cam2.i.1998-04-01-00000.nc"
+icPath = "/ptmp/mmills/waccm/inputdata/atm/waccm/ic/125smin_nogeo400SO2.cam2.i.1998-03-01-00000.nc"
 print("copying 125-level IC file")
 system("cp " + srcIcPath + " " + icPath)
 
@@ -17,7 +17,7 @@ lon = icFile->lon
 time = icFile->time
 
 ; Use IC file for 66 levels for missing sulfur species
-sulfIc66Path = "/Volumes/Data/Models/waccm/inputdata/ncdata/expuT125E01.cam2.i.1997-04-01-00000.nc"
+sulfIc66Path = "/ptmp/mmills/waccm/inputdata/atm/waccm/ic/nogeo400SO2.cam2.i.1999-03-01-00000.nc"
 sulfIc66File = addfile(sulfIc66Path,"r")
 lev66 = sulfIc66File->lev
 

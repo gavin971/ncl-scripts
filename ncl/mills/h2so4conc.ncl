@@ -15,7 +15,7 @@ local historyPath, historyPathD, historyNames, history
 
 begin
   historyPath = getHistoryPath(historyRun)
-  historyPathD = historyPath + "daily/"
+  historyPathD = historyPath + "alldaily/"
   historyNames = systemfunc("ls " + historyPathD + prefix + "*")
   history = addfiles(historyNames, "r")
   ListSetType(history, "cat")
@@ -132,15 +132,16 @@ begin
 ;  plot  = fill_xy2(wks,plot(0),time,mnmx(0,:),mnmx(1,:),(/1.0,0.71,0.76/),\
 ;  (/1.0,0.71,0.76/))
 
-;  a = addfile(historyPath+"H2SO4conc.nc","c")
-;  a->lev=lev
-;  a->date=date
-;  a->Z=Z
-;  a->H2SO4min=H2SO4min
-;  a->H2SO4ave=H2SO4ave
-;  a->H2SO4max=H2SO4max
+  a = addfile(historyPath+"H2SO4conc.nc","c")
+  a->lev=lev
+  a->date=date
+  a->Z=Z
+  a->H2SO4min=H2SO4min
+  a->H2SO4ave=H2SO4ave
+  a->H2SO4max=H2SO4max
   
 end
 
-h2so4conc("125smin","all.125smin.cam2.h3.1997-[01][09]") 
+;h2so4conc("125smin","all.125smin.cam2.h3.1997-[01][09]") 
 ;h2so4conc("nogeoPurSpin1","all.nogeoPurSpin1.cam2.h3.1995-[01][09]") 
+h2so4conc("nogeo400SO2","all.nogeo400SO2.cam2.h3.1998-[01][09]") 
