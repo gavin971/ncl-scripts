@@ -9,29 +9,37 @@ load "tests/common.ncl"
 ;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 undef("monave_za")
-procedure monave_za()
+procedure monave_za(caseid:string)
 
 local files, nFiles, historyFile
 
 begin
-;  runname="Solar Max"
-  runname="Solar Min"
   
   print("")
-  print(runname)
-  print(runname .eq. "Solar Min")
+  print("caseid="+caseid)
   print("  Plot monthly average mixed sulfate densities ...")
   
   ; Open the  history files
   
-  if (runname .eq. "Solar Min") then
+  if (caseid .eq. "125smin400") then
+  
+    historyPattern="waccm/dust-sulfur/run/125smin/alldaily/all.125smin400.cam2.h3.1995-0[67]*"
+    
+    historyPattern2="waccm/dust-sulfur/run/125smin/alldaily/all.125smin400.cam2.h3.1996-01*"
+    historyNames2 = systemfunc("ls " + historyPattern2)
+    
+  end if
+  
+  if (caseid .eq. "125smin") then
   
     historyPattern="waccm/dust-sulfur/run/125smin/daily/all.125smin.cam2.h3.1998-0[67]*"
     
     historyPattern2="waccm/dust-sulfur/run/125smin/daily/all.125smin.cam2.h3.1998-01*"
     historyNames2 = systemfunc("ls " + historyPattern2)
     
-  else
+  end if
+  
+  if (caseid .eq. "125expuT15") then
   
     historyPattern="waccm/dust-sulfur/run/125expuT15/daily/all.125expuT15.cam2.h3.1997-0[67]*"
     
@@ -190,7 +198,7 @@ begin
   resP@gsnPanelYWhiteSpacePercent = 0.5
   resP@lbLabelStride        = 1
   resP@lbLabelAngleF        = 60
-  resP@tiMainString          = runname
+  resP@tiMainString          = caseid
         
   res                       = True
   res@gsnDraw               = False
@@ -242,7 +250,7 @@ begin
   months = (/ "Dec", "January", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov" /)
 
   ; Open a workstation
-  wks = gsn_open_wks("pdf","images/totsulf125")
+  wks = gsn_open_wks("pdf","images/totsulf125."+caseid)
   gsn_define_colormap(wks,"gui_default")                ; choose colormap
   
   print("")
@@ -270,7 +278,6 @@ begin
 ;  res@cnMinLevelValF        = 10.0                  ; contour interval
 ;  res@cnMaxLevelValF        = 200.0                 ; contour interval
 
-;;  res@tiMainString          = runname
 
   res@cnLevelSelectionMode  = "ExplicitLevels"
   res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \

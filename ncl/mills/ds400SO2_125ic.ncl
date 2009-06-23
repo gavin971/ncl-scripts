@@ -22,26 +22,26 @@ sulfIc66File = addfile(sulfIc66Path,"r")
 lev66 = sulfIc66File->lev
 
 ; Gas species
-fields = (/ "OCS", "S", "SO", "SO2", "SO3", "HSO3", "H2SO4" /)
+gases = (/ "OCS", "S", "SO", "SO2", "SO3", "HSO3", "H2SO4" /)
 
-nFields = dimsizes(fields)
+nGases = dimsizes(gases)
 
-do i = 0, nFields - 1
-  print("interpolating "+fields(i))
-  spec66 = sulfIc66File->$fields(i)$
+do i = 0, nGases - 1
+  print("interpolating "+gases(i))
+  spec66 = sulfIc66File->$gases(i)$
   spec125 = linint1_Wrap(lev66, spec66(time|:,lat|:,lon|:,lev|:), False, lev125, 0)
-  icFile->$fields(i)$ = spec125(time|:,lev|:,lat|:,lon|:)
+  icFile->$gases(i)$ = spec125(time|:,lev|:,lat|:,lon|:)
 end do
 
 ; Handle aerosols
-fields = (/ "MIXSUL", "DUSSUL", "PURSUL" /)
+elements = (/ "MIXSUL", "DUSSUL", "PURSUL", "DUST" /)
 
-nFields = dimsizes(fields)
+nElements = dimsizes(elements)
 nBins = 38
 
-do i = 0, nFields - 1
+do i = 0, nElements - 1
   do b = 1, nBins
-    binName = fields(i) + sprinti("%2.2i", b)
+    binName = elements(i) + sprinti("%2.2i", b)
     print("interpolating "+binName)
     spec66 = sulfIc66File->$binName$
     spec125 = linint1_Wrap(lev66, spec66(time|:,lat|:,lon|:,lev|:), False, lev125, 0)

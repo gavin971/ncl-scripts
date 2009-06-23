@@ -1,6 +1,6 @@
 ; Dust-Sulfates
 ;
-; Monthly average plots
+; Daily average plots
 
 load "tests/common.ncl"
 ;load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
@@ -9,26 +9,19 @@ load "tests/common.ncl"
 ;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 undef("mixsulfTimeAnalysis")
-procedure mixsulfTimeAnalysis()
+procedure mixsulfTimeAnalysis(caseid:string)
 
 local files, nFiles, historyFile
 
 begin
-;  runname="Solar Max"
-  runname="Solar Min"
-  
+;  caseid="125smin400"
   print("")
-  print(runname)
-  print(runname .eq. "Solar Min")
-  print("  Plot monthly average mixed sulfate densities ...")
+  print("caseid="+caseid)
+  print("  Plot daily average mixed sulfate densities ...")
   
   ; Open the  history files
   
-  if (runname .eq. "Solar Min") then
-    historyPattern="waccm/dust-sulfur/run/125smin/daily/all.125smin.cam2.h3.*"    
-  else
-    historyPattern="waccm/dust-sulfur/run/125expuT15/daily/all.125expuT15.cam2.h3.*"
-  end if
+  historyPattern="waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3.*"    
   
   historyNames = systemfunc("ls " + historyPattern)
   history = addfiles(historyNames, "r")
@@ -72,7 +65,7 @@ begin
   lev_p@units = "mb"
   lev_p@long_name = "Pressure (mb)" 
   
- ; Calculate the zonal monthly average of temperature
+ ; Calculate the zonal daily average of temperature
   print("Averaging temperature ...")
   T_za=dim_avg_Wrap(T(lev|:,time|:,lat|:,lon|:))
   T_za&lev = lev_p
@@ -85,11 +78,7 @@ begin
   mixsulf_za=dim_avg_Wrap(mixsul10A(lev|:,time|:,lat|:,lon|:))  
   mixsulf_za&lev = lev_p
   
-  if (runname .eq. "Solar Min") then
-    outfile="analysis/125smin/mixsulf125Time.nc"
-  else
-    outfile="analysis/125expuT15/mixsulf125Time.nc"
-  end if
+  outfile="analysis/"+caseid+"/mixsulf125Time.nc"
 
   print("saving file "+outfile)
   fileout=addfile(outfile,"c")
@@ -106,26 +95,20 @@ begin
 end
 
 undef("mixsulfTime")
-procedure mixsulfTime(targetLat:float)
+procedure mixsulfTime(caseid:string,targetLat:float)
 
 local files, nFiles, historyFile
 
 begin
-;  runname="Solar Max"
-  runname="Solar Min"
+;  caseid="125smin400"
   
   print("")
-  print(runname)
-  print(runname .eq. "Solar Min")
-  print("  Plot monthly average mixed sulfate densities ...")
+  print("caseid="+caseid)
+  print("  Plot daily average mixed sulfate densities ...")
   
   ; Open the  history files
   
-  if (runname .eq. "Solar Min") then
-    infile="analysis/125smin/mixsulf125Time.nc"    
-  else
-    infile="analysis/125smin/mixsulf125Time.nc"    ; (fix this later)
-  end if
+  infile="analysis/"+caseid+"/mixsulf125Time.nc"    
   filein=addfile(infile,"r")
 
   time    = filein->time
@@ -140,12 +123,21 @@ begin
   T_za    = filein->T_za
   mixsulf_za = filein->mixsulf_za
   pursulf_za = filein->pursulf_za
-    
-  time0401=ind(date.eq."19970401")
-  time1031=ind(date.eq."19971031")
+  
+  
+  if (caseid .eq. "125smin400") then
+    year1="1995"
+    year2="1996"
+  else  
+    year1="1997"
+    year2="1998"
+  end if
+  
+  time0401=ind(date.eq.year1+"0401")
+  time1031=ind(date.eq.year1+"1031")
  
-  time1001=ind(date.eq."19971001")
-  time0430=ind(date.eq."19980430")
+  time1001=ind(date.eq.year1+"1001")
+  time0430=ind(date.eq.year2+"0430")
 
   ; Make a 4 plot panel ...
   print("")
@@ -170,7 +162,7 @@ begin
   resP@gsnPanelYWhiteSpacePercent = 0.5
   resP@lbLabelStride        = 1
   resP@lbLabelAngleF        = 60
-  resP@tiMainString          = runname
+  resP@tiMainString          = caseid
         
   res                       = True
   res@gsnDraw               = False
@@ -227,7 +219,7 @@ begin
   months = (/ "Dec", "January", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov" /)
 
   ; Open a workstation
-  wks = gsn_open_wks("pdf","images/mixsulf125Time"+targetLat)
+  wks = gsn_open_wks("pdf","images/mixsulf125Time."+caseid+"."+targetLat)
   gsn_define_colormap(wks,"gui_default")                ; choose colormap
   
   print("")
@@ -252,7 +244,6 @@ begin
 ;  res@cnLevelSpacingF       = 5.0                  ; contour interval
 ;  res@cnMinLevelValF        = 5.0                  ; contour interval
 ;  res@cnMaxLevelValF        = 100.0                 ; contour interval  
-;  res@tiMainString          = runname
 
   res@cnLevelSelectionMode  = "ExplicitLevels"
   res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
@@ -347,6 +338,8 @@ begin
 
 end
 
-;mixsulfTimeAnalysis()
+caseid="125smin400"
+;mixsulfTimeAnalysis(caseid)
 
-mixsulfTime(70)
+mixsulfTime(caseid,70)
+;mixsulfTime(caseid,84)
