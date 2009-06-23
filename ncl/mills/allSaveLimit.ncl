@@ -154,28 +154,52 @@ begin
       print("bin "+iBin+": "+sec+" sec")
     end do ; iBin
     
+    delete(mixsulndbin)
+    delete(sulfrad)
+    
+    delete(dustndbin)
+    delete(dustrad)
+    
+    delete(pursulndbin)
+    delete(purerad)
+        
+    delete(sec)
+    delete(sec2)
+    
     if (.not.(isfilevar(allhist,"MIXSUL05A"))) then
       print("writing output for MIXSUL...")
       allhist->MIXSUL05A=mixsul05a
+      delete(mixsul05a)
       allhist->MIXSUL10A=mixsul10a
+      delete(mixsul10a)
       allhist->MIXSUL13A=mixsul13a
+      delete(mixsul13a)
       allhist->MIXSUL30A=mixsul30a
+      delete(mixsul30a)
     end if
     
     if (.not.(isfilevar(allhist,"DUST05A"))) then
       print("writing output for DUST...")
       allhist->DUST05A=dust05a
+      delete(dust05a)
       allhist->DUST10A=dust10a
+      delete(dust10a)
       allhist->DUST13A=dust13a
-      allhist->DUST30A=dust30a
+       delete(dust13a)
+     allhist->DUST30A=dust30a
+      delete(dust30a)
     end if
     
     if (.not.(isfilevar(allhist,"PURSUL05A"))) then
       print("writing output for PURSUL...")
       allhist->PURSUL05A=pursul05a
+      delete(pursul05a)
       allhist->PURSUL10A=pursul10a
+      delete(pursul10a)
       allhist->PURSUL13A=pursul13a
+      delete(pursul13a)
       allhist->PURSUL30A=pursul30a
+      delete(pursul30a)
     end if
     
     print("cleaning up...")
@@ -190,23 +214,6 @@ begin
     delete(nLats)
     delete(lon)
     delete(nLons)
-    
-    delete(mixsul05a)
-    delete(mixsul10a)
-    delete(mixsul13a)
-    delete(mixsul30a)
-    delete(mixsulndbin)
-    delete(sulfrad)
-    
-    delete(dust05a)
-    delete(dust10a)
-    delete(dust13a)
-    delete(dust30a)
-    delete(dustndbin)
-    delete(dustrad)
-    
-    delete(sec)
-    delete(sec2)
     
     print("returning...")
    
@@ -258,5 +265,5 @@ end
 ;saveSizeLimit("125expuT15b","all.125expuT15b.cam2.h3.1998-04-30*") 
 
 ;saveSizeLimit("nogeo400SO2","all.nogeo400SO2.cam2.*") 
-;saveSizeLimit("125smin400","all.125smin400.cam2.*") 
-saveSizeLimit("125sminPtbo2","all.125sminPtbo2.cam2.*") 
+saveSizeLimit("125smin400","all.125smin400.cam2.*") 
+;saveSizeLimit("125sminPtbo2","all.125sminPtbo2.cam2.*") 

@@ -350,10 +350,10 @@ begin
     ; copy history file:
 ;    allfilename=historyPath+historyNames(ifile)
     allfilename=historyPath+"all."+historyNames(ifile)
-    print(allfilename)
-    out = systemfunc("cp " + historyPath + historyNames(ifile) + " " + allfilename )
+    print("moving file to "+allfilename)
+    out = systemfunc("mv " + historyPath + historyNames(ifile) + " " + allfilename )
     writefile=addfile(allfilename,"w")
-    print("file copied")
+    print("file moved")
 
     ; Find the last time.
     time = writefile->time
@@ -396,7 +396,7 @@ begin
     end if
     
     if (isfilevar(writefile,"PRESSURE")) then
-      P=writefile->PRESSURE
+;      P=writefile->PRESSURE
       arho=writefile->RHOAIR
     else
     
@@ -417,6 +417,7 @@ begin
       
       writefile->RHOAIR=arho
       writefile->PRESSURE=P
+      delete(P)
       
     end if
     
@@ -443,11 +444,19 @@ begin
         mixsulvmr@units = "mol/mol"
         mixsulvmr@long_name = "pure sulfates equivalent vmr"
         writefile->MIXSULVMR = mixsulvmr
+        delete(dussulmd)
       end if
             
       soy=soy+s+so+so2+so3+hso3+h2so4+mixsulvmr
       soy@units      = "mol/mol"
       soy@long_name  = "total sulfur"
+      delete(mixsulvmr)
+      delete(s)
+      delete(so)
+      delete(so2)
+      delete(so3)
+      delete(hso3)
+      delete(h2so4)
       
       if (isfilevar(writefile,"PURSULMD")) then
         if (isfilevar(writefile,"PURSULVMR")) then
@@ -461,33 +470,17 @@ begin
           writefile->PURSULVMR = pursulvmr
         end if
         soy=soy+pursulvmr
+        delete(pursulvmr)
       end if
 
       print("writing SOY ...")
       writefile->SOY=soy
+      delete(soy)
 
     end if        
 
     ; Get the Number density (#/cm-3) for each bin at the 
     ; specified time and location.
-    if (isfilevar(writefile,"MIXSUL01") .and. (.not.(isfilevar(writefile,"MIXSULNDBIN")))) then
-      print("Calculating the mixed sulfate number density ...")
-      mixsulndbin = new((/ nFTimes, nLevs, nLats, nLons, nBins /), float)
-      mixsulndbin!0="time"
-      mixsulndbin&time=time
-      mixsulndbin!1="lev"
-      mixsulndbin&lev=lev
-      mixsulndbin!2="lat"
-      mixsulndbin&lat=lat
-      mixsulndbin!3="lon"
-      mixsulndbin&lon=lon
-      mixsulndbin!4="bins"   
-      mixsulndbin@long_name="mixed sulfate number density per bin"
-      mixsulndbin@units="/cm3"
-      getN(writefile, "MIXSUL", rmass, arho, mixsulndbin, skipbin)
-      writefile->MIXSULNDBIN=mixsulndbin
-    end if
- 
     if (isfilevar(writefile,"DUST01") .and. (.not.(isfilevar(writefile,"DUSTNDBIN")))) then
       print("Calculating the dust number density ...")
       dustndbin = new((/ nFTimes, nLevs, nLats, nLons, nBins /), float)
@@ -504,6 +497,7 @@ begin
       dustndbin@units="/cm3"
       getN(writefile, "DUST", rmass, arho, dustndbin, skipbin)
       writefile->DUSTNDBIN=dustndbin
+      delete(dustndbin)
     end if
     
     if (isfilevar(writefile,"PURSUL01") .and. (.not.(isfilevar(writefile,"PURSULNDBIN")))) then
@@ -522,6 +516,25 @@ begin
       pursulndbin@units="/cm3"
       getN(writefile, "PURSUL", rmass, arho, pursulndbin, skipbin)
       writefile->PURSULNDBIN=pursulndbin
+      delete(pursulndbin)
+    end if
+ 
+    if (isfilevar(writefile,"MIXSUL01") .and. (.not.(isfilevar(writefile,"MIXSULNDBIN")))) then
+      print("Calculating the mixed sulfate number density ...")
+      mixsulndbin = new((/ nFTimes, nLevs, nLats, nLons, nBins /), float)
+      mixsulndbin!0="time"
+      mixsulndbin&time=time
+      mixsulndbin!1="lev"
+      mixsulndbin&lev=lev
+      mixsulndbin!2="lat"
+      mixsulndbin&lat=lat
+      mixsulndbin!3="lon"
+      mixsulndbin&lon=lon
+      mixsulndbin!4="bins"   
+      mixsulndbin@long_name="mixed sulfate number density per bin"
+      mixsulndbin@units="/cm3"
+      getN(writefile, "MIXSUL", rmass, arho, mixsulndbin, skipbin)
+      writefile->MIXSULNDBIN=mixsulndbin
     end if
  
     if ((.not.(isfilevar(writefile,"SULFRAD"))) .or. (.not.(isfilevar(writefile,"CORERAD"))) \
@@ -574,18 +587,29 @@ begin
       
       calcSulfRad(writefile, mixsulndbin, wtpct, sulfDens, "DUSSUL", rmass, arho, \
         sulfRad, coreRad, pureRad, skipbin)
+      delete(mixsulndbin)
+      delete(wtpct)
+      delete(sulfDens)
+      delete(arho)
+        
       if (.not.(isfilevar(writefile,"SULFRAD"))) then
         print("saving SULFRAD")
         writefile->SULFRAD=sulfRad
       end if
+      delete(sulfRad)
+      
       if (.not.(isfilevar(writefile,"CORERAD"))) then
          print("saving CORERAD")
        writefile->CORERAD=coreRad
       end if
+      delete(coreRad)
+      
       if (.not.(isfilevar(writefile,"PURERAD"))) then
          print("saving PURERAD")
         writefile->PURERAD=pureRad
       end if
+      delete(pureRad)
+      
     end if
             
     delete(time)
@@ -602,6 +626,6 @@ end
 
 ;saveSize("nogeoPurSpin1","nogeoPurSpin1.cam2",-1) 
 ;saveSize("nogeo400SO2","nogeo400SO2.cam2",-1) 
-saveSize("125smin400","125smin400.cam2",-1) 
-;saveSize("125sminPtbo2","125sminPtbo2.cam2",-1) 
+;saveSize("125smin400","125smin400.cam2",-1) 
+saveSize("125sminPtbo2","125sminPtbo2.cam2",-1) 
 
