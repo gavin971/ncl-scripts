@@ -124,20 +124,27 @@ begin
   mixsulf_za = filein->mixsulf_za
   pursulf_za = filein->pursulf_za
   
+  yearNH="1997"
+  yearSH1="1997"
+  yearSH2="1998"
   
   if (caseid .eq. "125smin400") then
-    year1="1995"
-    year2="1996"
-  else  
-    year1="1997"
-    year2="1998"
+    yearNH="1995"
+    yearSH1="1995"
+    yearSH2="1996"
   end if
   
-  time0401=ind(date.eq.year1+"0401")
-  time1031=ind(date.eq.year1+"1031")
+  if (caseid .eq. "125sminPtbo2") then
+    yearNH="1996"
+    yearSH1="1995"
+    yearSH2="1996"
+  end if
+  
+  time0401=ind(date.eq.yearNH+"0401")
+  time1031=ind(date.eq.yearNH+"1031")
  
-  time1001=ind(date.eq.year1+"1001")
-  time0430=ind(date.eq.year2+"0430")
+  time1001=ind(date.eq.yearSH1+"1001")
+  time0430=ind(date.eq.yearSH2+"0430")
 
   ; Make a 4 plot panel ...
   print("")
@@ -247,7 +254,7 @@ begin
 
   res@cnLevelSelectionMode  = "ExplicitLevels"
   res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
-      200, 300, 500, 750, 1000, 2000, 3000, 5000 /);, 7500, 10000 /)
+      200, 300, 500, 750, 1000, 1500, 2000, 3000, 5000, 7500, 10000 /)
   res@lbLabelAngleF = 60
   
 ;===================================================================
@@ -338,8 +345,9 @@ begin
 
 end
 
-caseid="125smin400"
+;caseid="125smin400"
+caseid="125sminPtbo2"
 ;mixsulfTimeAnalysis(caseid)
 
-mixsulfTime(caseid,70)
-;mixsulfTime(caseid,84)
+;mixsulfTime(caseid,70)
+mixsulfTime(caseid,84)

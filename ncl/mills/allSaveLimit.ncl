@@ -265,5 +265,5 @@ end
 ;saveSizeLimit("125expuT15b","all.125expuT15b.cam2.h3.1998-04-30*") 
 
 ;saveSizeLimit("nogeo400SO2","all.nogeo400SO2.cam2.*") 
-saveSizeLimit("125smin400","all.125smin400.cam2.*") 
-;saveSizeLimit("125sminPtbo2","all.125sminPtbo2.cam2.*") 
+;saveSizeLimit("125smin400","all.125smin400.cam2.*") 
+saveSizeLimit("125sminPtbo2","all.125sminPtbo2.cam2.*") 

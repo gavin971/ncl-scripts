@@ -21,40 +21,47 @@ begin
   
   ; Open the  history files
   
+  if (caseid .eq. "125expuT15") then     
+;    historyNames2="waccm/dust-sulfur/run/125expuT15b/daily/all.125expuT15b.cam2.h3.199" + \
+;       (/ "7-12-31-00000.nc", "8-01-05-00000.nc", "8-01-10-00000.nc", "8-01-15-00000.nc", \
+;          "8-01-20-00000.nc", "8-01-25-00000.nc", "8-01-30-00000.nc" /)
+    year1="1997"
+    year2="1998"        
+  end if
+  
   if (caseid .eq. "125smin400") then
-  
-    historyPattern="waccm/dust-sulfur/run/125smin/alldaily/all.125smin400.cam2.h3.1995-0[67]*"
-    
-    historyPattern2="waccm/dust-sulfur/run/125smin/alldaily/all.125smin400.cam2.h3.1996-01*"
-    historyNames2 = systemfunc("ls " + historyPattern2)
-    
+    year1="1995"
+    year2="1996"
+;    historyPattern21 = "waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+year1+"-12*"
+;    historyNames21 = systemfunc("ls " + historyPattern21)    
+;    historyPattern22 = "waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+year2+"-01*"
+;    historyNames22 = systemfunc("ls " + historyPattern22)
+;    historyNames2 = new( dimsizes(historyNames22)+1, string )
+;    historyNames2(0) = historyNames21(dimsizes(historyNames21)-1)
+;    historyNames2(1) = historyNames22
   end if
-  
+
   if (caseid .eq. "125smin") then
-  
-    historyPattern="waccm/dust-sulfur/run/125smin/daily/all.125smin.cam2.h3.1998-0[67]*"
+    year1="1998"
+    year2="1998"   
+;    historyPattern2="waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+year2+"-01*"
+;    historyNames2 = systemfunc("ls " + historyPattern2)    
+  end if    
     
-    historyPattern2="waccm/dust-sulfur/run/125smin/daily/all.125smin.cam2.h3.1998-01*"
-    historyNames2 = systemfunc("ls " + historyPattern2)
-    
-  end if
-  
-  if (caseid .eq. "125expuT15") then
-  
-    historyPattern="waccm/dust-sulfur/run/125expuT15/daily/all.125expuT15.cam2.h3.1997-0[67]*"
-    
-    historyNames2="waccm/dust-sulfur/run/125expuT15b/daily/all.125expuT15b.cam2.h3.199" + \
-       (/ "7-12-31-00000.nc", "8-01-05-00000.nc", "8-01-10-00000.nc", "8-01-15-00000.nc", \
-          "8-01-20-00000.nc", "8-01-25-00000.nc", "8-01-30-00000.nc" /)
-    
-  end if
-  
+  historyPattern="waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+year1+"-0[67]*" 
   historyNames = systemfunc("ls " + historyPattern)
   history = addfiles(historyNames, "r")
   ListSetType(history, "cat")
   print("historyNames:"+dimsizes(historyNames))
   print(historyNames)
    
+  historyPattern21 = "waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+year1+"-12*"
+  historyNames21 = systemfunc("ls " + historyPattern21)    
+  historyPattern22 = "waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+year2+"-01*"
+  historyNames22 = systemfunc("ls " + historyPattern22)
+  historyNames2 = new( dimsizes(historyNames22)+1, string )
+  historyNames2(0) = historyNames21(dimsizes(historyNames21)-1)
+  historyNames2(1:dimsizes(historyNames22)) = historyNames22
   history2 = addfiles(historyNames2, "r")
   
 ;  historyNames2 = historyNames
@@ -99,19 +106,25 @@ begin
   totsul10A2 = mixsul10A2 ; get dim wrappers
   totsul10A2 = totsul10A2 + pursul10A2
   
-;  time0701=ind(date.eq."19970701")
-;  time0731=ind(date.eq."19970731")
-  time0701=ind(date.eq."19980701")
-  time0731=ind(date.eq."19980731")
+  print(date)
+  startdate=year1+"0701"
+  enddate=year1+"0731"
+  print(startdate)
+  print(enddate)
+  time0701=ind(date.eq.stringtoint(startdate))
+  time0731=ind(date.eq.stringtoint(enddate))
+  print("time0701: "+startdate+" | "+time0701)
+  print("time0731: "+enddate+" | "+time0731)
  
-  time0101=ind(date2.eq."19980101")
-  time0131=ind(date2.eq."19980131")
-  
-;  time0101=time0701
-;  time0131=time0731
-
-  print("time0101:"+time0101)
-  print("time0131:"+time0131)
+  print(date2)
+  startdate=year2+"0101"
+  enddate=year2+"0131"
+  print(startdate)
+  print(enddate)
+  time0101=ind(date2.eq.stringtoint(startdate))
+  time0131=ind(date2.eq.stringtoint(enddate))
+  print("time0101: "+startdate+" | "+time0101)
+  print("time0131: "+enddate+" | "+time0131)
 
   lev_p   = lev
   lev_p@units = "mb"
@@ -281,7 +294,7 @@ begin
 
   res@cnLevelSelectionMode  = "ExplicitLevels"
   res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
-      200, 300, 500, 750, 1000, 2000, 3000, 5000 /);, 7500, 10000 /)
+      200, 300, 500, 750, 1000, 1500 /) ; 2000 , 3000, 5000 /) ;, 7500, 10000 /)
   res@lbLabelAngleF = 60
   
   res@tiMainString          = months(month(0))
@@ -321,6 +334,7 @@ begin
 
 end
 
+caseid="125smin400"
 
-monave_za()
-;monave_polar()
+monave_za(caseid)
+;monave_polar(caseid)

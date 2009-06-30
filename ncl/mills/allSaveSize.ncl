@@ -626,6 +626,6 @@ end
 
 ;saveSize("nogeoPurSpin1","nogeoPurSpin1.cam2",-1) 
 ;saveSize("nogeo400SO2","nogeo400SO2.cam2",-1) 
-;saveSize("125smin400","125smin400.cam2",-1) 
-saveSize("125sminPtbo2","125sminPtbo2.cam2",-1) 
+saveSize("125smin400","125smin400.cam2",-1) 
+;saveSize("125sminPtbo2","125sminPtbo2.cam2",-1) 
 
