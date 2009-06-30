@@ -139,6 +139,9 @@ begin
   a->H2SO4min=H2SO4min
   a->H2SO4ave=H2SO4ave
   a->H2SO4max=H2SO4max
+  a->H2SO4eqmin=H2SO4eqmin
+  a->H2SO4eqave=H2SO4eqave
+  a->H2SO4eqmax=H2SO4eqmax
   
 end
 

@@ -142,9 +142,15 @@ begin
   
   time0401=ind(date.eq.yearNH+"0401")
   time1031=ind(date.eq.yearNH+"1031")
+  
+  print("time0401="+time0401+" time="+time(time0401))
+  print("time1031="+time1031+" time="+time(time1031))
  
   time1001=ind(date.eq.yearSH1+"1001")
   time0430=ind(date.eq.yearSH2+"0430")
+  
+  print("time1001="+time1001+" time="+time(time1001))
+  print("time0430="+time0430+" time="+time(time0430))
 
   ; Make a 4 plot panel ...
   print("")
@@ -279,8 +285,8 @@ begin
   end do
 
   imonth      = 0
-  days_accumNH  = 15.
-  days_accumSH  = 15.+180
+  days_accumNH  = 15.+stringtofloat(time(time0401))
+  days_accumSH  = 15.+stringtofloat(time(time1001))
 
   tk_per_mon  = 4                    ; Tickmarks per month.
   nticks      = nmonths * tk_per_mon
@@ -348,6 +354,8 @@ end
 ;caseid="125smin400"
 caseid="125sminPtbo2"
 ;mixsulfTimeAnalysis(caseid)
+mixsulfTime(caseid,70)
 
-;mixsulfTime(caseid,70)
+caseid="125smin400"
+mixsulfTime(caseid,70)
 mixsulfTime(caseid,84)

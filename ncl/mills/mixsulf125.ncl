@@ -25,39 +25,39 @@ begin
 ;    historyNames2="waccm/dust-sulfur/run/125expuT15b/daily/all.125expuT15b.cam2.h3.199" + \
 ;       (/ "7-12-31-00000.nc", "8-01-05-00000.nc", "8-01-10-00000.nc", "8-01-15-00000.nc", \
 ;          "8-01-20-00000.nc", "8-01-25-00000.nc", "8-01-30-00000.nc" /)
-    year1="1997"
-    year2="1998"        
+    yearNH="1997"
+    yearSH1="1997"
+    yearSH2="1998"        
   end if
   
   if (caseid .eq. "125smin400") then
-    year1="1995"
-    year2="1996"
-;    historyPattern21 = "waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+year1+"-12*"
-;    historyNames21 = systemfunc("ls " + historyPattern21)    
-;    historyPattern22 = "waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+year2+"-01*"
-;    historyNames22 = systemfunc("ls " + historyPattern22)
-;    historyNames2 = new( dimsizes(historyNames22)+1, string )
-;    historyNames2(0) = historyNames21(dimsizes(historyNames21)-1)
-;    historyNames2(1) = historyNames22
+    yearNH="1995"
+    yearSH1="1995"
+    yearSH2="1996"
+  end if
+  
+  if (caseid .eq. "125sminPtbo2") then
+    yearNH="1996"
+    yearSH1="1995"
+    yearSH2="1996"
   end if
 
   if (caseid .eq. "125smin") then
-    year1="1998"
-    year2="1998"   
-;    historyPattern2="waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+year2+"-01*"
-;    historyNames2 = systemfunc("ls " + historyPattern2)    
+    yearNH="1998"
+    yearSH1="1997"
+    yearSH2="1998"   
   end if    
     
-  historyPattern="waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+year1+"-0[67]*" 
+  historyPattern="waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+yearNH+"-0[67]*" 
   historyNames = systemfunc("ls " + historyPattern)
   history = addfiles(historyNames, "r")
   ListSetType(history, "cat")
   print("historyNames:"+dimsizes(historyNames))
   print(historyNames)
    
-  historyPattern21 = "waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+year1+"-12*"
+  historyPattern21 = "waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+yearSH1+"-12*"
   historyNames21 = systemfunc("ls " + historyPattern21)    
-  historyPattern22 = "waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+year2+"-01*"
+  historyPattern22 = "waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+yearSH2+"-01*"
   historyNames22 = systemfunc("ls " + historyPattern22)
   historyNames2 = new( dimsizes(historyNames22)+1, string )
   historyNames2(0) = historyNames21(dimsizes(historyNames21)-1)
@@ -107,8 +107,8 @@ begin
   totsul10A2 = totsul10A2 + pursul10A2
   
   print(date)
-  startdate=year1+"0701"
-  enddate=year1+"0731"
+  startdate=yearNH+"0701"
+  enddate=yearNH+"0731"
   print(startdate)
   print(enddate)
   time0701=ind(date.eq.stringtoint(startdate))
@@ -117,8 +117,8 @@ begin
   print("time0731: "+enddate+" | "+time0731)
  
   print(date2)
-  startdate=year2+"0101"
-  enddate=year2+"0131"
+  startdate=yearSH2+"0101"
+  enddate=yearSH2+"0131"
   print(startdate)
   print(enddate)
   time0101=ind(date2.eq.stringtoint(startdate))
@@ -294,7 +294,7 @@ begin
 
   res@cnLevelSelectionMode  = "ExplicitLevels"
   res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
-      200, 300, 500, 750, 1000, 1500 /) ; 2000 , 3000, 5000 /) ;, 7500, 10000 /)
+      200, 300, 500, 750, 1000, 1500, 2000 , 3000, 5000, 7500, 10000 /)
   res@lbLabelAngleF = 60
   
   res@tiMainString          = months(month(0))
@@ -335,6 +335,7 @@ begin
 end
 
 caseid="125smin400"
+;caseid="125sminPtbo2"
 
 monave_za(caseid)
 ;monave_polar(caseid)
