@@ -9,7 +9,7 @@ load "tests/common.ncl"
 ;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 undef("monave_za")
-procedure monave_za(caseid:string)
+procedure monave_za(caseid:string, type:string)
 
 local files, nFiles, historyFile
 
@@ -106,6 +106,21 @@ begin
   totsul10A2 = mixsul10A2 ; get dim wrappers
   totsul10A2 = totsul10A2 + pursul10A2
   
+  if (type .eq. "mix") then
+    sul10A  = mixsul10A
+    sul10A2 = mixsul10A2
+  end if
+  
+  if (type .eq. "pur") then
+    sul10A  = pursul10A
+    sul10A2 = pursul10A2
+  end if
+  
+  if (type .eq. "tot") then
+    sul10A  = totsul10A
+    sul10A2 = totsul10A2
+  end if
+  
   print(date)
   startdate=yearNH+"0701"
   enddate=yearNH+"0731"
@@ -175,14 +190,14 @@ begin
   
  ; Calculate the zonal monthly average of particles r > 1 nm
   print("Averaging July N1 ...")
-  T_month=dim_avg_Wrap(totsul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
+  T_month=dim_avg_Wrap(sul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
 ;  T_month=dim_avg_Wrap(pursul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
 ;  T_month=dim_avg_Wrap(mixsul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
   print("Zonally averaging July N1 ...")  
   N1s(lev|:,lat|:, run|1) = dim_avg(T_month(lev|:,lat|:,lon|:))
   
   print("Averaging January N1 ...")
-  T_month=dim_avg_Wrap(totsul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
+  T_month=dim_avg_Wrap(sul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
 ;  T_month=dim_avg_Wrap(pursul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
 ;  T_month=dim_avg_Wrap(mixsul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
   print("Zonally averaging January N1 ...")  
@@ -263,7 +278,7 @@ begin
   months = (/ "Dec", "January", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov" /)
 
   ; Open a workstation
-  wks = gsn_open_wks("pdf","images/totsulf125."+caseid)
+  wks = gsn_open_wks("pdf","images/"+type+"sulf125."+caseid)
   gsn_define_colormap(wks,"gui_default")                ; choose colormap
   
   print("")
@@ -307,35 +322,22 @@ begin
 
   res@tiMainString          = months(month(1))
 ;  res@tiMainString          = runs(1)
-;  plot(1) = gsn_csm_pres_hgt(wks, zonal(1, {minP:maxP}, {30.0:90.0}), res)
   plot(1) = gsn_csm_pres_hgt(wks, zonal(1, {minP:maxP}, {30.0:90.0}), res)
   overlay(plot(1), plotT(1))
     
-
-;  print("")
-;  print("    mass density")
-;  zonal = MDs
-;  zonal&lev = lev_p
-
-;  res@lbTitleString        = zonal@units
-;  print("      min :  " + min(zonal(:, {0.0:maxP}, :)))
-;  print("      max :  " + max(zonal(:, {0.0:maxP}, :)))
-
-;  res@cnLevelSelectionMode = "ExplicitLevels"
-;  res@cnLevels = (/ .2, .4, .8, 1, 2, 4, 8, 10, 20, 40, 80, 100, 200 /)
-;  res@lbLabelStride        = 1
-
-;  res@tiMainString          = ""
-;  do i = 0, nRuns-1
-;    plot(2+i) = gsn_csm_pres_hgt(wks, zonal(i, {0.0:maxP}, :), res)
-;  end do
+  print("      min :  " + min(zonal(1, {minP:maxP}, {60.0:90.0})))
+  print("      max :  " + max(zonal(1, {minP:maxP}, {60.0:90.0})))
 
   gsn_panel(wks, plot, (/ 1, 2 /), resP)
 
 end
 
-caseid="125smin400"
-;caseid="125sminPtbo2"
+;caseid="125smin400"
+caseid="125sminPtbo2"
 
-monave_za(caseid)
+;type = "tot"
+type = "mix"
+;type = "pur"
+
+monave_za(caseid,type)
 ;monave_polar(caseid)

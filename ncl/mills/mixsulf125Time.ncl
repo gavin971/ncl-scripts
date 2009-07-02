@@ -14,7 +14,6 @@ procedure mixsulfTimeAnalysis(caseid:string)
 local files, nFiles, historyFile
 
 begin
-;  caseid="125smin400"
   print("")
   print("caseid="+caseid)
   print("  Plot daily average mixed sulfate densities ...")
@@ -100,7 +99,6 @@ procedure mixsulfTime(caseid:string,targetLat:float)
 local files, nFiles, historyFile
 
 begin
-;  caseid="125smin400"
   
   print("")
   print("caseid="+caseid)
@@ -348,14 +346,15 @@ begin
 
 
   gsn_panel(wks, plot, (/ 2, 2 /), resP)
+  
+  print("NH mixsulf max: "+max(mixsulf_za({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat})))
+  print("NH pursulf max: "+max(pursulf_za({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat})))
 
 end
 
-;caseid="125smin400"
-caseid="125sminPtbo2"
-;mixsulfTimeAnalysis(caseid)
-mixsulfTime(caseid,70)
-
 caseid="125smin400"
-mixsulfTime(caseid,70)
+;caseid="125sminPtbo2"
+;mixsulfTimeAnalysis(caseid)
+
+;mixsulfTime(caseid,70)
 mixsulfTime(caseid,84)
