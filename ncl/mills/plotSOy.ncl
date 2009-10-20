@@ -12,7 +12,7 @@ begin
 
   historyPath = getHistoryPath(historyRun)
   
-  historyPattern=historyPath+pattern+"*.nc"
+  historyPattern=historyPath+"allmonthly/*.cam2."+pattern+"*.nc"
 ;  sizePattern=historyRun+"/all.*.cam2.h0."+year+"*.nc"
   historyNames = systemfunc("ls " + historyPattern)
 ;  sizeNames = systemfunc("ls " + sizePattern)
@@ -51,9 +51,12 @@ begin
 ;************************************************
 ; plotting parameters
 ;************************************************
-  wks   = gsn_open_wks ("pdf","SOy_30N_"+historyRun+"_d"+day)      ; open workstation
+  wks   = gsn_open_wks ("pdf","SOy_30N_"+historyRun+"_"+pattern)      ; open workstation
 
   res                   = True                     ; plot mods desired
+  res@gsnPaperOrientation = "landscape"
+  res@gsnMaximize       = True
+  res@gsnBoxMargin      = 0.0
 ;  res@tiMainString      = "SO2 (pptv)"             ; add title
   res@trYReverse        = True                     ; reverse Y-axis
   res@trYLog            = True                     ; log Y-axis
@@ -151,5 +154,5 @@ end
 ;plotSOy("coag04-2","1996-12-26",728)
 ;plotSOy("nopur2_ncar","1995-07-05",185)
 
-plotSOy("125smin","monthly/*.cam2.h0.1997-11",244)
-plotSOy("125smin","monthly/*.cam2.h0.1997-05",61)
+;plotSOy("125smin","monthly/*.cam2.h0.1997-11",244)
+plotSOy("125smin","h0.1997-05",61)

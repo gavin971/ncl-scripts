@@ -126,7 +126,7 @@ begin
   yearSH1="1997"
   yearSH2="1998"
   
-  if (caseid .eq. "125smin400") then
+  if (caseid .eq. "125smin400" .or caseid .eq. "125tabaz22") then
     yearNH="1995"
     yearSH1="1995"
     yearSH2="1996"
@@ -352,7 +352,8 @@ begin
 
 end
 
-caseid="125smin400"
+caseid="125tabaz22"
+;caseid="125smin400"
 ;caseid="125sminPtbo2"
 ;mixsulfTimeAnalysis(caseid)
 
