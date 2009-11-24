@@ -1,8 +1,8 @@
 load "tests/getHistoryPath.ncl"
 load "tests/common2.ncl"
 
-undef("analysisSulf1nm")
-procedure analysisSulf1nm(historyRun:string,pattern:string)
+undef("analysisSulfLimit")
+procedure analysisSulfLimit(historyRun:string,pattern:string)
 
 ;  inputs: historyRun, i.e. "coag04"
 ;          year, i.e. "1995"
@@ -14,6 +14,12 @@ local historyNames, rmin, cpi, rmassmin, readfile, histfile, \
    mixsulndbin, mixsulrad, mixsul05a, mixsul10a, mixsul13a, mixsul30a
 
 begin
+
+  AVG     = 6.02252e+23             ; Avogadro's number (CARMA) ~ molecules/mole
+  cpi = 4./3.*PI
+
+  ;  Molecular weights [g/mol]
+  gwtH2SO4 = 98.078479
 
 ; Determine the path to history files
   historyPath = getHistoryPath(historyRun)
@@ -27,8 +33,13 @@ begin
   end if
   
   ; Setup the same bin structure used during the model run.
-  nBins = 38
-  rmin  = 2e-8 ; cm
+;  nBins = 38
+;  nBins = 29
+;  rmin  = 2e-8 ; cm
+  
+  nBins = 36
+  rmin  = (gwtH2SO4/AVG/RHO_H2SO4/cpi)^(1./3.) ; cm
+
   rmrat = 2.0
   rho   = RHO_DUST  ; g/cm-3
   
@@ -394,4 +405,5 @@ end
 
 ; Main
 
-analysisSulf1nm("125kelvH2Og","h3")
+;analysisSulfLimit("125kelvH2Og","h3")
+analysisSulfLimit("125bin36c","h3")

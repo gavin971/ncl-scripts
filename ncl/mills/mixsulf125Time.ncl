@@ -1,32 +1,45 @@
 ; Dust-Sulfates
 ;
-; Daily average plots
+; Daily average plots of aerosols larger than various radius thresholds:
+;  1 nm (10A), 0.5 nm (05A), or all aerosols (00A)
+;
+; The routine analysisSulfLimit.ncl must be run first to generate the files
+; in ~/analysis/<caseid> used as input.  Then the routine mixsulTimeAnalysis
+; (below) is called first to produce the file mixsulf125Time.nc from these
+; files.  This file is then used as input for the plotting routine,
+; mixsulf125Time (below).
 
 load "tests/common.ncl"
-;load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
-;load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
-;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
-;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
+load "tests/getHistoryPath.ncl"
 
 undef("mixsulfTimeAnalysis")
-procedure mixsulfTimeAnalysis(caseid:string)
+procedure mixsulfTimeAnalysis(caseid:string,pattern:string)
 
 local files, nFiles, historyFile
 
 begin
   print("")
-  print("caseid="+caseid)
-  print("  Plot daily average mixed sulfate densities ...")
+  print("mixsulfTimeAnalysis: caseid="+caseid)
   
+; Determine the path to history files
+  historyPath = getHistoryPath(caseid)
+  analysisPath = "analysis/" + caseid+ "/"
+
   ; Open the  history files
-  
-  historyPattern="waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3.*"    
-  
-  historyNames = systemfunc("ls " + historyPattern)
+;  historyNames = systemfunc("ls " + historyPath + "*" + pattern + "*")
+  analysisNames = systemfunc("ls analysis/" + caseid + "/*" + pattern + "*")
+  fileNames = systemfunc("ls " + analysisPath + "| grep " + pattern)
+  historyNames = historyPath + fileNames
+  print(historyNames)
+    
   history = addfiles(historyNames, "r")
   ListSetType(history, "cat")
   print("historyNames:"+dimsizes(historyNames))
 ;  print(historyNames)
+    
+  analysis = addfiles(analysisNames, "r")
+  ListSetType(analysis, "cat")
+  print("analysisNames:"+dimsizes(analysisNames))
    
  ; Compute the pressure levels ...
   time    = addfiles_GetVar(history, historyNames, "time")
@@ -51,14 +64,44 @@ begin
   date = addfiles_GetVar(history, historyNames, "date")
   print("reading T")
   T    = addfiles_GetVar(history, historyNames, "T")
+  print("reading PURSULND")
+  pursulnd    = addfiles_GetVar(history, historyNames, "PURSULND")
+  print("reading MIXSULND")
+  mixsulnd    = addfiles_GetVar(history, historyNames, "MIXSULND")
+  print("reading DUSTND")
+  dustnd    = addfiles_GetVar(history, historyNames, "DUSTND")
   
-  print("reading mixsul10A")
-  mixsul10A  = addfiles_GetVar(history,  historyNames,  "MIXSUL10A")
-  print("reading pursul10A")
-  pursul10A  = addfiles_GetVar(history,  historyNames,  "PURSUL10A")
-;  totsul10A  = mixsul10A ; get dim wrappers
-;  totsul10A  = totsul10A + pursul10A
+  print("reading zonal mean data")
+  mixsul05a_zm  = addfiles_GetVar(analysis, analysisNames, "mixsul05a_zm")
+  mixsul10a_zm  = addfiles_GetVar(analysis, analysisNames, "mixsul10a_zm")
+  mixsul13a_zm  = addfiles_GetVar(analysis, analysisNames, "mixsul13a_zm")
+  mixsul30a_zm  = addfiles_GetVar(analysis, analysisNames, "mixsul30a_zm")
+
+  pursul05a_zm  = addfiles_GetVar(analysis, analysisNames, "pursul05a_zm")
+  pursul10a_zm  = addfiles_GetVar(analysis, analysisNames, "pursul10a_zm")
+  pursul13a_zm  = addfiles_GetVar(analysis, analysisNames, "pursul13a_zm")
+  pursul30a_zm  = addfiles_GetVar(analysis, analysisNames, "pursul30a_zm")
+
+  dust05a_zm  = addfiles_GetVar(analysis, analysisNames, "dust05a_zm")
+  dust10a_zm  = addfiles_GetVar(analysis, analysisNames, "dust10a_zm")
+  dust13a_zm  = addfiles_GetVar(analysis, analysisNames, "dust13a_zm")
+  dust30a_zm  = addfiles_GetVar(analysis, analysisNames, "dust30a_zm")
   
+  print("reading 0.007 hPa data")
+  mixsul05a_007hPa  = addfiles_GetVar(analysis, analysisNames, "mixsul05a_007hPa")
+  mixsul10a_007hPa  = addfiles_GetVar(analysis, analysisNames, "mixsul10a_007hPa")
+  mixsul13a_007hPa  = addfiles_GetVar(analysis, analysisNames, "mixsul13a_007hPa")
+  mixsul30a_007hPa  = addfiles_GetVar(analysis, analysisNames, "mixsul30a_007hPa")
+
+  pursul05a_007hPa  = addfiles_GetVar(analysis, analysisNames, "pursul05a_007hPa")
+  pursul10a_007hPa  = addfiles_GetVar(analysis, analysisNames, "pursul10a_007hPa")
+  pursul13a_007hPa  = addfiles_GetVar(analysis, analysisNames, "pursul13a_007hPa")
+  pursul30a_007hPa  = addfiles_GetVar(analysis, analysisNames, "pursul30a_007hPa")
+
+  dust05a_007hPa  = addfiles_GetVar(analysis, analysisNames, "dust05a_007hPa")
+  dust10a_007hPa  = addfiles_GetVar(analysis, analysisNames, "dust10a_007hPa")
+  dust13a_007hPa  = addfiles_GetVar(analysis, analysisNames, "dust13a_007hPa")
+  dust30a_007hPa  = addfiles_GetVar(analysis, analysisNames, "dust30a_007hPa")
   
   lev_p   = lev
   lev_p@units = "mb"
@@ -66,35 +109,84 @@ begin
   
  ; Calculate the zonal daily average of temperature
   print("Averaging temperature ...")
-  T_za=dim_avg_Wrap(T(lev|:,time|:,lat|:,lon|:))
-  T_za&lev = lev_p
+  T_zm=dim_avg_Wrap(T(lev|:,time|:,lat|:,lon|:))
+  T_zm&lev = lev_p
   
-  print("Averaging pursulf ...")
-  pursulf_za=dim_avg_Wrap(pursul10A(lev|:,time|:,lat|:,lon|:))
-  pursulf_za&lev = lev_p
+  print("Averaging PURSULND ...")
+  pursulnd_zm=dim_avg_Wrap(pursulnd(lev|:,time|:,lat|:,lon|:))
+  pursulnd_zm&lev = lev_p
   
-  print("Averaging mixsulf ...")
-  mixsulf_za=dim_avg_Wrap(mixsul10A(lev|:,time|:,lat|:,lon|:))  
-  mixsulf_za&lev = lev_p
+  print("Averaging MIXSULND ...")
+  mixsulnd_zm=dim_avg_Wrap(mixsulnd(lev|:,time|:,lat|:,lon|:))
+  mixsulnd_zm&lev = lev_p
+  
+  print("Averaging DUSTND ...")
+  dustnd_zm=dim_avg_Wrap(dustnd(lev|:,time|:,lat|:,lon|:))
+  dustnd_zm&lev = lev_p
+  
+  pursul05a_zm&lev = lev_p  
+  pursul10a_zm&lev = lev_p  
+  pursul13a_zm&lev = lev_p  
+  pursul30a_zm&lev = lev_p
+  
+  dust05a_zm&lev = lev_p  
+  dust10a_zm&lev = lev_p  
+  dust13a_zm&lev = lev_p  
+  dust30a_zm&lev = lev_p
+  
+  mixsul05a_zm&lev = lev_p  
+  mixsul10a_zm&lev = lev_p  
+  mixsul13a_zm&lev = lev_p  
+  mixsul30a_zm&lev = lev_p
   
   outfile="analysis/"+caseid+"/mixsulf125Time.nc"
 
   print("saving file "+outfile)
   fileout=addfile(outfile,"c")
   
-  print("saving date")
   fileout->date=date
-  print("saving T_za")
-  fileout->T_za=T_za
-  print("saving mixsulf_za")
-  fileout->mixsulf_za=mixsulf_za
-  print("saving pursulf_za")
-  fileout->pursulf_za=pursulf_za
+  fileout->T_zm=T_zm
+  
+  fileout->mixsulnd_zm=mixsulnd_zm
+  fileout->mixsul05a_zm=mixsul05a_zm
+  fileout->mixsul10a_zm=mixsul10a_zm
+  fileout->mixsul13a_zm=mixsul13a_zm
+  fileout->mixsul30a_zm=mixsul30a_zm
+  fileout->mixsul05a_007hPa=mixsul05a_007hPa
+  fileout->mixsul10a_007hPa=mixsul10a_007hPa
+  fileout->mixsul13a_007hPa=mixsul13a_007hPa
+  fileout->mixsul30a_007hPa=mixsul30a_007hPa
+  
+  fileout->pursulnd_zm=pursulnd_zm
+  fileout->pursul05a_zm=pursul05a_zm
+  fileout->pursul10a_zm=pursul10a_zm
+  fileout->pursul13a_zm=pursul13a_zm
+  fileout->pursul30a_zm=pursul30a_zm
+  fileout->pursul05a_007hPa=pursul05a_007hPa
+  fileout->pursul10a_007hPa=pursul10a_007hPa
+  fileout->pursul13a_007hPa=pursul13a_007hPa
+  fileout->pursul30a_007hPa=pursul30a_007hPa
+  
+  fileout->dustnd_zm=dustnd_zm
+  fileout->dust05a_zm=dust05a_zm
+  fileout->dust10a_zm=dust10a_zm
+  fileout->dust13a_zm=dust13a_zm
+  fileout->dust30a_zm=dust30a_zm
+  fileout->dust05a_007hPa=dust05a_007hPa
+  fileout->dust10a_007hPa=dust10a_007hPa
+  fileout->dust13a_007hPa=dust13a_007hPa
+  fileout->dust30a_007hPa=dust30a_007hPa
 
 end
 
 undef("mixsulfTime")
-procedure mixsulfTime(caseid:string,targetLat:float)
+procedure mixsulfTime(caseid:string,targetLat:float,year:string)
+
+; inputs:
+;  caseid, e.g. "125kelvH2Oe"
+;  targetLat, e.g. 84 for 84°N and 84°S
+;  year = can be scalar string year for NH only, or
+;         array of (/yearNH,yearSH1,yearSH2/) for 2-hemisphere plots
 
 local files, nFiles, historyFile
 
@@ -118,46 +210,61 @@ begin
   nLats   = dimsizes(lat)
   
   date    = filein->date
-  T_za    = filein->T_za
-  mixsulf_za = filein->mixsulf_za
-  pursulf_za = filein->pursulf_za
+  T_zm    = filein->T_zm
+
+; Set for varios size thresholds  
+;  mixsul_zm = filein->mixsul10a_zm
+;  pursul_zm = filein->pursul10a_zm
+;  sizeLimit = "10A"
   
-  yearNH="1997"
-  yearSH1="1997"
-  yearSH2="1998"
+  mixsul_zm = filein->mixsul05a_zm
+  pursul_zm = filein->pursul05a_zm
+  sizeLimit = "05A"
   
-  if (caseid .eq. "125smin400" .or caseid .eq. "125tabaz22") then
-    yearNH="1995"
-    yearSH1="1995"
-    yearSH2="1996"
+;  mixsul_zm = filein->mixsulnd_zm
+;  pursul_zm = filein->pursulnd_zm
+;  sizeLimit = "00A"
+  
+  nYear = dimsizes(year)
+  print("nYear="+nYear)
+  
+  time0401=ind(date.eq.year(0)+"0401")
+  time1031=ind(date.eq.year(0)+"1031")
+  
+  if (ismissing(time1031)) then
+    time1031=nTime-1
   end if
-  
-  if (caseid .eq. "125sminPtbo2") then
-    yearNH="1996"
-    yearSH1="1995"
-    yearSH2="1996"
-  end if
-  
-  time0401=ind(date.eq.yearNH+"0401")
-  time1031=ind(date.eq.yearNH+"1031")
   
   print("time0401="+time0401+" time="+time(time0401))
   print("time1031="+time1031+" time="+time(time1031))
  
-  time1001=ind(date.eq.yearSH1+"1001")
-  time0430=ind(date.eq.yearSH2+"0430")
+  if (nYear.gt.1) then
   
-  print("time1001="+time1001+" time="+time(time1001))
-  print("time0430="+time0430+" time="+time(time0430))
+    time1001=ind(date.eq.year(1)+"1001")
+    time0430=ind(date.eq.year(2)+"0430")
 
-  ; Make a 4 plot panel ...
+    print("time1001="+time1001+" time="+time(time1001))
+    print("time0430="+time0430+" time="+time(time0430))
+  
+  else ; fill in some values for tick generation code below
+  
+    time1001=time0401
+    time0430=time1031
+
+  end if
+  
+  ; Make a 2- or 4-plot panel ...
   print("")
   print("  Plotting ...")
  
   minP      = 0.0001        ; largest pressure to plot ...
   maxP      = 0.1        ; largest pressure to plot ...
   
-  nPlots = 4
+  nPlots = 2
+  if (nYear.gt.1) then
+    nPlots = 4
+  end if
+  
   plot = new((/ nPlots /), graphic)
   plotT = new((/ nPlots /), graphic)
   
@@ -230,19 +337,28 @@ begin
   months = (/ "Dec", "January", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov" /)
 
   ; Open a workstation
-  wks = gsn_open_wks("pdf","images/mixsulf125Time."+caseid+"."+targetLat)
+  wks = gsn_open_wks("pdf","images/mixsulf125Time."+caseid+"."+sizeLimit+"."+targetLat)
   gsn_define_colormap(wks,"gui_default")                ; choose colormap
   
   print("")
   print("    temperature overlay")
   
  ; Create temperature overlay contours
-  plotT(0) = gsn_csm_contour(wks, T_za({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), resO)
-  plotT(2) = gsn_csm_contour(wks, T_za({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), resO)
+  plotT(0) = gsn_csm_contour(wks, T_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), resO)
   
-  plotT(1) = gsn_csm_contour(wks, T_za({lev|minP:maxP} , time|time1001:time0430, {lat|-targetLat}), resO)
-  plotT(3) = gsn_csm_contour(wks, T_za({lev|minP:maxP} , time|time1001:time0430, {lat|-targetLat}), resO)
+  if (nPlots.eq.2) then
+  
+    plotT(1) = gsn_csm_contour(wks, T_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), resO)  
+    
+  else
+  
+    plotT(2) = gsn_csm_contour(wks, T_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), resO)
 
+    plotT(1) = gsn_csm_contour(wks, T_zm({lev|minP:maxP} , time|time1001:time0430, {lat|-targetLat}), resO)
+    plotT(3) = gsn_csm_contour(wks, T_zm({lev|minP:maxP} , time|time1001:time0430, {lat|-targetLat}), resO)
+    
+  end if
+  
   print("")
   print("    number density")
    
@@ -257,8 +373,9 @@ begin
 ;  res@cnMaxLevelValF        = 100.0                 ; contour interval  
 
   res@cnLevelSelectionMode  = "ExplicitLevels"
-  res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
-      200, 300, 500, 750, 1000, 1500, 2000, 3000, 5000, 7500, 10000 /)
+;  res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
+;      200, 300, 500, 750, 1000, 1500, 2000, 3000, 5000, 7500, 10000 /)
+  res@cnLevels = (/ 1, 2, 3, 5, 7.5, 10, 20, 30, 50, 75, 100, 200, 300, 400, 500, 600 /);, 1000, 1500 /)
   res@lbLabelAngleF = 60
   
 ;===================================================================
@@ -332,30 +449,36 @@ begin
   
 ;===================================================================  
   
-  plot(0) = gsn_csm_pres_hgt(wks, mixsulf_za({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), res)
+  plot(0) = gsn_csm_pres_hgt(wks, mixsul_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), res)
   overlay(plot(0), plotT(0))
 
-  plot(1) = gsn_csm_pres_hgt(wks, mixsulf_za({lev|minP:maxP} , time|time1001:time0430, {lat|-targetLat}), resSH)
-  overlay(plot(1), plotT(1))
-    
-  plot(2) = gsn_csm_pres_hgt(wks, pursulf_za({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), res)
-  overlay(plot(2), plotT(2))
-
-  plot(3) = gsn_csm_pres_hgt(wks, pursulf_za({lev|minP:maxP} , time|time1001:time0430, {lat|-targetLat}), resSH)
-  overlay(plot(3), plotT(3))
-
-
-  gsn_panel(wks, plot, (/ 2, 2 /), resP)
+  if (nPlots.eq.2) then
   
-  print("NH mixsulf max: "+max(mixsulf_za({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat})))
-  print("NH pursulf max: "+max(pursulf_za({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat})))
+    plot(1) = gsn_csm_pres_hgt(wks, pursul_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), res)
+    overlay(plot(1), plotT(1))
+    gsn_panel(wks, plot, (/ 1, 2 /), resP)
+  
+  else
+    plot(1) = gsn_csm_pres_hgt(wks, mixsul_zm({lev|minP:maxP} , time|time1001:time0430, {lat|-targetLat}), resSH)
+    overlay(plot(1), plotT(1))
+
+    plot(2) = gsn_csm_pres_hgt(wks, pursul_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), res)
+    overlay(plot(2), plotT(2))
+
+    plot(3) = gsn_csm_pres_hgt(wks, pursul_zm({lev|minP:maxP} , time|time1001:time0430, {lat|-targetLat}), resSH)
+    overlay(plot(3), plotT(3))
+
+    gsn_panel(wks, plot, (/ 2, 2 /), resP)
+  end if
+  
+  print("NH mixsulf max: "+max(mixsul_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat})))
+  print("NH pursulf max: "+max(pursul_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat})))
 
 end
 
-caseid="125tabaz22"
-;caseid="125smin400"
-;caseid="125sminPtbo2"
-;mixsulfTimeAnalysis(caseid)
+caseid="125bin36c"
+
+mixsulfTimeAnalysis(caseid,"h3")
 
 ;mixsulfTime(caseid,70)
-mixsulfTime(caseid,84)
+;mixsulfTime(caseid,84,"1995")
