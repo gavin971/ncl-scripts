@@ -157,6 +157,99 @@ end
 
 ;=========================================
 
+; Get a radius for each bin.
+undef("getRad")
+procedure getRad(history:file, shortName:string, X:float, nBins:integer)
+  
+;  X( ,b) = binned quantity from history (i.e. mmr or radius) 
+
+local b, binName, nBins, xbin
+
+begin
+  
+  ; Iterate over the bins
+  
+  do b = 0, nBins-1
+    if (b.ne.skipbin) then
+      binName = shortName + sprinti("%2.2i", b+1) + "RA"
+
+      ; Get the radius for this bin.
+      xbin = history->$binName$
+
+      ; Set array of radii.
+      X(:, :, :, :, b) = xbin
+
+      delete(xbin)
+      print("bin "+b+" max="+max(X(:, :, :, :, b))+" min="+min(X(:, :, :, :, b)))
+    end if
+  end do
+ 
+end 
+
+;=========================================
+
+; Get a binned quantity for each bin.
+undef("getXbin")
+procedure getXbin(history:file, shortName:string, X:float, nBins:integer)
+  
+;  X( ,b) = binned quantity from history (i.e. mmr or radius) 
+
+local b, binName, nBins, xbin
+
+begin
+  
+  ; Iterate over the bins
+  
+  do b = 0, nBins-1
+    if (b.ne.skipbin) then
+      binName = shortName + sprinti("%2.2i", b+1)
+
+      ; Get the quantity for this bin.
+      xbin = history->$binName$
+
+      ; Set array of binned quantities.
+      X(:, :, :, :, b) = xbin
+
+      delete(xbin)
+      print("bin "+b+" max="+max(X(:, :, :, :, b))+" min="+min(X(:, :, :, :, b)))
+    end if
+  end do
+ 
+end 
+
+;=========================================
+
+; Set a binned quantity for each bin in a history file
+undef("setXbin")
+procedure getXbin(history:file, shortName:string, X:float, nBins:integer)
+  
+;  X( ,b) = binned quantity (i.e. mmr or radius) 
+
+local b, binName, nBins, xbin
+
+begin
+  
+  ; Iterate over the bins
+  
+  do b = 0, nBins-1
+    if (b.ne.skipbin) then
+      binName = shortName + sprinti("%2.2i", b+1)
+
+      ; Get the quantity for this bin.
+      xbin = X(:, :, :, :, b)
+
+      ; Set the value in the history file.
+      history->$binName$ = xbin
+
+      delete(xbin)
+      print("bin "+b+" max="+max(X(:, :, :, :, b))+" min="+min(X(:, :, :, :, b)))
+    end if
+  end do
+ 
+end 
+
+;=========================================
+
 ; Compute sulfate mass density
 undef("calcSulfDens")
 procedure calcSulfDens(wtp:float,temp:float,sulfDens:float)

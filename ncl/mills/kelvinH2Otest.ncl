@@ -9,38 +9,45 @@ targetDate = "19950615"
 print("Lat="+targetLat)
 print("Lev="+targetLev)
 
-historyRun="125tabaz22"
-historyPath = getHistoryPath(historyRun) + "alldaily/"
+;historyRun="125tabaz22"
+;historyPath = getHistoryPath(historyRun) + "alldaily/"
 
-file1="all."+historyRun+".cam2.h3.1995-06-14-00000.nc"
-history=addfile(historyPath+file1,"r")
+;file1="all."+historyRun+".cam2.h3.1995-06-14-00000.nc"
+;history=addfile(historyPath+file1,"r")
 
  ; vars(time, lev, lat, lon, bins)
 ;  print("  reading MIXSULNDBIN")
 ;  mixsulndbin  = history->MIXSULNDBIN
 ;  print("  reading SULFRAD")
 ;  sulfrad  = history->SULFRAD
-  print("  reading PURSULNDBIN")
-  pursulndbin  = history->PURSULNDBIN
-  print("  reading PURERAD")
-  purerad  = history->PURERAD
-  print("  reading SULDEN")
-  sulden  = history->SULDEN
-  t  = history->T
-  wtpct=history->WTPCT
-  lev = history->lev
-  lat = history->lat
-  lon = history->lon
-  time  = history->time
-  date  = history->date
 
-  iTime=ind(date.eq.targetDate)
+;  print("  reading PURSULNDBIN")
+;  pursulndbin  = history->PURSULNDBIN
+;  print("  reading PURERAD")
+;  purerad  = history->PURERAD
+;  print("  reading SULDEN")
+;  sulden  = history->SULDEN
+;  t  = history->T
+;  wtpct=history->WTPCT
+;  lev = history->lev
+;  lat = history->lat
+;  lon = history->lon
+;  time  = history->time
+;  date  = history->date
 
-  rad1 = purerad(iTime,{targetLev},{targetLat},{targetLon},:)
-  rad2 = rad1
-  rhoaer = sulden(iTime,{targetLev},{targetLat},{targetLon})
-  temp = t(iTime,{targetLev},{targetLat},{targetLon})
-  wp = wtpct(iTime,{targetLev},{targetLat},{targetLon})
+;  iTime=ind(date.eq.targetDate)
+
+;  rad1 = purerad(iTime,{targetLev},{targetLat},{targetLon},:)
+;  rad2 = rad1
+;  rhoaer = sulden(iTime,{targetLev},{targetLat},{targetLon})
+;  temp = t(iTime,{targetLev},{targetLat},{targetLon})
+;  wp = wtpct(iTime,{targetLev},{targetLat},{targetLon})
+ 
+temp= 149.330815851386916
+wp=45.6412523721937973
+rhoaer=1.572573157
+rad1=(/1.08E-08,1.36E-08,1.72E-08,2.17E-08,2.73E-08,3.44E-08/)
+ 
   
   dnwtp = (/0,1,5,10,20,25,30,35,40,41,45,50,53,55,56,60,65,66,70, \
    72,73,74,75,76,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93, \
@@ -72,7 +79,7 @@ history=addfile(historyPath+file1,"r")
   print("i="+i)
   den1=dnc0(i-1)+dnc1(i-1)*temp
   den2=dnc0(i)+dnc1(i)*temp
-  drho_dwt=(den1-den2)/(dnwtp(i)-dnwtp(i-1))
+  drho_dwt=(den2-den1)/(dnwtp(i)-dnwtp(i-1))
 
   if (i.eq.1 .or. wp.eq.dnwtp(i)) then
     rho=den2
@@ -111,7 +118,7 @@ history=addfile(historyPath+file1,"r")
   
   sig1=stc0(i-1)+stc1(i-1)*temp
   sig2=stc0(i)+stc1(i)*temp
-  dsig_dwt=(sig1-sig2)/(stwtp(i)-stwtp(i-1))
+  dsig_dwt=(sig2-sig1)/(stwtp(i)-stwtp(i-1))
 
   if (i.eq.0 .or. wp.eq.stwtp(i)) then
     surf_tens=sig2
@@ -134,6 +141,7 @@ history=addfile(historyPath+file1,"r")
   kelvinH2O_a = 2 * MWH2O * surf_tens / (rho * RGAS2 * temp * rad1)
   kelvinH2O_b = 1+ wp*drho_dwt/rho - 3.*wp*dsig_dwt/(2.*surf_tens)
   print("")
+  print("kelvinH2O_a="+kelvinH2O_a)
   print("kelvinH2O_b="+kelvinH2O_b)
   print("")
   
