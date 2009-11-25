@@ -39,12 +39,14 @@ begin
   
   nBins = 36
   rmin  = (gwtH2SO4/AVG/RHO_H2SO4/cpi)^(1./3.) ; cm
+  rmin2  = 2.0*rmin
 
   rmrat = 2.0
   rho   = RHO_DUST  ; g/cm-3
   
   rmass = new(nBins, float)
   rmass!0 = "bins"
+  rmass2 = rmass
   dustrad = rmass
   dustdr = rmass
   rmassup = rmass
@@ -57,12 +59,18 @@ begin
   print("    Assuming ...")
   print("      nBins    =  " + nBins)
   print("      rmin     =  " + rmin)
+  print("      rmin2    =  " + rmin2)
   print("      rmrat    =  " + rmrat)
   print("      rho      =  " + rho)
   
-  setupbins(nBins, rmin, rmrat, rho, rmass, dustrad, dustdr, rmassup, dm, dustvol, dustradup, dustradlow)
+  setupbins(nBins, rmin2, rmrat, rho, rmass2, dustrad, dustdr, \
+             rmassup, dm, dustvol, dustradup, dustradlow)
+  
+  setupbins(nBins, rmin, rmrat, rho, rmass, dustrad, dustdr, \
+             rmassup, dm, dustvol, dustradup, dustradlow)
   
   rmass@long_name  = "bin center mass"
+  rmass2@long_name  = "bin center mass"
   rmassup@long_name = "upper bin boundary mass"
   dustrad@long_name = "dust bin mean (volume-weighted) radius"
   dustradup@long_name = "dust upper bin boundary radius"
@@ -72,6 +80,7 @@ begin
   dm@long_name = "bin mass spacing"
  
   rmass@units = "g"
+  rmass2@units = "g"
   rmassup@units = "g"
   dustrad@units = "cm"
   dustradup@units = "cm"
@@ -154,11 +163,11 @@ begin
 
       print("pursul")
       getRad(histfile, "PURSUL", pursulrad, nBins)
-      getN(histfile, "PURSUL", rmass, arho, pursulndbin)    
+      getN(histfile, "PURSUL", rmass2, arho, pursulndbin)    
 
       print("mixsul")
       getRad(histfile, "MIXSUL", mixsulrad, nBins)
-      getN(histfile, "MIXSUL", rmass, arho, mixsulndbin)
+      getN(histfile, "MIXSUL", rmass2, arho, mixsulndbin)
 
       print("dust")
       getN(histfile, "DUST", rmass, arho, dustndbin)

@@ -46,18 +46,18 @@ local cpi, i, vrfact
 begin
 
   ; Allocate arrays for the return variables.
-  r = new(nbin, float)
-  r!0="bins"
-  rmass = r
-  dr = r
+;  r = new(nbin, float)
+;  r!0="bins"
+;  rmass = r
+;  dr = r
   
   ; NOTE: These aren't currently being returned, but are calculated
   ; in setupbins.
-  rmassup = r
-  dm = r
-  vol = r
-  rup = r
-  rlow = r
+;  rmassup = r
+;  dm = r
+;  vol = r
+;  rup = r
+;  rlow = r
   
   ; The first bin is based upon rmin.
   cpi = 4./3. * PI
@@ -107,27 +107,19 @@ end
 
 ; Get the number density for each bin.
 undef("getN")
-procedure getN(history:file, shortName:string, rmass:float, arho:float, N:float, skipbin:integer)
+procedure getN(history:file, shortName:string, rmass:float, arho:float, N:float )
   
 ;  rmass(nBins) = mass of 1 particle in each bin (g)
 ;  arho(:,:,:,:) = atmospheric density (g/cm3)
 ;  N( ,b) = number density of particles in each bin (#/cm3) 
-;  skipbin = bin to skip and interpolate (-1 to not skip any)
 local b, binName, nBins, mmr
 
 begin
   
   ; Iterate over the bins
   nBins = dimsizes(rmass)
-    
-;  ndname=shortName+"ND"
-;  nd=history->$ndname$
-  
-;  ndsum=nd
-;  ndsum(:,:,:,:)=0.0
   
   do b = 0, nBins-1
-    if (b.ne.skipbin) then
       binName = shortName + sprinti("%2.2i", b+1)
 
       ; Get the mass mixing ratio.
@@ -137,21 +129,8 @@ begin
       N(:, :, :, :, b) = (mmr * arho) / rmass(b)
 ;      ndsum(:,:,:,:)=ndsum(:,:,:,:)+N(:, :, :, :, b)
       delete(mmr)
-      print("bin "+b+" max="+max(N(:, :, :, :, b))+" min="+min(N(:, :, :, :, b)))
-    end if
+      print(binName+" max N="+max(N(:, :, :, :, b))+" min N="+min(N(:, :, :, :, b)))
   end do
-
-; HACK: interpolate missing bin 32: 
-  if (skipbin.gt.0) then 
-    N(:, :, :, :, skipbin) = sqrt(N(:, :, :, :, skipbin-1)*N(:, :, :, :, skipbin+1))
-  end if
-
-;  N(:, :, :, :, 31) = (nd-ndsum>0)
-;  mmr = N(:, :, :, :, 31)*rmass(31)/arho
-;  mmr@units="kg/kg"
-;  mmr@long_name="mass in bin 32"
-;  binName = shortName + "32"
-;  history->$binName$=mmr
  
 end 
 
@@ -170,7 +149,6 @@ begin
   ; Iterate over the bins
   
   do b = 0, nBins-1
-    if (b.ne.skipbin) then
       binName = shortName + sprinti("%2.2i", b+1) + "RA"
 
       ; Get the radius for this bin.
@@ -180,8 +158,18 @@ begin
       X(:, :, :, :, b) = xbin
 
       delete(xbin)
-      print("bin "+b+" max="+max(X(:, :, :, :, b))+" min="+min(X(:, :, :, :, b)))
-    end if
+      print(binName+" max="+max(X(:, :, :, :, b))+" min="+min(X(:, :, :, :, b)))
+;      if (binBame.eq."MIXSUL01RA") then
+      if (b.eq.0) then
+	a1D      = ndtooned(X(:, :, :, :, b))
+	dsizes_a = dimsizes(X)
+	indices  = ind_resolve(ind(a1D.eq.max(X(:, :, :, :, b))),dsizes_a)
+        print("max ind:"+indices)
+	print("time:"+X&time((/indices(0,0)/)))
+	print(" lev:"+X&lev((/indices(0,1)/)))
+	print(" lat:"+X&lat((/indices(0,2)/)))
+	print(" lon:"+X&lon((/indices(0,3)/)))
+      end if
   end do
  
 end 
@@ -190,29 +178,31 @@ end
 
 ; Get a binned quantity for each bin.
 undef("getXbin")
-procedure getXbin(history:file, shortName:string, X:float, nBins:integer)
+procedure getXbin(history:file, shortName:string, X:double, nBins:integer)
   
 ;  X( ,b) = binned quantity from history (i.e. mmr or radius) 
 
-local b, binName, nBins, xbin
+local b, binName, xbin
 
 begin
   
+  print("Getting "+shortName)
   ; Iterate over the bins
   
   do b = 0, nBins-1
-    if (b.ne.skipbin) then
       binName = shortName + sprinti("%2.2i", b+1)
 
       ; Get the quantity for this bin.
       xbin = history->$binName$
+;      print("xbin:"+dimsizes(xbin))
+;      print("X:"+dimsizes(X))
 
       ; Set array of binned quantities.
       X(:, :, :, :, b) = xbin
 
       delete(xbin)
-      print("bin "+b+" max="+max(X(:, :, :, :, b))+" min="+min(X(:, :, :, :, b)))
-    end if
+      print(binName+" max="+sprintf("%9.3e",max(X(:, :, :, :, b)))+\
+      " min="+sprintf("%9.3e",min(X(:, :, :, :, b))))
   end do
  
 end 
@@ -221,19 +211,22 @@ end
 
 ; Set a binned quantity for each bin in a history file
 undef("setXbin")
-procedure getXbin(history:file, shortName:string, X:float, nBins:integer)
+procedure setXbin(history:file, shortName:string, X:double, nBins:integer)
   
 ;  X( ,b) = binned quantity (i.e. mmr or radius) 
 
-local b, binName, nBins, xbin
+local b, binName, xbin
 
 begin
   
+  print("Setting "+shortName)
   ; Iterate over the bins
   
   do b = 0, nBins-1
-    if (b.ne.skipbin) then
       binName = shortName + sprinti("%2.2i", b+1)
+      
+      print(binName+" max="+sprintf("%9.3e",max(X(:, :, :, :, b)))+\
+           " min="+sprintf("%9.3e",min(X(:, :, :, :, b))))
 
       ; Get the quantity for this bin.
       xbin = X(:, :, :, :, b)
@@ -242,8 +235,8 @@ begin
       history->$binName$ = xbin
 
       delete(xbin)
-      print("bin "+b+" max="+max(X(:, :, :, :, b))+" min="+min(X(:, :, :, :, b)))
-    end if
+;      print(" bin "+sprinti("%2.2i",b)+" max="+sprintf("%9.3e",max(X(:, :, :, :, b)))+\
+;           " min="+sprintf("%9.3e",min(X(:, :, :, :, b))))
   end do
  
 end 
