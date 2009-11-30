@@ -29,7 +29,7 @@ begin
   fileNames = systemfunc("ls " + historyPath + "| grep " + pattern)
   
   if (.not.(isfilepresent("analysis/"+historyRun))) then
-    a = systemfunc("mkdir analysis/"+historyRun)
+    a = systemfunc("mkdir -p analysis/"+historyRun)
   end if
   
   ; Setup the same bin structure used during the model run.

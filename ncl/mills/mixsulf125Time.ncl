@@ -139,6 +139,10 @@ begin
   mixsul13a_zm&lev = lev_p  
   mixsul30a_zm&lev = lev_p
   
+  if (.not.(isfilepresent("analysis/"+caseid))) then
+    a = systemfunc("mkdir -p analysis/"+caseid)
+  end if
+  
   outfile="analysis/"+caseid+"/mixsulf125Time."+caseid+".nc"
 
   print("saving file "+outfile)
@@ -344,7 +348,12 @@ begin
   months = (/ "Dec", "January", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov" /)
 
   ; Open a workstation
-  wks = gsn_open_wks("pdf","images/mixsulf125Time."+caseid+"."+sizeLimit+"."+targetLat)
+  
+  if (.not.(isfilepresent("images/"+caseid))) then
+    a = systemfunc("mkdir -p images/"+caseid)
+  end if
+  
+  wks = gsn_open_wks("pdf","images/"+caseid+"/mixsulf125Time."+caseid+"."+sizeLimit+"."+targetLat)
   gsn_define_colormap(wks,"gui_default")                ; choose colormap
   
   print("")
@@ -489,3 +498,5 @@ caseid="125b36dq"
 
 ;mixsulfTime(caseid,70)
 mixsulfTime(caseid,84,"1995","00A")
+mixsulfTime(caseid,84,"1995","05A")
+mixsulfTime(caseid,84,"1995","10A")
