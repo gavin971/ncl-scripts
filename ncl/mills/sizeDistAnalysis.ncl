@@ -7,16 +7,16 @@ cpi = 4./3.*PI
 ;  Molecular weights [g/mol]
 gwtH2SO4 = 98.078479
 
-caseid = "125bin36c"
+caseid = "125b36dq"
 
 historyPath=getHistoryPath(caseid)
 
 print(historyPath)
 
-files=(/"125bin36c.cam2.h3.1995-05-30-00000.nc", \
-        "125bin36c.cam2.h3.1995-06-14-00000.nc", \
-        "125bin36c.cam2.h3.1995-06-29-00000.nc", \
-        "125bin36c.cam2.h3.1995-07-14-00000.nc" /)
+files=(/caseid+".cam2.h3.1995-05-30-00000.nc", \
+        caseid+".cam2.h3.1995-06-14-00000.nc", \
+        caseid+".cam2.h3.1995-06-29-00000.nc", \
+        caseid+".cam2.h3.1995-07-14-00000.nc" /)
 
 targetDates=(/"19950601","19950615","19950701","19950715"/)
 
@@ -216,7 +216,7 @@ if (.not.(isfilepresent("analysis/"+caseid))) then
   a = systemfunc("mkdir analysis/"+caseid)
 end if
 
-outfile="analysis/"+caseid+"/sizeDistAnalysis.nc"
+outfile="analysis/"+caseid+"/sizeDistAnalysis."+caseid+".nc"
 
 if (isfilepresent(outfile)) then
   print("deleting previous "+outfile)

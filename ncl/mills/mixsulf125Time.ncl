@@ -139,7 +139,7 @@ begin
   mixsul13a_zm&lev = lev_p  
   mixsul30a_zm&lev = lev_p
   
-  outfile="analysis/"+caseid+"/mixsulf125Time.nc"
+  outfile="analysis/"+caseid+"/mixsulf125Time."+caseid+".nc"
 
   print("saving file "+outfile)
   fileout=addfile(outfile,"c")
@@ -180,7 +180,7 @@ begin
 end
 
 undef("mixsulfTime")
-procedure mixsulfTime(caseid:string,targetLat:float,year:string)
+procedure mixsulfTime(caseid:string,targetLat:float,year:string,sizeLimit:string)
 
 ; inputs:
 ;  caseid, e.g. "125kelvH2Oe"
@@ -198,7 +198,7 @@ begin
   
   ; Open the  history files
   
-  infile="analysis/"+caseid+"/mixsulf125Time.nc"    
+  infile="analysis/"+caseid+"/mixsulf125Time."+caseid+".nc"    
   filein=addfile(infile,"r")
 
   time    = filein->time
@@ -212,19 +212,26 @@ begin
   date    = filein->date
   T_zm    = filein->T_zm
 
-; Set for varios size thresholds  
-;  mixsul_zm = filein->mixsul10a_zm
-;  pursul_zm = filein->pursul10a_zm
-;  sizeLimit = "10A"
-  
-  mixsul_zm = filein->mixsul05a_zm
-  pursul_zm = filein->pursul05a_zm
-  sizeLimit = "05A"
-  
-;  mixsul_zm = filein->mixsulnd_zm
-;  pursul_zm = filein->pursulnd_zm
-;  sizeLimit = "00A"
-  
+; Set for various size thresholds
+
+  if (sizeLimit.eq."10A") then
+    mixsul_zm = filein->mixsul10a_zm
+    pursul_zm = filein->pursul10a_zm
+  else
+    if (sizeLimit.eq."05A") then
+      mixsul_zm = filein->mixsul05a_zm
+      pursul_zm = filein->pursul05a_zm
+    else
+      if (sizeLimit.eq."00A") then  
+        mixsul_zm = filein->mixsulnd_zm
+        pursul_zm = filein->pursulnd_zm
+      else
+        print("FATAL: sizeLimit not recognized="+sizeLimit)
+        return
+      end if
+    end if
+  end if
+        
   nYear = dimsizes(year)
   print("nYear="+nYear)
   
@@ -476,9 +483,9 @@ begin
 
 end
 
-caseid="125bin36c"
+caseid="125b36dq"
 
-mixsulfTimeAnalysis(caseid,"h3")
+;mixsulfTimeAnalysis(caseid,"h3")
 
 ;mixsulfTime(caseid,70)
-;mixsulfTime(caseid,84,"1995")
+mixsulfTime(caseid,84,"1995","00A")
