@@ -20,7 +20,9 @@ begin
   lev = history->lev
   lat = history->lat
   date= history->date
-
+  print(lat)
+  print(lev)
+  
   print("  reading mixsulndbin")
   mixsulndbin  = history->mixsulndbin
   print("  reading mixsulrad")
@@ -34,7 +36,8 @@ begin
     a = systemfunc("mkdir -p images/"+caseid)
   end if
   
-  wks   = gsn_open_wks ("pdf","images/"+caseid+"/sizeDistEnsembleMeso."+caseid) ; open workstation
+  wks   = gsn_open_wks ("pdf","images/"+caseid+"/sizeDistEnsembleMeso."+caseid+"."+\
+          lat({targetLat})+"N_"+lev({targetLev})+"hPa") ; open workstation
 
   res                   = True                      ; plot mods desired
   res@gsnDraw           = False
@@ -141,13 +144,14 @@ begin
 
 end ; procedure sizeDistEnsembleMeso()
 
-targetLat = 78
+;targetLat = 78
+targetLat = 86
 ;targetLat = 82
 ;targetLev=0.002404575    ; ~86 km at 78N (?)
-targetLev=0.00230591145   ; 86.7 km at 78N
+;targetLev=0.00230591145   ; 86.7 km at 78N
 ;targetLev=0.0016106433  ; 88.1 km at 78N
 ;targetLev=0.0011211287  ; 89.5 km at 78N
-;targetLev=0.00584271015  ; 83 km at 78N
+targetLev=0.005842710  ; 83 km at 78N
 ;targetLev=0.00395005   ; 84.3 km at 82N
 
 caseid="125b36dq"

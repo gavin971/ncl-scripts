@@ -9,7 +9,10 @@ load "tests/common.ncl"
 ;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 undef("monave_za")
-procedure monave_za(caseid:string, type:string)
+procedure monave_za(caseid:string, aerType:string, year:string, sizeLimit:string)
+
+;  year = can be scalar string year for NH only, or
+;         array of (/yearNH,yearSH1,yearSH2/) for 2-hemisphere plots
 
 local files, nFiles, historyFile
 
@@ -18,142 +21,111 @@ begin
   print("")
   print("caseid="+caseid)
   print("  Plot monthly average mixed sulfate densities ...")
-  
-  ; Open the  history files
-  
-  if (caseid .eq. "125expuT15") then     
-;    historyNames2="waccm/dust-sulfur/run/125expuT15b/daily/all.125expuT15b.cam2.h3.199" + \
-;       (/ "7-12-31-00000.nc", "8-01-05-00000.nc", "8-01-10-00000.nc", "8-01-15-00000.nc", \
-;          "8-01-20-00000.nc", "8-01-25-00000.nc", "8-01-30-00000.nc" /)
-    yearNH="1997"
-    yearSH1="1997"
-    yearSH2="1998"        
-  end if
-  
-  if (caseid .eq. "125smin400") then
-    yearNH="1995"
-    yearSH1="1995"
-    yearSH2="1996"
-  end if
-  
-  if (caseid .eq. "125sminPtbo2") then
-    yearNH="1996"
-    yearSH1="1995"
-    yearSH2="1996"
-  end if
 
-  if (caseid .eq. "125smin") then
-    yearNH="1998"
-    yearSH1="1997"
-    yearSH2="1998"   
-  end if    
-    
-  historyPattern="waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+yearNH+"-0[67]*" 
-  historyNames = systemfunc("ls " + historyPattern)
-  history = addfiles(historyNames, "r")
-  ListSetType(history, "cat")
-  print("historyNames:"+dimsizes(historyNames))
-  print(historyNames)
-   
-  historyPattern21 = "waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+yearSH1+"-12*"
-  historyNames21 = systemfunc("ls " + historyPattern21)    
-  historyPattern22 = "waccm/dust-sulfur/run/"+caseid+"/alldaily/all.*.cam2.h3."+yearSH2+"-01*"
-  historyNames22 = systemfunc("ls " + historyPattern22)
-  historyNames2 = new( dimsizes(historyNames22)+1, string )
-  historyNames2(0) = historyNames21(dimsizes(historyNames21)-1)
-  historyNames2(1:dimsizes(historyNames22)) = historyNames22
-  history2 = addfiles(historyNames2, "r")
-  
-;  historyNames2 = historyNames
-;  history2 = history
-  
-  ListSetType(history2, "cat")
-  print("historyNames2:"+dimsizes(historyNames2))
-  print(historyNames2)
+  ; Open the analysis file
+  infile="analysis/"+caseid+"/mixsulf125Time."+caseid+".nc"    
+  filein=addfile(infile,"r")
 
- ; Compute the pressure levels ...
-  time     = addfiles_GetVar(history, historyNames, "time")
-;  time2    = addfiles_GetVar(history2, historyNames2, "time")
-  time2   = time
+  time    = filein->time
+  nTime   = dimsizes(time)
 
-  lev     = history[4]->lev
+  lev     = filein->lev
   nLevs   = dimsizes(lev)
-  lat     = history[0]->lat
+  lat     = filein->lat
   nLats   = dimsizes(lat)
-  lon     = history[0]->lon
-  nLons   = dimsizes(lon)
   
-  ; Determine an approximate dz/dp.
-  hyam 	= history[0]->hyam
-  hybm 	= history[0]->hybm
-  hyai 	= history[0]->hyai
-  hybi 	= history[0]->hybi
-  P0 	  = history[0]->P0
-  PS 	  = history[0]->PS
-  
-  T    = addfiles_GetVar(history, historyNames, "T")
-  T2   = addfiles_GetVar(history2, historyNames2, "T")
-  date = addfiles_GetVar(history, historyNames, "date")
-  date2= addfiles_GetVar(history2, historyNames2, "date")
-  
-  mixsul10A  = addfiles_GetVar(history,  historyNames,  "MIXSUL10A")
-  pursul10A  = addfiles_GetVar(history,  historyNames,  "PURSUL10A")
-  totsul10A  = mixsul10A ; get dim wrappers
-  totsul10A  = totsul10A + pursul10A
-  
-  mixsul10A2 = addfiles_GetVar(history2, historyNames2, "MIXSUL10A")
-  pursul10A2 = addfiles_GetVar(history2, historyNames2, "PURSUL10A")
-  totsul10A2 = mixsul10A2 ; get dim wrappers
-  totsul10A2 = totsul10A2 + pursul10A2
-  
-  if (type .eq. "mix") then
-    sul10A  = mixsul10A
-    sul10A2 = mixsul10A2
+  date    = filein->date
+  T_zm    = filein->T_zm
+
+; Set for various size thresholds
+
+  if (sizeLimit.eq."10A") then
+    mixsul_zm = filein->mixsul10a_zm
+    pursul_zm = filein->pursul10a_zm
+  else
+    if (sizeLimit.eq."05A") then
+      mixsul_zm = filein->mixsul05a_zm
+      pursul_zm = filein->pursul05a_zm
+    else
+      if (sizeLimit.eq."00A") then  
+        mixsul_zm = filein->mixsulnd_zm
+        pursul_zm = filein->pursulnd_zm
+      else
+        print("FATAL: sizeLimit not recognized="+sizeLimit)
+        return
+      end if
+    end if
   end if
+        
+  nYear = dimsizes(year)
+  print("nYear="+nYear)
   
-  if (type .eq. "pur") then
-    sul10A  = pursul10A
-    sul10A2 = pursul10A2
-  end if
-  
-  if (type .eq. "tot") then
-    sul10A  = totsul10A
-    sul10A2 = totsul10A2
-  end if
-  
-  print(date)
+  yearNH = year(0)
   startdate=yearNH+"0701"
   enddate=yearNH+"0731"
   print(startdate)
   print(enddate)
-  time0701=ind(date.eq.stringtoint(startdate))
-  time0731=ind(date.eq.stringtoint(enddate))
-  print("time0701: "+startdate+" | "+time0701)
-  print("time0731: "+enddate+" | "+time0731)
- 
-  print(date2)
-  startdate=yearSH2+"0101"
-  enddate=yearSH2+"0131"
-  print(startdate)
-  print(enddate)
-  time0101=ind(date2.eq.stringtoint(startdate))
-  time0131=ind(date2.eq.stringtoint(enddate))
-  print("time0101: "+startdate+" | "+time0101)
-  print("time0131: "+enddate+" | "+time0131)
+  time1s=ind(date.eq.stringtoint(startdate))
+  time1e=ind(date.eq.stringtoint(enddate))
+  print("time1s: "+startdate+" | "+time1s)
+  print("time1e: "+enddate+" | "+time1e)
+  
+  if (nYear .gt. 1) then
+  
+    yearSH1= year(1)
+    yearSH2= year(2)      
+    startdate=yearSH2+"0101"
+    enddate=yearSH2+"0131"
+    print(startdate)
+    print(enddate)
+    time2s=ind(date.eq.stringtoint(startdate))
+    time2e=ind(date.eq.stringtoint(enddate))
+    print("time2s: "+startdate+" | "+time2s)
+    print("time2e: "+enddate+" | "+time2e)
+    
+    month = (/ 1, 7 /)
+    runs = (/ "January", "July" /)
 
+    if (aerType .eq. "mix") then
+      sulfate1_zm  = mixsul_zm
+      sulfate2_zm  = mixsul_zm
+    end if
+
+    if (aerType .eq. "pur") then
+      sulfate1_zm  = pursul_zm
+      sulfate2_zm  = pursul_zm
+    end if
+
+    if (aerType .eq. "tot") then
+      sulfate1_zm  = mixsul_zm ; get dimension wrappers
+      sulfate1_zm  = sulfate1_zm + pursul_zm
+      sulfate2_zm  = sulfate1_zm
+    end if
+
+    lat21=-90.0
+    lat22=-30.0
+    
+  else
+  
+    month = (/ 7, 7 /)
+    runs = (/ "Mixed Sulfates", "Pure Sulfates" /)
+    
+    time2s=time1s
+    time2e=time1e
+    
+    sulfate1_zm  = mixsul_zm
+    sulfate2_zm  = pursul_zm
+    
+    lat21=30.0
+    lat22=90.0
+
+  end if
+  
   lev_p   = lev
   lev_p@units = "mb"
   lev_p@long_name = "Pressure (mb)"
   
-  ; Make three sets of data:
-  ;  control
-  ;  test
-  ;  difference
-  month = (/ 1, 7 /)
-;  month = (/ 7, 7 /)
   nMonths = dimsizes(month)
-  runs = (/ "January", "July" /)
-;  runs = (/ "Pure Sulfates", "Mixed Sulfates" /)
   nRuns = dimsizes(runs)
   
   Ts = new((/ nRuns, nLevs, nLats /), float)
@@ -167,15 +139,9 @@ begin
   Ts@units = "K"
   
  ; Calculate the zonal monthly average of temperature
-  print("Averaging July temperature ...")
-  T_month=dim_avg_Wrap(T(lev|:,lat|:,lon|:,time|time0701:time0731))
-  print("Zonally averaging July temperature ...")
-  Ts(lev|:,lat|:, run|1) = dim_avg(T_month(lev|:,lat|:,lon|:))
-  
-  print("Averaging January temperature ...")
-  T_month=dim_avg_Wrap(T2(lev|:,lat|:,lon|:,time|time0101:time0131))
-  print("Zonally averaging January temperature ...")
-  Ts(lev|:,lat|:, run|0) = dim_avg(T_month(lev|:,lat|:,lon|:))
+  print("Averaging monthly temperature ...")
+  Ts(lev|:,lat|:, run|0) = dim_avg(T_zm(lev|:,lat|:,time|time1s:time1e))
+  Ts(lev|:,lat|:, run|1) = dim_avg(T_zm(lev|:,lat|:,time|time2s:time2e))
   
   N1s = new((/ nRuns, nLevs, nLats /), float)
   N1s!0 = "run"
@@ -189,22 +155,11 @@ begin
 
   
  ; Calculate the zonal monthly average of particles r > 1 nm
-  print("Averaging July N1 ...")
-  T_month=dim_avg_Wrap(sul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
-;  T_month=dim_avg_Wrap(pursul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
-;  T_month=dim_avg_Wrap(mixsul10A(lev|:,lat|:,lon|:,time|time0701:time0731))
-  print("Zonally averaging July N1 ...")  
-  N1s(lev|:,lat|:, run|1) = dim_avg(T_month(lev|:,lat|:,lon|:))
+  print("Averaging monthly sulfate  ...")
+  N1s(lev|:,lat|:, run|0)=dim_avg_Wrap(sulfate1_zm(lev|:,lat|:,time|time1s:time1e))
+  N1s(lev|:,lat|:, run|1)=dim_avg_Wrap(sulfate2_zm(lev|:,lat|:,time|time2s:time2e))
   
-  print("Averaging January N1 ...")
-  T_month=dim_avg_Wrap(sul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
-;  T_month=dim_avg_Wrap(pursul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
-;  T_month=dim_avg_Wrap(mixsul10A2(lev|:,lat|:,lon|:,time|time0101:time0131))
-  print("Zonally averaging January N1 ...")  
-  N1s(lev|:,lat|:, run|0) = dim_avg(T_month(lev|:,lat|:,lon|:))
-  
-
-  ; Make a 4 plot panel ...
+  ; Make a 2-plot panel ...
   print("")
   print("  Plotting ...")
  
@@ -275,10 +230,8 @@ begin
   resO@cnMaxLevelValF       = 160.0            ; max level
   resO@cnLineThicknessF     = 2.0                   ; color of second contours
 
-  months = (/ "Dec", "January", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov" /)
-
   ; Open a workstation
-  wks = gsn_open_wks("pdf","images/"+type+"sulf125."+caseid)
+  wks = gsn_open_wks("pdf","images/"+caseid+"/"+aerType+"sulf125."+caseid+"."+sizeLimit)
   gsn_define_colormap(wks,"gui_default")                ; choose colormap
   
   print("")
@@ -309,18 +262,18 @@ begin
 
   res@cnLevelSelectionMode  = "ExplicitLevels"
   res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
-      200, 300, 500, 750, 1000, 1500, 2000 , 3000, 5000, 7500, 10000 /)
+      200, 300, 400, 500, 600, 700, 800/)
   res@lbLabelAngleF = 60
   
-  res@tiMainString          = months(month(0))
+  res@tiMainString          = runs(0)
   res@tiMainFontHeightF         = 0.04
   
-  plot(0) = gsn_csm_pres_hgt(wks, zonal(0, {minP:maxP}, {-90.0:-30.0}), res)
+  plot(0) = gsn_csm_pres_hgt(wks, zonal(0, {minP:maxP}, {lat21:lat22}), res)
 ;  plot(0) = gsn_csm_pres_hgt(wks, zonal(0, {minP:maxP}, {30.0:90.0}), res)
 ;  plot(0) = gsn_csm_pres_hgt(wks, zonal(0, :, {-90.0:-30.0}), res)
   overlay(plot(0), plotT(0))
 
-  res@tiMainString          = months(month(1))
+  res@tiMainString          = runs(1)
 ;  res@tiMainString          = runs(1)
   plot(1) = gsn_csm_pres_hgt(wks, zonal(1, {minP:maxP}, {30.0:90.0}), res)
   overlay(plot(1), plotT(1))
@@ -330,14 +283,15 @@ begin
 
   gsn_panel(wks, plot, (/ 1, 2 /), resP)
 
-end
+end ; procedure monave_za(caseid:string, aerType:string, year:string, sizeLimit:string)
 
-;caseid="125smin400"
-caseid="125sminPtbo2"
+caseid="125b36dq"
 
-;type = "tot"
-type = "mix"
-;type = "pur"
+;aerType = "tot"
+aerType = "mix"
+;aerType = "pur"
 
-monave_za(caseid,type)
+;monave_za(caseid,aerType,"1995","00A")
+monave_za(caseid,aerType,"1995","05A")
+monave_za(caseid,aerType,"1995","10A")
 ;monave_polar(caseid)
