@@ -10,7 +10,7 @@
 ; mixsulf125Time (below).
 
 load "tests/common.ncl"
-load "tests/getHistoryPath.ncl"
+;load "tests/getHistoryPath.ncl"
 
 undef("mixsulfTimeAnalysis")
 procedure mixsulfTimeAnalysis(caseid:string,pattern:string)
@@ -21,57 +21,45 @@ begin
   print("")
   print("mixsulfTimeAnalysis: caseid="+caseid)
   
-; Determine the path to history files
-  historyPath = getHistoryPath(caseid)
+; Determine the path to analysis files
   analysisPath = "analysis/" + caseid+ "/"
 
   ; Open the  history files
-;  historyNames = systemfunc("ls " + historyPath + "*" + pattern + "*")
   analysisNames = systemfunc("ls analysis/" + caseid + "/*" + pattern + "*")
   fileNames = systemfunc("ls " + analysisPath + "| grep " + pattern)
-  historyNames = historyPath + fileNames
-  print(historyNames)
-    
-  history = addfiles(historyNames, "r")
-  ListSetType(history, "cat")
-  print("historyNames:"+dimsizes(historyNames))
-;  print(historyNames)
     
   analysis = addfiles(analysisNames, "r")
   ListSetType(analysis, "cat")
   print("analysisNames:"+dimsizes(analysisNames))
    
  ; Compute the pressure levels ...
-  time    = addfiles_GetVar(history, historyNames, "time")
+  time    = addfiles_GetVar(analysis, analysisNames, "time")
   nTime   = dimsizes(time)
 
-  lev     = history[4]->lev
+  lev     = analysis[4]->lev
   nLevs   = dimsizes(lev)
-  lat     = history[0]->lat
+  lat     = analysis[0]->lat
   nLats   = dimsizes(lat)
-  lon     = history[0]->lon
+  lon     = analysis[0]->lon
   nLons   = dimsizes(lon)
   
   ; Determine an approximate dz/dp.
-  hyam 	= history[0]->hyam
-  hybm 	= history[0]->hybm
-  hyai 	= history[0]->hyai
-  hybi 	= history[0]->hybi
-  P0 	  = history[0]->P0
-  PS 	  = history[0]->PS
+;  hyam 	= analysis[0]->hyam
+;  hybm 	= analysis[0]->hybm
+;  hyai 	= analysis[0]->hyai
+;  hybi 	= analysis[0]->hybi
+;  P0 	  = analysis[0]->P0
+;  PS 	  = analysis[0]->PS
   
   print("reading date")
-  date = addfiles_GetVar(history, historyNames, "date")
-  print("reading T")
-  T    = addfiles_GetVar(history, historyNames, "T")
-  print("reading PURSULND")
-  pursulnd    = addfiles_GetVar(history, historyNames, "PURSULND")
-  print("reading MIXSULND")
-  mixsulnd    = addfiles_GetVar(history, historyNames, "MIXSULND")
-  print("reading DUSTND")
-  dustnd    = addfiles_GetVar(history, historyNames, "DUSTND")
+  date = addfiles_GetVar(analysis, analysisNames, "date")
   
   print("reading zonal mean data")
+  T_zm  = addfiles_GetVar(analysis, analysisNames, "T_zm")
+  pursulnd_zm  = addfiles_GetVar(analysis, analysisNames, "pursulnd_zm")
+  mixsulnd_zm  = addfiles_GetVar(analysis, analysisNames, "mixsulnd_zm")
+  dustnd_zm  = addfiles_GetVar(analysis, analysisNames, "dustnd_zm")
+
   mixsul05a_zm  = addfiles_GetVar(analysis, analysisNames, "mixsul05a_zm")
   mixsul10a_zm  = addfiles_GetVar(analysis, analysisNames, "mixsul10a_zm")
   mixsul13a_zm  = addfiles_GetVar(analysis, analysisNames, "mixsul13a_zm")
@@ -88,6 +76,11 @@ begin
   dust30a_zm  = addfiles_GetVar(analysis, analysisNames, "dust30a_zm")
   
   print("reading 0.007 hPa data")
+  T_007hPa  = addfiles_GetVar(analysis, analysisNames, "T_007hPa")
+  pursulnd_007hPa  = addfiles_GetVar(analysis, analysisNames, "pursulnd_007hPa")
+  mixsulnd_007hPa  = addfiles_GetVar(analysis, analysisNames, "mixsulnd_007hPa")
+  dustnd_007hPa  = addfiles_GetVar(analysis, analysisNames, "dustnd_007hPa")
+
   mixsul05a_007hPa  = addfiles_GetVar(analysis, analysisNames, "mixsul05a_007hPa")
   mixsul10a_007hPa  = addfiles_GetVar(analysis, analysisNames, "mixsul10a_007hPa")
   mixsul13a_007hPa  = addfiles_GetVar(analysis, analysisNames, "mixsul13a_007hPa")
@@ -108,20 +101,9 @@ begin
   lev_p@long_name = "Pressure (mb)" 
   
  ; Calculate the zonal daily average of temperature
-  print("Averaging temperature ...")
-  T_zm=dim_avg_Wrap(T(lev|:,time|:,lat|:,lon|:))
-  T_zm&lev = lev_p
-  
-  print("Averaging PURSULND ...")
-  pursulnd_zm=dim_avg_Wrap(pursulnd(lev|:,time|:,lat|:,lon|:))
+  T_zm&lev = lev_p  
   pursulnd_zm&lev = lev_p
-  
-  print("Averaging MIXSULND ...")
-  mixsulnd_zm=dim_avg_Wrap(mixsulnd(lev|:,time|:,lat|:,lon|:))
   mixsulnd_zm&lev = lev_p
-  
-  print("Averaging DUSTND ...")
-  dustnd_zm=dim_avg_Wrap(dustnd(lev|:,time|:,lat|:,lon|:))
   dustnd_zm&lev = lev_p
   
   pursul05a_zm&lev = lev_p  
@@ -150,12 +132,14 @@ begin
   
   fileout->date=date
   fileout->T_zm=T_zm
+  fileout->T_007hPa=T_007hPa
   
   fileout->mixsulnd_zm=mixsulnd_zm
   fileout->mixsul05a_zm=mixsul05a_zm
   fileout->mixsul10a_zm=mixsul10a_zm
   fileout->mixsul13a_zm=mixsul13a_zm
   fileout->mixsul30a_zm=mixsul30a_zm
+  fileout->mixsulnd_007hPa=mixsulnd_007hPa
   fileout->mixsul05a_007hPa=mixsul05a_007hPa
   fileout->mixsul10a_007hPa=mixsul10a_007hPa
   fileout->mixsul13a_007hPa=mixsul13a_007hPa
@@ -166,6 +150,7 @@ begin
   fileout->pursul10a_zm=pursul10a_zm
   fileout->pursul13a_zm=pursul13a_zm
   fileout->pursul30a_zm=pursul30a_zm
+  fileout->pursulnd_007hPa=pursulnd_007hPa
   fileout->pursul05a_007hPa=pursul05a_007hPa
   fileout->pursul10a_007hPa=pursul10a_007hPa
   fileout->pursul13a_007hPa=pursul13a_007hPa
@@ -176,6 +161,7 @@ begin
   fileout->dust10a_zm=dust10a_zm
   fileout->dust13a_zm=dust13a_zm
   fileout->dust30a_zm=dust30a_zm
+  fileout->dustnd_007hPa=dustnd_007hPa
   fileout->dust05a_007hPa=dust05a_007hPa
   fileout->dust10a_007hPa=dust10a_007hPa
   fileout->dust13a_007hPa=dust13a_007hPa
@@ -192,7 +178,7 @@ procedure mixsulfTime(caseid:string,targetLat:float,year:string,sizeLimit:string
 ;  year = can be scalar string year for NH only, or
 ;         array of (/yearNH,yearSH1,yearSH2/) for 2-hemisphere plots
 
-local files, nFiles, historyFile
+local files, nFiles, inFile
 
 begin
   
@@ -492,7 +478,7 @@ begin
 
 end
 
-caseid="125b36dq"
+caseid="125b36eg"
 
 ;mixsulfTimeAnalysis(caseid,"h3")
 

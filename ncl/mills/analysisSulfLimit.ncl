@@ -1,4 +1,4 @@
-load "tests/getHistoryPath.ncl"
+;load "tests/getHistoryPath.ncl"
 load "tests/common2.ncl"
 
 undef("analysisSulfLimit")
@@ -22,10 +22,14 @@ begin
   gwtH2SO4 = 98.078479
 
 ; Determine the path to history files
-  historyPath = getHistoryPath(historyRun)
+;  historyPath = getHistoryPath(historyRun)
+  historyPath = "scratch/"+historyRun+"/"
+  print(historyPath)
   
 ; Create array of files matching pattern
   pathNames = systemfunc("ls " + historyPath + "*" + pattern + "*")
+  print(pathNames)
+  
   fileNames = systemfunc("ls " + historyPath + "| grep " + pattern)
   
   if (.not.(isfilepresent("analysis/"+historyRun))) then
@@ -38,8 +42,8 @@ begin
 ;  rmin  = 2e-8 ; cm
   
   nBins = 36
-  rmin  = (gwtH2SO4/AVG/RHO_H2SO4/cpi)^(1./3.) ; cm
-  rmin2  = 2.0*rmin
+  rmin  = (2.0*gwtH2SO4/AVG/RHO_H2SO4/cpi)^(1./3.) ; cm
+  rmin2  = rmin
 
   rmrat = 2.0
   rho   = RHO_DUST  ; g/cm-3
@@ -115,21 +119,72 @@ begin
       lon = histfile->lon
       nLons = dimsizes(lon)
 
-      temp  = histfile->T
+      print("Saving date...")
+      date     = histfile->date
+      analysisFile->date=date
+      
+      T  = histfile->T
+      pursulnd = histfile->PURSULND
+      mixsulnd = histfile->MIXSULND
+      dustnd   = histfile->DUSTND
+            
+     ; Calculate the zonal daily average of temperature
+      print("Averaging temperature zonally...")
+      T_zm=dim_avg_Wrap(T(time|:,lev|:,lat|:,lon|:))
+      print("Saving T_zm")
+      analysisFile->T_zm=T_zm
+
+      print("Averaging PURSULND zonally...")
+      pursulnd_zm=dim_avg_Wrap(pursulnd(time|:,lev|:,lat|:,lon|:))
+      print("Saving pursulnd_zm")
+      analysisFile->pursulnd_zm=pursulnd_zm
+
+      print("Averaging MIXSULND zonally...")
+      mixsulnd_zm=dim_avg_Wrap(mixsulnd(time|:,lev|:,lat|:,lon|:))
+      print("Saving mixsulnd_zm")
+      analysisFile->mixsulnd_zm=mixsulnd_zm
+
+      print("Averaging DUSTND zonally...")
+      dustnd_zm=dim_avg_Wrap(dustnd(time|:,lev|:,lat|:,lon|:))
+      print("Saving dustnd_zm")
+      analysisFile->dustnd_zm=dustnd_zm
+ 
+      print("Saving pressure surfaces...")
+      print("0.007 hPa")
+      iLev=0.007
+
+      print("T_007hPa")
+      T_007hPa=T(:,{iLev},:,:)
+      T_007hPa@long_name="Temperature at 0.007hPa"      
+      analysisFile->T_007hPa=T_007hPa
+      
+      print("pursulnd_007hPa")
+      pursulnd_007hPa=pursulnd(:,{iLev},:,:)
+      pursulnd_007hPa@long_name="Pure sulfate number density at 0.007hPa"      
+      analysisFile->pursund_007hPa=pursulnd_007hPa
+      
+      print("mixsulnd_007hPa")
+      mixsulnd_007hPa=mixsulnd(:,{iLev},:,:)
+      mixsulnd_007hPa@long_name="Mixed sulfate number density at 0.007hPa"      
+      analysisFile->pursund_007hPa=mixsulnd_007hPa
+
+      print("dustnd_007hPa")
+      dustnd_007hPa=dustnd(:,{iLev},:,:)
+      dustnd_007hPa@long_name="Dust number density at 0.007hPa"      
+      analysisFile->pursund_007hPa=dustnd_007hPa
+      
 
     ; Compute the air mass and density.
     ;
     ; NOTE: Convert arho and amass are in cgs units.
-      P               = temp ; get metadata and array structure from temperature
+      P               = T ; get metadata and array structure from temperature
       P@units         = "Pa"
       P@long_name     = "Pressure"
 
-      arho            = temp ; get metadata and array structure from temperature
+      arho            = T ; get metadata and array structure from temperature
       arho@units      = "g/cm3"
       arho@long_name  = "air density"
       
-      delete(temp)
-
       print("calling setupair")
       setupair(histfile, P, arho) ; calculate pressure and density
       arho = arho(:,:,:,:) * 1e3 / 1e6
@@ -336,9 +391,14 @@ begin
       analysisFile->dust30a_zm=dust30a_zm
       
       print("Saving pressure surfaces...")
-      print("0.007 hPa")
-      print("pursul")
       iLev=0.007
+      print(lev{iLev}+" hPa")
+      
+      print("pursul")
+      pursulnd_007hPa=pursulnd(:,{iLev},:,:)
+      pursulnd_007hPa@long_name="Pure sulfate number density at 0.007hPa"      
+      analysisFile->pursulnd_007hPa=pursulnd_007hPa
+
       pursul05a_007hPa=pursul05a(:,{iLev},:,:)
       pursul05a_007hPa@long_name="Pure sulfate number density (r>0.5 nm) at 0.007hPa"      
       analysisFile->pursul05a_007hPa=pursul05a_007hPa
@@ -356,6 +416,10 @@ begin
       analysisFile->pursul30a_007hPa=pursul30a_007hPa
 
       print("mixsul")
+      mixsulnd_007hPa=mixsulnd(:,{iLev},:,:)
+      mixsulnd_007hPa@long_name="Mixed sulfate number density at 0.007hPa"      
+      analysisFile->mixsulnd_007hPa=mixsulnd_007hPa
+
       mixsul05a_007hPa=mixsul05a(:,{iLev},:,:)
       mixsul05a_007hPa@long_name="Mixed sulfate number density (r>0.5 nm) at 0.007hPa"      
       analysisFile->mixsul05a_007hPa=mixsul05a_007hPa
@@ -373,6 +437,10 @@ begin
       analysisFile->mixsul30a_007hPa=mixsul30a_007hPa
 
       print("dust")
+      dustnd_007hPa=dustnd(:,{iLev},:,:)
+      dustnd_007hPa@long_name="Dust number density at 0.007hPa"      
+      analysisFile->dustnd_007hPa=dustnd_007hPa
+            
       dust05a_007hPa=dust05a(:,{iLev},:,:)
       dust05a_007hPa@long_name="Dust number density (r>0.5 nm) at 0.007hPa"      
       analysisFile->dust05a_007hPa=dust05a_007hPa
@@ -403,6 +471,7 @@ begin
       delete(nLons)
     
     end if
+            
     print("returning...")
    
   end do ; ifile
@@ -414,5 +483,4 @@ end
 
 ; Main
 
-;analysisSulfLimit("125kelvH2Og","h3")
-analysisSulfLimit("125bin36c","h3")
+analysisSulfLimit("125b36eg","h3")

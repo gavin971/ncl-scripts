@@ -285,13 +285,13 @@ begin
 
 end ; procedure monave_za(caseid:string, aerType:string, year:string, sizeLimit:string)
 
-caseid="125b36dq"
+caseid="125b36eg"
 
 ;aerType = "tot"
 aerType = "mix"
 ;aerType = "pur"
 
-;monave_za(caseid,aerType,"1995","00A")
+monave_za(caseid,aerType,"1995","00A")
 monave_za(caseid,aerType,"1995","05A")
 monave_za(caseid,aerType,"1995","10A")
 ;monave_polar(caseid)
