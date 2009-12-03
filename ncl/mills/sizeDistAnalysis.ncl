@@ -1,4 +1,4 @@
-load,"tests/getHistoryPath.ncl"
+;load,"tests/getHistoryPath.ncl"
 load "tests/common2.ncl"
 
 AVG     = 6.02252e+23             ; Avogadro's number (CARMA) ~ molecules/mole
@@ -7,9 +7,10 @@ cpi = 4./3.*PI
 ;  Molecular weights [g/mol]
 gwtH2SO4 = 98.078479
 
-caseid = "125b36dq"
+caseid = "125b36eg"
 
-historyPath=getHistoryPath(caseid)
+;historyPath=getHistoryPath(caseid)
+historyPath = "scratch/"+caseid+"/"
 
 print(historyPath)
 
@@ -35,8 +36,8 @@ targetLev2=0.00584271015  ; 83 km at 78N
 ;  rmin  = 2e-8 ; cm
   
   nBins = 36
-  rmin  = (gwtH2SO4/AVG/RHO_H2SO4/cpi)^(1./3.) ; cm
-  rmin2  = rmin*2.0
+  rmin  = (2.0*gwtH2SO4/AVG/RHO_H2SO4/cpi)^(1./3.) ; cm
+  rmin2  = rmin
 
   rmrat = 2.0
   rho   = RHO_DUST  ; g/cm-3
@@ -126,6 +127,9 @@ mixsulrad = pursulndbin
 mixsulndbin = pursulndbin
   mixsulndbin@long_name="mixed sulfate number density per bin"
   mixsulndbin@units="/cm3"
+dussulbin = pursulndbin
+  dussulbin@long_name="mixed sulfate number density per bin"
+  dussulbin@units="/cm3"
 dustndbin = pursulndbin
   dustndbin@long_name="dust number density per bin"
   dustndbin@units="/cm3"
@@ -151,6 +155,9 @@ mixsulrad2 = pursulndbin2
 mixsulndbin2 = pursulndbin2
   mixsulndbin2@long_name="mixed sulfate number density per bin"
   mixsulndbin2@units="/cm3"
+dussulbin2 = pursulndbin2
+  dussulbin2@long_name="mixed sulfate core mass"
+  dussulbin2@units="g/cm3"
 dustndbin2 = pursulndbin2
   dustndbin2@long_name="dust number density per bin"
   dustndbin2@units="/cm3"
@@ -196,6 +203,9 @@ do i = 0,nDates-1
   getRad(histfile, "MIXSUL", mixsulrad, nBins)
   getN(histfile, "MIXSUL", rmass2, arho, mixsulndbin)
 
+  print("dussul")
+  getCore(histfile, "DUSSUL", rmass2, arho, dussulbin)
+
   print("dust")
   getN(histfile, "DUST", rmass, arho, dustndbin)
   
@@ -208,6 +218,8 @@ do i = 0,nDates-1
   mixsulrad2(i, :, :, :, :) = mixsulrad(iTime, {targetLev1:targetLev2}, \
                                       {targetLat1:targetLat2}, :, :)
   dustndbin2(i, :, :, :, :) = dustndbin(iTime, {targetLev1:targetLev2}, \
+                                      {targetLat1:targetLat2}, :, :)
+  dussulbin2(i, :, :, :, :) = dussulbin(iTime, {targetLev1:targetLev2}, \
                                       {targetLat1:targetLat2}, :, :)
   
 end do
@@ -227,8 +239,18 @@ print("saving file "+outfile)
 fileout=addfile(outfile,"c")
 
 fileout->date=date2
+fileout->rmass=rmass
+fileout->rmassup=rmassup
+fileout->dm=dm
+fileout->dustrad=dustrad
+fileout->dustradup=dustradup
+fileout->dustradlow=dustradlow
+fileout->dustdr=dustdr
+fileout->dustvol=dustvol
+
 fileout->pursulndbin=pursulndbin2
 fileout->pursulrad=pursulrad2
 fileout->mixsulndbin=mixsulndbin2
 fileout->mixsulrad=mixsulrad2
 fileout->dustndbin=dustndbin2
+fileout->dussulbin=dussulbin2

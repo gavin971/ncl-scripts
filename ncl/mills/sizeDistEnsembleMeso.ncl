@@ -19,6 +19,8 @@ begin
  ; vars(time, lev, lat, lon, bins)
   lev = history->lev
   lat = history->lat
+  lon = history->lon
+  nLon = dimsizes(lon)
   date= history->date
   print(lat)
   print(lev)
@@ -27,11 +29,20 @@ begin
   mixsulndbin  = history->mixsulndbin
   print("  reading mixsulrad")
   mixsulrad  = history->mixsulrad
+  
   print("  reading pursulndbin")
   pursulndbin  = history->pursulndbin
   print("  reading pursulrad")
   pursulrad  = history->pursulrad
   
+;  print("  reading dussulbin")
+;  dussulbin  = history->dussulbin
+
+  print("  reading dustndbin")
+  dustndbin  = history->dustndbin
+  print("  reading dustrad")
+  dustrad  = history->dustrad
+
   if (.not.(isfilepresent("images/"+caseid))) then
     a = systemfunc("mkdir -p images/"+caseid)
   end if
@@ -72,9 +83,13 @@ begin
     
   res2 = res
   res2@xyLineColor = "red"
+    
+  res3 = res
+  res3@xyLineColor = "black"
 
   plot = new(4, graphic)
   plot2 = new(4, graphic)
+  plot3 = new(4, graphic)
   
   do i = 0,3
     print(date(i))
@@ -95,12 +110,21 @@ begin
     data2   = pursulndbin(i,{targetLev},{targetLat},:,:)
     radius2 = pursulrad(i,{targetLev},{targetLat},:,:)
 
+    data3   = dustndbin(i,{targetLev},{targetLat},:,:)
+    radius3 = radius2
+    
+    do j = 0, nLon - 1
+      radius3(j,:) = dustrad(:)
+    end do
+
    ; convert to dN/dlog10r
     data = data / dlog10r
     data2 = data2 / dlog10r
+    data3 = data3 / dlog10r
 
     print("mixsulf:"+min(data)+" | "+max(data))
     print("pursulf:"+min(data2)+" | "+max(data2))
+    print("   dust:"+min(data3)+" | "+max(data3))
 
     data@long_name="dN/dlogr (# cm~S~-3~N~)"
     data@units="/cm3"
@@ -110,6 +134,10 @@ begin
     data2@units="/cm3"
     data2@_FillValue=0.0
 
+    data3@long_name="dN/dlogr (# cm~S~-3~N~)"
+    data3@units="/cm3"
+    data3@_FillValue=0.0
+
     radius=radius*1e7  ; convert cm -> nm
     radius@long_name="sulfate radius (nm)"
     radius@units="nm"
@@ -118,8 +146,13 @@ begin
     radius2@long_name="sulfate radius (nm)"
     radius2@units="nm"
 
+    radius3=radius3*1e7  ; convert cm -> nm
+    radius3@long_name="sulfate radius (nm)"
+    radius3@units="nm"
+
     print("mixsulf:"+min(radius) +" | "+max(radius))
     print("pursulf:"+min(radius2)+" | "+max(radius2))
+    print("   dust:"+min(radius3)+" | "+max(radius3))
 
    ;************************************************
    ; plotting parameters
@@ -131,12 +164,14 @@ begin
   ;  plot = new((/ nPlots /), graphic)
 
     plot2(i) = gsn_csm_xy (wks,radius2,data2,res2) ; draw second plot
+    plot3(i) = gsn_csm_xy (wks,radius3,data3,res3) ; draw third plot
     plot(i) = gsn_csm_xy (wks,radius,data,res)    ; draw first plot
 
     resP                      = True
     resP@gsnMaximize          = True
     resP@gsnPanelXWhiteSpacePercent = 5
   ;  resP@tiMainString          = caseid
+    overlay(plot(i), plot3(i))
     overlay(plot(i), plot2(i))
   end do
   
@@ -144,16 +179,16 @@ begin
 
 end ; procedure sizeDistEnsembleMeso()
 
-;targetLat = 78
-targetLat = 86
+targetLat = 78
+;targetLat = 86
 ;targetLat = 82
 ;targetLev=0.002404575    ; ~86 km at 78N (?)
 ;targetLev=0.00230591145   ; 86.7 km at 78N
 ;targetLev=0.0016106433  ; 88.1 km at 78N
-;targetLev=0.0011211287  ; 89.5 km at 78N
-targetLev=0.005842710  ; 83 km at 78N
+targetLev=0.001121129  ; 89.5 km at 78N
+;targetLev=0.005842710  ; 83 km at 78N
 ;targetLev=0.00395005   ; 84.3 km at 82N
 
-caseid="125b36dq"
+caseid="125b36eg"
 
 sizeDistEnsembleMeso(targetLat, targetLev, caseid)

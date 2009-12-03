@@ -17,5 +17,6 @@ lon = icFile->lon
 time = icFile->time
 
 SO2 = icFile->SO2
-SO2(time|:,{lev|10:100},{lat|-10:20},lon|:) = 104.e-9
+;SO2(time|:,{lev|10:100},{lat|-10:20},lon|:) = 104.e-9
+SO2(time|:,{lev|10:100},{lat|-10:20},lon|:) = 6.9543.e-8
 icFile->SO2 = SO2
