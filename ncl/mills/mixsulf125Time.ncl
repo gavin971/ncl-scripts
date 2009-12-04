@@ -207,14 +207,17 @@ begin
   if (sizeLimit.eq."10A") then
     mixsul_zm = filein->mixsul10a_zm
     pursul_zm = filein->pursul10a_zm
+    dust_zm   = filein->dust10a_zm
   else
     if (sizeLimit.eq."05A") then
       mixsul_zm = filein->mixsul05a_zm
       pursul_zm = filein->pursul05a_zm
+      dust_zm   = filein->dust05a_zm
     else
       if (sizeLimit.eq."00A") then  
         mixsul_zm = filein->mixsulnd_zm
         pursul_zm = filein->pursulnd_zm
+        dust_zm   = filein->dustnd_zm
       else
         print("FATAL: sizeLimit not recognized="+sizeLimit)
         return
@@ -250,14 +253,14 @@ begin
 
   end if
   
-  ; Make a 2- or 4-plot panel ...
+  ; Make a 3- or 4-plot panel ...
   print("")
   print("  Plotting ...")
  
   minP      = 0.0001        ; largest pressure to plot ...
   maxP      = 0.1        ; largest pressure to plot ...
   
-  nPlots = 2
+  nPlots = 3
   if (nYear.gt.1) then
     nPlots = 4
   end if
@@ -339,7 +342,7 @@ begin
     a = systemfunc("mkdir -p images/"+caseid)
   end if
   
-  wks = gsn_open_wks("pdf","images/"+caseid+"/mixsulf125Time."+caseid+"."+sizeLimit+"."+targetLat)
+  wks = gsn_open_wks("pdf","images/"+caseid+"/mixsulf125Time."+caseid+"."+sizeLimit+"."+doubletoint(lat({targetLat})))
   gsn_define_colormap(wks,"gui_default")                ; choose colormap
   
   print("")
@@ -348,9 +351,10 @@ begin
  ; Create temperature overlay contours
   plotT(0) = gsn_csm_contour(wks, T_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), resO)
   
-  if (nPlots.eq.2) then
+  if (nPlots.eq.3) then
   
     plotT(1) = gsn_csm_contour(wks, T_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), resO)  
+    plotT(2) = gsn_csm_contour(wks, T_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), resO)  
     
   else
   
@@ -377,7 +381,7 @@ begin
   res@cnLevelSelectionMode  = "ExplicitLevels"
 ;  res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
 ;      200, 300, 500, 750, 1000, 1500, 2000, 3000, 5000, 7500, 10000 /)
-  res@cnLevels = (/ 1, 2, 3, 5, 7.5, 10, 20, 30, 50, 75, 100, 200, 300, 400, 500, 600 /);, 1000, 1500 /)
+  res@cnLevels = (/ 1, 2, 4, 8, 10, 20, 40, 80, 100, 200, 400, 600, 800, 1000, 2000, 4000, 8000, 1e4 /)
   res@lbLabelAngleF = 60
   
 ;===================================================================
@@ -454,11 +458,15 @@ begin
   plot(0) = gsn_csm_pres_hgt(wks, mixsul_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), res)
   overlay(plot(0), plotT(0))
 
-  if (nPlots.eq.2) then
+  if (nPlots.eq.3) then
   
     plot(1) = gsn_csm_pres_hgt(wks, pursul_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), res)
     overlay(plot(1), plotT(1))
-    gsn_panel(wks, plot, (/ 1, 2 /), resP)
+  
+    plot(2) = gsn_csm_pres_hgt(wks, dust_zm({lev|minP:maxP} , time|time0401:time1031, {lat|targetLat}), res)
+    overlay(plot(2), plotT(2))
+    
+    gsn_panel(wks, plot, (/ 1, 3 /), resP)
   
   else
     plot(1) = gsn_csm_pres_hgt(wks, mixsul_zm({lev|minP:maxP} , time|time1001:time0430, {lat|-targetLat}), resSH)
@@ -478,11 +486,13 @@ begin
 
 end
 
-caseid="125b36eg"
+caseid="125b36Pb02"
+year="1996"
+lat=86
 
 ;mixsulfTimeAnalysis(caseid,"h3")
 
 ;mixsulfTime(caseid,70)
-mixsulfTime(caseid,84,"1995","00A")
-mixsulfTime(caseid,84,"1995","05A")
-mixsulfTime(caseid,84,"1995","10A")
+mixsulfTime(caseid,lat,year,"00A")
+mixsulfTime(caseid,lat,year,"05A")
+mixsulfTime(caseid,lat,year,"10A")

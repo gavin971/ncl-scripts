@@ -42,14 +42,17 @@ begin
   if (sizeLimit.eq."10A") then
     mixsul_zm = filein->mixsul10a_zm
     pursul_zm = filein->pursul10a_zm
+    dust_zm   = filein->dust10a_zm
   else
     if (sizeLimit.eq."05A") then
       mixsul_zm = filein->mixsul05a_zm
       pursul_zm = filein->pursul05a_zm
+      dust_zm   = filein->dust05a_zm
     else
       if (sizeLimit.eq."00A") then  
         mixsul_zm = filein->mixsulnd_zm
         pursul_zm = filein->pursulnd_zm
+        dust_zm   = filein->dustnd_zm
       else
         print("FATAL: sizeLimit not recognized="+sizeLimit)
         return
@@ -107,14 +110,15 @@ begin
     
   else
   
-    month = (/ 7, 7 /)
-    runs = (/ "Mixed Sulfates", "Pure Sulfates" /)
+    month = (/ 7, 7, 7 /)
+    runs = (/ "Mixed Sulfates", "Pure Sulfates" , "Dust"/)
     
     time2s=time1s
     time2e=time1e
     
-    sulfate1_zm  = mixsul_zm
-    sulfate2_zm  = pursul_zm
+    aer1_zm  = mixsul_zm
+    aer2_zm  = pursul_zm
+    aer3_zm  = dust_zm
     
     lat21=30.0
     lat22=90.0
@@ -156,8 +160,12 @@ begin
   
  ; Calculate the zonal monthly average of particles r > 1 nm
   print("Averaging monthly sulfate  ...")
-  N1s(lev|:,lat|:, run|0)=dim_avg_Wrap(sulfate1_zm(lev|:,lat|:,time|time1s:time1e))
-  N1s(lev|:,lat|:, run|1)=dim_avg_Wrap(sulfate2_zm(lev|:,lat|:,time|time2s:time2e))
+  N1s(lev|:,lat|:, run|0)=dim_avg_Wrap(aer1_zm(lev|:,lat|:,time|time1s:time1e))
+  N1s(lev|:,lat|:, run|1)=dim_avg_Wrap(aer2_zm(lev|:,lat|:,time|time2s:time2e))
+  if (nRuns.eq.3) then
+    N1s(lev|:,lat|:, run|2)=dim_avg_Wrap(aer3_zm(lev|:,lat|:,time|time2s:time2e))
+    Ts(lev|:,lat|:, run|2) = dim_avg(T_zm(lev|:,lat|:,time|time2s:time2e))
+  end if
   
   ; Make a 2-plot panel ...
   print("")
@@ -166,7 +174,7 @@ begin
   minP      = 0.0001        ; largest pressure to plot ...
   maxP      = 0.1        ; largest pressure to plot ...
   
-  nPlots = 2
+  nPlots = nRuns
   plot = new((/ nPlots /), graphic)
   plotT = new((/ nPlots /), graphic)
   
@@ -261,8 +269,10 @@ begin
 
 
   res@cnLevelSelectionMode  = "ExplicitLevels"
-  res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
-      200, 300, 400, 500, 600, 700, 800/)
+;  res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
+;      200, 300, 400, 500, 600, 700, 800/)
+  res@cnLevels = (/ 1, 2, 4, 8, 10, 20, 40, 80, 100, 200, 400, 600, 800, \
+      1000, 2000, 4000, 8000, 1e4 /)
   res@lbLabelAngleF = 60
   
   res@tiMainString          = runs(0)
@@ -278,10 +288,16 @@ begin
   plot(1) = gsn_csm_pres_hgt(wks, zonal(1, {minP:maxP}, {30.0:90.0}), res)
   overlay(plot(1), plotT(1))
     
+  if (nRuns.eq.3) then
+    res@tiMainString          = runs(2)
+    plot(2) = gsn_csm_pres_hgt(wks, zonal(2, {minP:maxP}, {30.0:90.0}), res)
+    overlay(plot(2), plotT(2))
+  end if
+    
   print("      min :  " + min(zonal(1, {minP:maxP}, {60.0:90.0})))
   print("      max :  " + max(zonal(1, {minP:maxP}, {60.0:90.0})))
 
-  gsn_panel(wks, plot, (/ 1, 2 /), resP)
+  gsn_panel(wks, plot, (/ 1, nPlots /), resP)
 
 end ; procedure monave_za(caseid:string, aerType:string, year:string, sizeLimit:string)
 

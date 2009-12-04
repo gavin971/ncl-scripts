@@ -179,14 +179,15 @@ begin
 
 end ; procedure sizeDistEnsembleMeso()
 
-targetLat = 78
+;targetLat = 78
 ;targetLat = 86
+targetLat = 84
 ;targetLat = 82
 ;targetLev=0.002404575    ; ~86 km at 78N (?)
 ;targetLev=0.00230591145   ; 86.7 km at 78N
 ;targetLev=0.0016106433  ; 88.1 km at 78N
-targetLev=0.001121129  ; 89.5 km at 78N
-;targetLev=0.005842710  ; 83 km at 78N
+;targetLev=0.001121129  ; 89.5 km at 78N
+targetLev=0.005842710  ; 83 km at 78N
 ;targetLev=0.00395005   ; 84.3 km at 82N
 
 caseid="125b36eg"
