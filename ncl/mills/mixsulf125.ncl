@@ -111,7 +111,7 @@ begin
   else
   
     month = (/ 7, 7, 7 /)
-    runs = (/ "Mixed Sulfates", "Pure Sulfates" , "Dust"/)
+    runs = (/ "Sulfates on Dust", "Pure Sulfates" , "Dust"/)
     
     time2s=time1s
     time2e=time1e
@@ -277,6 +277,7 @@ begin
   
   res@tiMainString          = runs(0)
   res@tiMainFontHeightF         = 0.04
+  res@gsnLeftString        = " "   ; Leftmost subtitle
   
   plot(0) = gsn_csm_pres_hgt(wks, zonal(0, {minP:maxP}, {lat21:lat22}), res)
 ;  plot(0) = gsn_csm_pres_hgt(wks, zonal(0, {minP:maxP}, {30.0:90.0}), res)
@@ -301,13 +302,14 @@ begin
 
 end ; procedure monave_za(caseid:string, aerType:string, year:string, sizeLimit:string)
 
-caseid="125b36eg"
+caseid="125b36Pb02"
+year="1996"
 
 ;aerType = "tot"
 aerType = "mix"
 ;aerType = "pur"
 
-monave_za(caseid,aerType,"1995","00A")
-monave_za(caseid,aerType,"1995","05A")
-monave_za(caseid,aerType,"1995","10A")
+monave_za(caseid,aerType,year,"00A")
+monave_za(caseid,aerType,year,"05A")
+monave_za(caseid,aerType,year,"10A")
 ;monave_polar(caseid)
