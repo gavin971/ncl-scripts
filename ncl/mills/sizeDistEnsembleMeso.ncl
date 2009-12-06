@@ -65,16 +65,20 @@ begin
   res@trXLog = True 
   res@trYLog = True 
 
-  res@trYMinF = 1e-5
-  res@trYMaxF = 1e4
+  res@trYMinF = 1e-3
+  res@trYMaxF = 1e5
 
-  res@trXMinF = 0.2  ; 0.2 to 100 nm range x-axis
-  res@trXMaxF = 30
+  res@trXMinF = 0.4  ; 0.2 to 100 nm range x-axis
+  res@trXMaxF = 20
 
 ;    res@tmEqualizeXYSizes = True
 ;    res@tmXTLabelFont = 25 ; change the font to Times Roman
-  res@tmXTLabelFontHeightF = 0.04 ; Change the font size (default 0.02)
-
+  res@tmXTLabelFontHeightF = 0.08 ; Change the font size (default 0.02)
+  res@tmXBMode = "Explicit"
+  res@tmXBValues = (/0.4,0.6,0.8,1.,2.,4.,6.,8.,10.,20./)
+  res@tmXBLabels = (/"0.4",".6"," ","1","2","4","6","8","10","20"/)
+  res@tiXAxisString = "radius (nm)"
+  
 ;    res@tiMainFont = 25 ; change the font to Times Roman
 ;    res@tiMainFontHeightF = 0.04 ; change the font size
 ;    res@tiUseMainAttributes = True ; use main tile font attributes for X and Y titles
@@ -94,7 +98,8 @@ begin
   do i = 0,3
     print(date(i))
 
-    res@tiMainString      = ""+date(i)+" "+lat({targetLat})+"~S~o~N~N "+lev({targetLev})+" hPa"
+;    res@tiMainString      = ""+date(i)+" "+lat({targetLat})+"~S~o~N~N "+lev({targetLev})+" hPa"
+
    ; ratio of mass in bin i to bin i+1:
     rmrat = 2.0
     dlog10r = (1./3.)*log10(rmrat)
@@ -180,8 +185,7 @@ begin
 end ; procedure sizeDistEnsembleMeso()
 
 ;targetLat = 78
-;targetLat = 86
-targetLat = 84
+targetLat = 86
 ;targetLat = 82
 ;targetLev=0.002404575    ; ~86 km at 78N (?)
 ;targetLev=0.00230591145   ; 86.7 km at 78N
@@ -190,6 +194,7 @@ targetLat = 84
 targetLev=0.005842710  ; 83 km at 78N
 ;targetLev=0.00395005   ; 84.3 km at 82N
 
-caseid="125b36eg"
+caseid="125b36Pb02"
+;caseid="125b36eg"
 
 sizeDistEnsembleMeso(targetLat, targetLev, caseid)
