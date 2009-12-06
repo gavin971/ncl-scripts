@@ -1,5 +1,5 @@
 load "tests/common2.ncl"
-load "tests/getHistoryPath.ncl"
+;load "tests/getHistoryPath.ncl"
 
 targetLat = 78
 targetLon = 0
@@ -46,7 +46,21 @@ print("Lev="+targetLev)
 temp= 149.330815851386916
 wp=45.6412523721937973
 rhoaer=1.572573157
-rad1=(/1.08E-08,1.36E-08,1.72E-08,2.17E-08,2.73E-08,3.44E-08/)
+;rad1=(/1.08E-08,1.36E-08,1.72E-08,2.17E-08,2.73E-08,3.44E-08/)
+  AVG     = 6.02252e+23             ; Avogadro's number (CARMA) ~ molecules/mole
+  cpi = 4./3.*PI
+
+  ;  Molecular weights [g/mol]
+  gwtH2SO4 = 98.078479
+
+  nBins = 36
+  rmin  = (2.0*gwtH2SO4/AVG/RHO_H2SO4/cpi)^(1./3.) ; cm
+  radrat = 2.0^(1./3.)
+  rad1 = new(nBins,"float")
+  rad1(0) = rmin
+  do i = 1,nBins-1
+    rad1(i) = rad1(i-1)*radrat
+  end do
  
   
   dnwtp = (/0,1,5,10,20,25,30,35,40,41,45,50,53,55,56,60,65,66,70, \
@@ -149,6 +163,6 @@ rad1=(/1.08E-08,1.36E-08,1.72E-08,2.17E-08,2.73E-08,3.44E-08/)
   kelvinH2O = exp (kelvinH2O_a*kelvinH2O_b)
   
   print("radius (nm)  |  preexponential  |  Kelvin factor 1  |  Kelvin factor")
-  do i = 0, 37
+  do i = 0, dimsizes(rad1) - 1 
     print(rad1(i)*1e7+" | "+kelvinH2O_a(i)+" | "+kelvinH2O_1(i)+" | "+kelvinH2O(i))
   end do

@@ -1,96 +1,59 @@
-;*************************************************
+;*********************************************************
 ; plotSO4vsN2O.ncl
 ; by Mike Mills
 ; June 10, 2009
-;*************************************************
+;*********************************************************
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-load "tests/getHistoryPath.ncl"
+;load "tests/getHistoryPath.ncl"
 load "tests/getDataPath.ncl"
 
-;*************************************************
-
-undef("plotSO4vsN2Oanalysis")
-procedure plotSO4vsN2Oanalysis (historyRun:string, pattern:string)
-begin
-
-  subDir="allmonthly"
-  
-  historyPath = getHistoryPath(historyRun1)
-  historyPattern=historyPath+subDir+"/*.cam2."+pattern+"*.nc"
-  historyNames = systemfunc("ls " + historyPattern)
-  history = addfiles(historyNames, "r")
-  ListSetType(history, "cat")
-  print("historyNames:"+dimsizes(historyNames))
-  N2O = addfiles_GetVar(history, historyNames, "N2O")
-  PURSULVMR = addfiles_GetVar(history, historyNames, "PURSULVMR")
-  MIXSULVMR = addfiles_GetVar(history, historyNames, "MIXSULVMR")
-  SO4VMR=PURSULVMR ; get metadata
-  SO4VMR=SULVMR+MIXSULVMR
-  SO4VMR@_FillValue=0.0
-; [time | 13] x [lev | 125] x [lat | 46] x [lon | 72]
-  
-  N2Obins=fspan(10,310,31)
-  SO4mean=new(31,float)
-  SO4std=new(31,float)
-  
-;  do i = 0, dimsizes(historyNames)-1
-;    do j = 0,45
-
-;  end do
-  
-
-end
-
-;*************************************************
+;*********************************************************
+; Run allSaveSulfVMR.ncl prior to this script to generate
+; the analysis files read in by this script. 
+;*********************************************************
 
 undef("plotSO4vsN2O")
-procedure plotSO4vsN2O (historyRun1:string, pattern1:string, historyRun2:string, pattern2:string)
+procedure plotSO4vsN2O (historyRun1:string, historyRun2:string)
 begin
   dataPath = getDataPath()
-  wilson = readAsciiTable(dataPath+"Chuck Wilson/WilsonSO4vsN2O.txt",4,"float",1)
+  dataFile=dataPath+"Chuck Wilson/WilsonSO4vsN2O.txt"
+  print(dataFile)
+  wilson = readAsciiTable(dataFile,4,"float",1)
 
   subDir="allmonthly"
 
-;  historyRun1="nogeo400SO2"
-;  historyRun1="125smin400"
-;  pattern1="h0"
-  historyPath = getHistoryPath(historyRun1)
-  historyPattern=historyPath+subDir+"/*.cam2."+pattern1+"*.nc"
-  historyNames = systemfunc("ls " + historyPattern)
-  history = addfiles(historyNames, "r")
-  ListSetType(history, "cat")
-  print("historyNames:"+dimsizes(historyNames))
-  N2O = addfiles_GetVar(history, historyNames, "N2O")
-  PURSULVMR = addfiles_GetVar(history, historyNames, "PURSULVMR")
-  MIXSULVMR = addfiles_GetVar(history, historyNames, "MIXSULVMR")
+  historyPath = "analysis/"+historyRun1+"/"
+  historyFile = addfile(historyPath+"sulfvmr."+historyRun1+".nc","r")
+  N2O = historyFile->N2O
+  PURSULVMR = historyFile->PURSULVMR
+  MIXSULVMR = historyFile->MIXSULVMR
+  MIXSULSHELLVMR = historyFile->MIXSULSHELLVMR
   SULVMR=PURSULVMR ; get metadata
-  SULVMR=SULVMR+MIXSULVMR
+  SULVMR=SULVMR+MIXSULSHELLVMR
+;  SULVMR=SULVMR+MIXSULVMR
   SULVMR@_FillValue=0.0
+  nTimes=dimsizes(historyFile->time)
   
-;  historyRun2="nogeoPurSpin1"
-;  historyRun2="125sminPtbo2"
-;  pattern2="h0.1996"
-  historyPath = getHistoryPath(historyRun2)
-  historyPattern=historyPath+subDir+"/*.cam2."+pattern2+"*.nc"
-  historyNames2 = systemfunc("ls " + historyPattern)
-  history2 = addfiles(historyNames2, "r")
-  ListSetType(history2, "cat")
-  print("historyNames2:"+dimsizes(historyNames2))
-  N2O_2 = addfiles_GetVar(history2, historyNames2, "N2O")
-  PURSULVMR_2 = addfiles_GetVar(history2, historyNames2, "PURSULVMR")
-  MIXSULVMR_2 = addfiles_GetVar(history2, historyNames2, "MIXSULVMR")
+  historyPath = "analysis/"+historyRun2+"/"
+  historyFile2 = addfile(historyPath+"sulfvmr."+historyRun2+".nc","r")
+  N2O_2 = historyFile2->N2O
+  PURSULVMR_2 = historyFile2->PURSULVMR
+  MIXSULVMR_2 = historyFile2->MIXSULVMR
+  MIXSULSHELLVMR_2 = historyFile2->MIXSULSHELLVMR
   SULVMR_2=PURSULVMR_2 ; get metadata
-  SULVMR_2=SULVMR_2+MIXSULVMR_2
+  SULVMR_2=SULVMR_2+MIXSULSHELLVMR_2
+;  SULVMR_2=SULVMR_2+MIXSULVMR_2
   SULVMR_2@_FillValue=0.0
+  nTimes2=dimsizes(historyFile2->time)
   
 ; [time | 13] x [lev | 125] x [lat | 46] x [lon | 72]
 
 ;************************************************
 ; plotting parameters
 ;************************************************
-  wks   = gsn_open_wks ("pdf","SO4vsN2O."+historyRun1+"."+historyRun2)                 ; open workstation
+  wks   = gsn_open_wks ("pdf","images/SO4vsN2O."+historyRun1+"."+historyRun2)                 ; open workstation
 
   res                   = True                     ; plot mods desired
   res@gsnDraw      = False                        ; don't draw yet
@@ -117,8 +80,8 @@ begin
   res@xyLineColor     = "red"                    ; Line color
   
   plot  = gsn_csm_xy (wks,N2O(0,{40:250},0,:)*1e9,SULVMR(0,{40:250},0,:)*1e9,res) ; create plot
-  do i = 0, dimsizes(historyNames)-1
-    print(i+": "+historyNames(i))
+  do i = 0, nTimes-1
+    print((i+1)+" of "+nTimes)
     do j = 21,45  ; 5S - 90N
 ;      print(i+" "+j)
       overlay(plot,gsn_csm_xy (wks,N2O(i,{40:250},j,:)*1e9,SULVMR(i,{40:250},j,:)*1e9,res))
@@ -126,8 +89,8 @@ begin
   end do
   
   res@xyLineColor     = "black"                    ; Line color
-  do i = 0, dimsizes(historyNames2)-1
-    print(i+": "+historyNames2(i))
+  do i = 0, nTimes2-1
+    print((i+1)+" of "+nTimes2)
     do j = 21,45 ; 5S - 90N
 ;      print(i+" "+j)  
       overlay(plot,gsn_csm_xy (wks,N2O_2(i,{40:250},j,:)*1e9,SULVMR_2(i,{40:250},j,:)*1e9,res))
@@ -179,7 +142,4 @@ end
 
 ;*************************************************
 
-;plotSO4vsN2Oanalysis ("125smin400", "h0")
-;plotSO4vsN2Oanalysis ("125sminPtbo2", "h0.1996")
-
-plotSO4vsN2O ("125smin400", "h0", "125sminPtbo2", "h0.1996")
+plotSO4vsN2O ("125b36eg", "125b36Pb02")

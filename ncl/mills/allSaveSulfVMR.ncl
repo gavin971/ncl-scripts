@@ -1,0 +1,148 @@
+; Constants
+;
+; NOTE: These are from CAM, shr_const_mod.F90.
+BOLTZ   = 1.38065e-23             ; Boltzmann's constant ~ J/K/molecule
+AVOGAD  = 6.02214e26              ; Avogadro's number ~ molecules/kmole
+RGAS    = AVOGAD*BOLTZ            ; Universal gas constant ~ J/K/kmole
+MWDAIR  = 28.966                  ; molecular weight dry air ~ kg/kmole
+RDAIR   = RGAS/MWDAIR             ; Dry air gas constant ~ J/K/kg
+
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
+;load "tests/getHistoryPath.ncl"
+
+; Calculate parameters of the air based upon the data in the history file.
+;
+undef("setupair")
+procedure setupair(historyFile:file, P, arho)
+
+local hyam, hybm, P0, PS, Q, T, arho
+
+begin
+  hyam 	= historyFile->hyam
+  hybm 	= historyFile->hybm
+  P0 	= historyFile->P0
+  PS 	= historyFile->PS
+;  Q     = historyFile->Q
+  T     = historyFile->T
+ 
+  ; Calculate the air pressures at the interfaces.
+  P = pres_hybrid_ccm(PS(:,:,:), P0, hyam(:) ,hybm(:))
+  
+  ; Calculate the density assuming an ideal gas.
+  arho(:,:,:,:)  = P(:,:,:,:) / (RDAIR * T(:,:,:,:))
+end
+
+undef("saveSulfVMR")
+procedure saveSulfVMR(historyRun:string,pattern:string)
+
+;  inputs: historyRun, i.e. "coag04"
+;          pattern, i.e. "nopur2.cam2.h0.1995"
+
+local historyNames,rmin,cpi,rmassmin,writefile,hrc,nhrc,fc
+
+begin
+  historyPath = "scratch/"+historyRun+"/"
+  
+  historyNames = systemfunc("ls " + historyPath + " | grep " + pattern \
+              + " | grep -v sulvmr.")
+  print(historyNames)
+  hrc=stringtochar(historyRun)
+  nhrc=dimsizes(hrc)
+
+  nFiles=dimsizes(historyNames)
+  do ifile = 0, nFiles-1
+    print("")
+    print("    " + ifile + " :  " + (/ historyNames(ifile) /))
+    
+    writefilename=historyPath+"sulvmr."+historyNames(ifile)
+    
+    if (.not.(isfilepresent(writefilename))) then
+      readfilename=historyPath+historyNames(ifile)
+
+      readfile =addfile(readfilename,"r")
+
+      mixsulvmr 	     = readfile->MIXSULMD
+      dussulmd 	     = readfile->DUSSULMD
+      mixsulshellvmr        = mixsulvmr
+      mixsulshellvmr        = mixsulshellvmr - dussulmd ; subtract core mass from sulfate (5/19/2009)
+
+      if (isfilevar(readfile,"RHOAIR")) then
+        arho           = readfile->RHOAIR
+        writerho       = False
+      else
+      ; Compute the air mass and density.
+      ;
+      ; NOTE: Convert arho and amass are in cgs units.
+        P                = mixsulvmr ; get metadata and array structure from OCS
+        P@units          = "Pa"
+        P@long_name      = "Pressure"
+
+        arho           = mixsulvmr ; get metadata and array structure from OCS
+        arho@units     = "g/cm3"
+        arho@long_name = "air density"
+
+        print("calling setupair")
+        setupair(readfile, P, arho) ; calculate pressure and density
+        arho = arho(:,:,:,:) * 1e3 / 1e6
+        writerho       = True
+      end if
+
+      print("      Calculating the mixed sulfate vmr ...")
+  ; (mol/mol)=(g/cm3)/(g/cm3)*(g/mol Air)/(g/mol H2SO4)
+  ;   (28.964 g/mol Air)/(98.0734 g/mol H2SO4) =0.2953
+      mixsulvmr=mixsulvmr(:,:,:,:)/arho(:,:,:,:)*0.2953
+      mixsulshellvmr=mixsulshellvmr(:,:,:,:)/arho(:,:,:,:)*0.2953
+      mixsulvmr@units      = "mol/mol"
+      mixsulvmr@long_name  = "mixed sulfates equivalent vmr"
+      mixsulshellvmr@units      = "mol/mol"
+      mixsulshellvmr@long_name  = "mixed sulfates shell equivalent vmr"
+
+      print("creating "+writefilename)
+      writefile=addfile(writefilename,"c")
+      if (writerho) then
+        writefile->RHOAIR=arho
+        writefile->PRESSURE=P
+      end if
+
+      writefile->MIXSULVMR=mixsulvmr
+      writefile->MIXSULSHELLVMR=mixsulshellvmr
+
+      print("      Calculating the pure sulfate vmr ...")
+      pursulvmr 	= readfile->PURSULMD    
+      pursulvmr=pursulvmr(:,:,:,:)/arho(:,:,:,:)*0.2953
+      pursulvmr@units      = "mol/mol"
+      pursulvmr@long_name  = "pure sulfates equivalent vmr"
+      writefile->PURSULVMR=pursulvmr
+
+    end if
+    
+  end do
+  
+  historyNames = systemfunc("ls " + historyPath + historyRun +"."+pattern+"*")
+  print(historyNames)
+  history = addfiles(historyNames, "r")
+  ListSetType(history, "cat")
+  N2O = addfiles_GetVar(history, historyNames, "N2O")
+
+  historyNames2 = systemfunc("ls " + historyPath + "sulvmr." + \
+                  historyRun +"."+pattern+"*")
+  print(historyNames2)
+  history2 = addfiles(historyNames2, "r")
+  ListSetType(history2, "cat")
+  PURSULVMR = addfiles_GetVar(history2, historyNames2, "PURSULVMR")
+  MIXSULVMR = addfiles_GetVar(history2, historyNames2, "MIXSULVMR")
+  MIXSULSHELLVMR = addfiles_GetVar(history2, historyNames2, "MIXSULSHELLVMR")
+  
+  writefile=addfile("analysis/"+historyRun+"/sulfvmr."+historyRun+".nc", "c")
+  
+  writefile->N2O = N2O
+  writefile->PURSULVMR = PURSULVMR
+  writefile->MIXSULVMR = MIXSULVMR
+  writefile->MIXSULSHELLVMR = MIXSULSHELLVMR
+  
+end
+
+;saveSulfVMR("125b36Pb02","cam2.h0")
+saveSulfVMR("125b36eg","cam2.h0")
