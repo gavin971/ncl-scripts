@@ -38,21 +38,27 @@ begin
   T_zm    = filein->T_zm
 
 ; Set for various size thresholds
-
+  res = True
   if (sizeLimit.eq."10A") then
     mixsul_zm = filein->mixsul10a_zm
     pursul_zm = filein->pursul10a_zm
     dust_zm   = filein->dust10a_zm
+    res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
+        200, 300, 400, 500, 600, 700, 800/)
   else
     if (sizeLimit.eq."05A") then
       mixsul_zm = filein->mixsul05a_zm
       pursul_zm = filein->pursul05a_zm
       dust_zm   = filein->dust05a_zm
+      res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
+           200, 300, 400, 500, 600, 700, 800/)
     else
       if (sizeLimit.eq."00A") then  
         mixsul_zm = filein->mixsulnd_zm
         pursul_zm = filein->pursulnd_zm
         dust_zm   = filein->dustnd_zm
+        res@cnLevels = (/ 1, 2, 4, 8, 10, 20, 40, 80, 100, 200, 400, \
+                  600, 800, 1000, 2000, 4000, 8000, 1e4 /)
       else
         print("FATAL: sizeLimit not recognized="+sizeLimit)
         return
@@ -110,15 +116,20 @@ begin
     
   else
   
-    month = (/ 7, 7, 7 /)
-    runs = (/ "Sulfates on Dust", "Pure Sulfates" , "Dust"/)
+;    month = (/ 7, 7, 7 /)
+;    runs = (/ "Sulfates on Dust", "Pure Sulfates" , "Dust"/)
+    month = (/ 7, 7 /)
+    runs = (/ "Sulfates", "Dust"/)
     
     time2s=time1s
     time2e=time1e
     
+;    aer1_zm  = mixsul_zm
+;    aer2_zm  = pursul_zm
+;    aer3_zm  = dust_zm
     aer1_zm  = mixsul_zm
-    aer2_zm  = pursul_zm
-    aer3_zm  = dust_zm
+    aer1_zm  = aer1_zm + pursul_zm
+    aer2_zm  = dust_zm
     
     lat21=30.0
     lat22=90.0
@@ -191,7 +202,6 @@ begin
   resP@lbLabelAngleF        = 60
   resP@tiMainString          = caseid
         
-  res                       = True
   res@gsnDraw               = False
   res@gsnFrame              = False
   res@lbLabelBarOn          = False
@@ -239,6 +249,10 @@ begin
   resO@cnLineThicknessF     = 2.0                   ; color of second contours
 
   ; Open a workstation
+  if (.not.(isfilepresent("images/"+caseid))) then
+    a = systemfunc("mkdir -p images/"+caseid)
+  end if
+  
   wks = gsn_open_wks("pdf","images/"+caseid+"/"+aerType+"sulf125."+caseid+"."+sizeLimit)
   gsn_define_colormap(wks,"gui_default")                ; choose colormap
   
@@ -271,8 +285,10 @@ begin
   res@cnLevelSelectionMode  = "ExplicitLevels"
 ;  res@cnLevels = (/ 5, 10, 20, 30, 50, 75, 100, \
 ;      200, 300, 400, 500, 600, 700, 800/)
-  res@cnLevels = (/ 1, 2, 4, 8, 10, 20, 40, 80, 100, 200, 400, 600, 800, \
-      1000, 2000, 4000, 8000, 1e4 /)
+;  res@cnLevels = (/ 1, 2, 4, 8, 10, 20, 40, 80, 100, 200, 400, 600, 800, \
+;      1000, 2000, 4000, 8000, 1e4 /)
+;  res@cnLevels = (/ 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 20, 25, 30, 40, \
+;         50, 60, 80, 100 /)
   res@lbLabelAngleF = 60
   
   res@tiMainString          = runs(0)
@@ -310,6 +326,6 @@ aerType = "mix"
 ;aerType = "pur"
 
 monave_za(caseid,aerType,year,"00A")
-monave_za(caseid,aerType,year,"05A")
-monave_za(caseid,aerType,year,"10A")
+;monave_za(caseid,aerType,year,"05A")
+;monave_za(caseid,aerType,year,"10A")
 ;monave_polar(caseid)

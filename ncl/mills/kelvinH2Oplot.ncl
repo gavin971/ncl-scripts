@@ -32,11 +32,16 @@ wtpct@long_name="Weight % H~B~2~N~O"
  res@trXMinF = 0.4  ; 0.1 to 100 nm range x-axis
  res@trXMaxF = 40
  
- res@tmEqualizeXYSizes = True
- res@tmXTLabelFont = 25 ; change the font to Times Roman
- res@tmXTLabelFontHeightF = 0.04 ; Change the font size (default 0.02)
+ res@tmXBMode = "Explicit"
+ res@tmXBValues = (/0.4,0.6,0.8,1.,2.,4.,6.,8.,10.,20.,40./)
+ res@tmXBLabels = (/"0.4",".6"," ","1","2","4","6"," ","10","20","40"/)
+  res@tiXAxisString = "Aerosol Radius (nm)"
  
- res@tiMainFont = 25 ; change the font to Times Roman
+ res@tmEqualizeXYSizes = True
+; res@tmXTLabelFont = 25 ; change the font to Times Roman
+ res@tmXTLabelFontHeightF = 0.03 ; Change the font size (default 0.02)
+ 
+; res@tiMainFont = 25 ; change the font to Times Roman
  res@tiMainFontHeightF = 0.04 ; change the font size
  res@tiUseMainAttributes = True ; use main tile font attributes for X and Y titles
 
