@@ -7,7 +7,7 @@ RGAS    = AVOGAD*BOLTZ            ; Universal gas constant ~ J/K/kmole
 MWDAIR  = 28.966                  ; molecular weight dry air ~ kg/kmole
 RDAIR   = RGAS/MWDAIR             ; Dry air gas constant ~ J/K/kg
 
-load "tests/getHistoryPath.ncl"
+load "ncl-scripts/getHistoryPath.ncl"
 
 ; Calculate parameters of the air based upon the data in the history file.
 ;

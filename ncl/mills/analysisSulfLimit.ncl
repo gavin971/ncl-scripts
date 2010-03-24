@@ -1,5 +1,5 @@
-;load "tests/getHistoryPath.ncl"
-load "tests/common2.ncl"
+;load "ncl-scripts/getHistoryPath.ncl"
+load "ncl-scripts/common2.ncl"
 
 undef("analysisSulfLimit")
 procedure analysisSulfLimit(historyRun:string,pattern:string)

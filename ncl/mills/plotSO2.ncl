@@ -1,8 +1,8 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-load "tests/getHistoryPath.ncl"
-load "tests/common.ncl"
+load "ncl-scripts/getHistoryPath.ncl"
+load "ncl-scripts/common.ncl"
 
 undef("plotSO2")
 procedure plotSO2(historyRun:string,year:string,month:string,day_offset:integer)

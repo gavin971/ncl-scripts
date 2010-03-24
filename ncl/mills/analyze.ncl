@@ -16,6 +16,6 @@ print("Analyzing History Files")
 ;HISTORYPATTERN = "run/" + WACCM_RUN + "/*cam2.h0*"
 HISTORYPATTERN = "run/" + WACCM_RUN + "/h0.2034.ave.nc"
 
-load "tests/dust.ncl"
+load "ncl-scripts/dust.ncl"
 
 analyzeHistory(HISTORYPATTERN)

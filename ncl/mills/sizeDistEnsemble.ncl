@@ -3,8 +3,8 @@
 ; ***********************************************
 ;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 ;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-load "tests/core.ncl"
-load "tests/getHistoryPath.ncl"
+load "ncl-scripts/core.ncl"
+load "ncl-scripts/getHistoryPath.ncl"
 ;************************************************
 
 undef("sizeDistEnsemble")

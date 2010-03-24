@@ -1,6 +1,6 @@
 ; Saber Temperatures
 
-load "tests/common.ncl"
+load "ncl-scripts/common.ncl"
 
 ;  Set up the particle bins.
 ;

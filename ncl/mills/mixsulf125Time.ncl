@@ -9,8 +9,8 @@
 ; files.  This file is then used as input for the plotting routine,
 ; mixsulf125Time (below).
 
-load "tests/common.ncl"
-;load "tests/getHistoryPath.ncl"
+load "ncl-scripts/common.ncl"
+;load "ncl-scripts/getHistoryPath.ncl"
 
 undef("mixsulfTimeAnalysis")
 procedure mixsulfTimeAnalysis(caseid:string,pattern:string)

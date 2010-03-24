@@ -11,7 +11,7 @@ end if
 print("Using " + WACCM_RES + " resolution ...")
 
 
-load "tests/soot.ncl"
+load "ncl-scripts/soot.ncl"
 
 print("Resolution" + WACCM_RES)
 

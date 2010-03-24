@@ -19,7 +19,7 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
-load "tests/getHistoryPath.ncl"
+load "ncl-scripts/getHistoryPath.ncl"
 
 ;  Set up the particle bins.
 ;

@@ -1,4 +1,4 @@
-load "tests/common2.ncl"
+load "ncl-scripts/common2.ncl"
 
 infilename="scratch/125smin_nogeo400SO2.bin36.cam2.i.1998-03-01-00000.nc"
 

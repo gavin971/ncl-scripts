@@ -10,7 +10,7 @@ RDAIR   = RGAS/MWDAIR             ; Dry air gas constant ~ J/K/kg
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-;load "tests/getHistoryPath.ncl"
+;load "ncl-scripts/getHistoryPath.ncl"
 
 ; Calculate parameters of the air based upon the data in the history file.
 ;

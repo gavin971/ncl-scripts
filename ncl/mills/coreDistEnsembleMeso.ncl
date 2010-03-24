@@ -3,7 +3,7 @@
 ; ***********************************************
 ;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 ;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-load "tests/core.ncl"
+load "ncl-scripts/core.ncl"
 ;************************************************
 RHO_DUST = 2.0
 PI      = 4.0 * atan(1.0)         ; pi

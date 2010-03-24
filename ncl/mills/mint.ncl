@@ -14,7 +14,7 @@ MWH2O   = 18.000                  ; molecular weight of water vapor
 PTOP    = 100.0                   ; pressure at the top of the model (non-zero) ~ Pa
 REARTH  = 6.37122e6               ; Earth's radius (m)
 
-load "tests/core.ncl"
+load "ncl-scripts/core.ncl"
 
 
   files = systemfunc("ls " + " run/mdust/*cam2.h0.*.nc")

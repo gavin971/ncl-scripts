@@ -16,7 +16,7 @@ REARTH  = 6.37122e6               ; Earth's radius (m)
 DG2RAD  = PI / 180.0              ; rad deg^-1
 RHO_I   = 0.93                    ; Ice Density (g/cm-3)
 
-load "tests/core.ncl"
+load "ncl-scripts/core.ncl"
 
 ;  Set up the particle bins.
 ;

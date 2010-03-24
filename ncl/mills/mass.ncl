@@ -15,7 +15,7 @@ PTOP    = 100.0                   ; pressure at the top of the model (non-zero) 
 REARTH  = 6.37122e6               ; Earth's radius (m)
 DG2RAD  = PI / 180.0              ; rad deg^-1
 
-load "tests/core.ncl"
+load "ncl-scripts/core.ncl"
 
 ;  Set up the particle bins.
 ;

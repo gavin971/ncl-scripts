@@ -10,7 +10,7 @@ end if
 print("Using " + WACCM_RES + " resolution ...")
 
 
-load "tests/dust.ncl"
+load "ncl-scripts/dust.ncl"
 
 if (WACCM_RES .eq. "10x15") then 
   newic("data/atm/cam/inic/fv/cami_0000-01-01_10x15_L26_c030918.nc")

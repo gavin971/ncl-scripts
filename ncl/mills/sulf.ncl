@@ -1,6 +1,6 @@
 ; Sulfur
 
-load "tests/core.ncl"
+load "ncl-scripts/core.ncl"
 ; Generate the initial tracer distribution.
 undef("newic")
 procedure newic(srcIcPath:string)

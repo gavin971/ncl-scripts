@@ -6,8 +6,8 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-;load "tests/getHistoryPath.ncl"
-load "tests/getDataPath.ncl"
+;load "ncl-scripts/getHistoryPath.ncl"
+load "ncl-scripts/getDataPath.ncl"
 
 ;*********************************************************
 ; Run allSaveSulfVMR.ncl prior to this script to generate

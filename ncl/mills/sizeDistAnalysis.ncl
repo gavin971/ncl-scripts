@@ -1,5 +1,5 @@
-;load,"tests/getHistoryPath.ncl"
-load "tests/common2.ncl"
+;load,"ncl-scripts/getHistoryPath.ncl"
+load "ncl-scripts/common2.ncl"
 
 AVG     = 6.02252e+23             ; Avogadro's number (CARMA) ~ molecules/mole
 cpi = 4./3.*PI

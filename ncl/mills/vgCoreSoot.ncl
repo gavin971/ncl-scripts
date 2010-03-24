@@ -7,6 +7,45 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
+undef("calcPdel")
+function calcPdel(historyPath:string)
+
+local ps,p0,hyai,hybi,pm
+
+begin
+
+  ; Open the set of history files.
+  ;
+  ; NOTE: We want to work with the entire set of history files, 
+  ; so we can do a time evolution.
+  print("  Reading data ...")
+
+  historyNames = systemfunc("ls " + historyPath)
+  history = addfiles(historyNames, "r")
+  ListSetType(history, "cat")
+  
+  ; Read in the fields we will need.
+  ps = addfiles_GetVar(history, historyNames, "PS")
+  p0 = history[0]->P0
+  hyai = history[0]->hyai
+  hybi = history[0]->hybi
+  time = addfiles_GetVar(history, historyNames, "time")
+  lev = history[0]->lev
+  lat = history[0]->lat
+  lon = history[0]->lon
+  
+  pm = pres_hybrid_ccm(ps,p0,hyai,hybi)
+  
+;  print(pm(0,:,0,0))
+  
+  pdel=pm(:,1:dimsizes(lev),:,:)-pm(:,0:dimsizes(lev)-1,:,:)
+  
+;  print(pdel(0,:,0,0))
+  
+  return(pdel)
+  
+end
+
 
 undef("closest_lon")
 function closest_lon(lon:numeric, lons[*])
@@ -704,6 +743,8 @@ begin
   return(totalMass)
 end
 
+
+undef("calculateMass")
 function calculateMass(historyPath:string, tracerNames[*]:string)
 
 local pi, dg2grad, g, re, historyNames, hists, lev, lat, lon, nLevs, nLats, nLons, \
@@ -730,7 +771,8 @@ begin
   ListSetType(history, "cat")
   
   ; Read in the fields we will need.
-  pdeldry = addfiles_GetVar(history, historyNames, "PDELDRY")
+;  pdeldry = addfiles_GetVar(history, historyNames, "PDELDRY")
+  pdeldry = calcPdel(historyPath)
 
   ; Create the output variable.
   nTimes = dimsizes(history[:]->time)
@@ -877,7 +919,7 @@ begin
   
   ; To figure out the size of the array that we will need, open the first
   ; set f history files.
-  historyPath = basePath + runNames(0) + "/" + historyPattern
+  historyPath = basePath + "/" + historyPattern
   historyNames = systemfunc("ls " + historyPath)
   history = addfiles(historyNames, "r")
   ListSetType(history, "cat")
@@ -903,16 +945,30 @@ begin
   dmass@units = "kg"
   
   ; Calculate the tracer masses for all the runs.
+  plotname="dmass"
   do i = 0, nRuns - 1
     print("")
     print("")
     print("Run :  " + runNames(i))
-    historyPath = basePath + runNames(i) + "/" + historyPattern
-    mass(i, :, :) = calculateMass(historyPath, tracerNames)
+    plotname=plotname + "." + runNames(i)
+    if (.not.(isfilepresent("analysis/"+runNames(i)+"/sootmass.nc"))) then
+      historyPath = basePath + "/" + historyPattern
+      sootmass = calculateMass(historyPath, tracerNames)
+      system("mkdir -p analysis/"+runNames(i))
+      outfile=addfile("analysis/"+runNames(i)+"/sootmass.nc","c")
+      outfile->sootmass=sootmass
+    else
+      infile=addfile("analysis/"+runNames(i)+"/sootmass.nc","r")
+      sootmass=infile->sootmass
+    end if
+    print(dimsizes(sootmass))
+    print(dimsizes(mass))
+    print(i)
+    mass(i, :, :) = (/sootmass/)
 
     print("")
     do j = 0, nTracers - 1
-      dmass(i, j, :) = mass(i, j, :) - mass(i, j, 0)
+      dmass(i, j, :) = mass(i, j, :) ;- mass(i, j, 0)
       
       print("  " + tracerNames(j) + " :  " + mass(i, j, nTimes-1) + " - " + \
         mass(i, j, 0) + " = " + dmass(i, j, nTimes-1))
@@ -922,7 +978,7 @@ begin
   ; Create a panel plot of the mass difference.
   print("")
   print(" Plotting ...")
-  wks = gsn_open_wks("pdf", "dmass")
+  wks = gsn_open_wks("pdf", plotname)
   plot = new(nRuns, graphic)
   
   res = True
@@ -932,17 +988,25 @@ begin
   res@gsnDraw = False
   res@gsnFrame = False
   
-  res@tmYLFormat = "0*+^e"
-  res@tmYLPrecision = 3
+  res@trYMinF = 0
+;  res@trYMaxF = 5.0
+
+  res@trXMinF = 0
+  res@trXMaxF = dmass&time(nTimes-1)/365.
+  res@tiXAxisString="Time (years)"
+  
+;  res@tmYLFormat = "0*+^e"
+;  res@tmYLPrecision = 3
   
   do i = 0, nRuns - 1
     res@gsnLeftString = runNames(i)
-    res@gsnRightString = "kg"
-    plot(i) = gsn_csm_xy(wks, dmass&time, dmass(i, nTracers - 1, :) / mass(i, nTracers-1, 0), res)
+    res@gsnRightString = "x10~S~6~N~ kg"
+;    plot(i) = gsn_csm_xy(wks, dmass&time, dmass(i, nTracers - 1, :) / mass(i, nTracers-1, 0), res)
+    plot(i) = gsn_csm_xy(wks, dmass&time/365., dmass(i, nTracers - 1, :)/1e6, res)
   end do
   
   resP = True
-  resP@txString = "Change in Total Mass"
+  resP@txString = "Total Mass"
   gsn_panel(wks, plot, (/ nRuns, 1 /), resP)
   delete(wks)
 end

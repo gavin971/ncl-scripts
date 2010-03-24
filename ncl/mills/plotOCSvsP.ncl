@@ -6,9 +6,9 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-load "tests/common.ncl"
-load "tests/getHistoryPath.ncl"
-load "tests/getDataPath.ncl"
+load "ncl-scripts/common.ncl"
+load "ncl-scripts/getHistoryPath.ncl"
+load "ncl-scripts/getDataPath.ncl"
 ;*************************************************
 
 begin

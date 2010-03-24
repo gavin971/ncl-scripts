@@ -2,7 +2,7 @@
 ;
 ; Monthly average plots
 
-load "tests/common.ncl"
+load "ncl-scripts/common.ncl"
 ;load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
 ;load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 ;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"

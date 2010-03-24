@@ -3,7 +3,7 @@ BOLTZ   = 1.38065e-16      ; Boltzmann's constant ~ erg/K/molecule
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-load "tests/getHistoryPath.ncl"
+load "ncl-scripts/getHistoryPath.ncl"
 
 undef("h2so4conc")
 procedure h2so4conc(historyRun:string,prefix:string)

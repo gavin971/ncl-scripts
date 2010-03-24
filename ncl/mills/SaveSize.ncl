@@ -15,7 +15,7 @@ DG2RAD  = PI / 180.0              ; rad deg^-1
 RHO_H2SO4 = 1.923                 ; density of pure H2SO4 (l) at 200K [ g / cm3 ]
 RHO_DUST = 2.0                    ; density of meteoritic dust [ g / cm3 ]
 
-load "tests/core.ncl"
+load "ncl-scripts/core.ncl"
 
 ;  Set up the particle bins.
 ;

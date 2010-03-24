@@ -1,4 +1,4 @@
-load "tests/getHistoryPath.ncl"
+load "ncl-scripts/getHistoryPath.ncl"
 
 undef("saveSizeLimit")
 procedure saveSizeLimit(historyRun:string,pattern:string)

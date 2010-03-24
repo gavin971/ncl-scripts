@@ -1,6 +1,6 @@
 ; Nuclear Soot
 
-load "tests/core.ncl"
+load "ncl-scripts/core.ncl"
 
 ; Add tracers to the initial conditions file.
 ;
