@@ -49,12 +49,10 @@ print("      rho      =  " + rho)
 
 setupbins(nBins, rmin, rmrat, rho, rmass, rad, dr, \
           rmassup, dm, vol, radup, radlow)
-print("      rmassmin =  " + rmass(0))
 
 nBins2 = 36
 ;rmin2  = (2.0*gwtSiO2/AVG/RHO_DUST/cpi)^(1./3.) ; cm
-;rmin2  = (gwtH2SO4/AVG/RHO_H2SO4/cpi)^(1./3.) ; cm
-rmin2  = (2.0*gwtH2SO4/AVG/RHO_DUST/cpi)^(1./3.) ; cm
+rmin2  = (gwtH2SO4/AVG/RHO_H2SO4/cpi)^(1./3.) ; cm
 rmrat2 = 2.0
 rho2   = RHO_DUST  ; g/cm-3
 
@@ -77,7 +75,6 @@ print("      rho      =  " + rho2)
 
 setupbins(nBins2, rmin2, rmrat2, rho2, rmass2, rad2, dr2, \
           rmassup2, dm2, vol2, radup2, radlow2)
-print("      rmassmin =  " + rmass2(0))
 
 rmin3  = (2.0*gwtH2SO4/AVG/RHO_H2SO4/cpi)^(1./3.) ; cm
 rmrat3 = 2.0
@@ -94,7 +91,7 @@ radup3 = rmass3
 radlow3 = rmass3
 
 print("")
-print("    New sulfate bins ...")
+print("    New dust bins ...")
 print("      nBins    =  " + nBins2)
 print("      rmin     =  " + rmin3)
 print("      rmrat    =  " + rmrat3)
@@ -102,7 +99,6 @@ print("      rho      =  " + rho3)
 
 setupbins(nBins2, rmin3, rmrat3, rho3, rmass3, rad3, dr3, \
           rmassup3, dm3, vol3, radup3, radlow3)
-print("      rmassmin =  " + rmass3(0))
 
 dust = new((/ nFTimes, nLevs, nLats, nLons, nBins /), double)
   dust!0="time"
@@ -130,7 +126,7 @@ getXbin(initfile, "DUSSUL", dussul, nBins)
 
 corefrac = dussul / mixsul
 
-print("corefrac max="+max(corefrac)+" min="+min(corefrac))
+print("corefrac max="+max(corefrac))
 if (any(corefrac.ge.1)) then
   x1D=ndtooned(corefrac)
   dsizes_a = dimsizes(corefrac)
@@ -138,7 +134,7 @@ if (any(corefrac.ge.1)) then
   print("dimsizes = "+dimsizes(ind1D))
 ;  indices  = ind_resolve(ind1D,dsizes_a)
 ;  print(indices)
-  corefrac = (corefrac < 0.1d0)
+  corefrac = (corefrac < 0.99d0)
   print("new corefrac max="+max(corefrac))
 end if
 
@@ -169,6 +165,7 @@ do i = 0, nBins-1
   dustdm(:, :, :, :, i)   = dust(:, :, :, :, i)   / dm(i)
   pursuldm(:, :, :, :, i) = pursul(:, :, :, :, i) / dm(i)
   mixsuldm(:, :, :, :, i) = mixsul(:, :, :, :, i) / dm(i)
+  corefracdm(:, :, :, :, i) = corefrac(:, :, :, :, i) / dm(i)
   
   dusttot   = dusttot   + dust(0,{43},{40},0,i)
   pursultot = pursultot + pursul(0,{43},{40},0,i)
@@ -212,13 +209,12 @@ mixsul2(:, :, :, :, 0:nBins2-1) = (x > 0.0d0)
 print("Interpolating dussul...")
 delete(x)
 corefracdm@_FillValue=0.0d0
-x = linint1_Wrap(rmass, corefrac(:, :, :, :, :), False, rmass3, 0)
+x = linint1_Wrap(rmass, corefracdm(:, :, :, :, :), False, rmass3, 0)
 
 delete(x@_FillValue)
 
-print("corefrac max="+max(x)+" min="+min(x))
 dussul2(:, :, :, :, 0:nBins2-1) = (x > 0.0d0)
-dussul2 = (dussul2 < 0.1d0) * mixsul2
+dussul2 = (dussul2 < 0.99d0) * mixsul2
 
 dusttot=0.0d0
 pursultot=0.0d0
@@ -247,21 +243,13 @@ end do
 print("totals:                 "\
        +sprintf("%9.3e",dusttot)+" "+sprintf("%9.3e",pursultot)+" "+\
         sprintf("%9.3e",mixsultot)+" "+sprintf("%9.3e",dussultot))
-
 	
-print("mixsul2 max="+max(mixsul2)+" min="+min(mixsul2))
-print("dussul2 max="+max(dussul2)+" min="+min(dussul2))
-
-;corefrac2 = dussul2(:, :, :, :, 0:nBins2-1)/(mixsul2(:, :, :, :, 0:nBins2-1)>1e-50)
-
-;print("corefrac2 max="+max(corefrac2)+" min="+min(corefrac2))
-
 a = systemfunc("ncks -x -v DUST37,DUST38,PURSUL37,PURSUL38,"+\ 
 	       "MIXSUL37,MIXSUL38,DUSSUL37,DUSSUL38 "+\
 	       "scratch/125smin_nogeo400SO2.cam2.i.1998-03-01-00000.nc "+\
-	       "scratch/125smin_nogeo400SO2.bin36e.cam2.i.1998-03-01-00000.nc")
+	       "scratch/125smin_nogeo400SO2.bin36.cam2.i.1998-03-01-00000.nc")
 	
-outfilename="scratch/125smin_nogeo400SO2.bin36e.cam2.i.1998-03-01-00000.nc"
+outfilename="scratch/125smin_nogeo400SO2.bin36.cam2.i.1998-03-01-00000.nc"
 outfile=addfile(outfilename,"w")
 
 setXbin(outfile, "DUST",   dust2,   nBins2)
