@@ -37,10 +37,9 @@ dussul = pursul
   dussul@long_name="mass of meteoritic dust in sulfate"
 
 
-pursul(:, :, :, :, :) = 0.0
-mixsul(:, :, :, :, :) = 0.0
-dussul(:, :, :, :, :) = 0.0
-
+pursul(:, :, :, :, :) = 0.0d0
+mixsul(:, :, :, :, :) = 0.0d0
+dussul(:, :, :, :, :) = 0.0d0
 	
 outfilename="scratch/125smin_nogeo400SO2.bin36void.cam2.i.1998-03-01-00000.nc"
 
