@@ -1,0 +1,46 @@
+#!/bin/ksh
+
+###.......creates monthly means from all available years.......
+
+echo zmavg
+
+runname='vgcontrol02'
+
+wadir='/data5/mmills/'$runname'/h0zm'
+
+# script to average and standard deviation of waccm h0 files
+
+count=1
+while [[ $count -le 12 ]];do
+   if  [[ $count -le 9 ]];then
+
+      ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0'$count'.nc'
+      echo $ncfiles
+
+      avgfile=$wadir'/'$runname'.cam2.h0zm.0'$count'.nc'
+      sdfile=$wadir'/'$runname'.cam2.h0zmsd.0'$count'.nc'
+
+   else
+
+      ncfiles=$wadir'/'$runname'.cam2.h0zm.*-'$count'.nc'
+      echo $ncfiles
+
+      avgfile=$wadir'/'$runname'.cam2.h0zm.'$count'.nc'
+      sdfile=$wadir'/'$runname'.cam2.h0zmsd.'$count'.nc'
+
+   fi
+
+   echo '-----------------'$count
+   echo $avgfile
+   echo $sdfile
+
+   ncrcat -O $ncfiles zmtmp.nc
+   ncwa -O -I -a time zmtmp.nc $avgfile 
+   ncbo -O -D 2 --op_typ=sub zmtmp.nc $avgfile tmp.nc
+   ncra -O -y rmssdn tmp.nc $sdfile
+   rm zmtmp.nc
+   rm tmp.nc
+
+   (( count += 1 ))
+
+done

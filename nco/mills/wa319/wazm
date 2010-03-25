@@ -1,0 +1,18 @@
+#!/bin/ksh
+
+wadir='/data5/mmills/vgcontrol02/h0/'
+
+ncfiles=$wadir'*.nc'
+
+for i in $ncfiles 
+do
+
+  oldfile=$i
+  newfile=`echo $oldfile | sed 's/h0/h0zm/g'`
+  echo $newfile
+
+  `ncwa -alon -O $oldfile $newfile`
+
+done
+
+

@@ -1,0 +1,27 @@
+#!/bin/ksh
+
+runname='vgcontrol02'
+wadir='/data5/mmills/'$runname'/h0zm'
+
+# script to average and standard deviation of waccm h0 files
+
+# calculate mean
+
+ncrcat -O $wadir'/'$runname'.cam2.h0zm.'*'.annual.nc' annual_tmp.nc 
+avgfile=$wadir'/'$runname'.cam2.h0zm.annual.nc'
+
+echo created $avgfile
+ncwa -O -a time annual_tmp.nc $avgfile
+
+# calculate standard deviation 
+
+ncbo -O --op_typ=sub annual_tmp.nc $avgfile tmp.nc
+
+sdfile=$wadir'/'$runname'.cam2.h0zm.annual_sd.nc'
+ncra -O -y rmssdn tmp.nc $sdfile 
+echo created $avgfile
+
+rm -f tmp.nc
+rm -f annual_tmp.nc
+
+

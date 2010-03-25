@@ -1,0 +1,24 @@
+#!/bin/ksh
+
+runname='vgcontrol02'
+wadir='/data5/mmills/'$runname'/h0zm'
+
+# script to average and standard deviation of waccm h0 files
+
+count=0
+while [[ $count -lt 5 ]];do
+
+   (( year = count + 2060 ))
+   ncfiles=$wadir'/'$runname'.cam2.h0zm.'$year*'.nc'
+   avgfile=$wadir'/'$runname'.cam2.h0zm.'$year'.annual.nc'
+
+   # create annual mean
+   echo averaging $ncfiles
+   ncea $ncfiles $avgfile
+   echo created $avgfile
+   
+   (( count += 1 ))
+  
+done
+
+
