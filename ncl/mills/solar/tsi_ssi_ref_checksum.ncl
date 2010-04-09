@@ -1,4 +1,5 @@
-ncf = addfile("spectra_1610_2009a_31Mar10.nc","r")
+;ncf = addfile("spectra_1610_2009a_31Mar10.nc","r")
+ncf = addfile("spectral_irradiance_Lean_1610-2009_ann_c100405.nc","r")
 
 ssi_ref=ncf->ssi_ref
 tsi_ref=ncf->tsi_ref

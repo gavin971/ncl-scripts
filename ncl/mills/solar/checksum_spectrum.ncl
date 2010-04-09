@@ -5,7 +5,8 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 ;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-ncf = addfile("spectra_1610_2009a_31Mar10.nc","r")
+;ncf = addfile("spectra_1610_2009a_31Mar10.nc","r")
+ncf = addfile("spectral_irradiance_Lean_1610-2140_ann_c100408.nc","r")
 
 ssi=ncf->ssi
 tsi=ncf->tsi
@@ -36,7 +37,8 @@ tsi3=ncf3->tsi
 
 year=round(date/10000.d0,0)+0.5d0
 
-do i = 220,260
+;do i = 220,260
+do i = 220,388
   print(sprintf("%6.1f",year(i))+"  "+sprintf("%16.11f",tsi(i))+\
         "  "+sprintf("%16.11f",tsi2(i))+"  "+sprintf("%16.11f",tsi_diff2(i)))
 end do
@@ -46,13 +48,18 @@ do i = 389,390
         "  "+sprintf("%16.11f",tsi2(i))+"  "+sprintf("%16.11f",tsi_diff2(i))+\
         "  "+sprintf("%16.11f",tsi3(i)))
 end do
-do i = 391,399
+do i = 391,398
   print(sprintf("%6.1f",year(i))+"  "+sprintf("%16.11f",tsi(i))+\
         "  "+sprintf("%16.11f",tsi2(i))+"  "+sprintf("%16.11f",tsi_diff2(i)))
 end do
+do i = 2009-1610,2009-1610+44
+  print(sprintf("%6.1f",year(i))+"  "+sprintf("%16.11f",tsi(i))+\
+        "  "+sprintf("%16.11f",tsi2(i))+"  "+sprintf("%16.11f",tsi_diff2(i))+\
+        "  "+sprintf("%6.1f",year(i-44))+"  "+sprintf("%16.11f",tsi(i-44))+"  "+sprintf("%16.11f",tsi2(i-44)))
+end do
 
 
-wks = gsn_open_wks("pdf", "tsi_diff")
+wks = gsn_open_wks("pdf", "tsi_diff_1610-2140")
 
   res                   = True                      ; plot mods desired
   res@gsnDraw           = False
@@ -61,7 +68,7 @@ wks = gsn_open_wks("pdf", "tsi_diff")
   res@vpWidthF              = 1.0
 
   res@trXMinF = 1610.d0
-  res@trXMaxF = 2010.d0
+  res@trXMaxF = 2141.d0
   res@tmXBLabelFontHeightF  = 0.02
 ;  res@tiXAxisString="Time (years)"
   res@tiYAxisString="TSI - SSI sum (W/m~S~2~N~)"
@@ -88,20 +95,21 @@ wks = gsn_open_wks("pdf", "tsi_diff")
 delete(wks)
 delete(res)
   
-wks = gsn_open_wks("pdf", "tsi_vs_ssi_1830-1870")
+wks = gsn_open_wks("pdf", "tsi_vs_ssi_1610-2140")
   res                   = True                      ; plot mods desired
 ;  res@gsnDraw           = False
 ;  res@gsnFrame          = False
 ;  res@vpHeightF             = 0.5              ; change aspect ratio
 ;  res@vpWidthF              = 1.0
-;  res@trXMinF = 1610.d0
+  res@trXMinF = 1610.d0
 ;  res@trXMaxF = 2010.d0
+  res@trXMaxF = 2141.d0
 
 
-  res@trXMinF = 1830.d0
-  res@trXMaxF = 1870.d0
-  res@trYMinF = 1360.4
-  res@trYMaxF = 1361.6
+;  res@trXMinF = 1830.d0
+;  res@trXMaxF = 1870.d0
+;  res@trYMinF = 1360.4
+;  res@trYMaxF = 1361.6
   res@tmXBLabelFontHeightF  = 0.015
   res@gsnMaximize          = True
   res@gsnPaperOrientation = "landscape"
@@ -115,9 +123,10 @@ wks = gsn_open_wks("pdf", "tsi_vs_ssi_1830-1870")
   res@xyDashPatterns      = (/0,0,1/)
   
   delete(data)
-  data=new((/2,dimsizes(tsi)/),double)
+  data=new((/3,dimsizes(tsi)/),double)
   data(0,:)=tsi
   data(1,:)=tsi_sum
+  data(2,:)=tsi2
 ;  data(2,:)=tsi_sum2
   plot1 = gsn_xy(wks, year, data, res)
   
