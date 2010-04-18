@@ -23,12 +23,16 @@ begin
   TS_diff&lat = lat
   
   iflag= False               ; population variance similar
-  prob = ttest(TS_x, TSSD_x, 30, TS_c, TSSD_c, 30, iflag, False)
+  prob = ttest(TS_x, TSSD_x^2.0, 30, TS_c, TSSD_c^2.0, 30, iflag, False)
   prob!0 = "time"
   prob!1 = "lat"
   prob&lat = lat
+
+  prob(0,:)=prob(12,:)
+  prob(13,:)=prob(1,:)
   
-  sig_level = 0.025  ; significance level (95%)
+;  sig_level = 0.025  ; significance level (95%)
+  sig_level = 0.05  ; significance level (95%)
   
   fmt = "%5.2f"
   monthnames = (/ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"/)
@@ -57,10 +61,11 @@ begin
 ;    print(monthnames(i-1)+"  "+sprintf(fmt, prob(1,i,:)))
 ;  end do
   
-  if (.not.(isfilepresent("images/vg"))) then
-    a = systemfunc("mkdir -p images/vg")
+  imgPath=getenv ("IMAGE_PATH")
+  if (.not.(isfilepresent(imgPath+"/vg"))) then
+    a = systemfunc("mkdir -p "+imgPath+"/vg")
   end if  
-  wks = gsn_open_wks("pdf", "images/vg/vgSurfTempChange")
+  wks = gsn_open_wks("pdf", imgPath+"/vg/vgSurfTempChange")
     
   resP                      = True
   resP@gsnMaximize          = True
@@ -231,6 +236,6 @@ historyRun="vgsoot08"
 controlRun="vgcontrol02"
 ;rootPath="/data5/mmills"
 ;rootPath="/Volumes/Data/Models/waccm/carma-soot/run"
-rootPath="/Data/Models/waccm/carma-soot/run"
+rootPath="/Data/Models/waccm/run/carma-soot"
 
 plotvgSurfTempChange(rootPath,historyRun,controlRun)
