@@ -113,7 +113,7 @@ begin
   markers2=new((/4,nLat/),float)
   markers2(0,:)=where(prob.lt.sig_level,data2(0,:),-999)
   markers2(1,:)=where(prob2d({100},:).lt.sig_level,data2(1,:),-999)
-  print("markers2(1):"+markers2(1,:)+" "+prob2d({100},:))
+;  print("markers2(1):"+markers2(1,:)+" "+prob2d({100},:))
   markers2(2,:)=where(prob2d({60},:).lt.sig_level,data2(2,:),-999)
   markers2(3,:)=where(prob2d({20},:).lt.sig_level,data2(3,:),-999)
   res@gsnDraw             = False       ; Do not draw plot
@@ -197,8 +197,8 @@ begin
   print("plotting ozone column...")
   plotvgDiffAnn(imgPath, "O3", O3_col_x, O3_col_c, O3_colSD_x, O3_colSD_c,\
           O3_x, O3_c, O3SD_x, O3SD_c)
-;  plotvgDiffAnn(imgPath, "Temp", TS_x, TS_c, TSSD_x, TSSD_c,\
-;          T_x, T_c, TSD_x, TSD_c)
+  plotvgDiffAnn(imgPath, "Temp", TS_x, TS_c, TSSD_x, TSSD_c,\
+          T_x, T_c, TSD_x, TSD_c)
   
 end
 

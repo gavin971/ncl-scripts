@@ -57,6 +57,16 @@ begin
        sprintf(fmt, prob(i,nLat-1)))
   end do
   
+  O31D=ndtooned(O3_col_dpct)
+  maxo3=max(O3_col_dpct)
+  mino3=min(O3_col_dpct)
+  dsizes=dimsizes(O3_col_dpct)
+  maxindx=ind_resolve(ind(O31D.eq.max(O3_col_dpct)),dsizes)
+  minindx=ind_resolve(ind(O31D.eq.min(O3_col_dpct)),dsizes)
+  
+  print("min:"+mino3+" "+minindx(:,0)+" "+lat(minindx(:,1)))
+  print("max:"+maxo3+" "+maxindx(:,0)+" "+lat(maxindx(:,1)))
+  
 ;  print("probability:")
 ;  do i = 1,ntimes -2
 ;    print(monthnames(i-1)+"  "+sprintf(fmt, (/prob(i,:)/)))
