@@ -4,12 +4,12 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
 undef("plotvgO3Diff")
 procedure plotvgO3Diff(O3_col_x[*][*]:float, O3_col_c[*][*]:float, \
-   O3_colSD_x[*][*]:float, O3_colSD_c[*][*]:float)
+   O3_colSD_x[*][*]:float, O3_colSD_c[*][*]:float, useIDLsig:logical)
    
 local O3_col_diff,wks,res,lev
 begin 
 
-  lat=O3_col_x&lat
+  lat=round(O3_col_x&lat,1)
   nLat=(/dimsizes(lat)/)
   
   xdim=dimsizes(O3_col_x)
@@ -27,16 +27,22 @@ begin
   O3_col_dpct!1 = "lat"
   O3_col_dpct&lat = lat
   
-  iflag= False               ; population variance similar
-  prob = ttest(O3_col_x, O3_colSD_x^2, 30, O3_col_c, O3_colSD_c^2, 30, iflag, False)
-  prob!0 = "time"
-  prob!1 = "lat"
-  prob&lat = lat
-  
-  prob(0,:)=prob(12,:)
-  prob(13,:)=prob(1,:)
-  
-;  sig_level = 0.025  ; significance level (95%)
+  if (useIDLsig) then
+    sigfile=addfile("$MODEL_PATH/waccm/run/carma-soot/signif.nc","r")
+    prob=sigfile->signif(time|:,lat|:)
+    prob&lat=lat
+  else
+    iflag= False               ; population variance similar
+    prob = ttest(O3_col_x, O3_colSD_x^2, 30, O3_col_c, O3_colSD_c^2, 30, iflag, False)
+    prob!0 = "time"
+    prob!1 = "lat"
+    prob&lat = lat
+
+    prob(0,:)=prob(12,:)
+    prob(13,:)=prob(1,:)
+
+  end if
+  ;  sig_level = 0.025  ; significance level (95%)
   sig_level = 0.05  ; significance level (95%)
   
   fmt = "%5.2f"
@@ -151,6 +157,7 @@ begin
   res2@gsnFrame            = False       ; Do not advance frame
   res2@cnLevelSelectionMode = "ManualLevels" ; set manual contour levels
   res2@cnMinLevelValF      = 0.00        ; set min contour level
+;  res2@cnMaxLevelValF      = 1.00        ; set max contour level
   res2@cnMaxLevelValF      = 1.00        ; set max contour level
   res2@cnLevelSpacingF     = sig_level   ; set contour spacing
   res2@cnInfoLabelOn       = False       ; turn off info label
@@ -173,7 +180,8 @@ begin
   opt@gsnShadeFillType = "pattern"      ; pattern fill
   opt@gsnShadeHigh = 17                  ; pattern # to use 
   plot2 = gsn_csm_lat_time(wks, prob(lat|:, time|:), res2) 
-  plot2   = gsn_contour_shade(plot2, -999, sig_level, opt)  ;
+  plot2   = gsn_contour_shade(plot2, -999, sig_level, opt)  
+  
   overlay (plot, plot2)
   draw(plot)
   frame(wks)
@@ -194,7 +202,7 @@ end
 
 
 undef("plotvgO3Change")
-procedure plotvgO3Change(rootPath:string,historyRun:string, controlRun:string)
+procedure plotvgO3Change(rootPath:string,historyRun:string, controlRun:string, useIDLsig:logical)
 local T_x,T_c
 
 begin
@@ -257,14 +265,15 @@ begin
   O3_colSD_c&time=time
 
   print("plotting ozone column...")
-  plotvgO3Diff(O3_col_x, O3_col_c, O3_colSD_x, O3_colSD_c)
+  plotvgO3Diff(O3_col_x, O3_col_c, O3_colSD_x, O3_colSD_c, useIDLsig)
   
 end
 
 historyRun="vgsoot08"
 controlRun="vgcontrol02"
 ;rootPath="/data5/mmills"
-;rootPath="/Volumes/Data/Models/waccm/carma-soot/run"
-rootPath="/Data/Models/waccm/run/carma-soot"
+rootPath="$MODEL_PATH/waccm/run/carma-soot"
 
-plotvgO3Change(rootPath,historyRun,controlRun)
+useIDLsig = True
+
+plotvgO3Change(rootPath,historyRun,controlRun,useIDLsig)

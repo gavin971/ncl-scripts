@@ -158,17 +158,17 @@ monthnames = (/ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
  
 ;  res2=res
   
-  res@gsnAboveYRefLineColor = "black"
-  res@gsnBelowYRefLineColor = "black"
+  res@gsnAboveYRefLineColor = "blue"
+  res@gsnBelowYRefLineColor = "blue"
   
   res2=res
  
   plot  = gsn_csm_xy (wks,month,data,res) ; create plot
   
-;  res2@gsnAboveYRefLineColor = "white"
-  res2@gsnBelowYRefLineColor = "white"
-  res2@gsnAboveYRefLineBarPatterns = 14
-  res2@gsnBelowYRefLineBarPatterns = 14
+  res2@gsnAboveYRefLineColor = "red"
+  res2@gsnBelowYRefLineColor = "red"
+;  res2@gsnAboveYRefLineBarPatterns = 14
+;  res2@gsnBelowYRefLineBarPatterns = 14
   plot2  = gsn_csm_xy (wks,month,data2,res2) ; create plot
   
   overlay (plot, plot2)
