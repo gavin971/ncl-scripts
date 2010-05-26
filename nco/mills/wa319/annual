@@ -1,24 +1,54 @@
 #!/bin/ksh
 
-runname='vgcontrol02'
-wadir='/data5/mmills/'$runname'/h0zm'
+#runname='vgcontrol02'
+#runname='b40.20th.track1.2deg.wcm.007'
+runname='b40.1850.track1.2deg.wcm.007'
+wadir='/data3/mmills/'$runname'/h0zm'
+anndir='/data3/mmills/'$runname'/h0zm.annual'
+
+#year1=1885
+#year2=1914
+
+year1=97
+year2=168
 
 # script to average and standard deviation of waccm h0 files
 
-count=0
-while [[ $count -lt 5 ]];do
+mkdir -p $anndir
 
-   (( year = count + 2060 ))
-   ncfiles=$wadir'/'$runname'.cam2.h0zm.'$year*'.nc'
-   avgfile=$wadir'/'$runname'.cam2.h0zm.'$year'.annual.nc'
+year=$year1
+while [[ $year -le $year2 ]];do
 
-   # create annual mean
-   echo averaging $ncfiles
-   ncea $ncfiles $avgfile
-   echo created $avgfile
-   
-   (( count += 1 ))
+  if [[ year -lt 10 ]]
+    then
+      yearstr='000'$year
+    elif [[ year -lt 100 ]]
+    then
+      yearstr='00'$year
+    elif [[ year -lt 1000 ]]
+    then
+      yearstr='0'$year
+    else
+      yearstr=$year
+    fi
   
+  ncfiles=$wadir'/'$runname'.cam2.h0zm.'$yearstr*'.nc'
+  avgfile=$anndir'/'$runname'.cam2.h0zm.'$yearstr'.annual.nc'
+
+  # create annual mean
+  echo averaging $ncfiles
+  ncea $ncfiles $avgfile
+  echo created $avgfile
+   
+  (( year+=1 ))
+     
 done
 
+echo "Annual averaging complete.  Now run fixdate.ncl to fix the dates!"
 
+export runname
+export anndir
+export year1
+export year2
+
+ncl ~/ncl-scripts/fixdate.ncl

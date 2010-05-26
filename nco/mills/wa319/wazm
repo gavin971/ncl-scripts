@@ -1,18 +1,63 @@
 #!/bin/ksh
 
-wadir='/data5/mmills/vgcontrol02/h0/'
+#caseid='b40.1850.track1.2deg.wcm.007'
+caseid='b40.20th.track1.2deg.wcm.007'
+wadir='/data2/fischer/'$caseid'/h0'
+outdir='/data3/mmills/'$caseid'/h0zm'
 
-ncfiles=$wadir'*.nc'
+#year1=97
+#year2=177
 
-for i in $ncfiles 
-do
+year1=1889
+year2=1889
 
-  oldfile=$i
-  newfile=`echo $oldfile | sed 's/h0/h0zm/g'`
-  echo $newfile
+mkdir -p $outdir
 
-  `ncwa -alon -O $oldfile $newfile`
+#ncfiles=$wadir'*cam2.h0.*.nc'
 
+year=$year1
+while [[ $year -le $year2 ]];do
+
+  if [[ year -lt 10 ]];then
+    yearstr='000'$year
+  elif [[ year -lt 100 ]];then
+    yearstr='00'$year
+  elif [[ year -lt 1000 ]]
+    yearstr='0'$year
+  else
+    yearstr=$year
+  fi
+
+  month=1
+
+  while [[ month -le 12 ]];do
+
+    if [[ month -lt 10 ]];then
+      monstr='0'$month
+    else
+      monstr=$month
+    fi
+
+    oldfile=$wadir'/'$caseid'.cam2.h0.'$yearstr'-'$monstr'.nc'
+
+    if [[ -e $oldfile ]];then
+      echo $oldfile
+    else
+      echo 'missing file: '$oldfile
+      exit
+    fi
+    newfile=`echo $oldfile | sed 's/h0/h0zm/g' | sed 's/data1/data3/g' | sed 's/fischer/mmills/g'`
+    echo $newfile
+
+    if [[ ! -e $newfile ]] then
+      echo "ncwa -alon -O "$oldfile" "$newfile
+      ncwa -alon -O $oldfile $newfile
+    fi
+    ls -sh $oldfile
+    ls -sh $newfile
+
+    (( month+=1 ))
+    
+  done
+  (( year+=1 ))
 done
-
-
