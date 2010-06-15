@@ -5,27 +5,25 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 begin
 
-year0 = 1850
-nyearsmax = 1972-year0
+year0 = (/1850, 1960, 1850/)
+yearmax=(/2005, 2005, 2005/)
+nyearsmax = 2005-1850+1
 filt121 = True
 nyrunave = 11
 omask0 = False
 ;omask0 = True
 norm_plot = True
-norm_plot_yrs = (/1941,1971/)
+norm_plot_yrs_abs = (/1961,1990/)
 
 
-run_names = (/"b40.20th.track1.2deg.wcm.007","Obs"/)
+run_names = (/"b40.20th.track1.2deg.wcm.007","b52.refB1.track1.2deg.002","Obs"/)
 con_names = (/"b40.1850.track1.1deg.006","Obs"/)
-case_names = (/"WACCM4","HadCRU"/)
+case_names = (/"WACCM4 20th Century","WACCM4 RefB1","HadCRU"/)
 
 
 ;var_names = (/"LWCF","RESTOM","FSNT","FLNT"/)
 var_names = (/"TS"/)
-nyears = (/nyearsmax,nyearsmax/)
-
-
-
+nyears = yearmax - year0 + 1
 
 
 
@@ -67,7 +65,7 @@ obs_file = "$DATA_PATH/HADCRU/HadCRUT3v.nc"
 
 ncases = dimsizes(case_names)
 nvarnames = dimsizes(var_names)
-year = ispan (year0,nyearsmax+year0-1,1)  
+year = ispan (1850,2005,1)
 
 mon_wgt = (/0.08493150770664215,0.07671232521533966,0.08493150770664215,0.08219178020954132,0.08493150770664215,0.08219178020954132,0.08493150770664215,0.08493150770664215,0.08219178020954132,0.08493150770664215,0.08219178020954132,0.08493150770664215/)
 
@@ -76,7 +74,7 @@ Lv = 2.501e6
 
 ; Calculate normalizing years.
 
-norm_plot_yrs = norm_plot_yrs - 1850
+norm_plot_yrs = norm_plot_yrs_abs - 1850
 
 
 if (region.eq."Global") then
@@ -356,15 +354,18 @@ do ivar=0,nvarnames-1
         end if
         
         do iyr=0,nyears(icase)-1
+          iyr2=iyr+year0(icase)-1850
           do imonth=0,11
-            var_ann_w(icase,iyr) = mon_wgt(imonth)*dim_avg(var_w(iyr*12+imonth))+var_ann_w(icase,iyr)
+            var_ann_w(icase,iyr2) = mon_wgt(imonth)*dim_avg(var_w(iyr*12+imonth))+var_ann_w(icase,iyr2)
           end do
+;          print("icase:"+icase+" iyr:"+iyr+" iyr2:"+iyr2+" var:"+var_ann_w(icase,iyr2))
         end do
         if (ldtrend) then
           var_dtrend = dtrend(var_ann_w(icase,0:49),True)
           printVarSummary(var_dtrend)
           do iyr=0,nyears(icase)-1
-            var_ann_w(icase,iyr) = var_ann_w(icase,iyr)-iyr*var_dtrend@slope
+            iyr2=iyr+year0(icase)-1850
+            var_ann_w(icase,iyr2) = var_ann_w(icase,iyr2)-iyr*var_dtrend@slope
           end do
           delete(var_dtrend)
         end if
@@ -383,9 +384,11 @@ do ivar=0,nvarnames-1
         var_w = wgt_areaave(var_in,gwobs,1.0,0) 
         delete(var_in)
         
+      
         do iyr=0,nyears(icase)-1
+          iyr2=iyr+year0(icase)-1850
           do imonth=0,11
-            var_ann_w(icase,iyr) = mon_wgt(imonth)*dim_avg(var_w(iyr*12+imonth))+var_ann_w(icase,iyr)
+            var_ann_w(icase,iyr2) = mon_wgt(imonth)*dim_avg(var_w(iyr*12+imonth))+var_ann_w(icase,iyr2)
           end do
         end do
         
@@ -399,7 +402,9 @@ do ivar=0,nvarnames-1
         
       end if
       
-      var_ann_w(icase,nyears(icase)-1:nyearsmax-1) = var_ann_w@_FillValue
+;      var_ann_w(icase,nyears(icase)-1:nyearsmax-1) = var_ann_w@_FillValue
+      var_ann_w(icase,yearmax(icase)-1850:) = var_ann_w@_FillValue
+      var_ann_w(icase,:year0(icase)-1850) = var_ann_w@_FillValue
           
     end do
     
@@ -407,7 +412,7 @@ do ivar=0,nvarnames-1
 ; Averages for annual means.
 
     do icase=0,ncases-1
-      print(run_names(icase)+" "+norm_plot_yrs(0)+" "+norm_plot_yrs(1))
+;      print(run_names(icase)+" "+norm_plot_yrs(0)+" "+norm_plot_yrs(1))
       print(dimsizes(var_ann_w))
       pi_ave = " (PI ave = "+flt2string(dim_avg(var_ann_w(icase,norm_plot_yrs(0):norm_plot_yrs(1))))+")"
       res@xyExplicitLegendLabels(icase) = case_names(icase)+pi_ave(icase)
@@ -473,8 +478,8 @@ end if
   gsn_panel(wks_s,plot2,(/2,2/),pan)
 
    legend = create "Legend" legendClass wks 
-    "vpXF"                     : 0.44                    ; orientation on page
-    "vpYF"                     : 0.53
+    "vpXF"                     : 0.74                    ; orientation on page
+    "vpYF"                     : 0.73
     "vpWidthF"                 : 0.08                     ; width
     "vpHeightF"                : 0.1                     ; height
     "lgPerimOn"                : True                   ; no perimeter
@@ -492,8 +497,8 @@ end if
     end create
    
      legend_s = create "Legend" legendClass wks_s 
-    "vpXF"                     : 0.44                    ; orientation on page
-    "vpYF"                     : 0.53
+    "vpXF"                     : 0.74                    ; orientation on page
+    "vpYF"                     : 0.73
     "vpWidthF"                 : 0.08                     ; width
     "vpHeightF"                : 0.1                     ; height
     "lgPerimOn"                : True                   ; no perimeter
