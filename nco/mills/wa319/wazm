@@ -8,8 +8,8 @@ outdir='/data3/mmills/'$caseid'/h0zm'
 #year1=97
 #year2=177
 
-year1=1889
-year2=1889
+year1=1915
+year2=1941
 
 mkdir -p $outdir
 
@@ -22,7 +22,7 @@ while [[ $year -le $year2 ]];do
     yearstr='000'$year
   elif [[ year -lt 100 ]];then
     yearstr='00'$year
-  elif [[ year -lt 1000 ]]
+  elif [[ year -lt 1000 ]];then
     yearstr='0'$year
   else
     yearstr=$year
@@ -46,7 +46,7 @@ while [[ $year -le $year2 ]];do
       echo 'missing file: '$oldfile
       exit
     fi
-    newfile=`echo $oldfile | sed 's/h0/h0zm/g' | sed 's/data1/data3/g' | sed 's/fischer/mmills/g'`
+    newfile=`echo $oldfile | sed 's/h0/h0zm/g' | sed 's/data2/data3/g' | sed 's/fischer/mmills/g'`
     echo $newfile
 
     if [[ ! -e $newfile ]] then
