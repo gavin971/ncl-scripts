@@ -161,7 +161,7 @@ ssi = solar_data(:,4:)
   globalAtt@creator = nl+\
       "Mike Mills, mmills@ucar.edu"
   globalAtt@title = nl+\
-      "Lean annual daily solar irradiance for years 1950-2009" ;
+      "Lean daily solar irradiance for years 1950-2009" ;
   globalAtt@Source_website = nl+\
        "http://www.geo.fu-berlin.de/en/met/ag/strat/forschung/SOLARIS/Input_data/index.html"
   globalAtt@Source_data=nl+\
