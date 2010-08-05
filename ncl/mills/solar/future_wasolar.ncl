@@ -83,7 +83,7 @@ do year = 2008,2140
   print(year+" "+day+" "+date(day)+" "+f107(day))
 end do
 
- ncf_out = addfile(datapath+"wasolar_1948-2140_daily_c100804.nc","c")
+ ncf_out = addfile(datapath+"wasolar_1948-2140_daily_c100805.nc","c")
  
 ; Create an UNLIMITED record dimension in the output netCDF file.  This is critical if 
 ;  the user plans to ever use NCO to concatenate the file along the time/record dimension.
@@ -108,7 +108,7 @@ end do
   globalAtt@title = nl+\
       "Time-dependent solar activity conditions 1948-2140" ;
   globalAtt@Source_website = nl+\
-       "http://www.sec.noa.gov"
+       "http://www.sec.noaa.gov"
   globalAtt@history = nl+\
        "Extended from wasolar_c100106.nc by program future_wasolar.ncl."
   globalAtt@notes = nl+\
