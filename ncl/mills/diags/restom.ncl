@@ -12,8 +12,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 nyears=-1
 
 year0 = 1
-;run_name = "b40.1850.2deg.wset.001"
-run_name = "b40.1850.2deg.wset.002"
+run_name = "b40.1850.2deg.wset.001"
+;run_name = "b40.1850.2deg.wset.002"
 in_dir ="/data3/mmills/"+run_name+"/h0/"
 save_dir ="/data3/mmills/"+run_name+"/analysis/"
 savefile=save_dir+run_name+"_RESTOM.nc"
