@@ -5,13 +5,17 @@
 
 print("in fixdate.ncl:")
 runname=getenv("runname")
-print(runname)
+print("runname="+(/runname/))
 wadir=getenv("anndir")
-print(wadir)
+print("wadir="+(/wadir/))
 year1=stringtoint(getenv("year1"))
-print(year1)
+print("year1="+(/year1/))
 year2=stringtoint(getenv("year2"))
-print(year2)
+print("year2="+(/year2/))
+searchstr=getenv("searchstr")
+print("searchstr="+(/searchstr/))
+addstr=getenv("addstr")
+print("addstr="+(/addstr/))
 
 do year = year1, year2
   date=year*10000+701
@@ -29,7 +33,7 @@ do year = year1, year2
     end if
   end if
   
-  filename=wadir+"/"+runname+".cam2.h0zm."+yearstr+".annual.nc"
+  filename=wadir+"/"+runname+"."+searchstr+"."+yearstr+"."+addstr+".nc"
   print(date+"  "+filename)
   a=addfile(filename,"w")
   a->date=(/date/)
