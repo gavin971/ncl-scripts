@@ -1,15 +1,16 @@
 #!/bin/ksh
 
 #caseid='b40.1850.track1.2deg.wcm.007'
-caseid='b40.20th.track1.2deg.wcm.007'
-wadir='/data2/fischer/'$caseid'/h0'
-outdir='/data3/mmills/'$caseid'/h0zm'
+#caseid='b40.20th.track1.2deg.wcm.007'
+caseid='f2000.e10r02.2deg.waccm.005'
+wadir='/data5/mmills/'$caseid'/h0'
+outdir='/data5/mmills/'$caseid'/h0zm'
 
 #year1=97
 #year2=177
 
-year1=1915
-year2=1941
+year1=16
+year2=16
 
 mkdir -p $outdir
 
@@ -46,7 +47,7 @@ while [[ $year -le $year2 ]];do
       echo 'missing file: '$oldfile
       exit
     fi
-    newfile=`echo $oldfile | sed 's/h0/h0zm/g' | sed 's/data2/data3/g' | sed 's/fischer/mmills/g'`
+    newfile=`echo $oldfile | sed 's/h0/h0zm/g'` # | sed 's/data2/data3/g' | sed 's/fischer/mmills/g'`
     echo $newfile
 
     if [[ ! -e $newfile ]] then

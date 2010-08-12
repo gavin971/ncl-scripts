@@ -1,18 +1,14 @@
 #!/bin/ksh
 
-#runname='vgcontrol02'
-#runname='b40.20th.track1.2deg.wcm.007'
-runname='b40.1850.track1.2deg.wcm.007'
-wadir='/data3/mmills/'$runname'/h0zm'
-anndir='/data3/mmills/'$runname'/h0zm.annual'
-searchstr='cam2.h0zm'
-addstr='annual'
+;runname='b40.1850.track1.2deg.wcm.007'
+runname='b40.1850.2deg.wset.002'
+wadir='/data3/mmills/'$runname'/h0'
+anndir='/data3/mmills/'$runname'/h0.annual'
+searchstr='cam2.h0'
+addstr='TS.annual'
 
-#year1=1885
-#year2=1914
-
-year1=97
-year2=168
+year1=20
+year2=96
 
 # script to average and standard deviation of waccm h0 files
 
@@ -35,11 +31,11 @@ while [[ $year -le $year2 ]];do
     fi
   
   ncfiles=$wadir'/'$runname'.'$searchstr'.'$yearstr*'.nc'
-  avgfile=$anndir'/'$runname'.'$yearstr'.'$addstr'.nc'
+  avgfile=$anndir'/'$runname'.'$searchstr'.'$yearstr'.'$addstr'.nc'
 
   # create annual mean
   echo averaging $ncfiles
-  ncea $ncfiles $avgfile
+  ncea -v TS,date $ncfiles $avgfile
   echo created $avgfile
    
   (( year+=1 ))
@@ -56,3 +52,7 @@ export searchstr
 export addstr
 
 ncl ~/ncl-scripts/fixdate.ncl
+
+#catfile=$anndir'/'$runname'.'$searchstr'.'$year1'-'$year2'.TS.nc'
+#echo creating $catfile
+#ncrcat -O $anndir'/*.'$addstr'.nc' $catfile
