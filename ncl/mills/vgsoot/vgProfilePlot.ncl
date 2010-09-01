@@ -18,6 +18,13 @@ cntlfile=cntlcase+"_JJA_climo.nc"
 testf=addfile(testpath+testfile,"r")
 cntlf=addfile(cntlpath+cntlfile,"r")
 
+emisfile="$MODEL_PATH/waccm/carma-soot/emissions/soot_virgin_galactic_base.nc"
+emisf=addfile(emisfile,"r")
+
+soot_emis=emisf->SOOT
+lev_emis=emisf->lev
+lev_emis=lev_emis/1e3  ; Convert m -> km
+
 Tsoot=testf->T
 Tcntl=cntlf->T
 Zsoot=testf->Z3
@@ -63,15 +70,17 @@ wks   = gsn_open_wks ("pdf", "$IMG_PATH/vgProfilePlot")
   
   res@trYMinF = 0.0
   res@trYMaxF = 50.0
-  res@trXMaxF = 8.5
+  res@trXMaxF = 105.0
   res@tiYAxisString = "Altitude (km)"
-  res@tiXAxisString = "Soot mass (ng/kg air)"
+  res@tiXAxisString = "Soot emission rate (kg m~S~-1~N~ s~S~-1~N~)"
 
-  plot(0) = gsn_csm_xy (wks,soot_mass,z3,res)
+  plot(0) = gsn_csm_xy (wks,soot_emis,lev_emis,res)
   
   res@tiYAxisString = " "
   res@tmYLLabelsOn = False
   res@vpXF             = 0.30                  ; position and sizes
+  res@trXMaxF = 8.5
+  res@tiXAxisString = "Soot mass (ng/kg air)"
   
   plot(1) = gsn_csm_xy (wks,soot_mass,z3,res)
 
