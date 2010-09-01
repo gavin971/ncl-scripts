@@ -1,3 +1,7 @@
+; Prior to running, do:
+;   ncrcat -v TS <h0.files*.nc> <TS_timeseries.nc>
+; and have that as your addfile input in ncl.
+
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
@@ -5,9 +9,12 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 begin
 
-year0 = (/1850, 1960, 1850/)
-yearmax=(/2005, 2005, 2005/)
-nyearsmax = 2005-1850+1
+year0 = (/1850, 1960, 1850, 1850/)
+yearmax=(/2005, 2025, 2005, 2005/)
+
+maxyear=max(yearmax)
+minyear=min(year0)
+nyearsmax = maxyear-minyear+1
 filt121 = True
 nyrunave = 11
 omask0 = False
@@ -16,9 +23,10 @@ norm_plot = True
 norm_plot_yrs_abs = (/1961,1990/)
 
 
-run_names = (/"b40.20th.track1.2deg.wcm.007","b52.refB1.track1.2deg.002","Obs"/)
+run_names = (/"b40.20th.track1.2deg.wcm.007","b40.1955-2005.2deg.wcm.002",\
+              "b40.20th.2deg.wset.001","Obs"/)
 con_names = (/"b40.1850.track1.1deg.006","Obs"/)
-case_names = (/"WACCM4 20th Century","WACCM4 RefB1","HadCRU"/)
+case_names = (/"WACCM4 20th Century","WACCM4 Ensemble 1","CAM4","HadCRU"/)
 
 
 ;var_names = (/"LWCF","RESTOM","FSNT","FLNT"/)
@@ -65,7 +73,7 @@ obs_file = "$DATA_PATH/HADCRU/HadCRUT3v.nc"
 
 ncases = dimsizes(case_names)
 nvarnames = dimsizes(var_names)
-year = ispan (1850,2005,1)
+year = ispan (minyear,maxyear,1)
 
 mon_wgt = (/0.08493150770664215,0.07671232521533966,0.08493150770664215,0.08219178020954132,0.08493150770664215,0.08219178020954132,0.08493150770664215,0.08493150770664215,0.08219178020954132,0.08493150770664215,0.08219178020954132,0.08493150770664215/)
 
@@ -114,11 +122,13 @@ res@gsnFrame = False
 
 res@trYMinF = -2.5
 res@trYMaxF = 2.5
+res@trXMaxF = maxyear+1
+;res@trXMaxF = 2021
 res@gsnYRefLine           = 0.              ; reference line   
 res@gsnYRefLineDashPattern = 1.
-res@xyLineColors      = (/"blue","darkgreen","black"/)    
+res@xyLineColors      = (/"blue","darkgreen","red","black"/)    
 res@xyLineThicknessF = 2
-res@xyDashPatterns = (/0,0,1/)
+res@xyDashPatterns = (/0,0,0,1/)
  
 
 res@pmLegendDisplayMode    = "Never"            ; turn on legend
@@ -162,7 +172,7 @@ do ivar=0,nvarnames-1
   if (any(var_name.eq.(/"TS","TREFHT"/))) then
     res@tiYAxisString = "TS anomaly (K)"
     res@trYMinF = -1.0
-    res@trYMaxF = 1.0
+    res@trYMaxF = 1.4
   end if
   if (any(var_name.eq.(/"AODVIS"/))) then
     res@tiYAxisString = "AOD anomaly"
@@ -356,6 +366,7 @@ do ivar=0,nvarnames-1
         do iyr=0,nyears(icase)-1
           iyr2=iyr+year0(icase)-1850
           do imonth=0,11
+;            print(icase+" "+nyears(icase)+" "+iyr+" "+imonth)
             var_ann_w(icase,iyr2) = mon_wgt(imonth)*dim_avg(var_w(iyr*12+imonth))+var_ann_w(icase,iyr2)
           end do
 ;          print("icase:"+icase+" iyr:"+iyr+" iyr2:"+iyr2+" var:"+var_ann_w(icase,iyr2))
@@ -408,27 +419,34 @@ do ivar=0,nvarnames-1
           
     end do
     
+    var_ann_w0=var_ann_w(0,norm_plot_yrs(0):norm_plot_yrs(1))
     
 ; Averages for annual means.
 
-    do icase=0,ncases-1
-;      print(run_names(icase)+" "+norm_plot_yrs(0)+" "+norm_plot_yrs(1))
-      print(dimsizes(var_ann_w))
-      pi_ave = " (PI ave = "+flt2string(dim_avg(var_ann_w(icase,norm_plot_yrs(0):norm_plot_yrs(1))))+")"
-      res@xyExplicitLegendLabels(icase) = case_names(icase)+pi_ave(icase)
-      if (lrmcon.and.icase.ne.ncases-1.and.var_name.eq."TS") then
-        var_ann_w(icase,:) =  var_ann_w(icase,:)-var_c_w(icase)
-      else
-        var_ann_w(icase,:) =  var_ann_w(icase,:)-dim_avg(var_ann_w(icase,norm_plot_yrs(0):norm_plot_yrs(1)))
-      end if
-    end do
+    if (norm_plot) then
+      do icase=0,ncases-1
+  ;      print(run_names(icase)+" "+norm_plot_yrs(0)+" "+norm_plot_yrs(1))
+        print(dimsizes(var_ann_w))
+        pi_ave = " (PI ave = "+flt2string(dim_avg(var_ann_w(icase,norm_plot_yrs(0):norm_plot_yrs(1))))+")"
+        res@xyExplicitLegendLabels(icase) = case_names(icase)+pi_ave(icase)
+        if (lrmcon.and.icase.ne.ncases-1.and.var_name.eq."TS") then
+          var_ann_w(icase,:) =  var_ann_w(icase,:)-var_c_w(icase)
+        else
+          if (run_names(icase).eq."Obs") then
+            var_ann_w(icase,:) =  var_ann_w(icase,:)-dim_avg(var_ann_w(icase,norm_plot_yrs(0):norm_plot_yrs(1)))
+          else
+            var_ann_w(icase,:) =  var_ann_w(icase,:)-dim_avg(var_ann_w0)
+          end if
+        end if
+      end do
+    end if
     
     if (var_name.eq."FLNT".or.var_name.eq."FLNTC") then
       var_ann_w = -var_ann_w
     end if
 
     res@tiMainString = ptype(ip)
-    res@gsnYRefLines = (/0.0,0.0,0.0/)
+    res@gsnYRefLines = (/0.0,0.0,0.0,0.0/)
     print(res@xyLineColors)
     res@gsnAboveYRefLineColors = res@xyLineColors 
     res@gsnBelowYRefLineColors = res@xyLineColors 

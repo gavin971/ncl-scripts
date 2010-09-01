@@ -3,11 +3,39 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
 ;  run1="b40.1850.track1.2deg.wcm.007"
-  run1="b40.1850.2deg.wset.002"
+;  run1="b40.1850.2deg.wset.002"
+  run1="b40.20th.2deg.wset.001"
+;  run1="b40.1955-2005.2deg.wcm.002"
   tspath="/data3/mmills/"+run1+"/h0.annual/"
 
-  historyPattern=tspath+"*.TS.annual.nc"
-  historyNames = systemfunc("ls " + historyPattern)
+  year1=1986
+  year2=2005
+
+  nyears=year2-year1+1
+  historyNames=new(nyears,string)
+
+  do year = year1, year2
+    date=year*10000+701
+    if ( year .lt. 10 ) then
+        yearstr="000"+year
+    else
+      if ( year .lt. 100 ) then
+        yearstr="00"+year
+      else
+        if ( year .lt. 1000 ) then
+          yearstr="0"+year
+        else
+          yearstr=""+year
+        end if
+      end if
+    end if
+
+    historyNames(year-year1)=tspath+run1+".cam2.h0."+yearstr+".annual.nc"
+    
+  end do
+  
+  print(historyNames)
+
   history = addfiles(historyNames, "r")
   ListSetType(history, "cat")
   print("historyNames:"+dimsizes(historyNames))
@@ -21,6 +49,10 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
   
   decade = time/3650.d0
   decade@units="decade"
+  
+  print("decade:"+dimsizes(decade))
+  print("ts:"+dimsizes(ts))
+  
   rc = regCoef(decade,ts(lat|:,lon|:,time|:))
   rc!0=ts!1
   rc!1=ts!2
@@ -40,9 +72,9 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
   res@lbLabelAngleF        = 60
   
   res@cnLevelSelectionMode = "ManualLevels" 
-  res@cnMinLevelValF=-.36
-  res@cnMaxLevelValF=.28
-  res@cnLevelSpacingF     = .04
+  res@cnMinLevelValF=-2.8
+  res@cnMaxLevelValF=2.8
+  res@cnLevelSpacingF     = .4
   
   plot = gsn_csm_contour_map_ce(wks,rc,res)   ; plot model data  
   
