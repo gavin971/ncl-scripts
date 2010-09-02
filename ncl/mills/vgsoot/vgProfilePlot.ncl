@@ -29,6 +29,8 @@ Tsoot=testf->T
 Tcntl=cntlf->T
 Zsoot=testf->Z3
 Zcntl=cntlf->Z3
+QRSsoot=testf->QRS_TOT
+QRScntl=cntlf->QRS_TOT
 
 soot_mmr=testf->SOOT01
 
@@ -42,6 +44,11 @@ nlev=dimsizes(lev)
 DeltaT=new((/2,nlev/),"float")
 DeltaT(0,:)=dim_avg_Wrap(Tsoot(0,:,{45},:))-dim_avg_Wrap(Tcntl(0,:,{45},:))
 DeltaT(1,:)=dim_avg_Wrap(Tsoot(0,:,{-45},:))-dim_avg_Wrap(Tcntl(0,:,{-45},:))
+
+DeltaQRS=new((/2,nlev/),"float")
+DeltaQRS(0,:)=dim_avg_Wrap(QRSsoot(0,:,{45},:))-dim_avg_Wrap(QRScntl(0,:,{45},:))
+DeltaQRS(1,:)=dim_avg_Wrap(QRSsoot(0,:,{-45},:))-dim_avg_Wrap(QRScntl(0,:,{-45},:))
+DeltaQRS=DeltaQRS*3600.*24. ; Convert K/s -> K/day
 
 soot_mass=new((/2,nlev/),"float")
 soot_mass(0,:)=dim_avg_Wrap(soot_mmr(0,:,{45},:))
@@ -79,6 +86,7 @@ wks   = gsn_open_wks ("pdf", "$IMG_PATH/vgProfilePlot")
   res@tiYAxisString = " "
   res@tmYLLabelsOn = False
   res@vpXF             = 0.30                  ; position and sizes
+  res@trXMinF = -0.5
   res@trXMaxF = 8.5
   res@tiXAxisString = "Soot mass (ng/kg air)"
   
@@ -94,7 +102,10 @@ wks   = gsn_open_wks ("pdf", "$IMG_PATH/vgProfilePlot")
   res@vpXF             = 0.70                  ; position and sizes
   res@tmYROn = True
   res@tmYRLabelsOn = True
-  plot(3) = gsn_csm_xy (wks,DeltaT,z3,res)
+  res@trXMinF = -0.018
+  res@trXMaxF = 0.018
+  res@tiXAxisString = "QRS~B~test~N~-QRS~B~control~N~ (K day~S~-1~N~)"
+  plot(3) = gsn_csm_xy (wks,DeltaQRS,z3,res)
 
 ;
 ; Maximize plots in frame.
