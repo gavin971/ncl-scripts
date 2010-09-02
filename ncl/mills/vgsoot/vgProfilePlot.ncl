@@ -22,7 +22,7 @@ emisfile="$MODEL_PATH/waccm/carma-soot/emissions/soot_virgin_galactic_base.nc"
 emisf=addfile(emisfile,"r")
 
 soot_emis=emisf->SOOT
-soot_emis=soot_emis*3600.*24.*1e-6 ; convert kg/m/s -> Mt/km/day
+soot_emis=soot_emis*1e3/365. ; Convert kg/m/y -> kg/km/day
 
 lev_emis=emisf->lev
 lev_emis=lev_emis/1e3  ; Convert m -> km
@@ -83,13 +83,16 @@ wks   = gsn_open_wks ("pdf", "$IMG_PATH/vgProfilePlot")
   res@vpYF             = 0.94                  ; for XY plot
   res@vpWidthF         = 0.2
   res@vpHeightF        = 0.25
+
+  res@xyLineThicknessF = 2.5
+  res@xyMonoLineThickness = True
   
   res@trYMinF = 0.0
   res@trYMaxF = 50.0
 ;  res@trXMinF = -0.5
-  res@trXMaxF = 9.5
+  res@trXMaxF = 295.0
   res@tiYAxisString = "Altitude (km)"
-  res@tiXAxisString = "Soot emission rate (Mt km~S~-1~N~ day~S~-1~N~)"
+  res@tiXAxisString = "BC emission rate (kg km~S~-1~N~ day~S~-1~N~)"
 
   plot(0) = gsn_csm_xy (wks,soot_emis,lev_emis,res)
   
@@ -98,14 +101,14 @@ wks   = gsn_open_wks ("pdf", "$IMG_PATH/vgProfilePlot")
   res@vpXF             = 0.30                  ; position and sizes
   res@trXMinF = -0.5
   res@trXMaxF = 8.5
-  res@tiXAxisString = "Soot mass (ng/kg air)"
+  res@tiXAxisString = "BC mass (ng/kg air)"
   
   plot(1) = gsn_csm_xy (wks,soot_mass,z2,res)
 
   res@vpXF             = 0.50                  ; position and sizes
   res@trXMinF = -0.5
   res@trXMaxF = 0.5
-  res@tiXAxisString = "T~B~test~N~-T~B~control~N~ (K)"
+  res@tiXAxisString = "~F33~D~F21~T (K)"
   
   plot(2) = gsn_csm_xy (wks,DeltaT,z3,res)
   
@@ -114,7 +117,7 @@ wks   = gsn_open_wks ("pdf", "$IMG_PATH/vgProfilePlot")
   res@tmYRLabelsOn = True
   res@trXMinF = -0.018
   res@trXMaxF = 0.018
-  res@tiXAxisString = "QRS~B~test~N~-QRS~B~control~N~ (K day~S~-1~N~)"
+  res@tiXAxisString = "~F33~D~F21~Q (K day~S~-1~N~)"
   plot(3) = gsn_csm_xy (wks,DeltaQRS,z3,res)
 
 ;
