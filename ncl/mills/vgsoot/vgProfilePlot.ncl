@@ -22,6 +22,8 @@ emisfile="$MODEL_PATH/waccm/carma-soot/emissions/soot_virgin_galactic_base.nc"
 emisf=addfile(emisfile,"r")
 
 soot_emis=emisf->SOOT
+soot_emis=soot_emis*3600.*24.*1e-6 ; convert kg/m/s -> Mt/km/day
+
 lev_emis=emisf->lev
 lev_emis=lev_emis/1e3  ; Convert m -> km
 
@@ -41,24 +43,31 @@ time=testf->time
 
 nlev=dimsizes(lev)
 
-DeltaT=new((/2,nlev/),"float")
+DeltaT=new((/3,nlev/),"float")
 DeltaT(0,:)=dim_avg_Wrap(Tsoot(0,:,{45},:))-dim_avg_Wrap(Tcntl(0,:,{45},:))
 DeltaT(1,:)=dim_avg_Wrap(Tsoot(0,:,{-45},:))-dim_avg_Wrap(Tcntl(0,:,{-45},:))
+DeltaT(2,:)=0.0
 
-DeltaQRS=new((/2,nlev/),"float")
+DeltaQRS=new((/3,nlev/),"float")
 DeltaQRS(0,:)=dim_avg_Wrap(QRSsoot(0,:,{45},:))-dim_avg_Wrap(QRScntl(0,:,{45},:))
 DeltaQRS(1,:)=dim_avg_Wrap(QRSsoot(0,:,{-45},:))-dim_avg_Wrap(QRScntl(0,:,{-45},:))
 DeltaQRS=DeltaQRS*3600.*24. ; Convert K/s -> K/day
+DeltaQRS(2,:)=0.0
 
 soot_mass=new((/2,nlev/),"float")
 soot_mass(0,:)=dim_avg_Wrap(soot_mmr(0,:,{45},:))
 soot_mass(1,:)=dim_avg_Wrap(soot_mmr(0,:,{-45},:))
 soot_mass=1e12*soot_mass  ; Convert kg soot/kg air -> ng soot/kg air
 
-z3=new((/2,nlev/),"float")
-z3(0,:)=(dim_avg_Wrap(Zsoot(0,:,{45},:))+dim_avg_Wrap(Zcntl(0,:,{45},:)))/2.0
-z3(1,:)=(dim_avg_Wrap(Zsoot(0,:,{-45},:))+dim_avg_Wrap(Zcntl(0,:,{-45},:)))/2.0
-z3=z3/1e3  ; Convert m -> km
+z2=new((/2,nlev/),"float")
+z3=new((/3,nlev/),"float")
+
+z2(0,:)=(dim_avg_Wrap(Zsoot(0,:,{45},:))+dim_avg_Wrap(Zcntl(0,:,{45},:)))/2.0
+z2(1,:)=(dim_avg_Wrap(Zsoot(0,:,{-45},:))+dim_avg_Wrap(Zcntl(0,:,{-45},:)))/2.0
+z2=z2/1e3  ; Convert m -> km
+
+z3(0:1,:)=z2
+z3(2,:)=z2(0,:)
 
 wks   = gsn_open_wks ("pdf", "$IMG_PATH/vgProfilePlot")
 ;wks   = gsn_open_wks ("pdf", "/Volumes/Data/Images/vgProfilePlot")
@@ -77,9 +86,10 @@ wks   = gsn_open_wks ("pdf", "$IMG_PATH/vgProfilePlot")
   
   res@trYMinF = 0.0
   res@trYMaxF = 50.0
-  res@trXMaxF = 105.0
+;  res@trXMinF = -0.5
+  res@trXMaxF = 9.5
   res@tiYAxisString = "Altitude (km)"
-  res@tiXAxisString = "Soot emission rate (kg m~S~-1~N~ s~S~-1~N~)"
+  res@tiXAxisString = "Soot emission rate (Mt km~S~-1~N~ day~S~-1~N~)"
 
   plot(0) = gsn_csm_xy (wks,soot_emis,lev_emis,res)
   
@@ -90,7 +100,7 @@ wks   = gsn_open_wks ("pdf", "$IMG_PATH/vgProfilePlot")
   res@trXMaxF = 8.5
   res@tiXAxisString = "Soot mass (ng/kg air)"
   
-  plot(1) = gsn_csm_xy (wks,soot_mass,z3,res)
+  plot(1) = gsn_csm_xy (wks,soot_mass,z2,res)
 
   res@vpXF             = 0.50                  ; position and sizes
   res@trXMinF = -0.5
