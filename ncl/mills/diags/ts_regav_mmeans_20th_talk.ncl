@@ -9,8 +9,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 begin
 
-year0 = (/1850, 1960, 1850, 1850/)
-yearmax=(/2005, 2025, 2005, 2005/)
+year0 = (/1850, 1960, 1850, 2005, 1850/)
+yearmax=(/2005, 2036, 2005, 2059, 2005/)
 
 maxyear=max(yearmax)
 minyear=min(year0)
@@ -24,9 +24,9 @@ norm_plot_yrs_abs = (/1961,1990/)
 
 
 run_names = (/"b40.20th.track1.2deg.wcm.007","b40.1955-2005.2deg.wcm.002",\
-              "b40.20th.2deg.wset.001","Obs"/)
+              "b40.20th.2deg.wset.001","b40.rcp4_5.1deg.ave","Obs"/)
 con_names = (/"b40.1850.track1.1deg.006","Obs"/)
-case_names = (/"WACCM4 20th Century","WACCM4 Ensemble 1","CAM4","HadCRU"/)
+case_names = (/"WACCM4 20th Century","WACCM4 Ensemble 1","CAM4 2deg","CAM4 1deg","HadCRU"/)
 
 
 ;var_names = (/"LWCF","RESTOM","FSNT","FLNT"/)
@@ -122,11 +122,11 @@ res@gsnFrame = False
 
 res@trYMinF = -2.5
 res@trYMaxF = 2.5
-res@trXMaxF = maxyear+1
-;res@trXMaxF = 2021
+;res@trXMaxF = maxyear+1
+res@trXMaxF = 2040
 res@gsnYRefLine           = 0.              ; reference line   
 res@gsnYRefLineDashPattern = 1.
-res@xyLineColors      = (/"blue","darkgreen","red","black"/)    
+res@xyLineColors      = (/"blue","darkgreen","red","red","black"/)    
 res@xyLineThicknessF = 2
 res@xyDashPatterns = (/0,0,0,1/)
  
@@ -172,7 +172,7 @@ do ivar=0,nvarnames-1
   if (any(var_name.eq.(/"TS","TREFHT"/))) then
     res@tiYAxisString = "TS anomaly (K)"
     res@trYMinF = -1.0
-    res@trYMaxF = 1.4
+    res@trYMaxF = 1.6
   end if
   if (any(var_name.eq.(/"AODVIS"/))) then
     res@tiYAxisString = "AOD anomaly"
@@ -366,10 +366,10 @@ do ivar=0,nvarnames-1
         do iyr=0,nyears(icase)-1
           iyr2=iyr+year0(icase)-1850
           do imonth=0,11
-;            print(icase+" "+nyears(icase)+" "+iyr+" "+imonth)
+            print(icase+" "+nyears(icase)+" "+iyr+" "+imonth)
             var_ann_w(icase,iyr2) = mon_wgt(imonth)*dim_avg(var_w(iyr*12+imonth))+var_ann_w(icase,iyr2)
           end do
-;          print("icase:"+icase+" iyr:"+iyr+" iyr2:"+iyr2+" var:"+var_ann_w(icase,iyr2))
+          print("icase:"+icase+" iyr:"+iyr+" iyr2:"+iyr2+" var:"+var_ann_w(icase,iyr2))
         end do
         if (ldtrend) then
           var_dtrend = dtrend(var_ann_w(icase,0:49),True)
