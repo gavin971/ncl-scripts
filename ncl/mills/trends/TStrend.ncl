@@ -53,6 +53,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
   print("decade:"+dimsizes(decade))
   print("ts:"+dimsizes(ts))
   
+; regCoef calculates the linear regression coefficient between two variables.
   rc = regCoef(decade,ts(lat|:,lon|:,time|:))
   rc!0=ts!1
   rc!1=ts!2
@@ -75,7 +76,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
   res@cnMinLevelValF=-2.8
   res@cnMaxLevelValF=2.8
   res@cnLevelSpacingF     = .4
-  
+
+; Create and draw a contour plot over a cylindrical equidistant map.  
   plot = gsn_csm_contour_map_ce(wks,rc,res)   ; plot model data  
   
   print("gv "+pdffile+".pdf")

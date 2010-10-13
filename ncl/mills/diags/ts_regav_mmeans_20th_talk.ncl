@@ -9,8 +9,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 begin
 
-year0 = (/1850, 1960, 1850, 2005, 1850/)
-yearmax=(/2005, 2036, 2005, 2059, 2005/)
+year0 = (/1850, 1960, 1955, 1850, 1850, 1850/)
+yearmax=(/2005, 2049, 2031, 2005, 2059, 2005/)
 
 maxyear=max(yearmax)
 minyear=min(year0)
@@ -24,9 +24,11 @@ norm_plot_yrs_abs = (/1961,1990/)
 
 
 run_names = (/"b40.20th.track1.2deg.wcm.007","b40.1955-2005.2deg.wcm.002",\
+              "b40.1955-2005.2deg.wcm.003",\
               "b40.20th.2deg.wset.001","b40.rcp4_5.1deg.ave","Obs"/)
 con_names = (/"b40.1850.track1.1deg.006","Obs"/)
-case_names = (/"WACCM4 20th Century","WACCM4 Ensemble 1","CAM4 2deg","CAM4 1deg","HadCRU"/)
+case_names = (/"WACCM4 20th Century","WACCM4 Ensemble 1","WACCM4 Ensemble 2",\
+               "CAM4 2deg","CAM4 1deg 5-Ensemble Average","HadCRU"/)
 
 
 ;var_names = (/"LWCF","RESTOM","FSNT","FLNT"/)
@@ -123,12 +125,12 @@ res@gsnFrame = False
 res@trYMinF = -2.5
 res@trYMaxF = 2.5
 ;res@trXMaxF = maxyear+1
-res@trXMaxF = 2040
+res@trXMaxF = 2050
 res@gsnYRefLine           = 0.              ; reference line   
 res@gsnYRefLineDashPattern = 1.
-res@xyLineColors      = (/"blue","darkgreen","red","red","black"/)    
+res@xyLineColors      = (/"blue","darkgreen","darkgreen","red","red","black"/)    
 res@xyLineThicknessF = 2
-res@xyDashPatterns = (/0,0,0,1/)
+res@xyDashPatterns = (/0,0,1,0,1,1/)
  
 
 res@pmLegendDisplayMode    = "Never"            ; turn on legend
@@ -171,8 +173,8 @@ do ivar=0,nvarnames-1
 
   if (any(var_name.eq.(/"TS","TREFHT"/))) then
     res@tiYAxisString = "TS anomaly (K)"
-    res@trYMinF = -1.0
-    res@trYMaxF = 1.6
+    res@trYMinF = -1.2
+    res@trYMaxF = 1.8
   end if
   if (any(var_name.eq.(/"AODVIS"/))) then
     res@tiYAxisString = "AOD anomaly"
@@ -201,9 +203,9 @@ do ivar=0,nvarnames-1
   var_ann_w = new((/ncases,nyearsmax/),"float")
   var_c_w  = new(ncases,"float")
 
-    
-  wks   = gsn_open_wks ("ps", "$IMG_PATH/"+ps_pref+"_20th_gmean_ts_"+var_name)
-  wks_s = gsn_open_wks ("ps", "$IMG_PATH/"+ps_pref+"_20th_gmean_ts_"+var_name+"_smooth")
+  filename=  "$IMG_PATH/"+ps_pref+"_20th_gmean_ts_"+var_name
+  wks   = gsn_open_wks ("ps", filename)
+  wks_s = gsn_open_wks ("ps", filename+"_smooth")
 
   pi_ave = new(ncases,"string")
   var_ann_w = 0.
@@ -366,10 +368,10 @@ do ivar=0,nvarnames-1
         do iyr=0,nyears(icase)-1
           iyr2=iyr+year0(icase)-1850
           do imonth=0,11
-            print(icase+" "+nyears(icase)+" "+iyr+" "+imonth)
+;            print(run_names(icase)+" "+nyears(icase)+" "+year0(icase)+" "+iyr+" "+imonth)
             var_ann_w(icase,iyr2) = mon_wgt(imonth)*dim_avg(var_w(iyr*12+imonth))+var_ann_w(icase,iyr2)
           end do
-          print("icase:"+icase+" iyr:"+iyr+" iyr2:"+iyr2+" var:"+var_ann_w(icase,iyr2))
+;          print(run_names(icase)+" iyr:"+iyr+" iyr2:"+iyr2+" var:"+var_ann_w(icase,iyr2))
         end do
         if (ldtrend) then
           var_dtrend = dtrend(var_ann_w(icase,0:49),True)
@@ -421,6 +423,10 @@ do ivar=0,nvarnames-1
     
     var_ann_w0=var_ann_w(0,norm_plot_yrs(0):norm_plot_yrs(1))
     
+    TS_0=dim_avg(var_ann_w0)
+    print("TS_0="+TS_0)
+;    case_names(0)=case_names(0)+": TS~B~0~N~="+TS_0
+    
 ; Averages for annual means.
 
     if (norm_plot) then
@@ -435,7 +441,7 @@ do ivar=0,nvarnames-1
           if (run_names(icase).eq."Obs") then
             var_ann_w(icase,:) =  var_ann_w(icase,:)-dim_avg(var_ann_w(icase,norm_plot_yrs(0):norm_plot_yrs(1)))
           else
-            var_ann_w(icase,:) =  var_ann_w(icase,:)-dim_avg(var_ann_w0)
+            var_ann_w(icase,:) =  var_ann_w(icase,:)-TS_0
           end if
         end if
       end do
@@ -452,6 +458,13 @@ do ivar=0,nvarnames-1
     res@gsnBelowYRefLineColors = res@xyLineColors 
     if (ip.ne.1) then
       plot1(ip) = gsn_csm_xy (wks,int2flt(year),var_ann_w,res)
+    ; Add text string to small map.
+      txres2               = True
+      txres2@txFontHeightF = 0.04
+      txres2@txFontColor = "black"
+;      txres2@txAngleF      = -45.     ; Rotate text 45 degrees
+      textstr="TS~B~0~N~="+TS_0
+      text_anno = gsn_add_text(wks,plot1(ip),textstr,1890,1.0,txres2)
     end if
 
     if (var_name.eq."TS") then
@@ -496,7 +509,7 @@ end if
   gsn_panel(wks_s,plot2,(/2,2/),pan)
 
    legend = create "Legend" legendClass wks 
-    "vpXF"                     : 0.74                    ; orientation on page
+    "vpXF"                     : 0.6                    ; orientation on page
     "vpYF"                     : 0.73
     "vpWidthF"                 : 0.08                     ; width
     "vpHeightF"                : 0.1                     ; height
@@ -512,10 +525,11 @@ end if
     "lgMonoLineLabelFontColor" : False                    ; one label color
     "lgItemOrder"              : ispan(ncases-1,0,1)    ; Reverse order 
     "lgAutoManage"             : False
+    "lgLabelJust"              : "CenterLeft"
     end create
    
      legend_s = create "Legend" legendClass wks_s 
-    "vpXF"                     : 0.74                    ; orientation on page
+    "vpXF"                     : 0.6                    ; orientation on page
     "vpYF"                     : 0.73
     "vpWidthF"                 : 0.08                     ; width
     "vpHeightF"                : 0.1                     ; height
@@ -531,6 +545,7 @@ end if
     "lgMonoLineLabelFontColor" : False                    ; one label color
     "lgItemOrder"              : ispan(ncases-1,0,1)    ; Reverse order 
     "lgAutoManage"             : False
+    "lgLabelJust"              : "CenterLeft"
     end create
 
     draw(legend)
@@ -553,6 +568,14 @@ end if
   
 end do
 
+;print("TS_0="+TS_0)
 
+;print("ps2pdf " + filename + ".ps")
+;pstest=systemfunc("ps2pdf " + filename + ".ps")
+;print(pstest)
+
+;print("mutt -a " + filename + ".pdf mikejmills@mac.com < /dev/null")
+;mutter=systemfunc("mutt -a " + filename + ".pdf mikejmills@mac.com < /dev/null")
+;print(mutter)
 
 end
