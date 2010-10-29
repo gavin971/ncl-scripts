@@ -31,8 +31,10 @@ Tsoot=testf->T
 Tcntl=cntlf->T
 Zsoot=testf->Z3
 Zcntl=cntlf->Z3
-QRSsoot=testf->QRS_TOT
-QRScntl=cntlf->QRS_TOT
+;QRSsoot=testf->QRS_TOT
+;QRScntl=cntlf->QRS_TOT
+QRSsoot=testf->QRS
+QRScntl=cntlf->QRS
 
 soot_mmr=testf->SOOT01
 

@@ -15,7 +15,8 @@ begin
   
   print("Calculating zdel...")
   zdel = z3
-  zdel(:,0:nlev-2,:)=z3(:,0:nlev-2,:)-z3(:,1:nlev-1,:)
+;  zdel(:,0:nlev-2,:)=z3(:,0:nlev-2,:)-z3(:,1:nlev-1,:)
+  zdel(0:nlev-2,:)=z3(0:nlev-2,:)-z3(1:nlev-1,:)
     
   delete(z3)
   delete(nlev)
@@ -61,18 +62,26 @@ begin
   pi=acos(0.0)*2.0
   print("calculating column")
 
+  print("rho:"+dimsizes(rho))
+  print("zdel:"+dimsizes(zdel))
   levcol=rho*zdel
 
-  levcol!0 = "time"
-  levcol!1 = "lev"
-  levcol!2 = "lat"
+;  levcol!0 = "time"
+;  levcol!1 = "lev"
+;  levcol!2 = "lat"
+
+  levcol!0 = "lev"
+  levcol!1 = "lat"
 
   print("Calculating column ...")
-  column = dim_sum_Wrap(levcol(time|:, lat|:, lev|:))
+;  column = dim_sum_Wrap(levcol(time|:, lat|:, lev|:))
+  column = dim_sum_Wrap(levcol(lat|:, lev|:))
   delete(levcol)
-  column!0 = "time"
-  column&time = rho&time
-  column!1 = "lat"
+;  column!0 = "time"
+;  column&time = rho&time
+;  column!1 = "lat"
+;  column&lat = rho&lat
+  column!0 = "lat"
   column&lat = rho&lat
   print("dimsizes in calcColZavg_conc:"+dimsizes(column))
   
@@ -88,9 +97,11 @@ begin
 
   pi=acos(0.0)*2.0
   
-  historyPattern = rootPath+"/"+historyRun+"/h0/*.h0.*.nc"
+;  historyPattern = rootPath+"/"+historyRun+"/h0/*.h0.*.nc"
+  historyPattern = rootPath+"/"+historyRun+"/h0zm/"+historyRun+".cam2.h0zm.[01][0-9].nc"
   historyNames = systemfunc("ls " + historyPattern)
-  zmNames = str_sub_str(historyNames,"h0","h0zm")
+;  zmNames = str_sub_str(historyNames,"h0","h0zm")
+  zmNames = historyNames
   nFiles=dimsizes(historyNames)
    
   i = 0
@@ -99,44 +110,47 @@ begin
     a = addfile(zmNames(i),"w")
     
     ; Ozone:
-    print("  reading ozone...")
+;    print("  reading ozone...")
     O3=a->O3
     pdel=a->pdel
     nlat=dimsizes(O3&lat)
     
-    O3_col=new((/1,nlat/),float)
-    O3_col!0 = "time"
-    O3_col&time = O3&time
-    O3_col!1 = "lat"
-    O3_col&lat = O3&lat
+;    O3_col=new((/1,nlat/),float)
+;    O3_col!0 = "time"
+;    O3_col&time = O3&time
+;    O3_col!1 = "lat"
+;    O3_col&lat = O3&lat
     
-    O3_col=calcColZavg_vmr(pdel, O3)
-    O3_col=O3_col/2.687e16 ; Convert to Dobson Units
-    O3_col@units="Dobson Units"
+;    O3_col=calcColZavg_vmr(pdel, O3)
+;    O3_col=O3_col/2.687e16 ; Convert to Dobson Units
+;    O3_col@units="Dobson Units"
 
-    print("  saving ozone column...")
-    a->O3_col=O3_col
+;    print("  saving ozone column...")
+;    a->O3_col=O3_col
 
     print("  reading soot...")
-    SOOT01=a->SOOT01
+    SOOTMD=a->SOOTMD  ; mass density (g/cm3)
     
     print("  calculating zdel...")
-    zdel=calcZdelZavg(a)
+    zdel=calcZdelZavg(a)  ; delta z (m)
+    zdel=zdel*100.        ; m -> cm
 
-    ; Sulfate mass densities in g/cm3:
     print("  calculating soot column...")
-    SOOT01_col=new((/1,nlat/),float)
-    SOOT01_col!0 = "time"
-    SOOT01_col&time = O3&time
-    SOOT01_col!1 = "lat"
-    SOOT01_col&lat = O3&lat
-    SOOT01_col   =calcColZavg_conc(zdel, SOOT01)
-    SOOT01_col   =SOOT01_col*1e10 ; Convert to ug/m2
-    SOOT01_col@units="ug/m2"
+;    SOOT01_col=new((/1,nlat/),float)
+;    SOOT01_col!0 = "time"
+;    SOOT01_col&time = O3&time
+;    SOOT01_col!1 = "lat"
+;    SOOT01_col&lat = O3&lat
+    SOOTMD_col=new(nlat,float)
+    SOOTMD_col!0 = "lat"
+    SOOTMD_col&lat = O3&lat
+    SOOTMD_col   =calcColZavg_conc(zdel, SOOTMD) ; g/cm2
+    SOOTMD_col   =SOOTMD_col*1e13 ; Convert to ng/m2
+    SOOTMD_col@units="ng/m2"
     
     print("  saving soot column...")
-    a->SOOT01_col=SOOT01_col
-    delete(SOOT01_col)
+    a->SOOTMD_col=SOOTMD_col
+    delete(SOOTMD_col)
 
     i = i + 1
   end do
@@ -149,11 +163,13 @@ procedure saveZavgPdel(historyRun:string, rootPath:string)
 local historyPattern,historyNames,i,a,b,ps,p0,hyai,hybi,time,lev,lat,lon,pm,pdel,pdelZavg
  
 begin
-  historyPattern = rootPath+"/"+historyRun+"/h0/*.h0.*.nc"
+;  historyPattern = rootPath+"/"+historyRun+"/h0/*.h0.*.nc"
+  historyPattern = rootPath+"/"+historyRun+"/h0zm/"+historyRun+".cam2.h0zm.[01][0-9].nc"
   print(historyPattern)
   historyNames = systemfunc("ls " + historyPattern)
-  print(historyNames)
-  zmNames = str_sub_str(historyNames,"h0","h0zm")
+;  print(historyNames)
+;  zmNames = str_sub_str(historyNames,"h0","h0zm")
+  zmNames = historyNames
   print(zmNames)
   nFiles=dimsizes(historyNames)
   
@@ -212,9 +228,10 @@ begin
   end do
 end
 
-historyRun="vgcontrol02"
-;historyRun="vgsoot08"
-rootPath="/data5/mmills"
+;historyRun="vgcontrol02"
+historyRun="vgsoot08"
+;rootPath="/data5/mmills"
+rootPath="/Volumes/Data/Models/waccm/run/carma-soot"
 
 ;saveZavgPdel(historyRun, rootPath)
 saveZavgCol(historyRun, rootPath)
