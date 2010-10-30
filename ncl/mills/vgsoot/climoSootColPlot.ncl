@@ -3,11 +3,12 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
 undef("plotClimoSootCol")
-procedure plotClimoSootCol(historyFile:string, rootPath:string) 
+procedure plotClimoSootCol(season:string, rootPath:string) 
 local wks,res,lev
 begin 
 
-  a = addfile(rootPath+historyFile,"r")
+  fileName=rootPath+"vgsoot08_"+season+"_climo.nc"
+  a = addfile(fileName,"r")
   SOOTMD_col=a->SOOTMD_col
 
   lat=a->lat
@@ -17,7 +18,7 @@ begin
   print("xdim="+xdim)
   ntimes=min((/xdim(0)/))
     
-  wks = gsn_open_wks("pdf", "$IMAGE_PATH/ClimoSootColumnPolarMap")
+  wks = gsn_open_wks("pdf", "$IMAGE_PATH/ClimoSootColumnPolarMap"+season)
 ;  gsn_define_colormap(wks,"BlRe")
 ;  gsn_define_colormap(wks,"BlAqGrYeOrReVi200")
   gsn_define_colormap(wks,"rainbow")
@@ -27,18 +28,18 @@ begin
 ;  res@lbLabelBarOn        = False         ; turn off color labelbar
   res@gsnSpreadColors     = True          ; use full range of colormap
   res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "landscape"
+  res@gsnPaperOrientation = "portrait"
   res@vpWidthF            = 1.2           ; change aspect ratio of plot
   res@vpHeightF           = 0.7
 
   res@cnLevelSelectionMode = "ManualLevels" 
   res@cnMinLevelValF=500
-  res@cnMaxLevelValF=8000
+  res@cnMaxLevelValF=9000
   res@cnLevelSpacingF     = 500.
   
   res@gsnCenterString      = "Soot Column (ng m~S~-2~N~)"
 ;  res@tiMainString         =   
-  res@gsnRightString      = " "
+  res@gsnRightString      = season
   res@lbLabelAngleF       = 60
   res@gsnPolar   = "NH"                          ; specify the hemisphere
 
@@ -53,7 +54,10 @@ begin
 end
 
 
-historyFile="vgsoot08_ANN_climo.nc"
+;season="ANN"
+;season="DJF"
+season="JJA"
+
 rootPath="/Volumes/Data/Models/waccm/run/carma-soot/vgsoot08/climo/2035-2064/"
 
-plotClimoSootCol(historyFile,rootPath)
+plotClimoSootCol(season,rootPath)

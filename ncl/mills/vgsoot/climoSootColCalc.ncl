@@ -98,7 +98,9 @@ begin
   
 end
 
-historyFile="vgsoot08_ANN_climo.nc"
+;historyFile="vgsoot08_ANN_climo.nc"
+;historyFile="vgsoot08_DJF_climo.nc"
+historyFile="vgsoot08_JJA_climo.nc"
 rootPath="/Volumes/Data/Models/waccm/run/carma-soot/vgsoot08/climo/2035-2064/"
 
 saveSootCol(historyFile, rootPath)
