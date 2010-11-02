@@ -9,8 +9,32 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 begin
 
-year0 = (/1850, 1960, 1955, 1850, 1850, 1850/)
-yearmax=(/2005, 2049, 2031, 2005, 2059, 2005/)
+;year0 = (/1850, 1960, 1955, 1850, 1850, 1850/)
+;yearmax=(/2005, 2049, 2031, 2005, 2059, 2005/)
+;run_names = (/"b40.20th.track1.2deg.wcm.007","b40.1955-2005.2deg.wcm.002",\
+;              "b40.1955-2005.2deg.wcm.003",\
+;              "b40.20th.2deg.wset.001","b40.rcp4_5.1deg.ave","Obs"/)
+;case_names = (/"WACCM4 20th Century","WACCM4 Ensemble 1","WACCM4 Ensemble 2",\
+;               "CAM4 2deg","CAM4 1deg 5-Ensemble Average","HadCRU"/)
+
+year0 = (/1850, 1850, 1850, 1960, 1955, 1955, 1850/)
+yearmax=(/2005, 1939, 1924, 2072, 2051, 2005, 2005/)
+run_names = (/"b40.20th.track1.2deg.wcm.007",\
+              "br04.20th.track1.2deg.wcm.pd.001",\
+              "br04.20th.track1.2deg.wcm.pd.002",\
+              "b40.1955-2005.2deg.wcm.002",\
+              "b40.1955-2005.2deg.wcm.003",\
+              "b40.1955-2005.2deg.wcm.004",\
+              "Obs"/)
+case_names = (/"WACCM4 20th Century 1",\
+               "WACCM4 20th Century 2",\
+               "WACCM4 20th Century 3",\
+               "WACCM4 Ensemble 1",\
+               "WACCM4 Ensemble 2",\
+               "WACCM4 Ensemble 3",\
+               "HadCRU"/)
+
+con_names = (/"b40.1850.track1.1deg.006","Obs"/)
 
 maxyear=max(yearmax)
 minyear=min(year0)
@@ -21,14 +45,6 @@ omask0 = False
 ;omask0 = True
 norm_plot = True
 norm_plot_yrs_abs = (/1961,1990/)
-
-
-run_names = (/"b40.20th.track1.2deg.wcm.007","b40.1955-2005.2deg.wcm.002",\
-              "b40.1955-2005.2deg.wcm.003",\
-              "b40.20th.2deg.wset.001","b40.rcp4_5.1deg.ave","Obs"/)
-con_names = (/"b40.1850.track1.1deg.006","Obs"/)
-case_names = (/"WACCM4 20th Century","WACCM4 Ensemble 1","WACCM4 Ensemble 2",\
-               "CAM4 2deg","CAM4 1deg 5-Ensemble Average","HadCRU"/)
 
 
 ;var_names = (/"LWCF","RESTOM","FSNT","FLNT"/)
@@ -128,9 +144,11 @@ res@trYMaxF = 2.5
 res@trXMaxF = 2050
 res@gsnYRefLine           = 0.              ; reference line   
 res@gsnYRefLineDashPattern = 1.
-res@xyLineColors      = (/"blue","darkgreen","darkgreen","red","red","black"/)    
+;res@xyLineColors      = (/"blue","darkgreen","darkgreen","red","red","black"/)    
+;res@xyDashPatterns = (/0,0,1,0,1,1/)
+res@xyLineColors      = (/"blue","turquoise","orange","red","darkgreen","chartreuse","black"/)    
+res@xyDashPatterns = (/0,0,0,0,0,0,1/)
 res@xyLineThicknessF = 2
-res@xyDashPatterns = (/0,0,1,0,1,1/)
  
 
 res@pmLegendDisplayMode    = "Never"            ; turn on legend
@@ -452,10 +470,10 @@ do ivar=0,nvarnames-1
     end if
 
     res@tiMainString = ptype(ip)
-    res@gsnYRefLines = (/0.0,0.0,0.0,0.0/)
-    print(res@xyLineColors)
-    res@gsnAboveYRefLineColors = res@xyLineColors 
-    res@gsnBelowYRefLineColors = res@xyLineColors 
+;    res@gsnYRefLines = (/0.0,0.0,0.0,0.0/)
+;    print(res@xyLineColors)
+;    res@gsnAboveYRefLineColors = res@xyLineColors 
+;    res@gsnBelowYRefLineColors = res@xyLineColors 
     if (ip.ne.1) then
       plot1(ip) = gsn_csm_xy (wks,int2flt(year),var_ann_w,res)
     ; Add text string to small map.
@@ -570,12 +588,12 @@ end do
 
 ;print("TS_0="+TS_0)
 
-;print("ps2pdf " + filename + ".ps")
-;pstest=systemfunc("ps2pdf " + filename + ".ps")
-;print(pstest)
+print("ps2pdf " + filename + ".ps" + " " + filename + ".pdf")
+pstest=systemfunc("ps2pdf " + filename + ".ps" + " " + filename + ".pdf")
+print(pstest)
 
-;print("mutt -a " + filename + ".pdf mikejmills@mac.com < /dev/null")
-;mutter=systemfunc("mutt -a " + filename + ".pdf mikejmills@mac.com < /dev/null")
-;print(mutter)
+print("mutt -a " + filename + ".pdf mikejmills@mac.com < /dev/null")
+mutter=systemfunc("mutt -a " + filename + ".pdf mikejmills@mac.com < /dev/null")
+print(mutter)
 
 end
