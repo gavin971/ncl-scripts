@@ -6,6 +6,9 @@ undef("calcAerRF")
 procedure calcAerRF(rootdir:string, file1:string) 
 begin 
   print(file1)
+  
+  addPdelZm(file1)
+  
   a = addfile(rootdir+file1,"w")
   QRS_RF=a->QRS_RF
   QRS_AER=a->QRS
@@ -44,7 +47,6 @@ begin
   a->MCA_V=MCA_V
   a->MBCPHOFRAC_V=MBCPHOFRAC_V
 
-  
 
 
 end
