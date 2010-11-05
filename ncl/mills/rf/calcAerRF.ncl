@@ -31,22 +31,34 @@ begin
   FSNSC_AER=a->FSNSC
   FSNSC_AER=FSNSC_AER-FSNSC_RF
   a->FSNSC_AER=FSNSC_AER
+  
+  MCA_V=a->MBCPHO_V
+  MCA_V@long_name="Mass of all carbon aerosols in and below layer"  
+  MCA_V=MCA_V+a->MOCPHI_V
+  MCA_V=MCA_V+a->MBCPHI_V 
+  MCA_V=MCA_V+a->MBCPHO_V 
+  MBCPHOFRAC_V=a->MBCPHO_V 
+  MBCPHOFRAC_V@long_name=\
+    "Fractional mass of BCPHO to all carbon aerosols in and below layer"
+  MBCPHOFRAC_V=MBCPHOFRAC_V/MCA_V
+  a->MCA_V=MCA_V
+  a->MBCPHOFRAC_V=MBCPHOFRAC_V
+
+  
+
 
 end
 
 
-rootdir="/Volumes/Data/Models/waccm/run/carma-soot/bch0zm/"
-file1="bccntl01.cam2.h0zm.2025-01-01-00000.nc"
+basedir="/data5/mmills/wa319/carma-soot/"
+year="2034"
+
+caseid="bcrckt03"
+rootdir=basedir+caseid+"/"+"h0zm.annual/"
+file1=caseid+".cam2.h0zm."+year+".annual.nc"
 ;calcAerRF(rootdir,file1)
 
-file1="bcrckt000001.cam2.h0zm.2025-01-01-00000.nc"
-;calcAerRF(rootdir,file1)
-
-file1="bcrckt01.cam2.h0zm.2025-01-01-00000.nc"
-;calcAerRF(rootdir,file1)
-
-file1="bcrckt6000.cam2.h0zm.2025-01-01-00000.nc"
-;calcAerRF(rootdir,file1)
-
-file1="bcrckt6000b.cam2.h0zm.2025-01-01-00000.nc"
+caseid="bccntl02"
+rootdir=basedir+caseid+"/"+"h0zm.annual/"
+file1=caseid+".cam2.h0zm."+year+".annual.nc"
 calcAerRF(rootdir,file1)
