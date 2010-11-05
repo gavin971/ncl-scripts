@@ -23,7 +23,7 @@ begin
  
   ; Calculate the air pressures at the interfaces.
   pdel1 = dpres_hybrid_ccm(PS, P0, hyai ,hybi)
-  print("pdel1: "+dimsizes(pdel1))
+;  print("pdel1: "+dimsizes(pdel1))
   pdel1!0="lev"
   pdel1!1="time" 
   pdel1!2="lat"  
