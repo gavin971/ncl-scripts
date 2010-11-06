@@ -61,11 +61,12 @@ begin
 ;    print(monthnames(i-1)+"  "+sprintf(fmt, prob(1,i,:)))
 ;  end do
   
-  imgPath=getenv ("IMAGE_PATH")
-  if (.not.(isfilepresent(imgPath+"/vg"))) then
-    a = systemfunc("mkdir -p "+imgPath+"/vg")
-  end if  
-  wks = gsn_open_wks("pdf", imgPath+"/vg/vgSurfTempChange")
+  imgPath=getenv ("IMG_PATH")
+  if (.not.(isfilepresent(imgPath+"/bc"))) then
+    a = systemfunc("mkdir -p "+imgPath+"/bc")
+  end if
+  filename=imgPath+"/bc/bcSurfTempChange"
+  wks = gsn_open_wks("ps", filename)
     
   resP                      = True
   resP@gsnMaximize          = True
@@ -161,6 +162,14 @@ begin
   draw(plot)
   frame(wks)
   
+  print("ps2pdf " + filename + ".ps" + " " + filename + ".pdf")
+  pstest=systemfunc("ps2pdf " + filename + ".ps" + " " + filename + ".pdf")
+  print(pstest)
+
+  print("mutt -a " + filename + ".pdf mikejmills@mac.com < /dev/null")
+  mutter=systemfunc("mutt -a " + filename + ".pdf mikejmills@mac.com < /dev/null")
+  print(mutter)
+  
 end
 
 
@@ -232,10 +241,11 @@ begin
   
 end
 
-historyRun="vgsoot08"
-controlRun="vgcontrol02"
+historyRun="bcrckt03"
+controlRun="bccntl02"
 ;rootPath="/data5/mmills"
 ;rootPath="/Volumes/Data/Models/waccm/carma-soot/run"
-rootPath="/Data/Models/waccm/run/carma-soot"
+;rootPath="/Data/Models/waccm/run/carma-soot"
+rootPath="/data5/mmills/wa319/carma-soot"
 
 plotvgSurfTempChange(rootPath,historyRun,controlRun)

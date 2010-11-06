@@ -85,10 +85,11 @@ begin
 ;  end do
   
   imgPath=getenv ("IMAGE_PATH")
-  if (.not.(isfilepresent(imgPath+"/vg"))) then
-    a = systemfunc("mkdir -p "+imgPath+"/vg")
+  if (.not.(isfilepresent(imgPath+"/bc"))) then
+    a = systemfunc("mkdir -p "+imgPath+"/bc")
   end if  
-  wks = gsn_open_wks("pdf", imgPath+"/vg/vgO3ColumnChange")
+  filename=imgPath+"/bc/bcO3ColumnChange"
+  wks = gsn_open_wks("ps", filename)
     
   resP                      = True
   resP@gsnMaximize          = True
@@ -251,8 +252,8 @@ begin
   
   O3_col_x(0,:)=O3_col_x(12,:)
   O3_col_c(0,:)=O3_col_c(12,:)
-  O3_colSD_x(0,:)=O3_col_x(12,:)
-  O3_colSD_c(0,:)=O3_col_c(12,:)
+  O3_colSD_x(0,:)=(/O3_col_x(12,:)/)
+  O3_colSD_c(0,:)=(/O3_col_c(12,:)/)
   
   O3_col_x(13,:)=O3_col_x(1,:)
   O3_col_c(13,:)=O3_col_c(1,:)
@@ -267,12 +268,23 @@ begin
   print("plotting ozone column...")
   plotvgO3Diff(O3_col_x, O3_col_c, O3_colSD_x, O3_colSD_c, useIDLsig)
   
+  print("ps2pdf " + filename + ".ps" + " " + filename + ".pdf")
+  pstest=systemfunc("ps2pdf " + filename + ".ps" + " " + filename + ".pdf")
+  print(pstest)
+
+  print("mutt -a " + filename + ".pdf mikejmills@mac.com < /dev/null")
+  mutter=systemfunc("mutt -a " + filename + ".pdf mikejmills@mac.com < /dev/null")
+  print(mutter)
+  
 end
 
-historyRun="vgsoot08"
-controlRun="vgcontrol02"
+;historyRun="vgsoot08"
+;controlRun="vgcontrol02"
+historyRun="bcrckt03"
+controlRun="bccntl02"
 ;rootPath="/data5/mmills"
-rootPath="$MODEL_PATH/waccm/run/carma-soot"
+;rootPath="$MODEL_PATH/waccm/run/carma-soot"
+rootPath="/data5/mmills/wa319/carma-soot"
 
 useIDLsig = True
 

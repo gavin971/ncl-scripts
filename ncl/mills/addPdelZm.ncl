@@ -1,5 +1,5 @@
 undef("addPdelZm")
-procedure addPdelZm(filePath:string)
+procedure addPdelZm(filePath:string,opt:logical)
 
 local i, j, k, b, pdel1, pdel, pdeldry
 
@@ -23,7 +23,8 @@ begin
  
   ; Calculate the air pressures at the interfaces.
   pdel1 = dpres_hybrid_ccm(PS, P0, hyai ,hybi)
-;  print("pdel1: "+dimsizes(pdel1))
+  print("pdel1: "+dimsizes(pdel1))
+  print("lev: "+dimsizes(lev))
   pdel1!0="lev"
   pdel1!1="time" 
   pdel1!2="lat"  
@@ -40,6 +41,12 @@ begin
   pdeldry@long_name="Dry pressure difference between levels"
 
   icFile->PDEL=pdel  
-  icFile->PDELDRY=pdeldry 
+  icFile->PDELDRY=pdeldry
+  delete(icFile)
+  
+  if (opt) then
+    opt@pdel=pdel
+    opt@pdeldry=pdeldry
+  end if
     
 end
