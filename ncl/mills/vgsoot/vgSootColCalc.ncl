@@ -52,7 +52,7 @@ begin
   partPress!2 = "lat"
   partPress&lat = vmr&lat
     
-  print("  Calculating column ...")
+  print("  Calculating column from vmr...")
   column = dim_sum_Wrap(partPress(time|:, lat|:, lev|:))
 
   return(column)
@@ -67,15 +67,14 @@ begin
   g       = 980.6               ; cm s^-2 
   Mair    = 28.964/6.022e23     ; g/molec
   pi=acos(0.0)*2.0
-  print("calculating column")
 
-  print("rho:"+dimsizes(rho))
-  print("zdel:"+dimsizes(zdel))
+;  print("rho:"+dimsizes(rho))
+;  print("zdel:"+dimsizes(zdel))
   levcol=rho*zdel
 
   rank=dimsizes(dimsizes(levcol))
   
-  print("Calculating column ...")
+  print("  Calculating column from rho...")
   if (rank.eq.3) then
     levcol!0 = "time"
     levcol!1 = "lev"
@@ -94,7 +93,7 @@ begin
   end if
 
   delete(levcol)
-  print("dimsizes in calcColZavg_conc:"+dimsizes(column))
+;  print("dimsizes in calcColZavg_conc:"+dimsizes(column))
   
   return(column)
 end
@@ -130,7 +129,7 @@ begin
     else
       print("  computing PDELDRY...")
       opt=True
-      addPdelZm(zmNames(i),opt)
+      addPdelZm(a,opt)
       pdeldry=opt@pdeldry
     end if
         

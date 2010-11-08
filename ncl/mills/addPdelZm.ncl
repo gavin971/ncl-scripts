@@ -1,12 +1,12 @@
 undef("addPdelZm")
-procedure addPdelZm(filePath:string,opt:logical)
+procedure addPdelZm(icFile:file,opt:logical)
 
 local i, j, k, b, pdel1, pdel, pdeldry
 
 begin
   
   ; Open the initial conditions file.
-  icFile = addfile(filePath, "w")
+;  icFile = addfile(filePath, "w")
   
   ; Read in the dimensions.
   lev 	= icFile->lev
@@ -23,8 +23,8 @@ begin
  
   ; Calculate the air pressures at the interfaces.
   pdel1 = dpres_hybrid_ccm(PS, P0, hyai ,hybi)
-  print("pdel1: "+dimsizes(pdel1))
-  print("lev: "+dimsizes(lev))
+;  print("pdel1: "+dimsizes(pdel1))
+;  print("lev: "+dimsizes(lev))
   pdel1!0="lev"
   pdel1!1="time" 
   pdel1!2="lat"  
@@ -42,7 +42,6 @@ begin
 
   icFile->PDEL=pdel  
   icFile->PDELDRY=pdeldry
-  delete(icFile)
   
   if (opt) then
     opt@pdel=pdel

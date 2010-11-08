@@ -12,9 +12,11 @@ begin
 
   print(rootdir+file1)
   
-  addPdelZm(rootdir+file1)
-  
   a = addfile(rootdir+file1,"w")
+  
+  opt=True
+  addPdelZm(a,opt)
+  
   lev=a->lev
   nlev=dimsizes(lev)
   
@@ -55,7 +57,7 @@ begin
   a->MCA_V=MCA_V
   a->MBCPHOFRAC_V=MBCPHOFRAC_V
 
-  pdeldry=a->PDELDRY
+  pdeldry=opt@pdeldry
   airden=pdeldry/g ; air column mass in kg/m2
   
   MBCPHO_V=a->MBCPHO_V
