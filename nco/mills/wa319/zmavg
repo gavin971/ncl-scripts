@@ -9,6 +9,8 @@ rootpath='/data5/mmills/wa319/carma-soot'
 runname='bcrckt03'
 
 wadir=$rootpath'/'$runname'/h0zm'
+outdir=$rootpath'/'$runname'/h0zm.monavg'
+mkdir -p $outdir
 
 # script to average and standard deviation of waccm h0 files
 
@@ -19,16 +21,16 @@ while [[ $count -le 12 ]];do
       ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0'$count'.nc'
       echo $ncfiles
 
-      avgfile=$wadir'/'$runname'.cam2.h0zm.0'$count'.nc'
-      sdfile=$wadir'/'$runname'.cam2.h0zmsd.0'$count'.nc'
+      avgfile=$outdir'/'$runname'.cam2.h0zm.0'$count'.nc'
+      sdfile=$outdir'/'$runname'.cam2.h0zmsd.0'$count'.nc'
 
    else
 
       ncfiles=$wadir'/'$runname'.cam2.h0zm.*-'$count'.nc'
       echo $ncfiles
 
-      avgfile=$wadir'/'$runname'.cam2.h0zm.'$count'.nc'
-      sdfile=$wadir'/'$runname'.cam2.h0zmsd.'$count'.nc'
+      avgfile=$outdir'/'$runname'.cam2.h0zm.'$count'.nc'
+      sdfile=$outdir'/'$runname'.cam2.h0zmsd.'$count'.nc'
 
    fi
 
