@@ -1,14 +1,14 @@
 #!/bin/ksh
 
 ;runname='b40.1850.track1.2deg.wcm.007'
-runname='b40.1850.2deg.wset.002'
+runname='b40.1850.2deg.wset.003'
 wadir='/data3/mmills/'$runname'/h0'
 anndir='/data3/mmills/'$runname'/h0.annual'
 searchstr='cam2.h0'
 addstr='TS.annual'
 
-year1=20
-year2=96
+year1=1
+year2=18
 
 # script to average and standard deviation of waccm h0 files
 

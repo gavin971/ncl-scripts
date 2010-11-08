@@ -1,16 +1,14 @@
 #!/bin/ksh
 
-#caseid='b40.1850.track1.2deg.wcm.007'
-#caseid='b40.20th.track1.2deg.wcm.007'
-caseid='f2000.e10r02.2deg.waccm.005'
-wadir='/data5/mmills/'$caseid'/h0'
-outdir='/data5/mmills/'$caseid'/h0zm'
+rootpath='/data5/mmills/wa319/carma-soot'
+#caseid='bcrckt03'
+caseid='bccntl02'
 
-#year1=97
-#year2=177
+wadir=$rootpath'/'$caseid'/h0'
+outdir=$rootpath'/'$caseid'/h0zm'
 
-year1=16
-year2=16
+year1=2035
+year2=2058
 
 mkdir -p $outdir
 

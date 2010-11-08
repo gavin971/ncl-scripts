@@ -2,17 +2,25 @@
 
 #runname='vgcontrol02'
 #runname='b40.20th.track1.2deg.wcm.007'
-runname='b40.1850.track1.2deg.wcm.007'
-wadir='/data3/mmills/'$runname'/h0zm'
-anndir='/data3/mmills/'$runname'/h0zm.annual'
+#runname='b40.1850.track1.2deg.wcm.007'
+#runname='b40.20th.2deg.wset.001'
+#runname='b40.1955-2005.2deg.wcm.002'
+runname='bcrckt03'
+#runname='bccntl02'
+
+rootpath='/data5/mmills/wa319/carma-soot'
+
+wadir=$rootpath'/'$runname'/h0zm'
+anndir=$rootpath'/'$runname'/h0zm.annual'
 searchstr='cam2.h0zm'
+#wadir='/data3/mmills/'$runname'/h0'
+#anndir='/data3/mmills/'$runname'/h0.annual'
+#searchstr='cam2.h0'
 addstr='annual'
 
-#year1=1885
-#year2=1914
+year1=2044
+year2=2050
 
-year1=97
-year2=168
 
 # script to average and standard deviation of waccm h0 files
 
@@ -35,7 +43,7 @@ while [[ $year -le $year2 ]];do
     fi
   
   ncfiles=$wadir'/'$runname'.'$searchstr'.'$yearstr*'.nc'
-  avgfile=$anndir'/'$runname'.'$yearstr'.'$addstr'.nc'
+  avgfile=$anndir'/'$runname'.'$searchstr'.'$yearstr'.'$addstr'.nc'
 
   # create annual mean
   echo averaging $ncfiles

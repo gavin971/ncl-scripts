@@ -4,9 +4,11 @@
 
 echo zmavg
 
-runname='vgcontrol02'
+rootpath='/data5/mmills/wa319/carma-soot'
+#runname='bccntl02'
+runname='bcrckt03'
 
-wadir='/data5/mmills/'$runname'/h0zm'
+wadir=$rootpath'/'$runname'/h0zm'
 
 # script to average and standard deviation of waccm h0 files
 
