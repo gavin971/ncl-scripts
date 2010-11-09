@@ -1,8 +1,9 @@
 #!/bin/ksh
 
-rootpath='/data5/mmills/wa319/carma-soot'
-#runname='bccntl02'
-runname='bcrckt03'
+#rootpath='/data5/mmills/wa319/carma-soot'
+rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+runname='bccntl02'
+#runname='bcrckt03'
 wadir=$rootpath'/'$runname'/h0zm.annual'
 
 # script to average and standard deviation of waccm h0 files

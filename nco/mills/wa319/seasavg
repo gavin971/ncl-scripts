@@ -1,0 +1,58 @@
+#!/bin/ksh
+
+###.......creates monthly means from all available years.......
+
+echo zmavg
+
+#rootpath='/data5/mmills/wa319/carma-soot'
+rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+#runname='bccntl02'
+runname='bcrckt03'
+
+wadir=$rootpath'/'$runname'/h0zm'
+outdir=$rootpath'/'$runname'/h0zm.seasavg'
+mkdir -p $outdir
+
+# script to average and standard deviation of waccm h0 files
+
+# Jan, Feb, Mar
+#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[123].nc'
+#  avgfile=$outdir'/'$runname'.cam2.h0zm.JFM.nc'
+#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.JFM.nc'
+
+# Dec, Jan, Feb
+  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[12].nc'
+  ncfiles2=$wadir'/'$runname'.cam2.h0zm.*-12.nc'
+  avgfile=$outdir'/'$runname'.cam2.h0zm.DJF.nc'
+  sdfile=$outdir'/'$runname'.cam2.h0zmsd.DJF.nc'
+
+# Jun, Jul, Aug
+#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[678].nc'
+#  avgfile=$outdir'/'$runname'.cam2.h0zm.JJA.nc'
+#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.JJA.nc'
+
+# Aug, Sep, Oct
+#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[89].nc'
+#  ncfiles2=$wadir'/'$runname'.cam2.h0zm.*-10.nc'
+#  avgfile=$outdir'/'$runname'.cam2.h0zm.ASO.nc'
+#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.ASO.nc'
+
+  echo $ncfiles
+  echo $ncfiles2
+  echo $avgfile
+  echo $sdfile
+
+#  echo "ncrcat -O $ncfiles zmtmp.nc"
+#  ncrcat -O $ncfiles zmtmp.nc
+  echo "ncrcat -O $ncfiles $ncfiles2 zmtmp.nc"
+  ncrcat -O $ncfiles $ncfiles2 zmtmp.nc
+  
+  echo "ncwa -O -I -a time zmtmp.nc $avgfile"
+  ncwa -O -I -a time zmtmp.nc $avgfile 
+  echo "ncbo -O -D 2 --op_typ=sub zmtmp.nc $avgfile tmp.nc"
+  ncbo -O -D 2 --op_typ=sub zmtmp.nc $avgfile tmp.nc
+  echo "ncra -O -y rmssdn tmp.nc $sdfile"
+  ncra -O -y rmssdn tmp.nc $sdfile
+  rm zmtmp.nc
+  rm tmp.nc
+
