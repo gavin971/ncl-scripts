@@ -262,11 +262,12 @@ end
 ;historyRun="vgcontrol02"
 ;historyRun="vgsoot08"
 ;rootPath="/data5/mmills"
-;rootPath="/Volumes/Data/Models/waccm/run/carma-soot"
+
+;rootPath="/data5/mmills/wa319/carma-soot"
+rootPath="/Volumes/Data/Models/waccm/run/carma-soot"
 
 historyRun="bcrckt03"
 ;historyRun="bccntl02"
-rootPath="/data5/mmills/wa319/carma-soot"
 
 ;saveZavgPdel(historyRun, rootPath)
 saveZavgCol(historyRun, rootPath)

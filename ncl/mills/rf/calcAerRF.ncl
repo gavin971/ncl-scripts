@@ -64,7 +64,11 @@ begin
   BCPHO=MBCPHO_V
   BCPHO@long_name="Hydrophobic black carbon aerosol"  
   BCPHO@units="kg/kg"
-  BCPHO(:,0:nlev-2,:)=MBCPHO_V(:,0:nlev-2,:)-MBCPHO_V(:,1:nlev-1,:)
+  if (opt@notime) then
+    BCPHO(0:nlev-2,:)=MBCPHO_V(0:nlev-2,:)-MBCPHO_V(1:nlev-1,:)  
+  else
+    BCPHO(:,0:nlev-2,:)=MBCPHO_V(:,0:nlev-2,:)-MBCPHO_V(:,1:nlev-1,:)
+  end if
   BCPHO=BCPHO/airden
   a->BCPHO=BCPHO
   
@@ -72,7 +76,11 @@ begin
   BCPHI=MBCPHI_V
   BCPHI@long_name="Hydrophilic black carbon aerosol"  
   BCPHI@units="kg/kg"
-  BCPHI(:,0:nlev-2,:)=MBCPHI_V(:,0:nlev-2,:)-MBCPHI_V(:,1:nlev-1,:)
+  if (opt@notime) then
+    BCPHI(0:nlev-2,:)=MBCPHI_V(0:nlev-2,:)-MBCPHI_V(1:nlev-1,:)  
+  else
+    BCPHI(:,0:nlev-2,:)=MBCPHI_V(:,0:nlev-2,:)-MBCPHI_V(:,1:nlev-1,:)
+  end if
   BCPHI=BCPHI/airden
   a->BCPHI=BCPHI
   
@@ -80,7 +88,11 @@ begin
   OCPHO=MOCPHO_V
   OCPHO@long_name="Hydrophobic organic carbon aerosol"  
   OCPHO@units="kg/kg"
-  OCPHO(:,0:nlev-2,:)=MOCPHO_V(:,0:nlev-2,:)-MOCPHO_V(:,1:nlev-1,:)
+  if (opt@notime) then
+    OCPHO(0:nlev-2,:)=MOCPHO_V(0:nlev-2,:)-MOCPHO_V(1:nlev-1,:)  
+  else
+    OCPHO(:,0:nlev-2,:)=MOCPHO_V(:,0:nlev-2,:)-MOCPHO_V(:,1:nlev-1,:)
+  end if
   OCPHO=OCPHO/airden
   a->OCPHO=OCPHO
   
@@ -88,7 +100,11 @@ begin
   OCPHI=MOCPHI_V
   OCPHI@long_name="Hydrophilic organic carbon aerosol"  
   OCPHI@units="kg/kg"
-  OCPHI(:,0:nlev-2,:)=MOCPHI_V(:,0:nlev-2,:)-MOCPHI_V(:,1:nlev-1,:)
+  if (opt@notime) then
+    OCPHI(0:nlev-2,:)=MOCPHI_V(0:nlev-2,:)-MOCPHI_V(1:nlev-1,:)  
+  else
+    OCPHI(:,0:nlev-2,:)=MOCPHI_V(:,0:nlev-2,:)-MOCPHI_V(:,1:nlev-1,:)
+  end if
   OCPHI=OCPHI/airden
   a->OCPHI=OCPHI
   
@@ -108,16 +124,36 @@ end
 ;basedir="/data5/mmills/wa319/carma-soot/"
 basedir="/Volumes/Data/Models/waccm/run/carma-soot/"
 
-do year=2034,2042
+;do year=2034,2042
 
-  caseid="bcrckt03"
-  rootdir=basedir+caseid+"/"+"h0zm.annual/"
-  file1=caseid+".cam2.h0zm."+year+".annual.nc"
-  calcAerRF(rootdir,file1)
+;  caseid="bcrckt03"
+;  rootdir=basedir+caseid+"/"+"h0zm.annual/"
+;  file1=caseid+".cam2.h0zm."+year+".annual.nc"
+;  calcAerRF(rootdir,file1)
 
-  caseid="bccntl02"
-  rootdir=basedir+caseid+"/"+"h0zm.annual/"
-  file1=caseid+".cam2.h0zm."+year+".annual.nc"
-  calcAerRF(rootdir,file1)
+;  caseid="bccntl02"
+;  rootdir=basedir+caseid+"/"+"h0zm.annual/"
+;  file1=caseid+".cam2.h0zm."+year+".annual.nc"
+;  calcAerRF(rootdir,file1)
 
-end do
+;end do
+
+caseid="bcrckt03"
+rootdir=basedir+caseid+"/"+"h0zm.annual/"
+file1=caseid+".cam2.h0zm.annual.nc"
+file2=caseid+".cam2.h0zm.aer.annual.nc"
+cpcmd="cp "+rootdir+file1+" "+rootdir+file2
+print((/cpcmd/))
+system(cpcmd)
+
+calcAerRF(rootdir,file2)
+
+caseid="bccntl02"
+rootdir=basedir+caseid+"/"+"h0zm.annual/"
+file1=caseid+".cam2.h0zm.annual.nc"
+file2=caseid+".cam2.h0zm.aer.annual.nc"
+cpcmd="cp "+rootdir+file1+" "+rootdir+file2
+print(cpcmd)
+system(cpcmd)
+
+calcAerRF(rootdir,file2)

@@ -4,19 +4,24 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
 ;modelpath=getenv("MODEL_PATH")
 
-sootcase="vgsoot08"
-cntlcase="vgcontrol02"
+;sootcase="vgsoot08"
+;cntlcase="vgcontrol02"
+;years="2035-2064"
+
+sootcase="bcrckt03"
+cntlcase="bccntl02"
+years="2035-2066"
 
 ;runpath=modelpath+"/waccm/run/carma-soot/"
 runpath="$MODEL_PATH/waccm/run/carma-soot/"
 
-sootpath=runpath+sootcase+"/climo/2035-2064/"
+sootpath=runpath+sootcase+"/climo/"+years+"/"
 sootHistoryPattern=sootpath+sootcase+"_[01][0-9]_climo.nc"
 sootHistoryNames = systemfunc("ls " + sootHistoryPattern)
 sootHistory = addfiles(sootHistoryNames, "r")
 ListSetType(sootHistory, "cat")
 
-cntlpath=runpath+cntlcase+"/climo/2035-2064/"
+cntlpath=runpath+cntlcase+"/climo/"+years+"/"
 cntlHistoryPattern=cntlpath+cntlcase+"_[01][0-9]_climo.nc"
 cntlHistoryNames = systemfunc("ls " + cntlHistoryPattern)
 cntlHistory = addfiles(cntlHistoryNames, "r")
@@ -110,7 +115,8 @@ monthnames = (/ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 ;************************************************
 ; plotting parameters
 ;************************************************
-  wks   = gsn_open_wks ("pdf","$IMAGE_PATH/vgIceFracChange")      ; open workstation
+  a = systemfunc("mkdir -p $IMAGE_PATH/bc")
+  wks   = gsn_open_wks ("pdf","$IMAGE_PATH/bc/bcIceFracChange")      ; open workstation
   res                   = True                     ; plot mods desired
   res@gsnPaperOrientation = "landscape"
   res@gsnMaximize       = True
@@ -119,8 +125,8 @@ monthnames = (/ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 ;  res@xyLineColors = (/"Red","Blue"/)
   
 ;  res@trYLog            = True                       ; log Y-axis
-  res@trYMinF           = -20
-  res@trYMaxF           = 2.0
+  res@trYMinF           = -1.0
+  res@trYMaxF           = 18.0
 ;  res@trYReverse        = True                       ; reverse Y-axis
 
 ;  res@trXMinF           = 0.0
