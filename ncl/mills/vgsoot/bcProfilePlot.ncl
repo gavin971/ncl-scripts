@@ -7,16 +7,23 @@ testcase="bcrckt03"
 cntlcase="bccntl02"
 
 rootpath="$MODEL_PATH/waccm/run/carma-soot/"
-climopath="h0zm.annual/"
+annpath="/h0zm.annual/"
+seaspath="/h0zm.seasavg/"
 
-testpath=rootpath+testcase+"/"+climopath
-testfile=testcase+".cam2.h0zm.aer.annual.nc"
+testfileANN=rootpath+testcase+annpath+testcase+".cam2.h0zm.aer.annual.nc"
+testfileJJA=rootpath+testcase+seaspath+testcase+".cam2.h0zm.JJA.nc"
+testfileDJF=rootpath+testcase+seaspath+testcase+".cam2.h0zm.DJF.nc"
 
-cntlpath=rootpath+cntlcase+"/"+climopath
-cntlfile=cntlcase+".cam2.h0zm.aer.annual.nc"
+cntlfileANN=rootpath+cntlcase+annpath+cntlcase+".cam2.h0zm.aer.annual.nc"
+cntlfileJJA=rootpath+cntlcase+seaspath+cntlcase+".cam2.h0zm.JJA.nc"
+cntlfileDJF=rootpath+cntlcase+seaspath+cntlcase+".cam2.h0zm.DJF.nc"
 
-testf=addfile(testpath+testfile,"r")
-cntlf=addfile(cntlpath+cntlfile,"r")
+testfANN=addfile(testfileANN,"r")
+cntlfANN=addfile(cntlfileANN,"r")
+testfJJA=addfile(testfileJJA,"r")
+cntlfJJA=addfile(cntlfileJJA,"r")
+testfDJF=addfile(testfileDJF,"r")
+cntlfDJF=addfile(cntlfileDJF,"r")
 
 emisfile="$MODEL_PATH/waccm/carma-soot/emissions/soot_virgin_galactic_base.nc"
 emisf=addfile(emisfile,"r")
@@ -27,71 +34,76 @@ soot_emis=soot_emis*1e3/365. ; Convert kg/m/y -> kg/km/day
 lev_emis=emisf->lev
 lev_emis=lev_emis/1e3  ; Convert m -> km
 
-Tsoot=testf->T
-Tcntl=cntlf->T
-Zsoot=testf->Z3
-Zcntl=cntlf->Z3
+TsootJJA=testfJJA->T
+TcntlJJA=cntlfJJA->T
+ZsootJJA=testfJJA->Z3
+ZcntlJJA=cntlfJJA->Z3
+
+TsootDJF=testfDJF->T
+TcntlDJF=cntlfDJF->T
+ZsootDJF=testfDJF->Z3
+ZcntlDJF=cntlfDJF->Z3
+
 ;QRSsoot=testf->QRS_TOT
 ;QRScntl=cntlf->QRS_TOT
 ;QRSsoot=testf->QRS_AER
 ;QRScntl=cntlf->QRS_AER
-QRSsoot=testf->QRS
-QRScntl=cntlf->QRS
+;QRSsoot=testf->QRS
+;QRScntl=cntlf->QRS
 
 ;soot_mmr=testf->SOOT01
-soot_mmr=testf->CARAER
-soot_mmr_cntl=cntlf->CARAER
+soot_mmr=testfANN->CARAER
+soot_mmr_cntl=cntlfANN->CARAER
+ZsootANN=testfANN->Z3
+ZcntlANN=cntlfANN->Z3
 
-lat=testf->lat
-lon=testf->lon
-lev=testf->lev
-time=testf->time
+lat=testfANN->lat
+lon=testfANN->lon
+lev=testfANN->lev
+time=testfANN->time
 
 nlev=dimsizes(lev)
 
 DeltaT=new((/3,nlev/),"float")
 
 
-DeltaT(0,:)=dim_avg_Wrap(Tsoot(:,{45:60}))-dim_avg_Wrap(Tcntl(:,{45:60}))
-DeltaT(1,:)=dim_avg_Wrap(Tsoot(:,{-45:-60}))-dim_avg_Wrap(Tcntl(:,{-45:-60}))
+DeltaT(0,:)=dim_avg_Wrap(TsootDJF(:,{15:45}))-dim_avg_Wrap(TcntlDJF(:,{15:45}))
+DeltaT(1,:)=dim_avg_Wrap(TsootJJA(:,{-60:-30}))-dim_avg_Wrap(TcntlJJA(:,{-60:-30}))
 DeltaT(2,:)=0.0
 
-DeltaQRS=new((/3,nlev/),"float")
-DeltaQRS(0,:)=dim_avg_Wrap(QRSsoot(:,{45:60}))-dim_avg_Wrap(QRScntl(:,{45:60}))
-DeltaQRS(1,:)=dim_avg_Wrap(QRSsoot(:,{-45:-60}))-dim_avg_Wrap(QRScntl(:,{-45:-60}))
-;DeltaQRS(0,:)=QRSsoot(:,{45})-QRScntl(:,{45})
-;DeltaQRS(1,:)=QRSsoot(:,{-45})-QRScntl(:,{-45})
-DeltaQRS=DeltaQRS*3600.*24. ; Convert K/s -> K/day
-DeltaQRS(2,:)=0.0
-;print("lev(:)===========DeltaQRS(0,:)===========DeltaQRS(1,:)=======")
-;print (lev(:)+"   |   "+DeltaQRS(0,:)+"   |   "+DeltaQRS(1,:))
+;DeltaQRS=new((/3,nlev/),"float")
+;DeltaQRS(0,:)=dim_avg_Wrap(QRSsoot(:,{45:60}))-dim_avg_Wrap(QRScntl(:,{45:60}))
+;DeltaQRS(1,:)=dim_avg_Wrap(QRSsoot(:,{-45:-60}))-dim_avg_Wrap(QRScntl(:,{-45:-60}))
+;;DeltaQRS(0,:)=QRSsoot(:,{45})-QRScntl(:,{45})
+;;DeltaQRS(1,:)=QRSsoot(:,{-45})-QRScntl(:,{-45})
+;DeltaQRS=DeltaQRS*3600.*24. ; Convert K/s -> K/day
+;DeltaQRS(2,:)=0.0
+;;print("lev(:)===========DeltaQRS(0,:)===========DeltaQRS(1,:)=======")
+;;print (lev(:)+"   |   "+DeltaQRS(0,:)+"   |   "+DeltaQRS(1,:))
 
-soot_mass=new((/4,nlev/),"float")
-soot_mass(0,:)=dim_avg_Wrap(soot_mmr(:,{45:60}))
-soot_mass(1,:)=dim_avg_Wrap(soot_mmr(:,{-45:-60}))
-soot_mass(2,:)=dim_avg_Wrap(soot_mmr_cntl(:,{45:60}))
-soot_mass(3,:)=dim_avg_Wrap(soot_mmr_cntl(:,{-45:-60}))
+soot_mass=new((/2,nlev/),"float")
+soot_mass(0,:)=dim_avg_Wrap(soot_mmr(:,{45:60}))-dim_avg_Wrap(soot_mmr_cntl(:,{45:60}))
+soot_mass(1,:)=dim_avg_Wrap(soot_mmr(:,{-45:-60}))-dim_avg_Wrap(soot_mmr_cntl(:,{-45:-60}))
 soot_mass=1e12*soot_mass  ; Convert kg soot/kg air -> ng soot/kg air
 
 z2=new((/2,nlev/),"float")
 z3=new((/3,nlev/),"float")
-z4=new((/4,nlev/),"float")
+;z4=new((/4,nlev/),"float")
 
-z2(0,:)=(dim_avg_Wrap(Zsoot(:,{45:60}))+dim_avg_Wrap(Zcntl(:,{45:60})))/2.0
-z2(1,:)=(dim_avg_Wrap(Zsoot(:,{-45:-60}))+dim_avg_Wrap(Zcntl(:,{-45:-60})))/2.0
+z2(0,:)=(dim_avg_Wrap(ZsootANN(:,{45:60}))+dim_avg_Wrap(ZcntlANN(:,{45:60})))/2.0
+z2(1,:)=(dim_avg_Wrap(ZsootANN(:,{-45:-60}))+dim_avg_Wrap(ZcntlANN(:,{-45:-60})))/2.0
 z2=z2/1e3  ; Convert m -> km
 
-z3(0:1,:)=z2
-z3(2,:)=z2(0,:)
-
-z4(0:2,:)=z3
-z4(3,:)=z2(0,:)
+z3(0,:)=(dim_avg_Wrap(ZsootDJF(:,{15:45}))+dim_avg_Wrap(ZcntlDJF(:,{15:45})))/2.0
+z3(1,:)=(dim_avg_Wrap(ZsootJJA(:,{-60:-30}))+dim_avg_Wrap(ZcntlJJA(:,{-60:-30})))/2.0
+z3(2,:)=z3(1,:)
+z3=z3/1e3  ; Convert m -> km
 
 wks   = gsn_open_wks ("pdf", "$IMG_PATH/bc/bcProfilePlot")
 ;wks   = gsn_open_wks ("pdf", "/Volumes/Data/Images/vgProfilePlot")
 
 
-  plot = new(4, graphic)
+  plot = new(3, graphic)
 
   res = True
   res@gsnDraw           = False
@@ -117,13 +129,13 @@ wks   = gsn_open_wks ("pdf", "$IMG_PATH/bc/bcProfilePlot")
   res@tiYAxisString = " "
   res@tmYLLabelsOn = False
   res@vpXF             = 0.30                  ; position and sizes
-  res@trXMinF = 45.0
-  res@trXMaxF = 85.0
+  res@trXMinF = 0.0
+  res@trXMaxF = 9.0
 ;  delete(res@trXMinF)
 ;  delete(res@trXMaxF)  
   res@tiXAxisString = "BC mass (ng/kg air)"
   
-  plot(1) = gsn_csm_xy (wks,soot_mass,z4,res)
+  plot(1) = gsn_csm_xy (wks,soot_mass,z2,res)
 
   res@vpXF             = 0.50                  ; position and sizes
   res@trXMinF = -0.5
@@ -132,13 +144,13 @@ wks   = gsn_open_wks ("pdf", "$IMG_PATH/bc/bcProfilePlot")
   
   plot(2) = gsn_csm_xy (wks,DeltaT,z3,res)
   
-  res@vpXF             = 0.70                  ; position and sizes
-  res@tmYROn = True
-  res@tmYRLabelsOn = True
-  res@trXMinF = -0.018
-  res@trXMaxF = 0.018
-  res@tiXAxisString = "~F33~D~F21~Q (K day~S~-1~N~)"
-  plot(3) = gsn_csm_xy (wks,DeltaQRS,z3,res)
+;  res@vpXF             = 0.70                  ; position and sizes
+;  res@tmYROn = True
+;  res@tmYRLabelsOn = True
+;  res@trXMinF = -0.018
+;  res@trXMaxF = 0.018
+;  res@tiXAxisString = "~F33~D~F21~Q (K day~S~-1~N~)"
+;  plot(3) = gsn_csm_xy (wks,DeltaQRS,z3,res)
 
 ;
 ; Maximize plots in frame.
