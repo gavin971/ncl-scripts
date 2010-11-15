@@ -2,27 +2,32 @@
 
 #rootpath='/data5/mmills/wa319/carma-soot'
 rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-runname='bccntl02'
-#runname='bcrckt03'
-wadir=$rootpath'/'$runname'/h0zm.annual'
+#runname='bccntl02'
+runname='bcrckt03'
+#addstr='annual'
+#addstr='JJA'
+addstr='DJF'
+wadir=$rootpath'/'$runname'/h0zm.'$addstr
 
 # script to average and standard deviation of waccm h0 files
 
 # calculate mean
 
-ncrcat -O $wadir'/'$runname'.cam2.h0zm.'*'.annual.nc' annual_tmp.nc 
-avgfile=$wadir'/'$runname'.cam2.h0zm.annual.nc'
+ncrcat -O $wadir'/'$runname'.cam2.h0zm.'*'.'$addstr'.nc' annual_tmp.nc 
+avgfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'.nc'
 
-echo created $avgfile
+echo ncwa -O -a time annual_tmp.nc $avgfile
 ncwa -O -a time annual_tmp.nc $avgfile
+#echo created $avgfile
 
 # calculate standard deviation 
 
 ncbo -O --op_typ=sub annual_tmp.nc $avgfile tmp.nc
 
-sdfile=$wadir'/'$runname'.cam2.h0zm.annual_sd.nc'
+sdfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'_sd.nc'
+echo ncra -O -y rmssdn tmp.nc $sdfile
 ncra -O -y rmssdn tmp.nc $sdfile 
-echo created $avgfile
+#echo created $sdfile
 
 rm -f tmp.nc
 rm -f annual_tmp.nc

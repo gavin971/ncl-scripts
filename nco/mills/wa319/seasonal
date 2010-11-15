@@ -1,0 +1,58 @@
+#!/bin/ksh
+
+runname='bcrckt03'
+#runname='bccntl02'
+
+#rootpath='/data5/mmills/wa319/carma-soot'
+rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+
+searchstr='cam2.h0zm'
+
+# Dec, Jan, Feb
+monthstr1='-0[12].nc'
+monthstr2='-12.nc'
+addstr='DJF'
+
+# Jun, Jul, Aug
+#monthstr1='-0[67].nc'
+#monthstr2='-08.nc'
+#addstr='JJA'
+
+year1=2035
+year2=2074
+
+wadir=$rootpath'/'$runname'/h0zm'
+anndir=$rootpath'/'$runname'/h0zm.'$addstr
+
+# script to average and standard deviation of waccm h0 files
+
+mkdir -p $anndir
+
+year=$year1
+while [[ $year -le $year2 ]];do
+
+  if [[ year -lt 10 ]]
+    then
+      yearstr='000'$year
+    elif [[ year -lt 100 ]]
+    then
+      yearstr='00'$year
+    elif [[ year -lt 1000 ]]
+    then
+      yearstr='0'$year
+    else
+      yearstr=$year
+    fi
+  
+  ncfiles1=$wadir'/'$runname'.'$searchstr'.'$yearstr*$monthstr1
+  ncfiles2=$wadir'/'$runname'.'$searchstr'.'$yearstr*$monthstr2
+  avgfile=$anndir'/'$runname'.'$searchstr'.'$yearstr'.'$addstr'.nc'
+
+  # create annual mean
+  echo averaging $ncfiles1 $ncfiles2
+  ncea $ncfiles1 $ncfiles2 $avgfile
+  echo created $avgfile
+   
+  (( year+=1 ))
+     
+done
