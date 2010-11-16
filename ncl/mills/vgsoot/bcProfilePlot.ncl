@@ -6,24 +6,54 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 testcase="bcrckt03"
 cntlcase="bccntl02"
 
+; significance level (95%)
+nyear=40
+sample_size = 2*nyear-2 
+;sig_level = t_cvf(.025,sample_size)
+sig_level = 1.99085 ; 40-year 95% significance cutoff (from IDL)
+;sig_level = 1.66462
+;sig_level = 1.29250
+iflag= False               ; population variance similar
+
 rootpath="$MODEL_PATH/waccm/run/carma-soot/"
 annpath="/h0zm.annual/"
-seaspath="/h0zm.seasavg/"
+DJFpath="/h0zm.DJF/"
+JJApath="/h0zm.JJA/"
 
 testfileANN=rootpath+testcase+annpath+testcase+".cam2.h0zm.aer.annual.nc"
-testfileJJA=rootpath+testcase+seaspath+testcase+".cam2.h0zm.JJA.nc"
-testfileDJF=rootpath+testcase+seaspath+testcase+".cam2.h0zm.DJF.nc"
+;testfileJJA=rootpath+testcase+JJApath+testcase+".cam2.h0zm.JJA.30-60S.nc"
+;testfileDJF=rootpath+testcase+DJFpath+testcase+".cam2.h0zm.DJF.15-45N.nc"
+;testsdfileJJA=rootpath+testcase+JJApath+testcase+".cam2.h0zmsd.JJA.30-60S.nc"
+;testsdfileDJF=rootpath+testcase+DJFpath+testcase+".cam2.h0zmsd.DJF.15-45N.nc"
+testfileJJA=rootpath+testcase+JJApath+testcase+".cam2.h0zm.JJA.60-75S.nc"
+testfileDJF=rootpath+testcase+DJFpath+testcase+".cam2.h0zm.DJF.15-30N.nc"
+testsdfileJJA=rootpath+testcase+JJApath+testcase+".cam2.h0zmsd.JJA.60-75S.nc"
+testsdfileDJF=rootpath+testcase+DJFpath+testcase+".cam2.h0zmsd.DJF.15-30N.nc"
 
 cntlfileANN=rootpath+cntlcase+annpath+cntlcase+".cam2.h0zm.aer.annual.nc"
-cntlfileJJA=rootpath+cntlcase+seaspath+cntlcase+".cam2.h0zm.JJA.nc"
-cntlfileDJF=rootpath+cntlcase+seaspath+cntlcase+".cam2.h0zm.DJF.nc"
+;cntlfileJJA=rootpath+cntlcase+JJApath+cntlcase+".cam2.h0zm.JJA.30-60S.nc"
+;cntlfileDJF=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zm.DJF.15-45N.nc"
+;cntlsdfileJJA=rootpath+cntlcase+JJApath+cntlcase+".cam2.h0zmsd.JJA.30-60S.nc"
+;cntlsdfileDJF=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zmsd.DJF.15-45N.nc"
+cntlfileJJA=rootpath+cntlcase+JJApath+cntlcase+".cam2.h0zm.JJA.60-75S.nc"
+cntlfileDJF=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zm.DJF.15-30N.nc"
+cntlsdfileJJA=rootpath+cntlcase+JJApath+cntlcase+".cam2.h0zmsd.JJA.60-75S.nc"
+cntlsdfileDJF=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zmsd.DJF.15-30N.nc"
 
 testfANN=addfile(testfileANN,"r")
 cntlfANN=addfile(cntlfileANN,"r")
+
 testfJJA=addfile(testfileJJA,"r")
 cntlfJJA=addfile(cntlfileJJA,"r")
+
 testfDJF=addfile(testfileDJF,"r")
 cntlfDJF=addfile(cntlfileDJF,"r")
+
+testsdfJJA=addfile(testsdfileJJA,"r")
+testsdfDJF=addfile(testsdfileDJF,"r")
+
+cntlsdfJJA=addfile(cntlsdfileJJA,"r")
+cntlsdfDJF=addfile(cntlsdfileDJF,"r")
 
 emisfile="$MODEL_PATH/waccm/carma-soot/emissions/soot_virgin_galactic_base.nc"
 emisf=addfile(emisfile,"r")
@@ -35,14 +65,54 @@ lev_emis=emisf->lev
 lev_emis=lev_emis/1e3  ; Convert m -> km
 
 TsootJJA=testfJJA->T
+print("TsootJJA:"+dimsizes(TsootJJA))
 TcntlJJA=cntlfJJA->T
+print("TcntlJJA:"+dimsizes(TcntlJJA))
+
+sd1=testsdfJJA->T
+print("sd1:"+dimsizes(sd1))
+sd2=cntlsdfJJA->T
+print("sd2:"+dimsizes(sd2))
+var1=sd1(0,:)*sd1(0,:)
+print("var1:"+dimsizes(var1))
+var2=sd2(0,:)*sd2(0,:)
+print("var2:"+dimsizes(var2))
+
+;probtJJA = ttest(TsootJJA,var1,nyear, TcntlJJA,var2,nyear, iflag, False)
+;print("probtJJA:"+dimsizes(probtJJA))
+
+se = sqrt((var1 + var2)/sample_size)
+t_JJA = abs(TsootJJA - TcntlJJA)/se
+
 ZsootJJA=testfJJA->Z3
+print("ZsootJJA:"+dimsizes(ZsootJJA))
 ZcntlJJA=cntlfJJA->Z3
+print("ZcntlJJA:"+dimsizes(ZcntlJJA))
 
 TsootDJF=testfDJF->T
 TcntlDJF=cntlfDJF->T
+TsootsdDJF=testsdfDJF->T
+print("TsootDJF:"+dimsizes(TsootDJF))
+TcntlsdDJF=cntlsdfDJF->T
+print("TcntlDJF:"+dimsizes(TcntlDJF))
+
+sd1=testsdfDJF->T
+print("sd1:"+dimsizes(sd1))
+sd2=cntlsdfDJF->T
+print("sd2:"+dimsizes(sd2))
+var1=sd1(0,:)*sd1(0,:)
+print("var1:"+dimsizes(var1))
+var2=sd2(0,:)*sd2(0,:)
+print("var2:"+dimsizes(var2))
+;probtDJF = ttest(TsootDJF,var1,nyear, TcntlDJF,var2,nyear, iflag, False)
+;print("probtDJF:"+dimsizes(probtDJF))
+se = sqrt((var1 + var2)/sample_size)
+t_DJF = abs(TsootDJF - TcntlDJF)/se
+
 ZsootDJF=testfDJF->Z3
+print("ZsootDJF:"+dimsizes(ZsootDJF))
 ZcntlDJF=cntlfDJF->Z3
+print("ZcntlDJF:"+dimsizes(ZcntlDJF))
 
 ;QRSsoot=testf->QRS_TOT
 ;QRScntl=cntlf->QRS_TOT
@@ -55,7 +125,9 @@ ZcntlDJF=cntlfDJF->Z3
 soot_mmr=testfANN->CARAER
 soot_mmr_cntl=cntlfANN->CARAER
 ZsootANN=testfANN->Z3
+print("ZsootANN:"+dimsizes(ZsootANN))
 ZcntlANN=cntlfANN->Z3
+print("ZcntlANN:"+dimsizes(ZcntlANN))
 
 lat=testfANN->lat
 lon=testfANN->lon
@@ -64,12 +136,16 @@ time=testfANN->time
 
 nlev=dimsizes(lev)
 
-DeltaT=new((/3,nlev/),"float")
+DeltaT=new((/5,nlev/),"float")
+DeltaT@_FillValue=-9999
 
+DeltaT(0,:)=TsootDJF-TcntlDJF
+DeltaT(1,:)=TsootJJA-TcntlJJA
+DeltaT(2,:)=where(t_DJF.gt.sig_level,DeltaT(0,:),-9999)
+DeltaT(3,:)=where(t_JJA.gt.sig_level,DeltaT(1,:),-9999)
+DeltaT(4,:)=0.0
 
-DeltaT(0,:)=dim_avg_Wrap(TsootDJF(:,{15:45}))-dim_avg_Wrap(TcntlDJF(:,{15:45}))
-DeltaT(1,:)=dim_avg_Wrap(TsootJJA(:,{-60:-30}))-dim_avg_Wrap(TcntlJJA(:,{-60:-30}))
-DeltaT(2,:)=0.0
+;print(TsootJJA+" | "+TcntlJJA+" | "+DeltaT(1,:))
 
 ;DeltaQRS=new((/3,nlev/),"float")
 ;DeltaQRS(0,:)=dim_avg_Wrap(QRSsoot(:,{45:60}))-dim_avg_Wrap(QRScntl(:,{45:60}))
@@ -87,19 +163,23 @@ soot_mass(1,:)=dim_avg_Wrap(soot_mmr(:,{-45:-60}))-dim_avg_Wrap(soot_mmr_cntl(:,
 soot_mass=1e12*soot_mass  ; Convert kg soot/kg air -> ng soot/kg air
 
 z2=new((/2,nlev/),"float")
-z3=new((/3,nlev/),"float")
+;z3=new((/3,nlev/),"float")
 ;z4=new((/4,nlev/),"float")
+z5=new((/5,nlev/),"float")
 
 z2(0,:)=(dim_avg_Wrap(ZsootANN(:,{45:60}))+dim_avg_Wrap(ZcntlANN(:,{45:60})))/2.0
 z2(1,:)=(dim_avg_Wrap(ZsootANN(:,{-45:-60}))+dim_avg_Wrap(ZcntlANN(:,{-45:-60})))/2.0
 z2=z2/1e3  ; Convert m -> km
 
-z3(0,:)=(dim_avg_Wrap(ZsootDJF(:,{15:45}))+dim_avg_Wrap(ZcntlDJF(:,{15:45})))/2.0
-z3(1,:)=(dim_avg_Wrap(ZsootJJA(:,{-60:-30}))+dim_avg_Wrap(ZcntlJJA(:,{-60:-30})))/2.0
-z3(2,:)=z3(1,:)
-z3=z3/1e3  ; Convert m -> km
+z5(0,:)=(ZsootDJF+ZcntlDJF)/2.0
+z5(1,:)=(ZsootJJA+ZcntlJJA)/2.0
+z5(2,:)=z5(0,:)
+z5(3,:)=z5(1,:)
+z5(4,:)=z5(1,:)
+z5=z5/1e3  ; Convert m -> km
 
-wks   = gsn_open_wks ("pdf", "$IMG_PATH/bc/bcProfilePlot")
+pdffile="$IMG_PATH/bc/bcProfilePlot.JJA60-75S.DJF15-30N"
+wks   = gsn_open_wks ("pdf", pdffile)
 ;wks   = gsn_open_wks ("pdf", "/Volumes/Data/Images/vgProfilePlot")
 
 
@@ -138,11 +218,15 @@ wks   = gsn_open_wks ("pdf", "$IMG_PATH/bc/bcProfilePlot")
   plot(1) = gsn_csm_xy (wks,soot_mass,z2,res)
 
   res@vpXF             = 0.50                  ; position and sizes
-  res@trXMinF = -0.5
-  res@trXMaxF = 0.5
+  res@trXMinF = -0.6
+  res@trXMaxF = 1.6
   res@tiXAxisString = "~F33~D~F21~T (K)"
+  res@xyMonoLineThickness = False
+  res@xyLineThicknesses = (/1.5, 1.5, 5.0, 5.0, 1.0/)
+  res@xyMonoDashPattern = False
+  res@xyDashPatterns = (/0,1,0,1,2/)
   
-  plot(2) = gsn_csm_xy (wks,DeltaT,z3,res)
+  plot(2) = gsn_csm_xy (wks,DeltaT,z5,res)
   
 ;  res@vpXF             = 0.70                  ; position and sizes
 ;  res@tmYROn = True
@@ -171,3 +255,5 @@ wks   = gsn_open_wks ("pdf", "$IMG_PATH/bc/bcProfilePlot")
 ;  gsn_panel(wks, plot, (/ 1, 2 /), resP)
 
 delete(wks)
+
+opentest = systemfunc("open "+pdffile+".pdf")
