@@ -2,14 +2,14 @@
 
 #rootpath='/data5/mmills/wa319/carma-soot'
 rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-caseid='bcrckt03'
-#caseid='bccntl02'
+#caseid='bcrckt03'
+caseid='bccntl02'
 
 wadir=$rootpath'/'$caseid'/h0'
 outdir=$rootpath'/'$caseid'/h0zm'
 
-year1=2035
-year2=2066
+year1=2072
+year2=2074
 
 mkdir -p $outdir
 

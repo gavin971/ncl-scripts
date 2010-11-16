@@ -2,57 +2,62 @@
 
 ###.......creates monthly means from all available years.......
 
-echo zmavg
+  echo zmavg
 
 #rootpath='/data5/mmills/wa319/carma-soot'
-rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-#runname='bccntl02'
-runname='bcrckt03'
-
-wadir=$rootpath'/'$runname'/h0zm'
-outdir=$rootpath'/'$runname'/h0zm.seaslatavg'
-mkdir -p $outdir
-
-# script to average and standard deviation of waccm h0 files
-
-# Jan, Feb, Mar
-#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[123].nc'
-#  avgfile=$outdir'/'$runname'.cam2.h0zm.JFM.nc'
-#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.JFM.nc'
+  rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+  runname='bccntl02'
+#  runname='bcrckt03'
 
 # Dec, Jan, Feb
-  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[12].nc'
-  ncfiles2=$wadir'/'$runname'.cam2.h0zm.*-12.nc'
-  avgfile=$outdir'/'$runname'.cam2.h0zm.DJF.nc'
-  sdfile=$outdir'/'$runname'.cam2.h0zmsd.DJF.nc'
+#  addstr='DJF'
+# Jun, Jul, Aug
+  addstr='JJA'
+
+  wadir=$rootpath'/'$runname'/h0zm.'$addstr
+
+# Dec, Jan, Feb
+#  avgfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'.15-45N.nc'
+#  sdfile=$wadir'/'$runname'.cam2.h0zmsd.'$addstr'.15-45N.nc'
+#  avgfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'.15-30N.nc'
+#  sdfile=$wadir'/'$runname'.cam2.h0zmsd.'$addstr'.15-30N.nc'
 
 # Jun, Jul, Aug
-#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[678].nc'
-#  avgfile=$outdir'/'$runname'.cam2.h0zm.JJA.nc'
-#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.JJA.nc'
-
-# Aug, Sep, Oct
-#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[89].nc'
-#  ncfiles2=$wadir'/'$runname'.cam2.h0zm.*-10.nc'
-#  avgfile=$outdir'/'$runname'.cam2.h0zm.ASO.nc'
-#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.ASO.nc'
-
-  echo $ncfiles
-  echo $ncfiles2
+#  avgfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'.30-60S.nc'
+#  sdfile=$wadir'/'$runname'.cam2.h0zmsd.'$addstr'.30-60S.nc'
+  avgfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'.60-75S.nc'
+  sdfile=$wadir'/'$runname'.cam2.h0zmsd.'$addstr'.60-75S.nc'
+  
   echo $avgfile
   echo $sdfile
-
-#  echo "ncrcat -O $ncfiles zmtmp.nc"
-#  ncrcat -O $ncfiles zmtmp.nc
-  echo "ncrcat -O $ncfiles $ncfiles2 zmtmp.nc"
-  ncrcat -O $ncfiles $ncfiles2 zmtmp.nc
   
-  echo "ncwa -O -I -a time zmtmp.nc $avgfile"
-  ncwa -O -I -a time,lat -d lat,15,45 zmtmp.nc $avgfile 
-  echo "ncbo -O -D 2 --op_typ=sub zmtmp.nc $avgfile tmp.nc"
-  ncbo -O -D 2 --op_typ=sub zmtmp.nc $avgfile tmp.nc
+  ncfiles=$wadir'/'$runname'.cam2.h0zm.20*.'$addstr'.nc'
+
+  echo "ncrcat -O $ncfiles zmtmp.nc"
+  ncrcat -O $ncfiles zmtmp.nc
+  
+# Dec, Jan, Feb
+#  echo "ncwa -O -I -a lat -d lat,15.0,45.0 -w gw zmtmp.nc zmtmp2.nc"
+#  ncwa -O -I -a lat -d lat,15.0,45.0 -w gw zmtmp.nc zmtmp2.nc
+#  echo "ncwa -O -I -a lat -d lat,15.0,30.0 -w gw zmtmp.nc zmtmp2.nc"
+#  ncwa -O -I -a lat -d lat,15.0,30.0 -w gw zmtmp.nc zmtmp2.nc
+  
+# Jun, Jul, Aug
+#  echo "ncwa -O -I -a lat -d lat,-60.0,-30.0 -w gw zmtmp.nc zmtmp2.nc"
+#  ncwa -O -I -a lat -d lat,-60.0,-30.0 -w gw zmtmp.nc zmtmp2.nc
+  echo "ncwa -O -I -a lat -d lat,-75.0,-60.0 -w gw zmtmp.nc zmtmp2.nc"
+  ncwa -O -I -a lat -d lat,-75.0,-60.0 -w gw zmtmp.nc zmtmp2.nc
+  
+  echo "ncwa -O -I -a time zmtmp2.nc $avgfile"
+  ncwa -O -I -a time zmtmp2.nc $avgfile
+   
+  echo "ncbo -O -D 2 --op_typ=sub zmtmp2.nc $avgfile tmp.nc"
+  ncbo -O -D 2 --op_typ=sub zmtmp2.nc $avgfile tmp.nc
+  
   echo "ncra -O -y rmssdn tmp.nc $sdfile"
   ncra -O -y rmssdn tmp.nc $sdfile
+  
   rm zmtmp.nc
+  rm zmtmp2.nc
   rm tmp.nc
 

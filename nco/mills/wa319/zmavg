@@ -6,8 +6,8 @@ echo zmavg
 
 #rootpath='/data5/mmills/wa319/carma-soot'
 rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-#runname='bccntl02'
-runname='bcrckt03'
+runname='bccntl02'
+#runname='bcrckt03'
 
 wadir=$rootpath'/'$runname'/h0zm'
 outdir=$rootpath'/'$runname'/h0zm.monavg'

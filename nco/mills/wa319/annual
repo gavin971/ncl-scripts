@@ -5,8 +5,8 @@
 #runname='b40.1850.track1.2deg.wcm.007'
 #runname='b40.20th.2deg.wset.001'
 #runname='b40.1955-2005.2deg.wcm.002'
-#runname='bcrckt03'
-runname='bccntl02'
+runname='bcrckt03'
+#runname='bccntl02'
 
 #rootpath='/data5/mmills/wa319/carma-soot'
 rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
@@ -19,8 +19,8 @@ searchstr='cam2.h0zm'
 #searchstr='cam2.h0'
 addstr='annual'
 
-year1=2035
-year2=2066
+year1=2067
+year2=2074
 
 
 # script to average and standard deviation of waccm h0 files
