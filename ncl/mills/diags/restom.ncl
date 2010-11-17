@@ -9,16 +9,20 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 ;year0 = 96
 ;run_name = "b40.1850.track1.2deg.wcm.007"
 
-nyears=-1
+nyears=50
 
-year0 = 1
+year0 = 2025
 ;run_name = "b40.1850.2deg.wset.001"
-run_name = "b40.1850.2deg.wset.003"
-in_dir ="/data3/mmills/"+run_name+"/h0/"
-save_dir ="/data3/mmills/"+run_name+"/analysis/"
+;run_name = "b40.1850.2deg.wset.003"
+;run_name = "bccntl02"
+run_name = "bcrckt03"
+rootpath="$MODEL_PATH/waccm/run/carma-soot/"
+in_dir =rootpath+run_name+"/h0/"
+save_dir =rootpath+run_name+"/analysis/"
 savefile=save_dir+run_name+"_RESTOM.nc"
 
-pdffile="~/images/"+run_name+"_RESTOM"
+image_path=getenv("IMAGE_PATH")
+pdffile=image_path+"/"+run_name+"_RESTOM"
 print("Creating PDF file "+pdffile+".pdf")
 wks   = gsn_open_wks ("pdf", pdffile)
 
@@ -197,7 +201,7 @@ print(year+" "+restom_ann_w+" "+ts_ann_w+" "+ts_land_ann_w+" "+sst_ann_w)
 res1@tiMainString  = "RESTOM" ; title
 res1@gsnYRefLine           = 0.              ; reference line   
 res1@trYMinF = -4
-res1@trYMaxF = 4
+res1@trYMaxF = 6
 res1@vpXF              = 0.1    ; X,Y position of first plot
 res1@vpYF              = 0.91
 print("year:"+dimsizes(year))
@@ -246,5 +250,6 @@ print("gv "+pdffile+".pdf")
 print("mutt -a "+pdffile+".pdf mikejmills@mac.com < /dev/null")
 
 frame(wks)
+opentest = systemfunc("open "+pdffile+".pdf")
 ;end
 

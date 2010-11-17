@@ -27,8 +27,10 @@ testfileANN=rootpath+testcase+annpath+testcase+".cam2.h0zm.aer.annual.nc"
 ;testsdfileDJF=rootpath+testcase+DJFpath+testcase+".cam2.h0zmsd.DJF.15-45N.nc"
 testfileJJA=rootpath+testcase+JJApath+testcase+".cam2.h0zm.JJA.60-75S.nc"
 testfileDJF=rootpath+testcase+DJFpath+testcase+".cam2.h0zm.DJF.15-30N.nc"
+testfileDJF2=rootpath+testcase+DJFpath+testcase+".cam2.h0zm.DJF.75-90S.nc"
 testsdfileJJA=rootpath+testcase+JJApath+testcase+".cam2.h0zmsd.JJA.60-75S.nc"
 testsdfileDJF=rootpath+testcase+DJFpath+testcase+".cam2.h0zmsd.DJF.15-30N.nc"
+testsdfileDJF2=rootpath+testcase+DJFpath+testcase+".cam2.h0zmsd.DJF.75-90S.nc"
 
 cntlfileANN=rootpath+cntlcase+annpath+cntlcase+".cam2.h0zm.aer.annual.nc"
 ;cntlfileJJA=rootpath+cntlcase+JJApath+cntlcase+".cam2.h0zm.JJA.30-60S.nc"
@@ -37,8 +39,10 @@ cntlfileANN=rootpath+cntlcase+annpath+cntlcase+".cam2.h0zm.aer.annual.nc"
 ;cntlsdfileDJF=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zmsd.DJF.15-45N.nc"
 cntlfileJJA=rootpath+cntlcase+JJApath+cntlcase+".cam2.h0zm.JJA.60-75S.nc"
 cntlfileDJF=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zm.DJF.15-30N.nc"
+cntlfileDJF2=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zm.DJF.75-90S.nc"
 cntlsdfileJJA=rootpath+cntlcase+JJApath+cntlcase+".cam2.h0zmsd.JJA.60-75S.nc"
 cntlsdfileDJF=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zmsd.DJF.15-30N.nc"
+cntlsdfileDJF2=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zmsd.DJF.75-90S.nc"
 
 testfANN=addfile(testfileANN,"r")
 cntlfANN=addfile(cntlfileANN,"r")
@@ -114,12 +118,52 @@ print("ZsootDJF:"+dimsizes(ZsootDJF))
 ZcntlDJF=cntlfDJF->Z3
 print("ZcntlDJF:"+dimsizes(ZcntlDJF))
 
-;QRSsoot=testf->QRS_TOT
-;QRScntl=cntlf->QRS_TOT
-;QRSsoot=testf->QRS_AER
-;QRScntl=cntlf->QRS_AER
-;QRSsoot=testf->QRS
-;QRScntl=cntlf->QRS
+; Ozone =============================
+; 15-45N
+O3sootJJA=testfJJA->O3
+print("O3sootJJA:"+dimsizes(O3sootJJA))
+O3cntlJJA=cntlfJJA->O3
+print("O3cntlJJA:"+dimsizes(O3cntlJJA))
+
+sd1=testsdfJJA->O3
+print("sd1:"+dimsizes(sd1))
+sd2=cntlsdfJJA->O3
+print("sd2:"+dimsizes(sd2))
+var1=sd1(0,:)*sd1(0,:)
+print("var1:"+dimsizes(var1))
+var2=sd2(0,:)*sd2(0,:)
+print("var2:"+dimsizes(var2))
+se = sqrt((var1 + var2)/sample_size)
+t_JJA = abs(O3sootJJA - O3cntlJJA)/se
+
+ZsootJJA=testfJJA->Z3
+print("ZsootJJA:"+dimsizes(ZsootJJA))
+ZcntlJJA=cntlfJJA->Z3
+print("ZcntlJJA:"+dimsizes(ZcntlJJA))
+
+; 75-90S
+O3sootJJA2=testfJJA2->O3
+print("O3sootJJA2:"+dimsizes(O3sootJJA2))
+O3cntlJJA2=cntlfJJA2->O3
+print("O3cntlJJA2:"+dimsizes(O3cntlJJA2))
+
+sd1=testsdfJJA2->O3
+print("sd1:"+dimsizes(sd1))
+sd2=cntlsdfJJA2->O3
+print("sd2:"+dimsizes(sd2))
+var1=sd1(0,:)*sd1(0,:)
+print("var1:"+dimsizes(var1))
+var2=sd2(0,:)*sd2(0,:)
+print("var2:"+dimsizes(var2))
+se = sqrt((var1 + var2)/sample_size)
+t_JJA2 = abs(O3sootJJA2 - O3cntlJJA2)/se
+
+ZsootJJA2=testfJJA2->Z3
+print("ZsootJJA2:"+dimsizes(ZsootJJA2))
+ZcntlJJA2=cntlfJJA2->Z3
+print("ZcntlJJA2:"+dimsizes(ZcntlJJA2))
+
+
 
 ;soot_mmr=testf->SOOT01
 soot_mmr=testfANN->CARAER
@@ -183,7 +227,7 @@ wks   = gsn_open_wks ("pdf", pdffile)
 ;wks   = gsn_open_wks ("pdf", "/Volumes/Data/Images/vgProfilePlot")
 
 
-  plot = new(3, graphic)
+  plot = new(4, graphic)
 
   res = True
   res@gsnDraw           = False
@@ -234,7 +278,7 @@ wks   = gsn_open_wks ("pdf", pdffile)
 ;  res@trXMinF = -0.018
 ;  res@trXMaxF = 0.018
 ;  res@tiXAxisString = "~F33~D~F21~Q (K day~S~-1~N~)"
-;  plot(3) = gsn_csm_xy (wks,DeltaQRS,z3,res)
+  plot(4) = gsn_csm_xy (wks,DeltaO3,z3,res)
 
 ;
 ; Maximize plots in frame.
