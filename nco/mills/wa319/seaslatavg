@@ -6,13 +6,13 @@
 
 #rootpath='/data5/mmills/wa319/carma-soot'
   rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-  runname='bccntl02'
-#  runname='bcrckt03'
+#  runname='bccntl02'
+  runname='bcrckt03'
 
 # Dec, Jan, Feb
-#  addstr='DJF'
+  addstr='DJF'
 # Jun, Jul, Aug
-  addstr='JJA'
+#  addstr='JJA'
 
   wadir=$rootpath'/'$runname'/h0zm.'$addstr
 
@@ -21,12 +21,14 @@
 #  sdfile=$wadir'/'$runname'.cam2.h0zmsd.'$addstr'.15-45N.nc'
 #  avgfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'.15-30N.nc'
 #  sdfile=$wadir'/'$runname'.cam2.h0zmsd.'$addstr'.15-30N.nc'
+  avgfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'.75-90S.nc'
+  sdfile=$wadir'/'$runname'.cam2.h0zmsd.'$addstr'.75-90S.nc'
 
 # Jun, Jul, Aug
 #  avgfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'.30-60S.nc'
 #  sdfile=$wadir'/'$runname'.cam2.h0zmsd.'$addstr'.30-60S.nc'
-  avgfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'.60-75S.nc'
-  sdfile=$wadir'/'$runname'.cam2.h0zmsd.'$addstr'.60-75S.nc'
+#  avgfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'.60-75S.nc'
+#  sdfile=$wadir'/'$runname'.cam2.h0zmsd.'$addstr'.60-75S.nc'
   
   echo $avgfile
   echo $sdfile
@@ -41,12 +43,14 @@
 #  ncwa -O -I -a lat -d lat,15.0,45.0 -w gw zmtmp.nc zmtmp2.nc
 #  echo "ncwa -O -I -a lat -d lat,15.0,30.0 -w gw zmtmp.nc zmtmp2.nc"
 #  ncwa -O -I -a lat -d lat,15.0,30.0 -w gw zmtmp.nc zmtmp2.nc
+  echo "ncwa -O -I -a lat -d lat,-91.0,-75.0 -w gw zmtmp.nc zmtmp2.nc"
+  ncwa -O -I -a lat -d lat,-91.0,-75.0 -w gw zmtmp.nc zmtmp2.nc
   
 # Jun, Jul, Aug
 #  echo "ncwa -O -I -a lat -d lat,-60.0,-30.0 -w gw zmtmp.nc zmtmp2.nc"
 #  ncwa -O -I -a lat -d lat,-60.0,-30.0 -w gw zmtmp.nc zmtmp2.nc
-  echo "ncwa -O -I -a lat -d lat,-75.0,-60.0 -w gw zmtmp.nc zmtmp2.nc"
-  ncwa -O -I -a lat -d lat,-75.0,-60.0 -w gw zmtmp.nc zmtmp2.nc
+#  echo "ncwa -O -I -a lat -d lat,-75.0,-60.0 -w gw zmtmp.nc zmtmp2.nc"
+#  ncwa -O -I -a lat -d lat,-75.0,-60.0 -w gw zmtmp.nc zmtmp2.nc
   
   echo "ncwa -O -I -a time zmtmp2.nc $avgfile"
   ncwa -O -I -a time zmtmp2.nc $avgfile

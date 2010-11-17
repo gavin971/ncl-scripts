@@ -2,8 +2,8 @@
 
 #rootpath='/data5/mmills/wa319/carma-soot'
 rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-#runname='bccntl02'
-runname='bcrckt03'
+runname='bccntl02'
+#runname='bcrckt03'
 #addstr='annual'
 #addstr='JJA'
 addstr='DJF'
@@ -13,7 +13,8 @@ wadir=$rootpath'/'$runname'/h0zm.'$addstr
 
 # calculate mean
 
-ncrcat -O $wadir'/'$runname'.cam2.h0zm.'*'.'$addstr'.nc' annual_tmp.nc 
+echo ncrcat -O $wadir'/'$runname'.cam2.h0zm.20'*'.'$addstr'.nc' annual_tmp.nc
+ncrcat -O $wadir'/'$runname'.cam2.h0zm.20'*'.'$addstr'.nc' annual_tmp.nc 
 avgfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'.nc'
 
 echo ncwa -O -a time annual_tmp.nc $avgfile
