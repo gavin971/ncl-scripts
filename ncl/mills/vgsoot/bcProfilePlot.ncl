@@ -27,10 +27,9 @@ testfileANN=rootpath+testcase+annpath+testcase+".cam2.h0zm.aer.annual.nc"
 ;testsdfileDJF=rootpath+testcase+DJFpath+testcase+".cam2.h0zmsd.DJF.15-45N.nc"
 testfileJJA=rootpath+testcase+JJApath+testcase+".cam2.h0zm.JJA.60-75S.nc"
 testfileDJF=rootpath+testcase+DJFpath+testcase+".cam2.h0zm.DJF.15-30N.nc"
-testfileDJF2=rootpath+testcase+DJFpath+testcase+".cam2.h0zm.DJF.75-90S.nc"
+testfileDJF2=rootpath+testcase+DJFpath+testcase+".cam2.h0zm.DJF.nc"
 testsdfileJJA=rootpath+testcase+JJApath+testcase+".cam2.h0zmsd.JJA.60-75S.nc"
 testsdfileDJF=rootpath+testcase+DJFpath+testcase+".cam2.h0zmsd.DJF.15-30N.nc"
-testsdfileDJF2=rootpath+testcase+DJFpath+testcase+".cam2.h0zmsd.DJF.75-90S.nc"
 
 cntlfileANN=rootpath+cntlcase+annpath+cntlcase+".cam2.h0zm.aer.annual.nc"
 ;cntlfileJJA=rootpath+cntlcase+JJApath+cntlcase+".cam2.h0zm.JJA.30-60S.nc"
@@ -39,10 +38,9 @@ cntlfileANN=rootpath+cntlcase+annpath+cntlcase+".cam2.h0zm.aer.annual.nc"
 ;cntlsdfileDJF=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zmsd.DJF.15-45N.nc"
 cntlfileJJA=rootpath+cntlcase+JJApath+cntlcase+".cam2.h0zm.JJA.60-75S.nc"
 cntlfileDJF=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zm.DJF.15-30N.nc"
-cntlfileDJF2=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zm.DJF.75-90S.nc"
+cntlfileDJF2=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zm.DJF.nc"
 cntlsdfileJJA=rootpath+cntlcase+JJApath+cntlcase+".cam2.h0zmsd.JJA.60-75S.nc"
 cntlsdfileDJF=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zmsd.DJF.15-30N.nc"
-cntlsdfileDJF2=rootpath+cntlcase+DJFpath+cntlcase+".cam2.h0zmsd.DJF.75-90S.nc"
 
 testfANN=addfile(testfileANN,"r")
 cntlfANN=addfile(cntlfileANN,"r")
@@ -53,6 +51,9 @@ cntlfJJA=addfile(cntlfileJJA,"r")
 testfDJF=addfile(testfileDJF,"r")
 cntlfDJF=addfile(cntlfileDJF,"r")
 
+testfDJF2=addfile(testfileDJF2,"r")
+cntlfDJF2=addfile(cntlfileDJF2,"r")
+
 testsdfJJA=addfile(testsdfileJJA,"r")
 testsdfDJF=addfile(testsdfileDJF,"r")
 
@@ -61,6 +62,13 @@ cntlsdfDJF=addfile(cntlsdfileDJF,"r")
 
 emisfile="$MODEL_PATH/waccm/carma-soot/emissions/soot_virgin_galactic_base.nc"
 emisf=addfile(emisfile,"r")
+
+lat=testfANN->lat
+lon=testfANN->lon
+lev=testfANN->lev
+time=testfANN->time
+
+nlev=dimsizes(lev)
 
 soot_emis=emisf->SOOT
 soot_emis=soot_emis*1e3/365. ; Convert kg/m/y -> kg/km/day
@@ -118,52 +126,36 @@ print("ZsootDJF:"+dimsizes(ZsootDJF))
 ZcntlDJF=cntlfDJF->Z3
 print("ZcntlDJF:"+dimsizes(ZcntlDJF))
 
+tsoot_ANN=testfANN->T
+tcntl_ANN=cntlfANN->T
+
 ; Ozone =============================
-; 15-45N
-O3sootJJA=testfJJA->O3
-print("O3sootJJA:"+dimsizes(O3sootJJA))
-O3cntlJJA=cntlfJJA->O3
-print("O3cntlJJA:"+dimsizes(O3cntlJJA))
+O3sootDJF=testfDJF2->O3
+print("O3sootDJF:"+dimsizes(O3sootDJF))
+O3cntlDJF=cntlfDJF2->O3
+print("O3cntlDJF:"+dimsizes(O3cntlDJF))
 
-sd1=testsdfJJA->O3
-print("sd1:"+dimsizes(sd1))
-sd2=cntlsdfJJA->O3
-print("sd2:"+dimsizes(sd2))
-var1=sd1(0,:)*sd1(0,:)
-print("var1:"+dimsizes(var1))
-var2=sd2(0,:)*sd2(0,:)
-print("var2:"+dimsizes(var2))
-se = sqrt((var1 + var2)/sample_size)
-t_JJA = abs(O3sootJJA - O3cntlJJA)/se
+ZsootDJF2=testfDJF2->Z3
+print("ZsootDJF:"+dimsizes(ZsootDJF))
+ZcntlDJF2=cntlfDJF2->Z3
+print("ZcntlDJF:"+dimsizes(ZcntlDJF))
 
-ZsootJJA=testfJJA->Z3
-print("ZsootJJA:"+dimsizes(ZsootJJA))
-ZcntlJJA=cntlfJJA->Z3
-print("ZcntlJJA:"+dimsizes(ZcntlJJA))
+DeltaO3=new((/4,nlev/),"float")
+DeltaO3@_FillValue=-9999
+DeltaO3(0,:)=dim_avg_Wrap(O3sootDJF(:,{45:60}))-dim_avg_Wrap(O3cntlDJF(:,{45:60}))
+DeltaO3(1,:)=dim_avg_Wrap(O3sootDJF(:,{-15:15}))-dim_avg_Wrap(O3cntlDJF(:,{-15:15}))
+DeltaO3(2,:)=dim_avg_Wrap(O3sootDJF(:,{-60:-45}))-dim_avg_Wrap(O3cntlDJF(:,{-60:-45}))
+DeltaO3(3,:)=0.0
+DeltaO3=DeltaO3*1e9 ; Convert to ppbv
 
-; 75-90S
-O3sootJJA2=testfJJA2->O3
-print("O3sootJJA2:"+dimsizes(O3sootJJA2))
-O3cntlJJA2=cntlfJJA2->O3
-print("O3cntlJJA2:"+dimsizes(O3cntlJJA2))
+zO3=new((/4,nlev/),"float")
+zO3(0,:)=(dim_avg_Wrap(ZsootDJF2(:,{45:60}))+dim_avg_Wrap(ZcntlDJF2(:,{45:60})))/2.0
+zO3(1,:)=(dim_avg_Wrap(ZsootDJF2(:,{-15:15}))+dim_avg_Wrap(ZcntlDJF2(:,{-15:15})))/2.0
+zO3(2,:)=(dim_avg_Wrap(ZsootDJF2(:,{-60:-45}))+dim_avg_Wrap(ZcntlDJF2(:,{-60:-45})))/2.0
+zO3(3,:)=zO3(1,:)
+zO3=zO3/1e3  ; Convert m -> km
 
-sd1=testsdfJJA2->O3
-print("sd1:"+dimsizes(sd1))
-sd2=cntlsdfJJA2->O3
-print("sd2:"+dimsizes(sd2))
-var1=sd1(0,:)*sd1(0,:)
-print("var1:"+dimsizes(var1))
-var2=sd2(0,:)*sd2(0,:)
-print("var2:"+dimsizes(var2))
-se = sqrt((var1 + var2)/sample_size)
-t_JJA2 = abs(O3sootJJA2 - O3cntlJJA2)/se
-
-ZsootJJA2=testfJJA2->Z3
-print("ZsootJJA2:"+dimsizes(ZsootJJA2))
-ZcntlJJA2=cntlfJJA2->Z3
-print("ZcntlJJA2:"+dimsizes(ZcntlJJA2))
-
-
+;======================
 
 ;soot_mmr=testf->SOOT01
 soot_mmr=testfANN->CARAER
@@ -173,33 +165,16 @@ print("ZsootANN:"+dimsizes(ZsootANN))
 ZcntlANN=cntlfANN->Z3
 print("ZcntlANN:"+dimsizes(ZcntlANN))
 
-lat=testfANN->lat
-lon=testfANN->lon
-lev=testfANN->lev
-time=testfANN->time
-
-nlev=dimsizes(lev)
-
-DeltaT=new((/5,nlev/),"float")
+DeltaT=new((/3,nlev/),"float")
 DeltaT@_FillValue=-9999
+;DeltaT(0,:)=TsootDJF-TcntlDJF
+;DeltaT(1,:)=TsootJJA-TcntlJJA
+DeltaT(0,:)=(dim_avg_Wrap(tsoot_ANN(:,{60:75}))-dim_avg_Wrap(tcntl_ANN(:,{60:75})))
+DeltaT(1,:)=(dim_avg_Wrap(tsoot_ANN(:,{-60:-40}))-dim_avg_Wrap(tcntl_ANN(:,{-60:-40})))
+;DeltaT(2,:)=where(t_DJF.gt.sig_level,DeltaT(0,:),-9999)
+;DeltaT(3,:)=where(t_JJA.gt.sig_level,DeltaT(1,:),-9999)
+DeltaT(2,:)=0.0
 
-DeltaT(0,:)=TsootDJF-TcntlDJF
-DeltaT(1,:)=TsootJJA-TcntlJJA
-DeltaT(2,:)=where(t_DJF.gt.sig_level,DeltaT(0,:),-9999)
-DeltaT(3,:)=where(t_JJA.gt.sig_level,DeltaT(1,:),-9999)
-DeltaT(4,:)=0.0
-
-;print(TsootJJA+" | "+TcntlJJA+" | "+DeltaT(1,:))
-
-;DeltaQRS=new((/3,nlev/),"float")
-;DeltaQRS(0,:)=dim_avg_Wrap(QRSsoot(:,{45:60}))-dim_avg_Wrap(QRScntl(:,{45:60}))
-;DeltaQRS(1,:)=dim_avg_Wrap(QRSsoot(:,{-45:-60}))-dim_avg_Wrap(QRScntl(:,{-45:-60}))
-;;DeltaQRS(0,:)=QRSsoot(:,{45})-QRScntl(:,{45})
-;;DeltaQRS(1,:)=QRSsoot(:,{-45})-QRScntl(:,{-45})
-;DeltaQRS=DeltaQRS*3600.*24. ; Convert K/s -> K/day
-;DeltaQRS(2,:)=0.0
-;;print("lev(:)===========DeltaQRS(0,:)===========DeltaQRS(1,:)=======")
-;;print (lev(:)+"   |   "+DeltaQRS(0,:)+"   |   "+DeltaQRS(1,:))
 
 soot_mass=new((/2,nlev/),"float")
 soot_mass(0,:)=dim_avg_Wrap(soot_mmr(:,{45:60}))-dim_avg_Wrap(soot_mmr_cntl(:,{45:60}))
@@ -209,20 +184,22 @@ soot_mass=1e12*soot_mass  ; Convert kg soot/kg air -> ng soot/kg air
 z2=new((/2,nlev/),"float")
 ;z3=new((/3,nlev/),"float")
 ;z4=new((/4,nlev/),"float")
-z5=new((/5,nlev/),"float")
 
 z2(0,:)=(dim_avg_Wrap(ZsootANN(:,{45:60}))+dim_avg_Wrap(ZcntlANN(:,{45:60})))/2.0
 z2(1,:)=(dim_avg_Wrap(ZsootANN(:,{-45:-60}))+dim_avg_Wrap(ZcntlANN(:,{-45:-60})))/2.0
 z2=z2/1e3  ; Convert m -> km
 
-z5(0,:)=(ZsootDJF+ZcntlDJF)/2.0
-z5(1,:)=(ZsootJJA+ZcntlJJA)/2.0
-z5(2,:)=z5(0,:)
-z5(3,:)=z5(1,:)
-z5(4,:)=z5(1,:)
-z5=z5/1e3  ; Convert m -> km
+zT=new((/3,nlev/),"float")
+;zT(0,:)=(ZsootDJF+ZcntlDJF)/2.0
+;zT(1,:)=(ZsootJJA+ZcntlJJA)/2.0
+zT(0:1,:)=z2
+;zT(2,:)=z5(0,:)
+;zT(3,:)=z5(1,:)
+zT(2,:)=zT(1,:)
+;zT=zT/1e3  ; Convert m -> km
 
-pdffile="$IMG_PATH/bc/bcProfilePlot.JJA60-75S.DJF15-30N"
+;pdffile="$IMG_PATH/bc/bcProfilePlot.JJA60-75S.DJF15-30N"
+pdffile="$IMG_PATH/bc/bcProfilePlot"
 wks   = gsn_open_wks ("pdf", pdffile)
 ;wks   = gsn_open_wks ("pdf", "/Volumes/Data/Images/vgProfilePlot")
 
@@ -241,7 +218,7 @@ wks   = gsn_open_wks ("pdf", pdffile)
   res@xyLineThicknessF = 2.5
   res@xyMonoLineThickness = True
   
-  res@trYMinF = 10.0
+  res@trYMinF = 2.0
   res@trYMaxF = 50.0
 ;  res@trXMinF = -0.5
   res@trXMaxF = 295.0
@@ -253,32 +230,43 @@ wks   = gsn_open_wks ("pdf", pdffile)
   res@tiYAxisString = " "
   res@tmYLLabelsOn = False
   res@vpXF             = 0.30                  ; position and sizes
-  res@trXMinF = 0.0
-  res@trXMaxF = 9.0
+  res@trXMinF = -0.25
+  res@trXMaxF = 8.5
 ;  delete(res@trXMinF)
 ;  delete(res@trXMaxF)  
+;  res@xyMonoDashPattern = True
+  res@xyDashPatterns = (/0,1,2/)
+;  res@xyLineColors = (/"Blue","Red","Black"/)
   res@tiXAxisString = "BC mass (ng/kg air)"
   
   plot(1) = gsn_csm_xy (wks,soot_mass,z2,res)
 
   res@vpXF             = 0.50                  ; position and sizes
-  res@trXMinF = -0.6
-  res@trXMaxF = 1.6
+  res@trXMinF = -0.45
+  res@trXMaxF = 0.35
   res@tiXAxisString = "~F33~D~F21~T (K)"
   res@xyMonoLineThickness = False
-  res@xyLineThicknesses = (/1.5, 1.5, 5.0, 5.0, 1.0/)
-  res@xyMonoDashPattern = False
-  res@xyDashPatterns = (/0,1,0,1,2/)
+;  res@xyLineThicknesses = (/1.5, 1.5, 5.0, 5.0, 1.0/)
+  res@xyLineThicknesses = (/2.5, 2.5, 1.0/)
+;  res@xyMonoDashPattern = False
+  res@xyDashPatterns = (/0,1,2/)
+;  res@xyLineColors = (/"Dark Green","Red","Black"/)
   
-  plot(2) = gsn_csm_xy (wks,DeltaT,z5,res)
+  plot(2) = gsn_csm_xy (wks,DeltaT,zT,res)
   
-;  res@vpXF             = 0.70                  ; position and sizes
-;  res@tmYROn = True
-;  res@tmYRLabelsOn = True
-;  res@trXMinF = -0.018
-;  res@trXMaxF = 0.018
-;  res@tiXAxisString = "~F33~D~F21~Q (K day~S~-1~N~)"
-  plot(4) = gsn_csm_xy (wks,DeltaO3,z3,res)
+  res@vpXF             = 0.70                  ; position and sizes
+  res@tmYROn = True
+  res@tmYRLabelsOn = True
+  res@trXMinF=-55
+  res@trXMaxF=45
+;  delete(res@xyLineColors)
+  delete(res@xyDashPatterns)
+  delete(res@xyLineThicknesses)
+  res@tiXAxisString = "~F33~D~F21~O~B~3~N~ (ppbv)"
+  res@xyDashPatterns = (/0,1,3,2/)
+  res@xyLineThicknesses = (/2.5, 2.5, 2.5, 1.0/)
+;  res@xyLineColors = (/"Blue","Dark Green","Red","Black"/)
+  plot(3) = gsn_csm_xy (wks,DeltaO3,zO3,res)
 
 ;
 ; Maximize plots in frame.
