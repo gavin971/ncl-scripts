@@ -1,6 +1,6 @@
 ; Nuclear Soot
 
-load "ncl-scripts/core.ncl"
+load "core.ncl"
 
 ; Add tracers to the initial conditions file.
 ;
@@ -134,17 +134,16 @@ end
 ; NOTE: The values for nbin, rmin, rmrat. and rho should match those
 ; in CARMA (aerrad.h and defineaer.f).
 undef("newic")
-procedure newic(srcIcPath:string)
+procedure newic(srcIcPath:string, srcIcFile:string, icFileName:string, mmr:float)
 
 begin
-  system("mkdir -p dyn")
 
-  icPath    = "dyn/waccm319_8_smaxa_soot1Tg.cam2.i.2025-01-01-00000.nc"
+  icPath    = srcIcPath+"/"+icFileName
   
   ; Copy the initial conditions file.
   print("  Creating " + icPath)
-  print("    from " + srcIcPath)
-  system("cp " + srcIcPath + " " + icPath)
+  print("    from " + srcIcPath + "/" + srcIcFile)
+  system("cp " + srcIcPath + "/" + srcIcFile + " " + icPath)
 
   ; Add initial conditions for Sulfate CN from a
   ; lognormal distribution.
@@ -155,7 +154,7 @@ begin
   
   ; 12 ppmm x 4 deg lat x 5 deg long x 300 - 150 mbar = 5 Tg Soot
 ;  mmr = 1.8031e-5
-  mmr = 3.6062e-6 ; 1 Tg soot
+;  mmr = 3.6062e-6 ; 1 Tg soot
     
   ; Open the initial conditions file.
   icFile = addfile(icPath, "w")
@@ -191,7 +190,7 @@ begin
   tmp = 0.0
   ; Add initial mass mixing ratio distribution for nuclear soot here
   ;   input at (70E, 300-150 mbar, 30N)
-  tmp(0, {300:150}, {30}, {70}) = mmr
+  tmp(0, {300:150}, {25:31.5}, {69:78}) = mmr
  
   ; Write the field.
   icFile->$name$ = (/ tmp /)

@@ -609,7 +609,7 @@ begin
   ; levels of:
   ;    MASScolumn = SUMlev((PDELDRY / g) * TRACER)
   ;
-  ; NOTE: By default, PDELDRY is output to the histoy files as an average value,
+  ; NOTE: By default, PDELDRY is output to the history files as an average value,
   ; but to check mass conservation, you want to work with instantaneous values.
   print("Calculating cell mass ...")
   cellMass = (pdeldry / g) * tracerMMR
