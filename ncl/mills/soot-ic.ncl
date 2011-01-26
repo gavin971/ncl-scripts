@@ -30,8 +30,25 @@ print("Resolution: " + WACCM_RES)
 
 if (WACCM_RES .eq. "2x2.5") then 
 ;  newic("data/atm/waccm/ic/wa3_4x5_1950_spinup.cam2.i.1960-01-01-00000.nc")
+
+;  newic(MODEL_PATH+"/waccm/inputdata/atm/waccm/ic", \
+;       "f2000.e10r02.2deg.waccm.005.cam2.i.0017-01-01-00000.nc", \
+;       "f40.2000.2deg.waccm.carma.bc5_0tg.cam2.i.0017-01-01-00000.nc", \
+;       4.50775e-06)
+
+;  newic(MODEL_PATH+"/waccm/inputdata/atm/waccm/ic", \
+;       "b40.2000.2deg.wcm.carma.bc.002.0Tg.cam2.i.0001-05-15-00000.nc", \
+;       "b40.2000.2deg.wcm.carma.bc.002.5Tg_4x5.cam2.i.0001-05-15-00000.nc", \
+;       5.0, 4.0, 5.0)
+
+;  newic(MODEL_PATH+"/waccm/inputdata/atm/waccm/ic", \
+;       "b40.2000.2deg.wcm.carma.bc.002.0Tg.cam2.i.0001-05-15-00000.nc", \
+;       "b40.2000.2deg.wcm.carma.bc.002.5Tg_8x10.cam2.i.0001-05-15-00000.nc", \
+;       5.0, 8.0, 10.0)
+
   newic(MODEL_PATH+"/waccm/inputdata/atm/waccm/ic", \
-       "f2000.e10r02.2deg.waccm.005.cam2.i.0017-01-01-00000.nc", \
-       "f40.2000.2deg.waccm.carma.bc5_0tg.cam2.i.0017-01-01-00000.nc", \
-       4.50775e-06)
+       "b40.2000.2deg.wcm.carma.bc.002.0Tg.cam2.i.0001-05-15-00000.nc", \
+       "b40.2000.2deg.wcm.carma.bc.002.5Tg.cam2.i.0001-05-15-00000.nc", \
+       5.0)
+
 end if

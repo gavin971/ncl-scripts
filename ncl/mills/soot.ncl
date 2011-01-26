@@ -134,7 +134,7 @@ end
 ; NOTE: The values for nbin, rmin, rmrat. and rho should match those
 ; in CARMA (aerrad.h and defineaer.f).
 undef("newic")
-procedure newic(srcIcPath:string, srcIcFile:string, icFileName:string, mmr:float)
+procedure newic(srcIcPath:string, srcIcFile:string, icFileName:string, mass_tg:float)
 
 begin
 
@@ -153,9 +153,14 @@ begin
   print("  Adding particles ... ")
   
   ; 12 ppmm x 4 deg lat x 5 deg long x 300 - 150 mbar = 5 Tg Soot
-;  mmr = 1.8031e-5
-;  mmr = 3.6062e-6 ; 1 Tg soot
-    
+;  mmr = 1.8031e-5 ; 5 Tg soot @ 4 deg lat x 5 deg long x 300 - 150 mbar
+;  mmr = 3.6062e-6 ; 1 Tg soot @ 4 deg lat x 5 deg long x 300 - 150 mbar
+;  mmr = 1.8031e-5 * (mass_tg / 5.0) * (20.0 / (dlat * dlon))
+;  mmr = 1.8031e-5 * (mass_tg / 5.0) * (3.8*5.0) / (50 * 1.9 * 2.5)
+  mmr = 1.744568e-05 * (mass_tg / 5.0) * (3.8*5.0) / (50 * 1.9 * 2.5)
+  
+  print("mmr="+mmr)
+      
   ; Open the initial conditions file.
   icFile = addfile(icPath, "w")
 
@@ -180,18 +185,27 @@ begin
   ; Name the bin.
   name = "SOOT01"
 
-  ; Create the field.
-
-  filevardef(icFile, name, "double", (/"time","lev","lat","lon"/))
-  icFile->$name$@units        = "kg/kg"
-  icFile->$name$@long_name    = "CARMA particle " + name
-
+  ; Create the field if it does not exist.
+  if (.not.(isfilevar(icFile,name))) then
+    filevardef(icFile, name, "double", (/"time","lev","lat","lon"/))
+    icFile->$name$@units        = "kg/kg"
+    icFile->$name$@long_name    = "CARMA particle " + name
+  end if
+  
   ; Set the mmr.
   tmp = 0.0
   ; Add initial mass mixing ratio distribution for nuclear soot here
   ;   input at (70E, 300-150 mbar, 30N)
-  tmp(0, {300:150}, {25:31.5}, {69:78}) = mmr
- 
+  j1=closest_val(33.16,lat)
+  j2=j1-9
+  l1=closest_val(72.5,lon)
+  l2=l1+3
+  
+  do i =0,4
+    tmp(0, {300:150}, j1-i, l1-i:l1+i) = mmr
+    tmp(0, {300:150}, j2+i, l2-i:l2+i) = mmr
+  end do
+  
   ; Write the field.
   icFile->$name$ = (/ tmp /)
 
