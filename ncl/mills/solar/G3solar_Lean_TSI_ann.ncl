@@ -8,16 +8,30 @@ tsifile="$DIN_LOC_ROOT/atm/cam/solar/SOLAR_TSI_Lean_1610-2140_annual_c100301.nc"
 g3solarfile="$DIN_LOC_ROOT/atm/cam/solar/SOLAR_TSI_Lean_1610-2140_annual_G3solar_c110203.nc"
 system("cp " + tsifile + " " + g3solarfile)
 ncf    = addfile(g3solarfile,"w")
-ncghgf = addfile("$DIN_LOC_ROOT/atm/cam/ggas/ghg_rcp45_1765-2500_c100405.nc","r")
+;ncghgf = addfile("$DIN_LOC_ROOT/atm/cam/ggas/ghg_rcp45_1765-2500_c100405.nc","r")
 
 tsi=ncf->tsi
-co2=ncghgf->CO2
+;co2=ncghgf->CO2
+trf=(/2.5317551,2.6216119,2.6855166,2.7329421,2.7634036,2.7757707,2.7881402,2.8119714,2.8428423,2.8770636,\
+      2.9143627,2.9875188,3.0779096,3.1416521,3.188017, 3.2169447,3.2272914,3.2371493,3.2579732,3.28534,  \
+      3.3158721,3.3493106,3.4172469,3.5015888,3.5595233,3.6000211,3.6231047,3.627692, 3.6319198,3.6473113,\
+      3.6684475,3.6905975,3.713792, 3.7711875,3.8452247,3.8926295,3.9223327,3.9343296,3.927522, 3.9200453,\
+      3.9231352,3.9321376,3.9434429,3.9565635,4.0039984,4.0681076,4.1055948,4.1253671,4.1274023,4.1105889,\
+      4.0927972,4.0852475,4.0835997,4.084251, 4.0866409,4.1232564,4.1764501,4.2029154,4.2115701,4.2024557,\
+      4.1735135,4.1418535,4.1214889,4.1097216,4.1019818,4.0976103,4.1290055,4.1784445,4.2025543,4.2101752,\
+      4.2012273,4.1745478,4.1482203,4.1336824,4.1264816,4.1228955,4.1223161,4.1571893,4.2098327,4.2369026,\
+      4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,\
+      4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,\
+      4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,\
+      4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,4.2451996,\
+      4.2451996/)
 
 do year = 2020, 2140
-  co2diff=co2(year-1765)-co2(2020-1765)
-  tsidiff=co2diff*0.0655661
+;  co2diff=co2(year-1765)-co2(2020-1765)
+;  tsidiff=co2diff*0.0655661
+  tsidiff=(trf(year-2020)-trf(0))*4.0/(1.0-0.32)
   newtsi=tsi(year-1610)-tsidiff
-  print(year+" "+co2(year-1765)+" "+co2diff+" "+tsi(year-1610)+" "+newtsi+" "+tsidiff)
+  print(year+" "+trf(year-2020)+" "+tsidiff+" "+tsi(year-1610)+" "+newtsi)
   tsi(year-1610)=newtsi
 end do
 
@@ -38,6 +52,8 @@ end do
       
   globalAtt@creator = nl+\
       "Mike Mills, mmills@ucar.edu"
+  globalAtt@user = nl+\
+      "CESM1.0 user"
   globalAtt@title = nl+\
       "Lean total solar irradiance for years 1610-2140, adjusted for GeoMIP experiment G3solar" ;
   globalAtt@Source_data=nl+\
@@ -50,9 +66,8 @@ end do
        "Irradiances for 2009-2140 created by repeating the last 4 cycles (cycle 20-23)"+nl+\
        "with values from 1965 to 2008 inclusive mapping to 2009-2052, 2053-2096, 2097-2140"+nl+\
        "TSI from 2020-2140 is adjusted for the GeoMIP experiment G3solar,"+nl+\
-       "dimming TSI by 0.0655661 W/m^2 per ppmv CO2 increase over the 2020 mixing ratio,"+nl+\
-       "assuming the RCP4.5 emission scenario. CO2 values taken from the file:"+nl+\
-       "ghg_rcp45_1765-2500_c100405.nc" ;
+       "dimming TSI by the change in total RF * 4.0 / (1-albedo), assuming the RCP4.5,"+nl+\
+       "emission scenario, and albedo = 0.32." ;
 
   fileattdef( ncf, globalAtt )
   
