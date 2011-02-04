@@ -25,7 +25,11 @@ begin
 
   MODEL_PATH = getenv("MODEL_PATH")
 
-  icPath=MODEL_PATH+"/waccm/inputdata/atm/waccm/ic/b40.2000.2deg.wcm.carma.bc.002.5Tg.cam2.i.0001-05-15-00000.nc"
+  if (ismissing(MODEL_PATH)) then
+    MODEL_PATH  = "/waccm/mmills"
+  end if
+
+  icPath=MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic/b40.2000.2deg.wcm.carma.bc.002.1Tg.cam2.i.0001-05-15-00000.nc"
   history = addfile(icPath, "r")
 
   ; Find the last time.

@@ -11,6 +11,9 @@ if (ismissing(WACCM_RES)) then
 end if
 print("Using " + WACCM_RES + " resolution ...")
 
+if (ismissing(MODEL_PATH)) then
+  MODEL_PATH  = "/waccm/mmills"
+end if
 
 load "soot.ncl"
 
@@ -46,9 +49,14 @@ if (WACCM_RES .eq. "2x2.5") then
 ;       "b40.2000.2deg.wcm.carma.bc.002.5Tg_8x10.cam2.i.0001-05-15-00000.nc", \
 ;       5.0, 8.0, 10.0)
 
-  newic(MODEL_PATH+"/waccm/inputdata/atm/waccm/ic", \
-       "b40.2000.2deg.wcm.carma.bc.002.0Tg.cam2.i.0001-05-15-00000.nc", \
-       "b40.2000.2deg.wcm.carma.bc.002.5Tg.cam2.i.0001-05-15-00000.nc", \
+;  newic(MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic", \
+;       "b40.2000.2deg.wcm.carma.bc.002.0Tg.cam2.i.0001-05-15-00000.nc", \
+;       "b40.2000.2deg.wcm.carma.bc.002.1Tg.cam2.i.0001-05-15-00000.nc", \
+;       1.0)
+
+  newic(MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic", \
+       "b40.rcp4_5.2deg.wcm.carma.bc0tg.001.cam2.i.2012-05-15-00000.nc", \
+       "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.cam2.i.2012-05-15-00000.nc", \
        5.0)
 
 end if

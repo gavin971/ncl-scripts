@@ -195,7 +195,9 @@ begin
   ; Set the mmr.
   tmp = 0.0
   ; Add initial mass mixing ratio distribution for nuclear soot here
-  ;   input at (70E, 300-150 mbar, 30N)
+  ;   input in two triangular regions over Pakistan and India
+  ;   Apex of Pakistan triangle at 72.5E, 33.16N
+  ;   300-150 mbar
   j1=closest_val(33.16,lat)
   j2=j1-9
   l1=closest_val(72.5,lon)
