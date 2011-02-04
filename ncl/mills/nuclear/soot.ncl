@@ -1,6 +1,6 @@
 ; Nuclear Soot
 
-load "core.ncl"
+load "../core.ncl"
 
 ; Add tracers to the initial conditions file.
 ;
@@ -157,7 +157,8 @@ begin
 ;  mmr = 3.6062e-6 ; 1 Tg soot @ 4 deg lat x 5 deg long x 300 - 150 mbar
 ;  mmr = 1.8031e-5 * (mass_tg / 5.0) * (20.0 / (dlat * dlon))
 ;  mmr = 1.8031e-5 * (mass_tg / 5.0) * (3.8*5.0) / (50 * 1.9 * 2.5)
-  mmr = 1.744568e-05 * (mass_tg / 5.0) * (3.8*5.0) / (50 * 1.9 * 2.5)
+;  mmr = 1.744568e-05 * (mass_tg / 5.0) * (3.8*5.0) / (50 * 1.9 * 2.5)
+  mmr = 1.748958127e-05 * (mass_tg / 5.0) * (3.8*5.0) / (50 * 1.9 * 2.5)
   
   print("mmr="+mmr)
       
@@ -210,6 +211,34 @@ begin
   
   ; Write the field.
   icFile->$name$ = (/ tmp /)
+;
+; For a nicer looking netCDF, create a "new line" character.
+; This is not necessary.
+;
+  nl = integertochar(10)  ; newline character
+;
+; Define global attributes.
+;
+; globalAtt can be of any type. Here logical is used by convention.
+;
+  globalAtt             = True
+
+  globalAtt@creation_date     = nl+\
+      systemfunc("date")
+      
+  globalAtt@creator = nl+\
+      "Mike Mills, mmills@ucar.edu"
+  globalAtt@title = nl+\
+      "IC file for India-Pakistan nuclear war study with 5Tg black carbon on May 15, 2012" ;
+  globalAtt@history = nl+\
+       "Adapted from "+icFileName+nl+\
+       "SOOT01 field added by programs soot-ic.ncl and soot.ncl"
+  globalAtt@notes = nl+\
+       "5 Tg of black carbon input between 300 and 150 mbar in two triangular regions"+nl+\ 
+       "over Pakistan and India. Apex of Pakistan triangle at 72.5E, 33.16N."+nl+\
+       "SOOT01 supplied with a constant mass mixing ratio of "+mmr ;
+
+  fileattdef( icFile, globalAtt )
 
 end
 

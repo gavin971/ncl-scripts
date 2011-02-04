@@ -29,7 +29,7 @@ begin
     MODEL_PATH  = "/waccm/mmills"
   end if
 
-  icPath=MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic/b40.2000.2deg.wcm.carma.bc.002.1Tg.cam2.i.0001-05-15-00000.nc"
+  icPath=MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.cam2.i.2012-05-15-00000.nc"
   history = addfile(icPath, "r")
 
   ; Find the last time.
