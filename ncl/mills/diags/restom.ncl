@@ -9,14 +9,21 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 ;year0 = 96
 ;run_name = "b40.1850.track1.2deg.wcm.007"
 
-nyears=50
 
-year0 = 2025
+year0 = 2020
+nyears=2079-year0+1
+
 ;run_name = "b40.1850.2deg.wset.001"
 ;run_name = "b40.1850.2deg.wset.003"
 ;run_name = "bccntl02"
-run_name = "bcrckt03"
-rootpath="$MODEL_PATH/waccm/run/carma-soot/"
+;run_name = "b40.rcp4_5.2deg.g3solar.001"
+;rootpath="/data5/mmills/"
+run_name = "b40.rcp4_5.2deg.001"
+rootpath="/data1/tilmes/"
+;run_name = "b40.rcp4_5.2deg.wcm.001"
+;rootpath="/data2/mmills/"
+;run_name = "bcrckt03"
+;rootpath="$MODEL_PATH/waccm/run/carma-soot/"
 in_dir =rootpath+run_name+"/h0/"
 save_dir =rootpath+run_name+"/analysis/"
 savefile=save_dir+run_name+"_RESTOM.nc"
@@ -31,7 +38,7 @@ mon_wgt = (/0.08493150770664215,0.07671232521533966,0.08493150770664215,\
             0.08493150770664215,0.08493150770664215,0.08219178020954132,\
             0.08493150770664215,0.08219178020954132,0.08493150770664215/)
 
-infiles = systemfunc("ls -1 "+in_dir+run_name+"*h0.*nc")
+infiles = systemfunc("ls -1 "+in_dir+run_name+"*h0.20*.nc")
 nyears=dimsizes(infiles)/12
 
 if (isfilepresent(savefile)) then
@@ -63,6 +70,7 @@ else
   flnt = fin->FLNT
   ts = fin->TS
   landfrac = fin->LANDFRAC
+  year_in = fin->date/10000
 
   do i=nyears_a*12,dimsizes(infiles)-1,1
     print((/infiles(i)/))
@@ -86,6 +94,11 @@ else
     temp=landfrac
     delete(landfrac)
     landfrac = array_append_record(temp,fin->LANDFRAC,0)
+    delete(temp)
+
+    temp=year_in
+    delete(year_in)
+    year_in = array_append_record(temp,(fin->date)/10000,0)
     delete(temp)
 
   end do
@@ -123,6 +136,8 @@ else
   ts_land_ann_w = new(nyears,typeof(ts_land_w))
   ts_land_ann_w = 0.
 
+  year = new(nyears,integer)
+
   if (nyears_a.gt.0) then
       restom_ann_w(0:nyears_a-1) = restom_ann_w_a
       ts_ann_w(0:nyears_a-1) = ts_ann_w_a
@@ -133,6 +148,7 @@ else
   do iyr=nyears_a,nyears-1
     print((/iyr/))
     iyr2=iyr-nyears_a
+    year(iyr)=year_in(iyr2*12)
     do imonth=0,11
       restom_ann_w(iyr) = mon_wgt(imonth)*dim_avg(restom_w(iyr2*12+imonth))+restom_ann_w(iyr)
       ts_ann_w(iyr) = mon_wgt(imonth)*dim_avg(ts_w(iyr2*12+imonth))+ts_ann_w(iyr)
@@ -140,8 +156,20 @@ else
       ts_land_ann_w(iyr) = mon_wgt(imonth)*dim_avg(ts_land_w(iyr2*12+imonth))+ts_land_ann_w(iyr)
     end do
   end do
+  
+  restom_ann_w!0="year"
+  restom_ann_w&year=year
+  
+  ts_ann_w!0="year"
+  ts_ann_w&year=year
+  
+  sst_ann_w!0="year"
+  sst_ann_w&year=year
+  
+  ts_land_ann_w!0="year"
+  ts_land_ann_w&year=year
 
-  year = ispan (year0,nyears+year0-1,1)  
+;  year = ispan (year0,nyears+year0-1,1)  
 
   a = systemfunc("mkdir -p "+save_dir)
   ; Remove any preexisting file.
