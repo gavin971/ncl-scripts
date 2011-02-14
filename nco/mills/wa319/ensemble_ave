@@ -38,15 +38,15 @@ while [[ $year -le $year2 ]];do
     
   month=1
   
-  if [[ month -lt 10 ]]
-    then
-      monthstr='0'$month
-    else
-      monthstr=$month
-    fi
-    
   while [[ $month -le 12 ]];do
   
+    if [[ month -lt 10 ]]
+      then
+        monthstr='0'$month
+      else
+        monthstr=$month
+      fi
+      
     ncfiles1=$wadir1'/'$ensname1'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
     ncfiles2=$wadir2'/'$ensname2'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
     avgfile=$avgdir'/'$avgname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
