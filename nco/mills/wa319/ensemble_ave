@@ -1,0 +1,65 @@
+#!/bin/ksh
+
+ensname1='b40.1955-2005.2deg.wcm.002'
+ensname2='b40.1955-2005.2deg.wcm.00[34]'
+avgname='b40.1955-2005.2deg.wcm.avg'
+
+rootpath='/data5/mmills'
+rootpath1='/data3/mmills'
+
+wadir1=$rootpath1'/'$ensname1'/h0'
+wadir2=$rootpath'/'$ensname2'/h0'
+avgdir=$rootpath'/'$avgname'/h0'
+searchstr='cam2.h0'
+
+year1=1960
+year2=2005
+
+
+# script to average and standard deviation of waccm h0 files
+
+mkdir -p $avgdir
+
+year=$year1
+while [[ $year -le $year2 ]];do
+
+  if [[ year -lt 10 ]]
+    then
+      yearstr='000'$year
+    elif [[ year -lt 100 ]]
+    then
+      yearstr='00'$year
+    elif [[ year -lt 1000 ]]
+    then
+      yearstr='0'$year
+    else
+      yearstr=$year
+    fi
+    
+  month=1
+  
+  if [[ month -lt 10 ]]
+    then
+      monthstr='0'$month
+    else
+      monthstr=$month
+    fi
+    
+  while [[ $month -le 12 ]];do
+  
+    ncfiles1=$wadir1'/'$ensname1'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
+    ncfiles2=$wadir2'/'$ensname2'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
+    avgfile=$avgdir'/'$avgname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
+
+    # create ensemble mean
+    echo ncea $ncfiles1 $ncfiles2 $avgfile
+    ncea $ncfiles1 $ncfiles2 $avgfile
+    
+    (( month+=1 ))
+  
+  done
+   
+  (( year+=1 ))
+     
+done
+
