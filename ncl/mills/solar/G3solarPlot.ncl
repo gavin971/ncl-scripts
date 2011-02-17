@@ -1,7 +1,7 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-path="/Data/Models/ccsm/inputdata/atm/cam/solar/"
+path="$MODEL_PATH/ccsm/inputdata/atm/cam/solar/"
 a=addfile(path+"SOLAR_TSI_Lean_1610-2140_annual_c100301.nc","r")
 b=addfile(path+"SOLAR_TSI_Lean_1610-2140_annual_G3solar_c110203.nc","r")
 
