@@ -11,46 +11,59 @@ begin
 
   print("Reading surface pressure...")
   ps = addfiles_GetVar(history, historyNames, "PS")
+  rank=dimsizes(dimsizes(ps))
   p0 = history[0]->P0
+  gw = history[0]->gw
   hyam = history[0]->hyam
   hybm = history[0]->hybm
   time = addfiles_GetVar(history, historyNames, "time")
   lev = history[0]->lev
   lat = history[0]->lat
-  lon = history[0]->lon
+  if (rank.eq.3) then
+    lon = history[0]->lon
+  end if
   
   print("Calculating pressure at midpoints...")
   pm = pres_hybrid_ccm(ps,p0,hyam,hybm)
   print(dimsizes(pm))
-  pm!0 = "time"
-  pm!1 = "lev"
-  pm&lev = lev
-  pm!2 = "lat"
-  pm&lat = lat
-  pm!3 = "lon"
-  pm&lon = lon
+  if (rank.eq.3) then
+    pm!0 = "time"
+    pm!1 = "lev"
+    pm&lev = lev
+    pm!2 = "lat"
+    pm&lat = lat
+    pm!3 = "lon"
+    pm&lon = lon
+  else
+    pm!1 = "time"
+    pm!0 = "lev"
+    pm&lev = lev
+    pm!2 = "lat"
+    pm&lat = lat  
+  end if
   
   delete(p0)
   delete(ps)
   delete(hyam)
   delete(hybm)
   
+  if (rank.eq.3) then
+    print("averaging pressure zonally")
+    press=dim_avg_Wrap(pm(lev|:, lat|:, time|:, lon|:))
+    delete(pm)
+    pm=press
+    delete(press)
+  end if
+    
   print("averaging pressure over time")
-  press=dim_avg_Wrap(pm(lev|:, lat|:, lon|:, time|:))
+  press=dim_avg_Wrap(pm(lev|:, lat|:, time|:))
   
   delete(pm)
-  
-  print("averaging pressure zonally")
-  pm=dim_avg_Wrap(press(lev|:, lat|:, lon|:))
-  
-  delete(press)
-  
-  wgt=dble2flt(cos(lat*pi/180.))
   
   print("averaging pressure meridionally")
-  pressure=dim_avg_wgt_Wrap(pm(lev|:, lat|:),wgt,0)
+  pressure=dim_avg_wgt_Wrap(press(lev|:, lat|:),gw,0)
   
-  delete(pm)
+  delete(press)
   
   pressure=pressure/100.
   
@@ -67,13 +80,16 @@ begin
  
   print("Reading surface pressure...")
   ps = addfiles_GetVar(history, historyNames, "PS")
+  rank=dimsizes(dimsizes(ps))
   p0 = history[0]->P0
   hyai = history[0]->hyai
   hybi = history[0]->hybi
   time = addfiles_GetVar(history, historyNames, "time")
   lev = history[0]->lev
   lat = history[0]->lat
-  lon = history[0]->lon
+  if (rank.eq.3) then
+    lon = history[0]->lon
+  end if
   
   print("Calculating pressure at interfaces...")
   pm = pres_hybrid_ccm(ps,p0,hyai,hybi)
@@ -85,7 +101,14 @@ begin
   delete(hybi)
   
   print("Calculating pressure change...")
-  pdel=pm(:,1:dimsizes(lev),:,:)-pm(:,0:dimsizes(lev)-1,:,:)
+  if (rank.eq.3) then
+    pdel=pm(:,1:dimsizes(lev),:,:)-pm(:,0:dimsizes(lev)-1,:,:)
+  else
+    pm!1 = "time"
+    pm!0 = "lev"
+    pm!2 = "lat"
+    pdel=pm(time|:,lev|1:dimsizes(lev),lat|:)-pm(time|:,lev|0:dimsizes(lev)-1,lat|:)
+  end if
   
   delete(pm)
   
@@ -102,8 +125,13 @@ begin
   print("Reading geopotential heights...")
   z3 = addfiles_GetVar(history, historyNames, "Z3")
   nlev=dimsizes(z3&lev)
+  rank=dimsizes(dimsizes(z3))
   
-  z0 = z3(:,nlev-1,:,:)
+  if (rank.eq.4) then
+    z0 = z3(:,nlev-1,:,:)
+  else
+    z0 = z3(:,nlev-1,:)
+  end if
 
   delete(z3)
   delete(nlev)
@@ -126,8 +154,11 @@ begin
   ; volume mixing ratios:
   print("Reading vmr...")
   vmr=addfiles_GetVar(history, historyNames, var)
+  rank=dimsizes(dimsizes(vmr))
   lat=vmr&lat
-  lon=vmr&lon
+  if (rank.eq.4) then
+    lon=vmr&lon
+  end if
 ;  vmr=vmr/divfac
 
   ; dP=rho*g*dh=[M]*Mair*g*dh
@@ -138,19 +169,27 @@ begin
   partPress&lev = vmr&lev
   partPress!2 = "lat"
   partPress&lat = lat
-  partPress!3 = "lon"
-  partPress&lon = vmr&lon
+  if (rank.eq.4) then
+    partPress!3 = "lon"
+    partPress&lon = vmr&lon
+  end if
   
   delete(vmr)
   
   print("Calculating column ...")
-  column = dim_sum_Wrap(partPress(time|:, lat|:, lon|:, lev|:))
+  if (rank.eq.4) then
+    column = dim_sum_Wrap(partPress(time|:, lat|:, lon|:, lev|:))
+  else
+    column = dim_sum_Wrap(partPress(time|:, lat|:, lev|:))
+  end if
   column = column/2.687e16 ; Convert to Dobson Units
   column!0 = "time"
   column!1 = "lat"
   column&lat = lat
-  column!2 = "lon"
-  column&lon = lon
+  if (rank.eq.4) then
+    column!2 = "lon"
+    column&lon = lon
+  end if
   column@units = "Dobson Units"
   delete(lat)
 
@@ -164,10 +203,13 @@ local historyPattern1,historyNames1,history1,historyPattern2,historyNames2, \
   history2,T,Tmean,pi,pm,press,temp,tmean,saveFile1,saveFile2
 
 begin
-  pattern="h0"
+  pattern=subDir
   historyPath2=historyPath+historyRun+"/"
   
-  saveFile = addfile(historyPath2+historyRun+".O3Col.h0.nc", "c")
+  newfile=historyPath2+historyRun+".O3Col.h0.nc"
+  print("Creating file:")
+  print((/newfile/))
+  saveFile = addfile(newfile, "c")
   historyPattern=historyPath2+subDir+"/*.cam2."+pattern+"*.nc"
   
   historyNames = systemfunc("ls " + historyPattern)
@@ -190,13 +232,18 @@ begin
 end
 
 
-historyPath="/Volumes/Data/Models/waccm/run/carma-soot/"
-historyRun="Soot5Tg"
-subDir="h0"
+;historyPath="/Volumes/Data/Models/waccm/run/carma-soot/"
+;historyRun="Soot5Tg"
+;subDir="h0"
 
 ;saveMeanFiles(historyRun,historyPath,subDir)
 
-historyRun="PassiveSoot"
+;historyRun="PassiveSoot"
+
+historyPath="$MODEL_PATH/ccsm/run/"
+;historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIndPak.001"
+historyRun="b40.rcp4_5.2deg.wcm.001"
+subDir="h0zm"
 
 saveMeanFiles(historyRun,historyPath,subDir)
 
