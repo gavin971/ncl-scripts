@@ -3,14 +3,14 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
 path="$MODEL_PATH/ccsm/inputdata/atm/cam/solar/"
 a=addfile(path+"SOLAR_TSI_Lean_1610-2140_annual_c100301.nc","r")
-b=addfile(path+"SOLAR_TSI_Lean_1610-2140_annual_G3solar_c110203.nc","r")
+b=addfile(path+"SOLAR_TSI_Lean_1610-2140_annual_G3solar_c110222.nc","r")
 
 date=a->date/1e4
 data=new((/2,531/),double)
 data(0,:)=a->tsi
 data(1,:)=b->tsi
 
-  wks   = gsn_open_wks ("pdf","G3solarPlot") ; open workstation
+  wks   = gsn_open_wks ("pdf","$IMAGE_PATH/G3solarPlot") ; open workstation
 
   res                   = True                      ; plot mods desired
   res@xyLineThicknessF = 2.0
@@ -22,7 +22,7 @@ data(1,:)=b->tsi
   res@trYMaxF = 1364
 
   res@trXMinF = 2010
-  res@trXMaxF = 2080
+  res@trXMaxF = 2090
 
   res@tiYAxisString = "Total Solar Irradiance (W/m~S~2~N~)"
   res@tiXAxisString = "Year"
