@@ -38,18 +38,23 @@ begin
 ;xyLineColors      = (/"blue","turquoise","orange","red","darkgreen","chartreuse","black"/)    
 ;xyDashPatterns = (/0,0,0,0,0,0,1/)
 
-year0 = (/1850, 1960, 1850, 1850/)
-yearmax=(/2005, 2051, 2059, 2005/)
-run_names = (/"b40.20th.track1.2deg.wcm.007",\
+year0 = (/1850, 1960, 2005, 2005, 1850/);, 1850/)
+yearmax=(/2005, 2099, 2099, 2056, 2059/);, 2005/)
+run_names = (/"b40.20th.track1.2deg.wcm.ave",\
               "b40.1955-2005.2deg.wcm.ave",\
-              "b40.rcp4_5.1deg.ave",\
-              "Obs"/)
-case_names = (/"WACCM4 20th Century 1",\
-               "WACCM4 CMIP5 Ave",\
-               "CAM4 1deg 5-Ensemble Average",\
-               "HadCRU"/)
-xyLineColors      = (/"blue","red","darkgreen","black"/)    
-xyDashPatterns = (/0,0,0,1/)
+              "b40.rcp8_5.2deg.wcm.003",\
+              "b40.rcp2_6.2deg.wcm.002",\
+              "b40.rcp4_5.1deg.ave"/);,\
+;              "Obs"/)
+case_names = (/"WACCM4 20thC Ave(3)",\
+               "WACCM4 RCP4.5 Ave(3)",\
+               "WACCM4 RCP8.5",\
+               "WACCM4 RCP2.6",\
+               "CAM4 1deg RCP4.5 Ens Ave(5)"/);,\
+;               "HadCRU"/)
+xyLineColors      = (/"blue","darkgreen","red","black","darkgreen"/)    
+;xyDashPatterns = (/0,0,0,1/)
+xyDashPatterns = (/0,0,0,0,1/)
 
 con_names = (/"b40.1850.track1.1deg.006","Obs"/)
 
@@ -60,7 +65,8 @@ filt121 = True
 nyrunave = 11
 omask0 = False
 ;omask0 = True
-norm_plot = True
+;norm_plot = True
+norm_plot = False
 norm_plot_yrs_abs = (/1961,1990/)
 
 
@@ -155,10 +161,11 @@ res = True
 res@gsnDraw = False
 res@gsnFrame = False
 
-res@trYMinF = -2.5
-res@trYMaxF = 2.5
+;res@trYMinF = -2.5
+;res@trYMaxF = 2.5
 ;res@trXMaxF = maxyear+1
-res@trXMaxF = 2050
+;res@trXMaxF = 2050
+res@trXMaxF = 2099
 res@gsnYRefLine           = 0.              ; reference line   
 res@gsnYRefLineDashPattern = 1.
 res@xyLineColors   = xyLineColors
@@ -182,7 +189,7 @@ res@vpWidthF        = .9
 res@xyExplicitLegendLabels = case_names
 res@lgTitleFontHeightF = 0.015
 res@tiXAxisString = "Year"
-res@tiYAxisString = "Anomaly"
+;res@tiYAxisString = "Anomaly"
 ;
 
 do ivar=0,nvarnames-1
@@ -205,9 +212,13 @@ do ivar=0,nvarnames-1
   end if
 
   if (any(var_name.eq.(/"TS","TREFHT"/))) then
-    res@tiYAxisString = "TS anomaly (K)"
-    res@trYMinF = -1.2
-    res@trYMaxF = 1.8
+    if(norm_plot) then
+      res@tiYAxisString = "TS anomaly (K)"
+      res@trYMinF = -1.2
+      res@trYMaxF = 1.8
+    else
+      res@tiYAxisString = "TS (K)"
+    end if
   end if
   if (any(var_name.eq.(/"AODVIS"/))) then
     res@tiYAxisString = "AOD anomaly"

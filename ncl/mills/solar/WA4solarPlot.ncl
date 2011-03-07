@@ -1,24 +1,30 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
+load "../calendar_decode2.ncl"
 
 path="$MODEL_PATH/ccsm/inputdata/atm/cam/solar/"
-a=addfile(path+"SOLAR_TSI_Lean_1610-2140_annual_c100301.nc","r")
+a=addfile(path+"spectral_irradiance_Lean_1950-2140_daily_c100804.nc","r")
 
-date=a->date/1e4
-data=new((/2,531/),double)
-data(0,:)=a->tsi
-data(1,:)=b->tsi
+time=a->time
+date=calendar_decode2(time,4)
+data=a->tsi
 
-  wks   = gsn_open_wks ("pdf","$IMAGE_PATH/G3solarPlot") ; open workstation
+filename="$IMAGE_PATH/WA4solarPlot"
+
+  wks   = gsn_open_wks ("pdf",filename) ; open workstation
 
   res                   = True                      ; plot mods desired
-  res@xyLineThicknessF = 2.0
+  res@xyLineThicknessF = 1.0
+  res@gsnPaperOrientation = "landscape"
+  res@gsnMaximize          = True
+;  res@vpHeightF             = 0.5
+;  res@vpWidthF              = 1.2
 
-  res@xyLineColors       = (/"red","blue"/)          ; change line color
-  res@xyMonoLineColor   = False            ; same color for all lines
+  res@xyLineColor       = ("red")          ; change line color
+  res@xyMonoLineColor   = True            ; same color for all lines
   res@xyDashPattern     = 0                         ; all solid lines
-  res@trYMinF = 1350
-  res@trYMaxF = 1364
+  res@trYMinF = 1357.5
+  res@trYMaxF = 1363.5
 
   res@trXMinF = 2010
   res@trXMaxF = 2090
@@ -33,3 +39,10 @@ data(1,:)=b->tsi
 
 
   plot = gsn_csm_xy (wks,date,data,res) ; draw second plot
+  
+  delete(plot)
+  delete(wks)
+  
+print("mutt -a " + filename + ".pdf mikejmills@mac.com < /dev/null")
+mutter=systemfunc("mutt -a " + filename + ".pdf mikejmills@mac.com < /dev/null")
+print(mutter)
