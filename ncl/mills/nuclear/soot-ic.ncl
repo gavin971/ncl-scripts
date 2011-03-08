@@ -15,7 +15,8 @@ if (ismissing(MODEL_PATH)) then
   MODEL_PATH  = "/waccm/mmills"
 end if
 
-load "soot.ncl"
+;load "soot.ncl"
+load "ic-BC-IndPak.ncl"
 
 print("Resolution: " + WACCM_RES)
 
@@ -54,9 +55,21 @@ if (WACCM_RES .eq. "2x2.5") then
 ;       "b40.2000.2deg.wcm.carma.bc.002.1Tg.cam2.i.0001-05-15-00000.nc", \
 ;       1.0)
 
-  newic(MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic", \
-       "b40.rcp4_5.2deg.wcm.carma.bc0tg.001.cam2.i.2012-05-15-00000.nc", \
-       "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.cam2.i.2012-05-15-00000.nc", \
-       5.0)
+;  newic(MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic", \
+;       "b40.rcp4_5.2deg.wcm.carma.bc0tg.001.cam2.i.2012-05-15-00000.nc", \
+;       "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.cam2.i.2012-05-15-00000.nc", \
+;       5.0)
+
+;  newic("/u/mjmills2/csm/b40.rcp4_5.2deg.wcm.003/rest/2012-01-01-00000", \
+;       "b40.rcp4_5.2deg.wcm.003.cam2.i.2012-01-01-00000.nc", \
+;       "b40.rcp4_5.2deg.wcm.carma.bc0tg.003.cam2.i.2012-01-01-00000.nc", \
+;       0.0)
+
+; 2/23/2011       
+  newicBCIndPak("/u/mjmills2/csm/b40.rcp4_5.2deg.wcm.carma.bc0tg.002/rest/2012-05-15-00000", \
+       "b40.rcp4_5.2deg.wcm.carma.bc0tg.002.cam2.i.2012-05-15-00000.nc", \
+       "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.002.cam2.i.2012-05-15-00000.nc", \
+       5.0d0)
+
 
 end if

@@ -19,17 +19,10 @@ REARTH  = 6.37122e6               ; Earth's radius (m)
 DG2RAD  = PI / 180.0              ; rad deg^-1
 
 undef("calculateMass")
-procedure calculateMass()
+procedure calculateMass(icPath:string, binName:string, totalMass:double)
 
 begin
 
-  MODEL_PATH = getenv("MODEL_PATH")
-
-  if (ismissing(MODEL_PATH)) then
-    MODEL_PATH  = "/waccm/mmills"
-  end if
-
-  icPath=MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.cam2.i.2012-05-15-00000.nc"
   history = addfile(icPath, "r")
 
   ; Find the last time.
@@ -106,7 +99,7 @@ begin
 
   ; Get the mass (kg) for each bin.
   print("") 
-  print("  Calculating dust mass ...")
+  print("  Calculating bin mass ...")
   q         = history->Q
   mass = new((/ nTimes, nLevs, nLats, nLons /), double)
   mass!0 = "time"
@@ -120,28 +113,26 @@ begin
 
   ; NOTE: To keep the memory footprint smaller, calculate the total
   ; mass for each bin one at a time.
-  do b = 0, nBins-1
-    binName = "SOOT" + sprinti("%2.2i", b+1)
+;  do b = 0, nBins-1
+;    binName = "SOOT" + sprinti("%2.2i", bin+1)
     print("    " + binName)
 
     ; Get the mass mixing ratio.
     mmr = history->$binName$
 
     ; Compute the particle concentration.
-    ; NOTE: Ignore the mass at the bottom level, since this is were the mass that
+    ; NOTE: Ignore the mass at the bottom level, since this is where the mass that
     ; sediments will collect. Perhaops we should change the model to get rid of this
     ; mass.
     mass             = (mmr(:, :, :, :) * (1 + q(:, :, :, :)) * (pdel(:, :, :, :) / G))        
     columnMass       = dim_sum_Wrap(mass(time|:, lat|:, lon|:, lev|0:nLevs-2))       
     totalMass  = wgt_areasum2(columnMass(:, :, :), wgt, 0)
     totalMass  = totalMass/1e9
-    totalMass@units         = "Tg"
-    totalMass@long_name     = "mass"
 
     delete(mmr)
     delete(columnMass)
     print(totalMass)
-  end do
+;  end do
 
   delete(mass)
   delete(pdel)
@@ -151,5 +142,19 @@ begin
 
 end
 
+;  MODEL_PATH = getenv("MODEL_PATH")
 
-calculateMass()
+;  if (ismissing(MODEL_PATH)) then
+;    MODEL_PATH  = "/waccm/mmills"
+;  end if
+
+;  icPath=MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic/"+\
+;         "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.cam2.i.2012-05-15-00000.nc"
+icPath="/u/mjmills2/csm/b40.rcp4_5.2deg.wcm.carma.bc0tg.002/rest/2012-05-15-00000/"+\
+       "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.002.cam2.i.2012-05-15-00000.nc"
+
+totalMass=0.d0
+bin=0
+binName = "SOOT" + sprinti("%2.2i", bin+1)
+
+calculateMass(icPath, binName, totalMass)
