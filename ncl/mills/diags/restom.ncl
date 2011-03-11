@@ -10,22 +10,14 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 ;run_name = "b40.1850.track1.2deg.wcm.007"
 
 
-year0 = 2020
-nyears=2079-year0+1
+year0 = 96
+nyears=281-year0+1
 
-;run_name = "b40.1850.2deg.wset.001"
-;run_name = "b40.1850.2deg.wset.003"
-;run_name = "bccntl02"
-;run_name = "b40.rcp4_5.2deg.g3solar.001"
-;rootpath="/data5/mmills/"
-run_name = "b40.rcp4_5.2deg.001"
-rootpath="/data1/tilmes/"
-;run_name = "b40.rcp4_5.2deg.wcm.001"
-;rootpath="/data2/mmills/"
-;run_name = "bcrckt03"
-;rootpath="$MODEL_PATH/waccm/run/carma-soot/"
+run_name = "b40.1850.track1.2deg.wcm.007"
+rootpath="/data/waccm/"
+
 in_dir =rootpath+run_name+"/h0/"
-save_dir =rootpath+run_name+"/analysis/"
+save_dir ="~/"+run_name+"/analysis/"
 savefile=save_dir+run_name+"_RESTOM.nc"
 
 image_path=getenv("IMAGE_PATH")
@@ -38,7 +30,7 @@ mon_wgt = (/0.08493150770664215,0.07671232521533966,0.08493150770664215,\
             0.08493150770664215,0.08493150770664215,0.08219178020954132,\
             0.08493150770664215,0.08219178020954132,0.08493150770664215/)
 
-infiles = systemfunc("ls -1 "+in_dir+run_name+"*h0.20*.nc")
+infiles = systemfunc("ls -1 "+in_dir+run_name+"*h0.*.nc")
 nyears=dimsizes(infiles)/12
 
 if (isfilepresent(savefile)) then
@@ -193,11 +185,17 @@ end if
 
 ; Averages for annual means.
 
+  plot = new(4, graphic)
+
+resP                       = True
+resP@gsnMaximize           = True            ; expand plot size to maximum
+resP@gsnPaperOrientation   = "landscape"
+resP@txString   = run_name
+
 
 res = True
+res@gsnDraw               = False
 res@gsnFrame           = False   ; Don't advance the frame
-  res@vpHeightF          = 0.32    ; Width and height of
-  res@vpWidthF           = 0.32    ; each plot in NDC space.
 
 ;res@trYMinF = -4
 ;res@trYMaxF = 4
@@ -220,10 +218,6 @@ res@tiMainString  = run_name ; title
   res4 = res
 
 
- txres               = True   ; Set up resource list for text strings
-  txres@txFontHeightF = 0.025
-  gsn_text_ndc(wks,run_name,0.5,.98,txres)
-
 print(year+" "+restom_ann_w+" "+ts_ann_w+" "+ts_land_ann_w+" "+sst_ann_w)
 
 res1@tiMainString  = "RESTOM" ; title
@@ -235,7 +229,7 @@ res1@vpYF              = 0.91
 print("year:"+dimsizes(year))
 print("restom_ann_w:"+dimsizes(restom_ann_w))
 print(min(restom_ann_w)+" "+max(restom_ann_w))
-plot = gsn_csm_xy (wks,year,restom_ann_w,res1)
+plot(0) = gsn_csm_xy (wks,year,restom_ann_w,res1)
 
 res2@tiMainString  = "TS" ; title
 res2@tiYAxisString = "TS K" ; y-axis label      
@@ -249,7 +243,7 @@ res2@trYMaxF = 290.0  ;caf
 print("ts_ann_w:"+dimsizes(ts_ann_w))
 print(min(ts_ann_w)+" "+max(ts_ann_w))
 print(res2)
-plot = gsn_csm_xy (wks,year,ts_ann_w,res2)
+plot(1) = gsn_csm_xy (wks,year,ts_ann_w,res2)
 
 res3@tiMainString  = "TS_LAND" ; title
 res3@vpXF              = 0.1    ; X,Y position of third plot
@@ -262,7 +256,7 @@ res3@trYMaxF = 284.0  ;caf
 res3@tiYAxisString = "TS_LAND K" ; y-axis label      
 print("ts_land_ann_w:"+dimsizes(ts_land_ann_w))
 print(min(ts_land_ann_w)+" "+max(ts_land_ann_w))
-plot = gsn_csm_xy (wks,year,ts_land_ann_w,res3)
+plot(2) = gsn_csm_xy (wks,year,ts_land_ann_w,res3)
 
 res4@tiMainString  = "SST" ; title
 res4@vpXF              = 0.6    ; X,Y position of fourth plot
@@ -272,12 +266,16 @@ res4@trYMinF = 16
 res4@trYMaxF = 19
 print("sst_ann_w:"+dimsizes(sst_ann_w))
 print(min(sst_ann_w)+" "+max(sst_ann_w))
-plot = gsn_csm_xy (wks,year,sst_ann_w,res4)
+plot(3) = gsn_csm_xy (wks,year,sst_ann_w,res4)
+
+gsn_panel(wks, plot, (/ 2, 2 /), resP)
+
+
+delete(wks)
 
 print("gv "+pdffile+".pdf")
 print("mutt -a "+pdffile+".pdf mikejmills@mac.com < /dev/null")
 
-frame(wks)
-opentest = systemfunc("open "+pdffile+".pdf")
-;end
+mutter=systemfunc("mutt -a " + pdffile + ".pdf mikejmills@mac.com < /dev/null")
+print(mutter)
 
