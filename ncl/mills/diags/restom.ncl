@@ -3,12 +3,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
-
-;begin
-
-;year0 = 96
-;run_name = "b40.1850.track1.2deg.wcm.007"
-
+host=getenv("HOSTNAME")
 
 year0 = 96
 nyears=281-year0+1
@@ -17,7 +12,13 @@ run_name = "b40.1850.track1.2deg.wcm.007"
 rootpath="/data/waccm/"
 
 in_dir =rootpath+run_name+"/h0/"
-save_dir ="~/"+run_name+"/analysis/"
+
+if (host.eq."cmip5") then
+  save_dir ="/data/$USER/"+run_name+"/analysis/"
+else
+  save_dir ="~/"+run_name+"/analysis/"
+end if
+  
 savefile=save_dir+run_name+"_RESTOM.nc"
 
 image_path=getenv("IMAGE_PATH")

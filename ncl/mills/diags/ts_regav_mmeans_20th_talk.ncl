@@ -9,6 +9,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 begin
 
+host=getenv("HOSTNAME")
+
 ;year0 = (/1850, 1960, 1955, 1850, 1850, 1850/)
 ;yearmax=(/2005, 2049, 2031, 2005, 2059, 2005/)
 ;run_names = (/"b40.20th.track1.2deg.wcm.007","b40.1955-2005.2deg.wcm.002",\
@@ -39,9 +41,9 @@ begin
 ;xyDashPatterns = (/0,0,0,0,0,0,1/)
 
 year0 = (/1850, 1960, 2005, 2005, 1850/);, 1850/)
-yearmax=(/2005, 2099, 2099, 2065, 2059/);, 2005/)
-run_names = (/"b40.20th.track1.2deg.wcm.ave",\
-              "b40.1955-2005.2deg.wcm.ave",\
+yearmax=(/2005, 2099, 2099, 2099, 2059/);, 2005/)
+run_names = (/"b40.20th.track1.2deg.wcm.avg",\
+              "b40.1955-2005.2deg.wcm.avg",\
               "b40.rcp8_5.2deg.wcm.003",\
               "b40.rcp2_6.2deg.wcm.002",\
               "b40.rcp4_5.1deg.ave"/);,\
@@ -99,7 +101,12 @@ yr_weight = new(nyrunave,"float")
 yr_weight = 1.
 
 
-in_dir = "/data3/mmills/"
+if (host.eq."cmip5") then
+  in_dir = "/data/mmills/"
+else
+  in_dir = "/data3/mmills/"
+end if
+
 nplots = 4
 
 if (lrmcon) then
@@ -248,6 +255,7 @@ do ivar=0,nvarnames-1
   var_c_w  = new(ncases,"float")
 
   filename=  "$IMG_PATH/"+ps_pref+"_20th_gmean_ts_"+var_name
+  print(filename)
   wks   = gsn_open_wks ("ps", filename)
   wks_s = gsn_open_wks ("ps", filename+"_smooth")
 
