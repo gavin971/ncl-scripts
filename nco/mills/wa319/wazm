@@ -2,14 +2,17 @@
 
 #rootpath='/data5/mmills/wa319/carma-soot'
 #rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-rootpath='/data5/mmills'
-caseid='b40.1955-2005.2deg.wcm.003'
+#rootpath='/data5/mmills'
+#rootpath='/data/waccm'
+#caseid='b40.rcp2_6.2deg.wcm.002'
+rootpath='/data/ccsm4'
+caseid='b40.1955-2005.2deg.wset.002'
 
 wadir=$rootpath'/'$caseid'/h0'
 outdir=$rootpath'/'$caseid'/h0zm'
 
-year1=1960
-year2=1989
+year1=2005
+year2=2005
 
 mkdir -p $outdir
 
@@ -46,7 +49,7 @@ while [[ $year -le $year2 ]];do
       echo 'missing file: '$oldfile
       exit
     fi
-    newfile=`echo $oldfile | sed 's/h0/h0zm/g'` # | sed 's/data2/data3/g' | sed 's/fischer/mmills/g'`
+    newfile=`echo $oldfile | sed 's/h0/h0zm/g' | sed 's/atm\/hist/h0zm/g'` # | sed 's/data2/data3/g' | sed 's/fischer/mmills/g'`
     echo $newfile
 
     if [[ ! -e $newfile ]] then

@@ -1,18 +1,16 @@
 #!/bin/ksh
 
-ensname1='b40.1955-2005.2deg.wcm.002'
-ensname2='b40.1955-2005.2deg.wcm.00[34]'
-avgname='b40.1955-2005.2deg.wcm.avg'
+ensname='b40.1955-2005.2deg.wset.00[123]'
+avgname='b40.1955-2005.2deg.wset.avg'
 
-rootpath='/data5/mmills'
-rootpath1='/data3/mmills'
+rootpath='/data/ccsm4'
 
-wadir1=$rootpath1'/'$ensname1'/h0'
-wadir2=$rootpath'/'$ensname2'/h0'
-avgdir=$rootpath'/'$avgname'/h0'
-searchstr='cam2.h0'
+htype='h0'
+wadir=$rootpath'/'$ensname'/'$htype
+avgdir=$rootpath'/'$avgname'/'$htype
+searchstr='cam2.'$htype
 
-year1=1960
+year1=1955
 year2=2005
 
 
@@ -47,13 +45,12 @@ while [[ $year -le $year2 ]];do
         monthstr=$month
       fi
       
-    ncfiles1=$wadir1'/'$ensname1'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
-    ncfiles2=$wadir2'/'$ensname2'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
+    ncfiles=$wadir'/'$ensname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
     avgfile=$avgdir'/'$avgname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
 
     # create ensemble mean
-    echo ncea $ncfiles1 $ncfiles2 $avgfile
-    ncea $ncfiles1 $ncfiles2 $avgfile
+    echo ncea $ncfiles $avgfile
+    ncea $ncfiles $avgfile
     
     (( month+=1 ))
   
