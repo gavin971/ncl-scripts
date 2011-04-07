@@ -11,6 +11,12 @@ begin
 
 host=getenv("HOSTNAME")
 
+if (host.eq."cmip5") then
+  in_dir = "/data/mmills/"
+else
+  in_dir = "/data3/mmills/"
+end if
+
 ;year0 = (/1850, 1960, 1955, 1850, 1850, 1850/)
 ;yearmax=(/2005, 2049, 2031, 2005, 2059, 2005/)
 ;run_names = (/"b40.20th.track1.2deg.wcm.007","b40.1955-2005.2deg.wcm.002",\
@@ -71,12 +77,9 @@ omask0 = False
 norm_plot = False
 norm_plot_yrs_abs = (/1961,1990/)
 
-
 ;var_names = (/"LWCF","RESTOM","FSNT","FLNT"/)
 var_names = (/"TS"/)
 nyears = yearmax - year0 + 1
-
-
 
 con_tav = (/999.99,287.657,287.206,0./)
 
@@ -90,22 +93,11 @@ ldtrend = False
 
 ps_pref = "LBNL"
 
-
-
-
 xcor = (/0.12,0.63,0.12,0.63/)
 ycor = (/0.70,0.70,0.31,0.31/)
 
-
 yr_weight = new(nyrunave,"float")
 yr_weight = 1.
-
-
-if (host.eq."cmip5") then
-  in_dir = "/data/mmills/"
-else
-  in_dir = "/data3/mmills/"
-end if
 
 nplots = 4
 

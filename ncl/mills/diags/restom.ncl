@@ -5,6 +5,12 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 host=getenv("HOSTNAME")
 
+if (host.eq."cmip5") then
+  save_dir ="/data/$USER/"+run_name+"/analysis/"
+else
+  save_dir ="~/"+run_name+"/analysis/"
+end if
+
 year0 = 96
 nyears=281-year0+1
 
@@ -12,12 +18,6 @@ run_name = "b40.1850.track1.2deg.wcm.007"
 rootpath="/data/waccm/"
 
 in_dir =rootpath+run_name+"/h0/"
-
-if (host.eq."cmip5") then
-  save_dir ="/data/$USER/"+run_name+"/analysis/"
-else
-  save_dir ="~/"+run_name+"/analysis/"
-end if
   
 savefile=save_dir+run_name+"_RESTOM.nc"
 

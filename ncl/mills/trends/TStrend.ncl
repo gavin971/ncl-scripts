@@ -2,13 +2,29 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-;  run1="b40.1850.track1.2deg.wcm.007"
-;  run1="b40.1850.2deg.wset.002"
-  run1="b40.20th.2deg.wset.001"
-;  run1="b40.1955-2005.2deg.wcm.002"
-  tspath="/data3/mmills/"+run1+"/h0.annual/"
+  host=getenv("HOSTNAME")
+  run1="b40.1955-2005.2deg.wcm.avg"
+;  run1="b40.1955-2005.2deg.wset.avg"
 
-  year1=1986
+  if (host.eq."cmip5") then
+    if (isStrSubset(run1,"wcm")) then
+      tspath = "/data/waccm/"
+    else
+      tspath = "/data/ccsm4/"
+    end if
+  else
+    tspath = "/data3/mmills/"
+  end if
+
+  tspath=tspath+run1+"/h0.annual/"
+
+;  year1=1986
+;  year2=2005
+  
+;  year1=1960
+;  year2=1979
+
+  year1=1960
   year2=2005
 
   nyears=year2-year1+1
@@ -60,26 +76,29 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
   rc&lat=lat
   rc&lon=lon
   
-  pdffile="~/images/"+run1+"_TStrend"
+  pdffile="$IMAGE_PATH/"+run1+"_TStrend_"+year1+"-"+year2
   print("Creating PDF file "+pdffile+".pdf")
   wks=  gsn_open_wks ("pdf", pdffile)
   gsn_define_colormap(wks, "wgne15")
   
   res                      = True               ; plot mods desired
-  res@tiMainString         = "Surface Temperature Trends (K/decade), "+run1    ; main title
+  res@tiMainString         = "Surface Temperature Trends (K/decade), "+run1+":"+year1+"-"+year2    ; main title
   res@tiMainFontHeightF    = 0.015
   res@cnFillOn             = True               ; turn on color fill
   res@gsnMaximize          = True          ; expand plot size to maximum
   res@lbLabelAngleF        = 60
   
   res@cnLevelSelectionMode = "ManualLevels" 
-  res@cnMinLevelValF=-2.8
-  res@cnMaxLevelValF=2.8
-  res@cnLevelSpacingF     = .4
+;  res@cnMinLevelValF=-2.8
+;  res@cnMaxLevelValF=2.8
+;  res@cnLevelSpacingF     = .4
+  res@cnMinLevelValF=-2.1
+  res@cnMaxLevelValF=2.1
+  res@cnLevelSpacingF     = .3
 
 ; Create and draw a contour plot over a cylindrical equidistant map.  
   plot = gsn_csm_contour_map_ce(wks,rc,res)   ; plot model data  
   
   print("gv "+pdffile+".pdf")
-  print("mutt -a "+pdffile+".pdf mikejmills@mac.com < /dev/null")
+  print("mutt -a "+pdffile+".pdf -s "+pdffile+" mikejmills@mac.com < /dev/null")
 
