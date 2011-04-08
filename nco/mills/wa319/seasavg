@@ -5,12 +5,15 @@
 echo zmavg
 
 #rootpath='/data5/mmills/wa319/carma-soot'
-rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-runname='bccntl02'
-#runname='bcrckt03'
+#rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+rootpath='/data/waccm'
 
-wadir=$rootpath'/'$runname'/h0zm'
-outdir=$rootpath'/'$runname'/h0zm.seasavg'
+#runname='bccntl02'
+#runname='bcrckt03'
+runname='b40.1955-2005.2deg.wcm.avg'
+
+wadir=$rootpath'/'$runname'/h0zm1'
+outdir=$rootpath'/'$runname'/h0zm.seasavg.1986-2005'
 mkdir -p $outdir
 
 # script to average and standard deviation of waccm h0 files
@@ -21,15 +24,15 @@ mkdir -p $outdir
 #  sdfile=$outdir'/'$runname'.cam2.h0zmsd.JFM.nc'
 
 # Dec, Jan, Feb
-#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[12].nc'
-#  ncfiles2=$wadir'/'$runname'.cam2.h0zm.*-12.nc'
-#  avgfile=$outdir'/'$runname'.cam2.h0zm.DJF.nc'
-#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.DJF.nc'
+  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[12].nc'
+  ncfiles2=$wadir'/'$runname'.cam2.h0zm.*-12.nc'
+  avgfile=$outdir'/'$runname'.cam2.h0zm.DJF.nc'
+  sdfile=$outdir'/'$runname'.cam2.h0zmsd.DJF.nc'
 
 # May, Jun, Jul
-  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[567].nc'
-  avgfile=$outdir'/'$runname'.cam2.h0zm.MJJ.nc'
-  sdfile=$outdir'/'$runname'.cam2.h0zmsd.MJJ.nc'
+#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[567].nc'
+#  avgfile=$outdir'/'$runname'.cam2.h0zm.MJJ.nc'
+#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.MJJ.nc'
 
 # Jun, Jul, Aug
 #  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[678].nc'
@@ -47,11 +50,16 @@ mkdir -p $outdir
   echo $avgfile
   echo $sdfile
 
-  echo "ncrcat -O $ncfiles zmtmp.nc"
-  ncrcat -O $ncfiles zmtmp.nc
-#  echo "ncrcat -O $ncfiles $ncfiles2 zmtmp.nc"
-#  ncrcat -O $ncfiles $ncfiles2 zmtmp.nc
-  
+  if [ -n "$ncfiles2" ] ; then
+      echo "ncfiles2 is set"
+      echo "ncrcat -O $ncfiles $ncfiles2 zmtmp.nc"
+      ncrcat -O $ncfiles $ncfiles2 zmtmp.nc
+    else
+      echo "ncfiles2 is not set"
+      echo "ncrcat -O $ncfiles zmtmp.nc"
+      ncrcat -O $ncfiles zmtmp.nc
+    fi
+      
   echo "ncwa -O -I -a time zmtmp.nc $avgfile"
   ncwa -O -I -a time zmtmp.nc $avgfile 
   echo "ncbo -O -D 2 --op_typ=sub zmtmp.nc $avgfile tmp.nc"

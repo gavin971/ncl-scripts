@@ -1,11 +1,14 @@
 #!/bin/ksh
 
-ensname='b40.1955-2005.2deg.wset.00[123]'
-avgname='b40.1955-2005.2deg.wset.avg'
+#ensname='b40.1955-2005.2deg.wset.00[123]'
+#avgname='b40.1955-2005.2deg.wset.avg'
+#rootpath='/data/ccsm4'
 
-rootpath='/data/ccsm4'
+ensname='b40.1955-2005.2deg.wcm.00[234]'
+avgname='b40.1955-2005.2deg.wcm.avg'
+rootpath='/data/waccm'
 
-htype='h0'
+htype='h0zm'
 wadir=$rootpath'/'$ensname'/'$htype
 avgdir=$rootpath'/'$avgname'/'$htype
 searchstr='cam2.'$htype
