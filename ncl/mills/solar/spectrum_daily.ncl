@@ -7,7 +7,7 @@ ascii_path=getenv ("MODEL_PATH")+"/ccsm/solar/daily/"
 cdfpath=getenv ("MODEL_PATH")+"/ccsm/inputdata/atm/waccm/solar/"
 
 file1=ascii_path+"spectra_1950_1999d_11yr_new.txt"
-file2=ascii_path+"katja_spectra_2000_2009d_16Mar10.txt"
+file2=ascii_path+"katja_spectra_2000_2011d_28Mar11.txt"
 
 num_ssi_samples = 5*756
 
@@ -20,7 +20,7 @@ print ("nyears1="+nyears1)
 print ("nleap1="+nleap1)
 print ("num_samples_time1="+num_samples_time1)
 
-nyears2=2009-2000+1
+nyears2=2011-2000+1
 nleap2=3
 num_samples_time2 = nyears2*365+nleap2
 
@@ -54,6 +54,10 @@ band_width=asciiread(ascii_path+"bandwidths.txt",num_ssi_samples,"double")
   band_width@units = "nm"
   band_width!0="wavelength"
 
+; Read in ASCII files
+; First 4 entries for each time are year, month, day, and TSI.
+; These are followed by SSI for each of num_ssi_samples wavelengths.
+
 solar_data1=asciiread(file1,\
        (/num_samples_time1, num_ssi_samples +4/),"double")
        
@@ -66,14 +70,21 @@ solar_data3(num_samples_time1:num_samples_time3-1,:)=solar_data2
 
 solar_data=new((/num_samples_time,num_ssi_samples +4/),double)
 
-; Screen out leap days (Feb 29)
+; Screen out leap days (Feb 29) and missing values (TSI=-999)
 j=0
+nmiss=0
 do i = 0, num_samples_time3-1
-  if ((solar_data3(i,1).ne.2).or.(solar_data3(i,2).ne.29)) then
-    solar_data(j,:)=solar_data3(i,:)
-    j=j+1
-  else  
+  if ((solar_data3(i,1).eq.2).and.(solar_data3(i,2).eq.29)) then
     print("Excluding leap day: "+solar_data3(i,0)+" "+solar_data3(i,1)+" "+solar_data3(i,2))
+  else
+    if (solar_data3(i,3).lt.0.0) then
+      print("Excluding missing data: "+solar_data3(i,0)+" "+solar_data3(i,1)+" "+\
+            solar_data3(i,2)+" "+solar_data3(i,3))
+      nmiss=nmiss+1
+    else      
+      solar_data(j,:)=solar_data3(i,:)
+      j=j+1
+    end if
   end if
 end do
 
@@ -81,9 +92,16 @@ delete(solar_data1)
 delete(solar_data2)
 delete(solar_data3)
 
-time = solar_data(:,0)*365.d0 + \
-       day_of_year(conform_dims(num_samples_time,1999,-1),\
-       doubletoint(solar_data(:,1)),doubletoint(solar_data(:,2)))
+print("j="+j+", num_samples_time="+num_samples_time)
+nmiss2=num_samples_time-j
+print(nmiss+" missing values")
+print("num_samples_time-j="+nmiss2)
+nmiss=nmiss-365-5
+print(nmiss+" missing values through last data point")
+
+time = solar_data(0:j-1,0)*365.d0 + \
+       day_of_year(conform_dims(j,1999,-1),\
+       doubletoint(solar_data(0:j-1,1)),doubletoint(solar_data(0:j-1,2)))
   time@_FillValue = -9999.d0
   time@units = "days since 0000-01-01 00:00:00"
   time@time_origin = "01-JAN-0000"
@@ -91,21 +109,21 @@ time = solar_data(:,0)*365.d0 + \
   time@calendar = "noleap"
   time!0="time"
 
-date=doubletoint(solar_data(:,0)*10000+solar_data(:,1)*100+solar_data(:,2))
+date=doubletoint(solar_data(0:j-1,0)*10000+solar_data(0:j-1,1)*100+solar_data(0:j-1,2))
   date@format="YYYYMMDD"
   date!0="time"
   
  print(date(0)+" "+time(0)+" "+solar_data(0,0:2))
  print(date(365)+" "+time(365)+" "+solar_data(365,0:2))
- print(date(num_samples_time-1)+" "+time(num_samples_time-1)+" "+solar_data(num_samples_time-1,0:2))
+ print(date(j-1)+" "+time(j-1)+" "+solar_data(j-1,0:2))
 
-tsi = solar_data(:,3)
+tsi = solar_data(0:j-1,3)
   tsi@_FillValue = -9999.d0
   tsi@long_name = "Total Solar Irradiance at 1 a.u."
   tsi@units = "W/m^2" ;
   tsi!0="time"
 
-ssi = solar_data(:,4:)
+ssi = solar_data(0:j-1,4:)
   ssi@_FillValue = -9999.d0
   ssi@long_name = "Solar Spectral Irradiance at 1 a.u."
   ssi@units = "mW/m^2/nm"
@@ -127,9 +145,9 @@ ssi = solar_data(:,4:)
  print ("verify first ssi at first time, second file: "+ssi(nyears1*365,0))
  print ("verify last ssi at first time, second file: "+ssi(nyears1*365,num_ssi_samples-1))
  print ("---------------------------------------------------------") 
- print ("verify last date: "+date(num_samples_time-1))
- print ("verify last tsi: "+sprintf("%11.6f",tsi(num_samples_time-1)))
- print ("verify last ssi at last time: "+ssi(num_samples_time-1,num_ssi_samples-1))
+ print ("verify last date: "+date(j-1))
+ print ("verify last tsi: "+sprintf("%11.6f",tsi(j-1)))
+ print ("verify last ssi at last time: "+ssi(j-1,num_ssi_samples-1))
  print ("---------------------------------------------------------") 
  
  delete(solar_data)
@@ -137,7 +155,7 @@ ssi = solar_data(:,4:)
  tsi = tsi * pmod_tim_scale
  ssi = ssi * pmod_tim_scale
  
- ncf = addfile(cdfpath+"spectral_irradiance_Lean_1950-2009_daily_c100507.nc","c")
+ ncf = addfile(cdfpath+"spectral_irradiance_Lean_1950-2010_daily_c110328.nc","c")
  ncf_ann = addfile(cdfpath+"spectral_irradiance_Lean_1610-2140_ann_c100408.nc","r")
  
 ; Create an UNLIMITED record dimension in the output netCDF file.  This is critical if 
@@ -161,7 +179,7 @@ ssi = solar_data(:,4:)
   globalAtt@creator = nl+\
       "Mike Mills, mmills@ucar.edu"
   globalAtt@title = nl+\
-      "Lean daily solar irradiance for years 1950-2009" ;
+      "Lean daily solar irradiance for "+date(0)+"-"+date(j-1)+"; "+nmiss+" missing values" ;
   globalAtt@Source_website = nl+\
        "http://www.geo.fu-berlin.de/en/met/ag/strat/forschung/SOLARIS/Input_data/index.html"
   globalAtt@Source_data=nl+\

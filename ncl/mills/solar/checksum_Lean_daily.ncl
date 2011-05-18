@@ -7,7 +7,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 datapath="$MODEL_PATH/ccsm/inputdata/atm/waccm/solar/"
 imagepath="$IMAGE_PATH/solar/"
 
-ncf = addfile(datapath+"spectral_irradiance_Lean_1950-2140_daily_c100804.nc","r")
+;ncf = addfile(datapath+"spectral_irradiance_Lean_1950-2140_daily_c100804.nc","r")
+ncf = addfile(datapath+"spectral_irradiance_Lean_1950-2009_daily_c100507.nc","r")
 
 ;print("reading ncf->ssi")
 ;ssi=ncf->ssi
@@ -16,8 +17,8 @@ tsi=ncf->tsi
 print("dimsizes(tsi)="+dimsizes(tsi))
 print("reading ncf->band_width")
 band_width=ncf->band_width
-print("reading ncf->time")
-time=ncf->time
+;print("reading ncf->time")
+;time=ncf->time
 print("reading ncf->date")
 date=ncf->date
 
@@ -39,13 +40,14 @@ date=ncf->date
 ;print("calculating tsi_diff3")
 ;tsi_diff3=tsi-tsi_sum2
 
-ncf2 = addfile(datapath+"spectral_irradiance_Lean_1950-2009_daily_c100507.nc","r")
+ncf2 = addfile(datapath+"spectral_irradiance_Lean_1950-2010_daily_c110328.nc","r")
 print("reading ncf2->tsi")
 tsi2= ncf2->tsi
 print("dimsizes(tsi2)="+dimsizes(tsi2))
+time=ncf2->time
 
-print("calculating tsi_diff2")
-tsi_diff2=tsi(0:dimsizes(tsi2)-1)-tsi2
+;print("calculating tsi_diff2")
+;tsi_diff2=tsi(0:dimsizes(tsi2)-1)-tsi2
 
 
 print("calculating year")
@@ -87,21 +89,21 @@ year=time/365.d0
 ;delete(wks)
 ;delete(res)
   
-wks = gsn_open_wks("pdf", imagepath+"tsi_vs_ssi_1950-2140")
+wks = gsn_open_wks("pdf", imagepath+"tsi_2007-2011")
   res                   = True                      ; plot mods desired
 ;  res@gsnDraw           = False
 ;  res@gsnFrame          = False
 ;  res@vpHeightF             = 0.5              ; change aspect ratio
 ;  res@vpWidthF              = 1.0
-  res@trXMinF = 1950.d0
+  res@trXMinF = 2007.d0
 ;  res@trXMaxF = 2010.d0
-  res@trXMaxF = 2141.d0
+  res@trXMaxF = 2011.d0
 
 
 ;  res@trXMinF = 1830.d0
 ;  res@trXMaxF = 1870.d0
-;  res@trYMinF = 1360.4
-;  res@trYMaxF = 1361.6
+  res@trYMinF = 1360.4
+  res@trYMaxF = 1361.6
   res@tmXBLabelFontHeightF  = 0.015
   res@gsnMaximize          = True
   res@gsnPaperOrientation = "landscape"
@@ -115,8 +117,8 @@ wks = gsn_open_wks("pdf", imagepath+"tsi_vs_ssi_1950-2140")
   res@xyDashPatterns      = (/0,0,1/)
   
 ;  delete(data)
-  data=new((/2,dimsizes(tsi)/),double)
-  data(0,:)=tsi
+  data=new((/2,dimsizes(tsi2)/),double)
+  data(0,0:dimsizes(tsi)-1)=tsi
   data(1,0:dimsizes(tsi2)-1)=tsi2
 ;;  data(2,:)=tsi_sum2
   plot1 = gsn_xy(wks, year, data, res)
