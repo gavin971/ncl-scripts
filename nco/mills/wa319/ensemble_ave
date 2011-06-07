@@ -4,16 +4,18 @@
 #avgname='b40.1955-2005.2deg.wset.avg'
 #rootpath='/data/ccsm4'
 
-ensname='b40.1955-2005.2deg.wcm.00[234]'
-avgname='b40.1955-2005.2deg.wcm.avg'
+ensname='b40.20th.track1.2deg.wcm.007'
+ensname2='br04.20th.track1.2deg.wcm.pd.00[12]'
+avgname='b40.20th.track1.2deg.wcm.ave'
 rootpath='/data/waccm'
 
 htype='h0zm'
 wadir=$rootpath'/'$ensname'/'$htype
+wadir2=$rootpath'/'$ensname2'/'$htype
 avgdir=$rootpath'/'$avgname'/'$htype
 searchstr='cam2.'$htype
 
-year1=1955
+year1=1962
 year2=2005
 
 
@@ -49,11 +51,19 @@ while [[ $year -le $year2 ]];do
       fi
       
     ncfiles=$wadir'/'$ensname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
+    ncfiles_tmp=$wadir'/'$ensname'.'$searchstr'.'$yearstr'-'$monthstr'_tmp.nc'
+    ncfiles2=$wadir2'/'$ensname2'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
     avgfile=$avgdir'/'$avgname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
 
+    # "delete" missing variable to temporary file
+    echo ncks -x -v LCLOUD,LINOZ_DO3,LINOZ_DO3_PSC,LINOZ_O3CLIM,LINOZ_O3COL,LINOZ_SSO3,LINOZ_SZA,NDROPCOL,NDROPMIX,NDROPSNK,NDROPSRC,WTKE $ncfiles $ncfiles_tmp
+    ncks -O -x -v LCLOUD,LINOZ_DO3,LINOZ_DO3_PSC,LINOZ_O3CLIM,LINOZ_O3COL,LINOZ_SSO3,LINOZ_SZA,NDROPCOL,NDROPMIX,NDROPSNK,NDROPSRC,WTKE $ncfiles $ncfiles_tmp
     # create ensemble mean
-    echo ncea $ncfiles $avgfile
-    ncea $ncfiles $avgfile
+    echo ncea $ncfiles_tmp $ncfiles2 $avgfile
+    ncea -O $ncfiles_tmp $ncfiles2 $avgfile
+    # delete temporary file
+    echo rm $ncfiles_tmp
+    rm $ncfiles_tmp
     
     (( month+=1 ))
   

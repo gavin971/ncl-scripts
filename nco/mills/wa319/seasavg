@@ -7,13 +7,16 @@ echo zmavg
 #rootpath='/data5/mmills/wa319/carma-soot'
 #rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
 rootpath='/data/waccm'
+#rootpath='/data/ccsm4'
 
 #runname='bccntl02'
 #runname='bcrckt03'
 runname='b40.1955-2005.2deg.wcm.avg'
+#runname='b40.1955-2005.2deg.wset.avg'
 
-wadir=$rootpath'/'$runname'/h0zm1'
-outdir=$rootpath'/'$runname'/h0zm.seasavg.1986-2005'
+wadir=$rootpath'/'$runname'/h0zm2'
+#outdir=$rootpath'/'$runname'/h0zm.seasavg.1986-2005'
+outdir=$rootpath'/'$runname'/h0zm.seasavg.1960-1979'
 mkdir -p $outdir
 
 # script to average and standard deviation of waccm h0 files
@@ -24,10 +27,10 @@ mkdir -p $outdir
 #  sdfile=$outdir'/'$runname'.cam2.h0zmsd.JFM.nc'
 
 # Dec, Jan, Feb
-  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[12].nc'
-  ncfiles2=$wadir'/'$runname'.cam2.h0zm.*-12.nc'
-  avgfile=$outdir'/'$runname'.cam2.h0zm.DJF.nc'
-  sdfile=$outdir'/'$runname'.cam2.h0zmsd.DJF.nc'
+#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[12].nc'
+#  ncfiles2=$wadir'/'$runname'.cam2.h0zm.*-12.nc'
+#  avgfile=$outdir'/'$runname'.cam2.h0zm.DJF.nc'
+#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.DJF.nc'
 
 # May, Jun, Jul
 #  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[567].nc'
@@ -35,9 +38,9 @@ mkdir -p $outdir
 #  sdfile=$outdir'/'$runname'.cam2.h0zmsd.MJJ.nc'
 
 # Jun, Jul, Aug
-#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[678].nc'
-#  avgfile=$outdir'/'$runname'.cam2.h0zm.JJA.nc'
-#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.JJA.nc'
+  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[678].nc'
+  avgfile=$outdir'/'$runname'.cam2.h0zm.JJA.nc'
+  sdfile=$outdir'/'$runname'.cam2.h0zmsd.JJA.nc'
 
 # Aug, Sep, Oct
 #  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[89].nc'

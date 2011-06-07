@@ -3,15 +3,15 @@
 #rootpath='/data5/mmills/wa319/carma-soot'
 #rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
 #rootpath='/data5/mmills'
-#rootpath='/data/waccm'
-#caseid='b40.rcp2_6.2deg.wcm.002'
-rootpath='/data/ccsm4'
-caseid='b40.1955-2005.2deg.wset.002'
+rootpath='/data/waccm'
+caseid='b40.20th.track1.2deg.wcm.007'
+#rootpath='/data/ccsm4'
+#caseid='b40.1955-2005.2deg.wset.002'
 
 wadir=$rootpath'/'$caseid'/h0'
 outdir=$rootpath'/'$caseid'/h0zm'
 
-year1=2005
+year1=1942
 year2=2005
 
 mkdir -p $outdir

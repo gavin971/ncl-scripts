@@ -1,0 +1,72 @@
+#!/bin/ksh
+avgname='b40.20th.track1.2deg.wcm.ave'
+rootpath='/data/waccm'
+
+htype='h0zm'
+avgdir=$rootpath'/'$avgname'/'$htype
+scdir=$rootpath'/'$avgname'/sc'
+searchstr='cam2.'$htype
+
+mkdir -p $scdir
+
+year1=1961
+year2=2005
+
+year=$year1
+while [[ $year -le $year2 ]];do
+
+  if [[ year -lt 10 ]]
+    then
+      yearstr='000'$year
+    elif [[ year -lt 100 ]]
+    then
+      yearstr='00'$year
+    elif [[ year -lt 1000 ]]
+    then
+      yearstr='0'$year
+    else
+      yearstr=$year
+    fi
+    
+  month=1
+  
+  while [[ $month -le 12 ]];do
+  
+    if [[ month -lt 10 ]]
+      then
+        monthstr='0'$month
+      else
+        monthstr=$month
+      fi
+      
+    avgfile=$avgdir'/'$avgname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
+    scfile=$scdir'/'$avgname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
+
+    # "delete" missing variable to temporary file
+    echo ncks -v CO2,,H,NO,O,O2,O3,P0,QRS_TOT,date,datesec,hyam,hybm,lat,lev,lon,time $avgfile $scfile
+    ncks -v CO2,H,NO,O,O2,O3,P0,QRS_TOT,date,datesec,hyam,hybm,lat,lev,lon,time $avgfile $scfile
+    
+    (( month+=1 ))
+  
+  done
+   
+  (( year+=1 ))
+     
+done
+
+year1=1850
+forcingfile=$scdir'/sc_forcing_'$year1'-'$year2'_monthly_c110419.nc'
+echo rm -f $forcingfile
+rm -f $forcingfile
+scfiles=$scdir'/'$avgname'.'$searchstr'.*.nc'
+
+echo ncrcat $scfiles $forcingfile
+ncrcat $scfiles $forcingfile
+
+echo "Concatenation complete.  Now run fixdate-sc.ncl to fix the dates!"
+
+export forcingfile
+export year1
+export year2
+
+ncl $CODE_PATH/scripts/ncl/fixdate-sc.ncl
