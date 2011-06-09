@@ -1,10 +1,11 @@
 #!/bin/ksh
 
-#type='h0zm'
-type='h0'
+type='h0zm'
+#type='h0'
 
 #runname='b40.1955-2005.2deg.wcm.avg'
-runname='b40.1955-2005.2deg.wset.avg'
+#runname='b40.1955-2005.2deg.wset.avg'
+runname='b40.rcp8_5.2deg.wcm.003'
 #runname='vgcontrol02'
 #runname='b40.20th.track1.2deg.wcm.007'
 #runname='b40.1850.track1.2deg.wcm.007'
@@ -15,16 +16,16 @@ runname='b40.1955-2005.2deg.wset.avg'
 
 #rootpath='/data5/mmills/wa319/carma-soot'
 #rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-#rootpath='/data/waccm'
-rootpath='/data/ccsm4'
+rootpath='/data/waccm'
+#rootpath='/data/ccsm4'
 
 wadir=$rootpath'/'$runname'/'$type
 anndir=$rootpath'/'$runname'/'$type'.annual'
 searchstr='cam2.'$type
 addstr='annual'
 
-year1=1960
-year2=2005
+year1=2005
+year2=2099
 
 
 # script to average and standard deviation of waccm h0 files

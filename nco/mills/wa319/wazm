@@ -4,15 +4,19 @@
 #rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
 #rootpath='/data5/mmills'
 rootpath='/data/waccm'
-caseid='b40.20th.track1.2deg.wcm.007'
+#caseid='b40.20th.track1.2deg.wcm.007'
+caseid='b40.rcp4_5.2deg.wcm.001'
 #rootpath='/data/ccsm4'
 #caseid='b40.1955-2005.2deg.wset.002'
 
-wadir=$rootpath'/'$caseid'/h0'
-outdir=$rootpath'/'$caseid'/h0zm'
+#htype='.annual'
+htype=''
 
-year1=1942
-year2=2005
+wadir=$rootpath'/'$caseid'/h0'+htype
+outdir=$rootpath'/'$caseid'/h0zm'+htype
+
+year1=2052
+year2=2099
 
 mkdir -p $outdir
 
@@ -33,16 +37,8 @@ while [[ $year -le $year2 ]];do
 
   month=1
 
-  while [[ month -le 12 ]];do
-
-    if [[ month -lt 10 ]];then
-      monstr='0'$month
-    else
-      monstr=$month
-    fi
-
-    oldfile=$wadir'/'$caseid'.cam2.h0.'$yearstr'-'$monstr'.nc'
-
+  if [htype -eq '.annual'];then
+    oldfile=$wadir'/'$caseid'.cam2.h0.'$yearstr'.annual.nc'
     if [[ -e $oldfile ]];then
       echo $oldfile
     else
@@ -58,9 +54,36 @@ while [[ $year -le $year2 ]];do
     fi
     ls -sh $oldfile
     ls -sh $newfile
+  
+  else
+    while [[ month -le 12 ]];do
 
-    (( month+=1 ))
-    
-  done
+      if [[ month -lt 10 ]];then
+        monstr='0'$month
+      else
+        monstr=$month
+      fi
+
+      oldfile=$wadir'/'$caseid'.cam2.h0.'$yearstr'-'$monstr'.nc'
+
+      if [[ -e $oldfile ]];then
+        echo $oldfile
+      else
+        echo 'missing file: '$oldfile
+        exit
+      fi
+      newfile=`echo $oldfile | sed 's/h0/h0zm/g' | sed 's/atm\/hist/h0zm/g'` # | sed 's/data2/data3/g' | sed 's/fischer/mmills/g'`
+      echo $newfile
+
+      if [[ ! -e $newfile ]] then
+        echo "ncwa -alon -O "$oldfile" "$newfile
+        ncwa -alon -O $oldfile $newfile
+      fi
+      ls -sh $oldfile
+      ls -sh $newfile
+
+      (( month+=1 ))
+
+    done
   (( year+=1 ))
 done
