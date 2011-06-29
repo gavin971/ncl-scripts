@@ -2,16 +2,19 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
 rootdir="/data/waccm"
-case="b40.1955-2005.2deg.wcm.avg"
+;case="b40.1955-2005.2deg.wcm.avg"
+case="b40.rcp4_5.2deg.wcm.avg"
 
 ;rootdir="/data/ccsm4"
 ;case="b40.1955-2005.2deg.wset.avg"
 
-;season="DJF"
-season="JJA"
+season="DJF"
+;season="JJA"
 
-dir1="h0zm.seasavg.1960-1979"
-dir2="h0zm.seasavg.1986-2005"
+;dir1="h0zm.seasavg.1960-1979"
+;dir2="h0zm.seasavg.1986-2005"
+dir1="h0zm.seasavg.2005-2024"
+dir2="h0zm.seasavg.2032-2051"
 infile=case+".cam2.h0zm."+season+".nc"
 
 file1=addfile(rootdir+"/"+case+"/"+dir1+"/"+infile,"r")

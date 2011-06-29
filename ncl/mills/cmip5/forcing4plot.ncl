@@ -87,7 +87,7 @@ delete(year)
 year=ispan(year_start,year_end,1)
 year@long_name="year"
 
-wks = gsn_open_wks("ps", "$IMG_PATH/forcing4plot")
+wks = gsn_open_wks("pdf", "$IMG_PATH/forcing4plot")
 
 plot = new(4, graphic)
 
@@ -99,12 +99,13 @@ res=True
   res@gsnDraw           = False
   res@gsnFrame          = False
   res@gsnMaximize          = True
-  res@xyLineColors      = (/"blue","green","red"/)
+  res@xyLineColors      = (/"blue","darkgreen","red"/)
+  res@xyLineThicknessF  = 4.0
   res@xyDashPatterns      = (/0,0,0/)
   res@vpHeightF             = 0.7              ; change aspect ratio
   res@vpWidthF              = 1.0
-  res@trXMinF = 1850
-  res@trXMaxF = 2100
+  res@trXMinF = 1840
+  res@trXMaxF = 2110
 
   plot(0) = gsn_csm_xy(wks,year,co2,res)
   plot(1) = gsn_csm_xy(wks,year,ch4,res)
