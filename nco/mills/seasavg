@@ -2,7 +2,7 @@
 
 ###.......creates monthly means from all available years.......
 
-echo zmavg
+#echo zmavg
 
 #rootpath='/data5/mmills/wa319/carma-soot'
 #rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
@@ -11,42 +11,61 @@ rootpath='/data/waccm'
 
 #runname='bccntl02'
 #runname='bcrckt03'
-runname='b40.1955-2005.2deg.wcm.avg'
+#runname='b40.1955-2005.2deg.wcm.avg'
+runname='b40.rcp4_5.2deg.wcm.avg'
 #runname='b40.1955-2005.2deg.wset.avg'
 
 wadir=$rootpath'/'$runname'/h0zm2'
 #outdir=$rootpath'/'$runname'/h0zm.seasavg.1986-2005'
-outdir=$rootpath'/'$runname'/h0zm.seasavg.1960-1979'
+outdir=$rootpath'/'$runname'/h0zm.seasavg.2032-2051'
 mkdir -p $outdir
 
-# script to average and standard deviation of waccm h0 files
+set -A seasons JFM DJF MJJ JJA ASO
 
-# Jan, Feb, Mar
-#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[123].nc'
-#  avgfile=$outdir'/'$runname'.cam2.h0zm.JFM.nc'
-#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.JFM.nc'
+echo ${seasons[*]}
 
-# Dec, Jan, Feb
-#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[12].nc'
-#  ncfiles2=$wadir'/'$runname'.cam2.h0zm.*-12.nc'
-#  avgfile=$outdir'/'$runname'.cam2.h0zm.DJF.nc'
-#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.DJF.nc'
+for season in ${seasons[*]}
 
-# May, Jun, Jul
-#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[567].nc'
-#  avgfile=$outdir'/'$runname'.cam2.h0zm.MJJ.nc'
-#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.MJJ.nc'
+do
 
-# Jun, Jul, Aug
-  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[678].nc'
-  avgfile=$outdir'/'$runname'.cam2.h0zm.JJA.nc'
-  sdfile=$outdir'/'$runname'.cam2.h0zmsd.JJA.nc'
+  echo "season: $season"
 
-# Aug, Sep, Oct
-#  ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[89].nc'
-#  ncfiles2=$wadir'/'$runname'.cam2.h0zm.*-10.nc'
-#  avgfile=$outdir'/'$runname'.cam2.h0zm.ASO.nc'
-#  sdfile=$outdir'/'$runname'.cam2.h0zmsd.ASO.nc'
+  # script to average and standard deviation of waccm h0 files
+
+  # Jan, Feb, Mar
+  if [ $season = "JFM" ]; then
+    echo "in JFM if $season"
+    ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[123].nc'
+  fi
+
+  # Dec, Jan, Feb
+  if [ $season = "DJF" ]; then
+    echo "in DJF if $season"
+    ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[12].nc'
+    ncfiles2=$wadir'/'$runname'.cam2.h0zm.*-12.nc'
+  fi
+
+  # May, Jun, Jul
+  if [ $season = "MJJ" ]; then
+    echo "in MJJ if $season"
+    ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[567].nc'
+  fi
+
+  # Jun, Jul, Aug
+  if [ $season = "JJA" ]; then
+    echo "in JJA if $season"
+    ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[678].nc'
+  fi
+
+  # Aug, Sep, Oct
+  if [ $season = "ASO" ]; then
+    echo "in ASO if $season"
+    ncfiles=$wadir'/'$runname'.cam2.h0zm.*-0[89].nc'
+    ncfiles2=$wadir'/'$runname'.cam2.h0zm.*-10.nc'
+  fi
+
+  avgfile=$outdir'/'$runname'.cam2.h0zm.'$season'.nc'
+  sdfile=$outdir'/'$runname'.cam2.h0zmsd.'$season'.nc'
 
   echo $ncfiles
   echo $ncfiles2
@@ -55,11 +74,11 @@ mkdir -p $outdir
 
   if [ -n "$ncfiles2" ] ; then
       echo "ncfiles2 is set"
-      echo "ncrcat -O $ncfiles $ncfiles2 zmtmp.nc"
+      echo "ncrcat -O -x -v e $ncfiles $ncfiles2 zmtmp.nc"
       ncrcat -O $ncfiles $ncfiles2 zmtmp.nc
     else
       echo "ncfiles2 is not set"
-      echo "ncrcat -O $ncfiles zmtmp.nc"
+      echo "ncrcat -O -x -v e $ncfiles zmtmp.nc"
       ncrcat -O $ncfiles zmtmp.nc
     fi
       
@@ -72,3 +91,6 @@ mkdir -p $outdir
   rm zmtmp.nc
   rm tmp.nc
 
+done
+
+echo "Successfully completed script seasavg."
