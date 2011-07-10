@@ -118,10 +118,10 @@ begin
   globalAtt@creator = nl+\
       "Mike Mills, mmills@ucar.edu"
   globalAtt@title = nl+\
-      "IC file for India-Pakistan nuclear war study with 5Tg black carbon on May 15, 2012" ;
+      "IC file for India-Pakistan nuclear war study with 5Tg black carbon" ;
   globalAtt@history = nl+\
        "Adapted from "+icFileName+nl+\
-       "SOOT01 field added by programs soot-ic.ncl and soot.ncl"
+       "SOOT01 field added by programs soot-ic.ncl and ic-BC-IndPak.ncl"
   globalAtt@notes = nl+\
        "5 Tg of black carbon input between 300 and 150 mbar in two triangular regions"+nl+\ 
        "over Pakistan and India. Apex of Pakistan triangle at 72.5E, 33.16N."+nl+\

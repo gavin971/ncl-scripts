@@ -2,10 +2,11 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-path="$MODEL_PATH/ccsm/run/"
+;path="$MODEL_PATH/ccsm/run/"
+path="~/csm/"
 
-test="b40.rcp4_5.2deg.wcm.carma.bc5tgIndPak.001"
-cntl="b40.rcp4_5.2deg.wcm.001"
+test="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.002"
+cntl="b40.rcp4_5.2deg.wcm.carma.bc0tgIP.002"
 
 sub="h0zm"
 
