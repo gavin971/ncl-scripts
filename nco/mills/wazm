@@ -1,0 +1,88 @@
+#!/bin/ksh
+
+#rootpath='/data5/mmills/wa319/carma-soot'
+#rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+#rootpath='/data5/mmills'
+rootpath='/data/waccm'
+#rootpath='/data/ccsm4'
+caseid='b40.rcp8_5.2deg.wcm.004'
+
+#htype='.annual'
+htype=''
+
+wadir=$rootpath'/'$caseid'/h0'$htype
+outdir=$rootpath'/'$caseid'/h0zm'$htype
+
+year1=2005
+year2=2050
+
+mkdir -p $outdir
+
+#ncfiles=$wadir'*cam2.h0.*.nc'
+
+year=$year1
+while [[ $year -le $year2 ]];do
+
+  if [[ year -lt 10 ]];then
+    yearstr='000'$year
+  elif [[ year -lt 100 ]];then
+    yearstr='00'$year
+  elif [[ year -lt 1000 ]];then
+    yearstr='0'$year
+  else
+    yearstr=$year
+  fi
+
+  month=1
+
+  if [htype -eq '.annual'];then
+    oldfile=$wadir'/'$caseid'.cam2.h0.'$yearstr'.annual.nc'
+    if [[ -e $oldfile ]];then
+      echo $oldfile
+    else
+      echo 'missing file: '$oldfile
+      exit
+    fi
+    newfile=`echo $oldfile | sed 's/h0/h0zm/g' | sed 's/atm\/hist/h0zm/g'` # | sed 's/data2/data3/g' | sed 's/fischer/mmills/g'`
+    echo $newfile
+
+    if [[ ! -e $newfile ]] then
+      echo "ncwa -alon -O "$oldfile" "$newfile
+      ncwa -alon -O $oldfile $newfile
+    fi
+    ls -sh $oldfile
+    ls -sh $newfile
+  
+  else
+    while [[ month -le 12 ]];do
+
+      if [[ month -lt 10 ]];then
+        monstr='0'$month
+      else
+        monstr=$month
+      fi
+
+      oldfile=$wadir'/'$caseid'.cam2.h0.'$yearstr'-'$monstr'.nc'
+
+      if [[ -e $oldfile ]];then
+        echo $oldfile
+      else
+        echo 'missing file: '$oldfile
+        exit
+      fi
+      newfile=`echo $oldfile | sed 's/h0/h0zm/g' | sed 's/atm\/hist/h0zm/g'` # | sed 's/data2/data3/g' | sed 's/fischer/mmills/g'`
+      echo $newfile
+
+      if [[ ! -e $newfile ]] then
+        echo "ncwa -alon -O "$oldfile" "$newfile
+        ncwa -alon -O $oldfile $newfile
+      fi
+      ls -sh $oldfile
+      ls -sh $newfile
+
+      (( month+=1 ))
+
+    done
+  fi
+  (( year+=1 ))
+done
