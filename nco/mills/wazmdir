@@ -1,0 +1,30 @@
+#!/bin/ksh
+
+#rootpath='/data5/mmills/wa319/carma-soot'
+#rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+rootpath='/data5/mmills'
+#rootpath='/data/waccm'
+#rootpath='/data/ccsm4'
+caseid='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.004'
+
+#htype='.annual'
+htype=''
+
+wadir=$rootpath'/'$caseid'/h0'$htype
+outdir=$rootpath'/'$caseid'/h0zm'$htype
+
+mkdir -p $outdir
+
+for a in `ls -1 $wadir/*h0*.nc`; do
+  oldfile=$a
+  ls -sh $oldfile
+  newfile=`echo $oldfile | sed 's/h0/h0zm/g' | sed 's/atm\/hist/h0zm/g'` # | sed 's/data2/data3/g' | sed 's/fischer/mmills/g'`
+
+  if [[ ! -e $newfile ]];then
+    echo "ncwa -alon -O "$oldfile" "$newfile
+    ncwa -alon -O $oldfile $newfile
+  fi
+  
+  ls -sh $newfile
+
+done
