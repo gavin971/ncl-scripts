@@ -155,6 +155,7 @@ begin
   print("Reading vmr...")
   vmr=addfiles_GetVar(history, historyNames, var)
   rank=dimsizes(dimsizes(vmr))
+  time=vmr&time
   lat=vmr&lat
   if (rank.eq.4) then
     lon=vmr&lon
@@ -165,6 +166,7 @@ begin
   ; [M]*dh=dP/(Mair*g)
   partPress=pdel*vmr*10./(Mair*g)  ; pdel(Pa)*10(dynes/cm2/Pa)
   partPress!0 = "time"
+  partPress&time = time
   partPress!1 = "lev"
   partPress&lev = vmr&lev
   partPress!2 = "lat"
@@ -184,6 +186,7 @@ begin
   end if
   column = column/2.687e16 ; Convert to Dobson Units
   column!0 = "time"
+  column&time = time
   column!1 = "lat"
   column&lat = lat
   if (rank.eq.4) then
@@ -205,14 +208,13 @@ local historyPattern1,historyNames1,history1,historyPattern2,historyNames2, \
 begin
   pattern=subDir
   historyPath2=historyPath+historyRun+"/"
+  analysisPath=historyPath2+"proc/"
+  a = systemfunc("mkdir -p "+analysisPath)
   
-  newfile=historyPath2+historyRun+".O3Col.h0.nc"
-  print("Creating file:")
-  print((/newfile/))
-  saveFile = addfile(newfile, "c")
   historyPattern=historyPath2+subDir+"/*.cam2."+pattern+"*.nc"
   
   historyNames = systemfunc("ls " + historyPattern)
+  print("opening history files...")
   history = addfiles(historyNames, "r")
   ListSetType(history, "cat")
   
@@ -221,8 +223,21 @@ begin
   press=calcPress(history, historyNames)
   pdel=calcPdel(history, historyNames)
   O3_col=calcCol_vmr(history, historyNames, "O3", pdel)
+  O3_col@long_name="O3 column"
   Z0=calcZ3(history, historyNames)
+  print("reading date...")
+  date=addfiles_GetVar(history, historyNames, "date")
   
+  newfile=analysisPath+historyRun+".O3Col."+pattern+".nc"
+  exists = isfilepresent(newfile)
+  if (exists) then
+    print("Deleting existing file: "+newfile)
+    a = systemfunc("rm "+newfile)
+  end if
+  print("Creating file: "+newfile)
+  saveFile = addfile(newfile, "c")
+  print("saving date...")
+  saveFile->date=date
   print("saving ozone...")
   saveFile->O3_col=O3_col
   print("saving Z0...")
@@ -240,9 +255,12 @@ end
 
 ;historyRun="PassiveSoot"
 
-historyPath="$MODEL_PATH/ccsm/run/"
+;historyPath="$MODEL_PATH/ccsm/run/"
+historyPath="/data5/mmills/"
 ;historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIndPak.001"
-historyRun="b40.rcp4_5.2deg.wcm.001"
+;historyRun="b40.rcp4_5.2deg.wcm.001"
+;historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003"
+historyRun="b40.rcp4_5.2deg.wcm.carma.bc0tg.002"
 subDir="h0zm"
 
 saveMeanFiles(historyRun,historyPath,subDir)

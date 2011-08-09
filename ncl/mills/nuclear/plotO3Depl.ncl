@@ -27,32 +27,52 @@ procedure plotO3Depletion(path:string, historyRun:string, controlRun:string)
 
 begin
   print((/historyRun/))
-  historyPattern = path+historyRun+"/"+historyRun+".O3Col.h0.nc"
+  historyPattern = path+historyRun+"/proc/"+historyRun+".O3Col.h0zm.nc"
   historyNames = systemfunc("ls " + historyPattern)
   history = addfiles(historyNames, "r")
   ListSetType(history, "cat")
  
-  controlPattern = path+controlRun+"/"+controlRun+".O3Col.h0.nc"
+  controlPattern = path+controlRun+"/proc/"+controlRun+".O3Col.h0zm.nc"
   controlNames = systemfunc("ls " + controlPattern)
   control = addfiles(controlNames, "r")
   ListSetType(control, "cat")
+  
+  date_x=addfiles_GetVar(history, historyNames, "date")
+  dx=dimsizes(date_x)
+  print("dx:"+dx)
+  print("date_x(0):"+date_x(0))
+  print("date_x(dx-1):"+date_x(dx-1))
+  date_c=addfiles_GetVar(control, controlNames, "date")
+  dc=dimsizes(date_c)
+  print("dc:"+dc)
+  print("date_c(0):"+date_c(0))
+  print("date_c(dc-1):"+date_c(dc-1))
 
   O3_col_x=addfiles_GetVar(history, historyNames, "O3_col")
-  O3_col_c=addfiles_GetVar(control, controlNames, "O3_col")
   print("O3_col_x:"+dimsizes(O3_col_x))
+  O3_col_c=addfiles_GetVar(control, controlNames, "O3_col")
   print("O3_col_c:"+dimsizes(O3_col_c))
-  dc=dimsizes(O3_col_c)
-  dx=dimsizes(O3_col_x)
-  d1=min((/dc(0),dx(0)/))
+  
+  dc1=ind(date_c.eq.date_x(0))
+  dc2=ind(date_c.eq.date_x(dx-1))
+  
+  print(dc1+": "+date_c(dc1))
+  print(dc2+": "+date_c(dc2))
+  
+;  dc=dimsizes(O3_col_c)
+;  dx=dimsizes(O3_col_x)
+;  d1=min((/dc(0),dx(0)/))
  
-  O3_col_pct_loss=100.*(O3_col_x(0:d1-1,:)-O3_col_c)/O3_col_c
+;  O3_col_pct_loss=100.*(O3_col_x(0:d1-1,:)-O3_col_c)/O3_col_c
+  O3_col_pct_loss=100.*(O3_col_x-O3_col_c(dc1:dc2,:))/O3_col_c(dc1:dc2,:)
   time=O3_col_x&time
-  time=time/365.
+;  print(time+" "+time/365.)
+  time=time/365.  
   lat=O3_col_x&lat
   O3_col_pct_loss!1="lat"
   O3_col_pct_loss&lat=lat 
      
-  wks = gsn_open_wks("pdf", "$IMAGE_PATH/O3Depletion5TgWA4")
+  wks = gsn_open_wks("pdf", "$IMAGE_PATH/O3Depletion."+historyRun)
 
   res = True
   resP = True
@@ -77,54 +97,20 @@ begin
   res@vpHeightF             = 1.0 / nPanel              ; change aspect ratio
   plot = new(nPanel, graphic)
  
-;===================================================================
-; Do special labels on X axis. There will be 6 tickmarks per each
-; month, with a month label appearing in the middle.  Here, we are
-; treating minor tickmarks like major tickmarks, and vice versa, since
-; only the major tickmarks can actually be labeled.
-;
-  nmonths =8+12+12+10
-  months  = new(nmonths,integer)
-  months(0:7) = (/ 5, 6, 7, 8, 9,10,11,12/)
-  months(8:19) =(/ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12/) 
-  months(20:31) =(/ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12/) 
-  months(32:nmonths-1) =(/ 1, 2, 3, 4, 5, 6, 7, 8, 9,10/) 
-  years  = new(nmonths,integer)
-  years(0:7) = 2025
-  years(8:19) =2026 
-  years(20:31) =2027
-  years(32:nmonths-1) =2028
-  tk_per_mon  =4                                     ; Tickmarks per month.
-;  nmonths     = dimsizes(months)
-  ndays       = nmonths * tk_per_mon
 
-  day_in_mon  = new(nmonths,float)           ; Number of days in each month
-  do i=0,nmonths-1
-    day_in_mon(i) = days_in_month(years(i),months(i))*1.
-  end do
-
-  major_ticks = new(ndays,float)    ; Array to hold major tickmark values.
-  imonth      = 0
-  days_accum  = 0.
-  ii5         = ispan(1,tk_per_mon-1,1)*1.
-  do i=0,ndays-1,tk_per_mon
-    major_ticks(i) = days_accum
-    major_ticks(i+1:i+tk_per_mon-1) = major_ticks(i) + ii5*(day_in_mon(imonth)/tk_per_mon)
-    days_accum     = days_accum + day_in_mon(imonth)
-    imonth = imonth + 1
-  end do
-
-;  res@tmXBMode           = "Explicit"         ; Define own tick mark labels.
-;  res@tmXBMinorValues    = major_ticks(tk_per_mon/2:ndays-1:tk_per_mon)
+  res@tmXBMaxTicks     = 10
+  res@tmXBMinorPerMajor= 11
+;  res@tmXBMode         = "Manual"         ; Define own tick mark labels.
+;  res@tmXBTickStartF     = 15/365.
+;  res@tmXBTickSpacingF = 1
+;  res@tmXBTickEndF     = 10
+  res@tmXBAutoPrecision= False
+  res@tmXBPrecision    = 1
+  
 ;  res@tmXBValues         = major_ticks
 ;  res@tmXBLabels         = new(ndays,string)
 ;  res@tmXBLabels(:)     = ""
 
-  print("ndays="+ndays)
-  monthnames=(/"J","F","M","A","M","J","J","A","S","O","N","D"/)
-  print("monthnames:"+dimsizes(monthnames))
-;  print("labels:"+dimsizes(res@tmXBLabels(::tk_per_mon)))
-  print("ndays/tk_per_mon="+ndays/tk_per_mon)
   
  ; Label mid tickmark with the month label.
 ;  res@tmXBLabels(::tk_per_mon)  = monthnames(months-1)
@@ -170,26 +156,26 @@ begin
 ;  plot(1) = gsn_csm_xy(wks, time, data, res)
   
   print("create data")
-  data= new((/5,dimsizes(time)/),float)
+  data= new((/4,dimsizes(time)/),float)
   print("created data")
-  data(0,:)=O3_col_pct_loss(:,{-86})
-  data(1,:)=O3_col_pct_loss(:,{-46})
-  data(2,:)=O3_col_pct_loss(:,{46})
-  data(3,:)=O3_col_pct_loss(:,{86})
+;  data(0,:)=O3_col_pct_loss(:,{-86})
+  data(0,:)=O3_col_pct_loss(:,{-46})
+  data(1,:)=O3_col_pct_loss(:,{46})
+  data(2,:)=O3_col_pct_loss(:,{86})
   print("calling LOxLatMean")
-  data(4,:)=LOxLatMean(O3_col_pct_loss,-1)
+  data(3,:)=LOxLatMean(O3_col_pct_loss,-1)
   print("return from LOxLatMean")
   data!1="time"
   data&time=time
-  res@xyLineThicknesses = (/2,2,2,2,4/)
+  res@xyLineThicknesses = (/4,4,4,8/)
   res@xyMonoLineThickness = False
-  res@xyLineColors      = (/"blue","red","DarkOliveGreen","magenta","black"/); change line color
+  res@xyLineColors      = (/"blue","red","DarkOliveGreen","black"/); change line color
   res@xyDashPatterns=(/0,0,0,0,0/)
-  res@xyExplicitLegendLabels=(/"86~S~o~N~S", "46~S~o~N~S", "46~S~o~N~N", "86~S~o~N~N","global mean"/)
+  res@xyExplicitLegendLabels=(/"46~S~o~N~S", "46~S~o~N~N", "86~S~o~N~N","global mean"/)
   res@trXMinF = time(0)
   res@trXMaxF = time(dimsizes(time)-1)
-;  res@trYMaxF = 60
-;  res@trYMinF = -80
+  res@trYMaxF = 10
+  res@trYMinF = -70
   res@xyLineThicknessF = 3.0
 ;  res@tmXBLabelFontHeightF = 0.02
   print("plotting")
@@ -201,8 +187,11 @@ begin
 
 end
 
-path="$MODEL_PATH/ccsm/run/"
-historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIndPak.001"
-controlRun="b40.rcp4_5.2deg.wcm.001"
+;path="$MODEL_PATH/ccsm/run/"
+path="/data5/mmills/"
+;historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIndPak.001"
+;controlRun="b40.rcp4_5.2deg.wcm.001"
+historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003"
+controlRun="b40.rcp4_5.2deg.wcm.carma.bc0tg.002"
 
 plotO3Depletion(path, historyRun, controlRun)
