@@ -8,161 +8,132 @@ path="/data5/mmills/"
 
 ;test="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.002"
 ;cntl="b40.rcp4_5.2deg.wcm.carma.bc0tgIP.002"
-test ="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003"
+test1="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003"
 test2="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.006"
-cntl ="b40.rcp4_5.2deg.wcm.carma.bc0tg.002"
+cntl1="b40.rcp4_5.2deg.wcm.carma.bc0tg.002"
 cntl2="b40.rcp4_5.2deg.wcm.carma.bc0tg.003"
 
-sub="h0zm"
+sub="h0gm"
 
-testHistoryPattern=path+test+"/"+sub+"/"+"*.nc"
-testHistoryNames = systemfunc("ls " + testHistoryPattern)
-print("adding files for "+test)
-testHistory = addfiles(testHistoryNames, "r")
-ListSetType(testHistory, "cat")
+print("adding files...")
+testfile1=addfile(path+test1+"/"+sub+"/"+test1+".cam2.h0.globavg.nc","r")
+testfile2=addfile(path+test2+"/"+sub+"/"+test2+".cam2.h0.globavg.nc","r")
+cntlfile1=addfile(path+cntl1+"/"+sub+"/"+cntl1+".cam2.h0.globavg.nc","r")
+cntlfile2=addfile(path+cntl2+"/"+sub+"/"+cntl2+".cam2.h0.globavg.nc","r")
 
-test2HistoryPattern=path+test2+"/"+sub+"/"+"*.nc"
-test2HistoryNames = systemfunc("ls " + test2HistoryPattern)
-print("adding files for "+test2)
-test2History = addfiles(test2HistoryNames, "r")
-ListSetType(test2History, "cat")
-
-cntlHistoryPattern=path+cntl+"/"+sub+"/"+"*.nc"
-cntlHistoryNames = systemfunc("ls " + cntlHistoryPattern)
-print("adding files for "+cntl)
-cntlHistory = addfiles(cntlHistoryNames, "r")
-ListSetType(cntlHistory, "cat")
-
-cntl2HistoryPattern=path+cntl2+"/"+sub+"/"+"*.nc"
-cntl2HistoryNames = systemfunc("ls " + cntl2HistoryPattern)
-print("adding files for "+cntl2)
-cntl2History = addfiles(cntl2HistoryNames, "r")
-ListSetType(cntl2History, "cat")
-
-testfile=addfile(testHistoryNames(0),"r")
-gw=testfile->gw
-lat=testfile->lat
+gw=testfile1->gw
+lat=testfile1->lat
 nLats=dimsizes(lat)
 
-print("reading FSNS_test")
-FSNS_test  = addfiles_GetVar(testHistory, testHistoryNames, "FSNS")
-print("reading FSNSC_test")
-FSNSC_test = addfiles_GetVar(testHistory, testHistoryNames, "FSNSC")
-print("reading TS_test")
-TS_test    = addfiles_GetVar(testHistory, testHistoryNames, "TS")
-print("reading PRECT_test")
-PRECT_test = addfiles_GetVar(testHistory, testHistoryNames, "PRECT")
-print("reading CLDTOT_test")
-CLDTOT_test = addfiles_GetVar(testHistory, testHistoryNames, "CLDTOT")
-print("reading ASDIR_test")
-ASDIR_test = addfiles_GetVar(testHistory, testHistoryNames, "ASDIR")
-print("reading date_x")
-date_x  = addfiles_GetVar(testHistory, testHistoryNames, "date")
-time       = addfiles_GetVar(testHistory, testHistoryNames, "time")
+print("reading FSNS_test1")
+FSNS_test1  = testfile1->FSNS
+print("reading FSNSC_test1")
+FSNSC_test1 = testfile1->FSNSC
+print("reading TS_test1")
+TS_test1    = testfile1->TS
+print("reading PRECT_test1")
+PRECT_test1 = testfile1->PRECT
+print("reading CLDTOT_test1")
+CLDTOT_test1 = testfile1->CLDTOT
+print("reading ASDIR_test1")
+ASDIR_test1 = testfile1->ASDIR
+print("reading date_x1")
+date_x1     = testfile1->date
+time        = testfile1->time
 time=time/365.0
-dx=dimsizes(date_x)
-print("dx:"+dx)
+dx1=dimsizes(date_x1)
+print("dx1:"+dx1)
 
 print("reading FSNS_test2")
-FSNS_test2  = addfiles_GetVar(test2History, test2HistoryNames, "FSNS")
+FSNS_test2  = testfile2->FSNS
 print("reading FSNSC_test2")
-FSNSC_test2 = addfiles_GetVar(test2History, test2HistoryNames, "FSNSC")
+FSNSC_test2 = testfile2->FSNSC
 print("reading TS_test2")
-TS_test2    = addfiles_GetVar(test2History, test2HistoryNames, "TS")
+TS_test2    = testfile2->TS
 print("reading PRECT_test2")
-PRECT_test2 = addfiles_GetVar(test2History, test2HistoryNames, "PRECT")
-print("reading date_x")
-date_x2  = addfiles_GetVar(test2History, test2HistoryNames, "date")
+PRECT_test2 = testfile2->PRECT
+print("reading CLDTOT_test2")
+CLDTOT_test2 = testfile2->CLDTOT
+print("reading ASDIR_test2")
+ASDIR_test2 = testfile2->ASDIR
+print("reading date_x2")
+date_x2     = testfile2->date
 dx2=dimsizes(date_x2)
 print("dx2:"+dx2)
 
-print("reading FSNS_cntl")
-FSNS_cntl  = addfiles_GetVar(cntlHistory, cntlHistoryNames, "FSNS")
-print("reading FSNSC_cntl")
-FSNSC_cntl = addfiles_GetVar(cntlHistory, cntlHistoryNames, "FSNSC")
-print("reading TS_cntl")
-TS_cntl    = addfiles_GetVar(cntlHistory, cntlHistoryNames, "TS")
-print("reading PRECT_cntl")
-PRECT_cntl = addfiles_GetVar(cntlHistory, cntlHistoryNames, "PRECT")
-print("reading CLDTOT_cntl")
-CLDTOT_cntl = addfiles_GetVar(cntlHistory, cntlHistoryNames, "CLDTOT")
-print("reading ASDIR_cntl")
-ASDIR_cntl = addfiles_GetVar(cntlHistory, cntlHistoryNames, "ASDIR")
-print("reading date_c")
-date_c  = addfiles_GetVar(cntlHistory, cntlHistoryNames, "date")
-dc=dimsizes(date_c)
-print("dc:"+dc)
+print("reading FSNS_cntl1")
+FSNS_cntl1  = cntlfile1->FSNS
+print("reading FSNSC_cntl1")
+FSNSC_cntl1 = cntlfile1->FSNSC
+print("reading TS_cntl1")
+TS_cntl1    = cntlfile1->TS
+print("reading PRECT_cntl1")
+PRECT_cntl1 = cntlfile1->PRECT
+print("reading CLDTOT_cntl1")
+CLDTOT_cntl1 = cntlfile1->CLDTOT
+print("reading ASDIR_cntl1")
+ASDIR_cntl1 = cntlfile1->ASDIR
+print("reading date_c1")
+date_c1     = cntlfile1->date
+dc_1=dimsizes(date_c1)
+print("dc_1:"+dc_1)
 
 print("reading FSNS_cntl2")
-FSNS_cntl2  = addfiles_GetVar(cntl2History, cntl2HistoryNames, "FSNS")
+FSNS_cntl2  = cntlfile2->FSNS
 print("reading FSNSC_cntl2")
-FSNSC_cntl2 = addfiles_GetVar(cntl2History, cntl2HistoryNames, "FSNSC")
+FSNSC_cntl2 = cntlfile2->FSNSC
 print("reading TS_cntl2")
-TS_cntl2    = addfiles_GetVar(cntl2History, cntl2HistoryNames, "TS")
+TS_cntl2    = cntlfile2->TS
 print("reading PRECT_cntl2")
-PRECT_cntl2 = addfiles_GetVar(cntl2History, cntl2HistoryNames, "PRECT")
+PRECT_cntl2 = cntlfile2->PRECT
 print("reading CLDTOT_cntl2")
-CLDTOT_cntl2 = addfiles_GetVar(cntl2History, cntl2HistoryNames, "CLDTOT")
+CLDTOT_cntl2 = cntlfile2->CLDTOT
 print("reading ASDIR_cntl2")
-ASDIR_cntl2 = addfiles_GetVar(cntl2History, cntl2HistoryNames, "ASDIR")
-print("reading date_c")
-date_c2  = addfiles_GetVar(cntl2History, cntl2HistoryNames, "date")
+ASDIR_cntl2 = cntlfile2->ASDIR
+print("reading date_c2")
+date_c2     = cntlfile2->date
 dc_2=dimsizes(date_c2)
 print("dc_2:"+dc_2)
 
-dc1=ind(date_c.eq.date_x(0))
-dc2=ind(date_c.eq.date_x(dx-1))
+dc1=ind(date_c1.eq.date_x1(0))
+dc2=ind(date_c1.eq.date_x1(dx1-1))
 
 dc3=ind(date_c2.eq.date_x2(0))
 dc4=ind(date_c2.eq.date_x2(dx2-1))
 
-print("calculating TS_diff")
-TS_test_gavg  = dim_avg_wgt_Wrap(TS_test,gw,0)
-TS_test2_gavg = dim_avg_wgt_Wrap(TS_test2,gw,0)
-TS_cntl_gavg  = dim_avg_wgt_Wrap(TS_cntl,gw,0)
-TS_cntl2_gavg  = dim_avg_wgt_Wrap(TS_cntl2,gw,0)
-TS_diff  = TS_test_gavg - TS_cntl_gavg(dc1:dc2)
-TS_diff2 = TS_test2_gavg - TS_cntl2_gavg(dc3:dc4)
+print("dc1="+dc1)
+print("dc2="+dc2)
+print("dc3="+dc3)
+print("dc4="+dc4)
 
-;print(TS_test_gavg+" "+TS_cntl_gavg+" "+TS_diff)
+print("1: "+dimsizes(TS_test1)+" "+dimsizes(TS_cntl1(dc1:dc2)))
+print("2: "+dimsizes(TS_test2)+" "+dimsizes(TS_cntl2(dc3:dc4)))
+
+print("calculating TS_diff")
+TS_diff1 = TS_test1 - TS_cntl1(dc1:dc2)
+TS_diff2 = TS_test2 - TS_cntl2(dc3:dc4)
 
 print("calculating PRECT_diff")
-PRECT_test_gavg = dim_avg_wgt_Wrap(PRECT_test,gw,0)
-PRECT_test2_gavg = dim_avg_wgt_Wrap(PRECT_test2,gw,0)
-PRECT_cntl_gavg = dim_avg_wgt_Wrap(PRECT_cntl,gw,0)
-PRECT_cntl2_gavg = dim_avg_wgt_Wrap(PRECT_cntl2,gw,0)
-PRECT_diff = (PRECT_test_gavg - PRECT_cntl_gavg(dc1:dc2))*1000.*3600.*24.
-PRECT_diff2 = (PRECT_test2_gavg - PRECT_cntl2_gavg(dc3:dc4))*1000.*3600.*24.
-PRECT_diff_pct = 100.*(PRECT_test_gavg - PRECT_cntl_gavg(dc1:dc2))/PRECT_cntl_gavg(dc1:dc2)
-PRECT_diff_pct2 = 100.*(PRECT_test2_gavg - PRECT_cntl2_gavg(dc3:dc4))/PRECT_cntl2_gavg(dc3:dc4)
+PRECT_diff1 = (PRECT_test1 - PRECT_cntl1(dc1:dc2))*1000.*3600.*24.
+PRECT_diff2 = (PRECT_test2 - PRECT_cntl2(dc3:dc4))*1000.*3600.*24.
+PRECT_diff_pct1 = 100.*(PRECT_test1 - PRECT_cntl1(dc1:dc2))/PRECT_cntl1(dc1:dc2)
+PRECT_diff_pct2 = 100.*(PRECT_test2 - PRECT_cntl2(dc3:dc4))/PRECT_cntl2(dc3:dc4)
 
 print("calculating FSNS_diff")
-FSNS_test_gavg = dim_avg_wgt_Wrap(FSNS_test,gw,0)
-;FSNS_test2_gavg = dim_avg_wgt_Wrap(FSNS_test2,gw,0)
-FSNS_cntl_gavg = dim_avg_wgt_Wrap(FSNS_cntl,gw,0)
-FSNS_diff = FSNS_test_gavg - FSNS_cntl_gavg(dc1:dc2)
-;FSNS_diff2 = FSNS_test2_gavg - FSNS_cntl_gavg(dc3:dc4)
-FSNS_diff_pct = 100.*(FSNS_test_gavg - FSNS_cntl_gavg(dc1:dc2))/FSNS_cntl_gavg(dc1:dc2)
+FSNS_diff1 = FSNS_test1 - FSNS_cntl1(dc1:dc2)
+;FSNS_diff2 = FSNS_test2 - FSNS_cntl2(dc3:dc4)
+FSNS_diff_pct1 = 100.*(FSNS_test1 - FSNS_cntl1(dc1:dc2))/FSNS_cntl1(dc1:dc2)
 
 print("calculating FSNSC_diff")
-FSNSC_test_gavg = dim_avg_wgt_Wrap(FSNSC_test,gw,0)
-;FSNSC_test2_gavg = dim_avg_wgt_Wrap(FSNSC_test2,gw,0)
-FSNSC_cntl_gavg = dim_avg_wgt_Wrap(FSNSC_cntl,gw,0)
-FSNSC_diff = FSNSC_test_gavg - FSNSC_cntl_gavg(dc1:dc2)
-;FSNSC_diff2 = FSNSC_test2_gavg - FSNSC_cntl_gavg(dc3:dc4)
-FSNSC_diff_pct = 100.*(FSNSC_test_gavg - FSNSC_cntl_gavg(dc1:dc2))/FSNSC_cntl_gavg(dc1:dc2)
+FSNSC_diff1 = FSNSC_test1 - FSNSC_cntl1(dc1:dc2)
+;FSNSC_diff2 = FSNSC_test2 - FSNSC_cntl2(dc3:dc4)
+FSNSC_diff_pct1 = 100.*(FSNSC_test1 - FSNSC_cntl1(dc1:dc2))/FSNSC_cntl1(dc1:dc2)
 
 print("calculating CLDTOT_diff")
-CLDTOT_test_gavg  = dim_avg_wgt_Wrap(CLDTOT_test,gw,0)
-;CLDTOT_test2_gavg = dim_avg_wgt_Wrap(CLDTOT_test2,gw,0)
-CLDTOT_cntl_gavg  = dim_avg_wgt_Wrap(CLDTOT_cntl,gw,0)
-CLDTOT_diff  = CLDTOT_test_gavg - CLDTOT_cntl_gavg(dc1:dc2)
+CLDTOT_diff1  = CLDTOT_test1 - CLDTOT_cntl1(dc1:dc2)
 
 print("calculating ASDIR_diff")
-ASDIR_test_gavg  = dim_avg_wgt_Wrap(ASDIR_test,gw,0)
-;ASDIR_test2_gavg = dim_avg_wgt_Wrap(ASDIR_test2,gw,0)
-ASDIR_cntl_gavg  = dim_avg_wgt_Wrap(ASDIR_cntl,gw,0)
-ASDIR_diff  = ASDIR_test_gavg - ASDIR_cntl_gavg(dc1:dc2)
+ASDIR_diff1  = ASDIR_test1 - ASDIR_cntl1(dc1:dc2)
 
 ; (Time(y), TS change(K)) from Robock 5Tg study
 TS_time = (/ 0.072,0.158,0.23,0.316,0.402,0.488,0.646,0.703,0.919,1.062,1.148,1.234,1.306,1.407,1.507,\
@@ -215,7 +186,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   -4.576,-4.068,-3.559,-3.559,-3.39,-3.051,-3.051,-2.712,-2.712,-2.712,-2.373,-2.203,-2.034,-2.034,-1.864,-1.864,\
   -1.525,-1.525,-1.186/)
                
-  wks   = gsn_open_wks ("pdf","$IMAGE_PATH/TSvsRobock."+test) ; open workstation
+  wks   = gsn_open_wks ("pdf","$IMAGE_PATH/TSvsRobock."+test1+"."+test2) ; open workstation
 
   res                   = True                      ; plot mods desired
 ;  res@gsnPaperOrientation = "landscape"
@@ -230,10 +201,10 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@xyLineColor       = "red"          ; change line color
   res@xyMonoLineColor   = True            ; same color for all lines
 
-  res@tmXBMaxTicks     = 10
+  res@tmXBMaxTicks     = 15
   res@tmXBMinorPerMajor= 11
   res@tmXBAutoPrecision= False
-  res@tmXBPrecision    = 1
+  res@tmXBPrecision    = 2
   
   res@trXMinF = 0
   res@trXMaxF = max(time)
@@ -248,7 +219,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   
   res@xyLineColor       = "black"          ; change line color
   res@xyLineThicknessF = 8.0
-  plot = gsn_csm_xy (wks,time,TS_diff,res) ; draw  plot
+  plot = gsn_csm_xy (wks,time,TS_diff1,res) ; draw  plot
   res@xyLineColor       = "green"          ; change line color
   res@xyLineThicknessF = 8.0
   plot = gsn_csm_xy (wks,time,TS_diff2,res) ; draw  plot
@@ -266,7 +237,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   plot = gsn_csm_xy (wks,PRECT_time,PRECT_rbck,res) ; draw plot
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
-  plot = gsn_csm_xy (wks,time,PRECT_diff,res) ; draw plot
+  plot = gsn_csm_xy (wks,time,PRECT_diff1,res) ; draw plot
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "green"          ; change line color
   plot = gsn_csm_xy (wks,time,PRECT_diff2,res) ; draw plot
@@ -281,7 +252,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@tiYAxisString = "Precipitation Anomaly (%)"
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
-  plot = gsn_csm_xy (wks,time,PRECT_diff_pct,res) ; draw plot
+  plot = gsn_csm_xy (wks,time,PRECT_diff_pct1,res) ; draw plot
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
@@ -295,12 +266,12 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res) ; draw plot
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
-  plot = gsn_csm_xy (wks,time,FSNS_diff,res) ; draw plot
+  plot = gsn_csm_xy (wks,time,FSNS_diff1,res) ; draw plot
   res@xyLineThicknessF = 8.0
 ;  res@xyLineColor       = "green"          ; change line color
 ;  plot = gsn_csm_xy (wks,time,FSNS_diff2,res) ; draw plot
   res@xyLineColor       = "blue"          ; change line color
-  plot = gsn_csm_xy (wks,time,FSNSC_diff,res) ; draw plot
+  plot = gsn_csm_xy (wks,time,FSNSC_diff1,res) ; draw plot
 ;  res@xyLineColor       = "maroon"          ; change line color
 ;  plot = gsn_csm_xy (wks,time,FSNSC_diff2,res) ; draw plot
   frame(wks)
@@ -313,9 +284,9 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@trYMinF = -15
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
-  plot = gsn_csm_xy (wks,time,FSNS_diff_pct,res) ; draw plot
+  plot = gsn_csm_xy (wks,time,FSNS_diff_pct1,res) ; draw plot
   res@xyLineColor       = "blue"          ; change line color
-  plot = gsn_csm_xy (wks,time,FSNSC_diff_pct,res) ; draw plot
+  plot = gsn_csm_xy (wks,time,FSNSC_diff_pct1,res) ; draw plot
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
@@ -327,11 +298,11 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@trYMaxF=0.6
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
-  plot = gsn_csm_xy (wks,time,CLDTOT_test_gavg,res) ; draw plot
+  plot = gsn_csm_xy (wks,time,CLDTOT_test1,res) ; draw plot
   res@xyLineColor       = "blue"          ; change line color
-  plot = gsn_csm_xy (wks,time,CLDTOT_cntl_gavg,res) ; draw plot
+  plot = gsn_csm_xy (wks,time,CLDTOT_cntl1,res) ; draw plot
 ;  res@xyLineColor       = "red"          ; change line color
-;  plot = gsn_csm_xy (wks,time,CLDTOT_diff,res) ; draw plot
+;  plot = gsn_csm_xy (wks,time,CLDTOT_diff1,res) ; draw plot
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
@@ -343,11 +314,11 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@trYMaxF=0.59
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
-  plot = gsn_csm_xy (wks,time,ASDIR_test_gavg,res) ; draw plot
+  plot = gsn_csm_xy (wks,time,ASDIR_test1,res) ; draw plot
   res@xyLineColor       = "blue"          ; change line color
-  plot = gsn_csm_xy (wks,time,ASDIR_cntl_gavg,res) ; draw plot
+  plot = gsn_csm_xy (wks,time,ASDIR_cntl1,res) ; draw plot
 ;  res@xyLineColor       = "red"          ; change line color
-;  plot = gsn_csm_xy (wks,time,ASDIR_diff,res) ; draw plot
+;  plot = gsn_csm_xy (wks,time,ASDIR_diff1,res) ; draw plot
   frame(wks)
   
 
