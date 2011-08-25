@@ -9,8 +9,9 @@ path="/data5/mmills/"
 ;test="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.002"
 ;cntl="b40.rcp4_5.2deg.wcm.carma.bc0tgIP.002"
 test ="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003"
-test2="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.004"
+test2="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.006"
 cntl ="b40.rcp4_5.2deg.wcm.carma.bc0tg.002"
+cntl2="b40.rcp4_5.2deg.wcm.carma.bc0tg.003"
 
 sub="h0zm"
 
@@ -32,6 +33,12 @@ print("adding files for "+cntl)
 cntlHistory = addfiles(cntlHistoryNames, "r")
 ListSetType(cntlHistory, "cat")
 
+cntl2HistoryPattern=path+cntl2+"/"+sub+"/"+"*.nc"
+cntl2HistoryNames = systemfunc("ls " + cntl2HistoryPattern)
+print("adding files for "+cntl2)
+cntl2History = addfiles(cntl2HistoryNames, "r")
+ListSetType(cntl2History, "cat")
+
 testfile=addfile(testHistoryNames(0),"r")
 gw=testfile->gw
 lat=testfile->lat
@@ -45,6 +52,10 @@ print("reading TS_test")
 TS_test    = addfiles_GetVar(testHistory, testHistoryNames, "TS")
 print("reading PRECT_test")
 PRECT_test = addfiles_GetVar(testHistory, testHistoryNames, "PRECT")
+print("reading CLDTOT_test")
+CLDTOT_test = addfiles_GetVar(testHistory, testHistoryNames, "CLDTOT")
+print("reading ASDIR_test")
+ASDIR_test = addfiles_GetVar(testHistory, testHistoryNames, "ASDIR")
 print("reading date_x")
 date_x  = addfiles_GetVar(testHistory, testHistoryNames, "date")
 time       = addfiles_GetVar(testHistory, testHistoryNames, "time")
@@ -70,36 +81,48 @@ FSNS_cntl  = addfiles_GetVar(cntlHistory, cntlHistoryNames, "FSNS")
 print("reading FSNSC_cntl")
 FSNSC_cntl = addfiles_GetVar(cntlHistory, cntlHistoryNames, "FSNSC")
 print("reading TS_cntl")
-print("reading FSNS_test")
-FSNS_test  = addfiles_GetVar(testHistory, testHistoryNames, "FSNS")
-print("reading FSNSC_test")
-FSNSC_test = addfiles_GetVar(testHistory, testHistoryNames, "FSNSC")
-print("reading TS_test")
-TS_test    = addfiles_GetVar(testHistory, testHistoryNames, "TS")
-print("reading PRECT_test")
-PRECT_test = addfiles_GetVar(testHistory, testHistoryNames, "PRECT")
-print("reading date_x")
-date_x  = addfiles_GetVar(testHistory, testHistoryNames, "date")
 TS_cntl    = addfiles_GetVar(cntlHistory, cntlHistoryNames, "TS")
 print("reading PRECT_cntl")
 PRECT_cntl = addfiles_GetVar(cntlHistory, cntlHistoryNames, "PRECT")
+print("reading CLDTOT_cntl")
+CLDTOT_cntl = addfiles_GetVar(cntlHistory, cntlHistoryNames, "CLDTOT")
+print("reading ASDIR_cntl")
+ASDIR_cntl = addfiles_GetVar(cntlHistory, cntlHistoryNames, "ASDIR")
 print("reading date_c")
 date_c  = addfiles_GetVar(cntlHistory, cntlHistoryNames, "date")
 dc=dimsizes(date_c)
 print("dc:"+dc)
 
+print("reading FSNS_cntl2")
+FSNS_cntl2  = addfiles_GetVar(cntl2History, cntl2HistoryNames, "FSNS")
+print("reading FSNSC_cntl2")
+FSNSC_cntl2 = addfiles_GetVar(cntl2History, cntl2HistoryNames, "FSNSC")
+print("reading TS_cntl2")
+TS_cntl2    = addfiles_GetVar(cntl2History, cntl2HistoryNames, "TS")
+print("reading PRECT_cntl2")
+PRECT_cntl2 = addfiles_GetVar(cntl2History, cntl2HistoryNames, "PRECT")
+print("reading CLDTOT_cntl2")
+CLDTOT_cntl2 = addfiles_GetVar(cntl2History, cntl2HistoryNames, "CLDTOT")
+print("reading ASDIR_cntl2")
+ASDIR_cntl2 = addfiles_GetVar(cntl2History, cntl2HistoryNames, "ASDIR")
+print("reading date_c")
+date_c2  = addfiles_GetVar(cntl2History, cntl2HistoryNames, "date")
+dc_2=dimsizes(date_c2)
+print("dc_2:"+dc_2)
+
 dc1=ind(date_c.eq.date_x(0))
 dc2=ind(date_c.eq.date_x(dx-1))
 
-dc3=ind(date_c.eq.date_x2(0))
-dc4=ind(date_c.eq.date_x2(dx2-1))
+dc3=ind(date_c2.eq.date_x2(0))
+dc4=ind(date_c2.eq.date_x2(dx2-1))
 
 print("calculating TS_diff")
 TS_test_gavg  = dim_avg_wgt_Wrap(TS_test,gw,0)
 TS_test2_gavg = dim_avg_wgt_Wrap(TS_test2,gw,0)
 TS_cntl_gavg  = dim_avg_wgt_Wrap(TS_cntl,gw,0)
+TS_cntl2_gavg  = dim_avg_wgt_Wrap(TS_cntl2,gw,0)
 TS_diff  = TS_test_gavg - TS_cntl_gavg(dc1:dc2)
-TS_diff2 = TS_test2_gavg - TS_cntl_gavg(dc3:dc4)
+TS_diff2 = TS_test2_gavg - TS_cntl2_gavg(dc3:dc4)
 
 ;print(TS_test_gavg+" "+TS_cntl_gavg+" "+TS_diff)
 
@@ -107,25 +130,39 @@ print("calculating PRECT_diff")
 PRECT_test_gavg = dim_avg_wgt_Wrap(PRECT_test,gw,0)
 PRECT_test2_gavg = dim_avg_wgt_Wrap(PRECT_test2,gw,0)
 PRECT_cntl_gavg = dim_avg_wgt_Wrap(PRECT_cntl,gw,0)
+PRECT_cntl2_gavg = dim_avg_wgt_Wrap(PRECT_cntl2,gw,0)
 PRECT_diff = (PRECT_test_gavg - PRECT_cntl_gavg(dc1:dc2))*1000.*3600.*24.
-PRECT_diff2 = (PRECT_test2_gavg - PRECT_cntl_gavg(dc3:dc4))*1000.*3600.*24.
+PRECT_diff2 = (PRECT_test2_gavg - PRECT_cntl2_gavg(dc3:dc4))*1000.*3600.*24.
 PRECT_diff_pct = 100.*(PRECT_test_gavg - PRECT_cntl_gavg(dc1:dc2))/PRECT_cntl_gavg(dc1:dc2)
+PRECT_diff_pct2 = 100.*(PRECT_test2_gavg - PRECT_cntl2_gavg(dc3:dc4))/PRECT_cntl2_gavg(dc3:dc4)
 
 print("calculating FSNS_diff")
 FSNS_test_gavg = dim_avg_wgt_Wrap(FSNS_test,gw,0)
-FSNS_test2_gavg = dim_avg_wgt_Wrap(FSNS_test2,gw,0)
+;FSNS_test2_gavg = dim_avg_wgt_Wrap(FSNS_test2,gw,0)
 FSNS_cntl_gavg = dim_avg_wgt_Wrap(FSNS_cntl,gw,0)
 FSNS_diff = FSNS_test_gavg - FSNS_cntl_gavg(dc1:dc2)
-FSNS_diff2 = FSNS_test2_gavg - FSNS_cntl_gavg(dc3:dc4)
+;FSNS_diff2 = FSNS_test2_gavg - FSNS_cntl_gavg(dc3:dc4)
 FSNS_diff_pct = 100.*(FSNS_test_gavg - FSNS_cntl_gavg(dc1:dc2))/FSNS_cntl_gavg(dc1:dc2)
 
 print("calculating FSNSC_diff")
 FSNSC_test_gavg = dim_avg_wgt_Wrap(FSNSC_test,gw,0)
-FSNSC_test2_gavg = dim_avg_wgt_Wrap(FSNSC_test2,gw,0)
+;FSNSC_test2_gavg = dim_avg_wgt_Wrap(FSNSC_test2,gw,0)
 FSNSC_cntl_gavg = dim_avg_wgt_Wrap(FSNSC_cntl,gw,0)
 FSNSC_diff = FSNSC_test_gavg - FSNSC_cntl_gavg(dc1:dc2)
-FSNSC_diff2 = FSNSC_test2_gavg - FSNSC_cntl_gavg(dc3:dc4)
+;FSNSC_diff2 = FSNSC_test2_gavg - FSNSC_cntl_gavg(dc3:dc4)
 FSNSC_diff_pct = 100.*(FSNSC_test_gavg - FSNSC_cntl_gavg(dc1:dc2))/FSNSC_cntl_gavg(dc1:dc2)
+
+print("calculating CLDTOT_diff")
+CLDTOT_test_gavg  = dim_avg_wgt_Wrap(CLDTOT_test,gw,0)
+;CLDTOT_test2_gavg = dim_avg_wgt_Wrap(CLDTOT_test2,gw,0)
+CLDTOT_cntl_gavg  = dim_avg_wgt_Wrap(CLDTOT_cntl,gw,0)
+CLDTOT_diff  = CLDTOT_test_gavg - CLDTOT_cntl_gavg(dc1:dc2)
+
+print("calculating ASDIR_diff")
+ASDIR_test_gavg  = dim_avg_wgt_Wrap(ASDIR_test,gw,0)
+;ASDIR_test2_gavg = dim_avg_wgt_Wrap(ASDIR_test2,gw,0)
+ASDIR_cntl_gavg  = dim_avg_wgt_Wrap(ASDIR_cntl,gw,0)
+ASDIR_diff  = ASDIR_test_gavg - ASDIR_cntl_gavg(dc1:dc2)
 
 ; (Time(y), TS change(K)) from Robock 5Tg study
 TS_time = (/ 0.072,0.158,0.23,0.316,0.402,0.488,0.646,0.703,0.919,1.062,1.148,1.234,1.306,1.407,1.507,\
@@ -260,12 +297,12 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@xyLineColor       = "black"          ; change line color
   plot = gsn_csm_xy (wks,time,FSNS_diff,res) ; draw plot
   res@xyLineThicknessF = 8.0
-  res@xyLineColor       = "green"          ; change line color
-  plot = gsn_csm_xy (wks,time,FSNS_diff2,res) ; draw plot
+;  res@xyLineColor       = "green"          ; change line color
+;  plot = gsn_csm_xy (wks,time,FSNS_diff2,res) ; draw plot
   res@xyLineColor       = "blue"          ; change line color
   plot = gsn_csm_xy (wks,time,FSNSC_diff,res) ; draw plot
-  res@xyLineColor       = "maroon"          ; change line color
-  plot = gsn_csm_xy (wks,time,FSNSC_diff2,res) ; draw plot
+;  res@xyLineColor       = "maroon"          ; change line color
+;  plot = gsn_csm_xy (wks,time,FSNSC_diff2,res) ; draw plot
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
@@ -279,6 +316,38 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   plot = gsn_csm_xy (wks,time,FSNS_diff_pct,res) ; draw plot
   res@xyLineColor       = "blue"          ; change line color
   plot = gsn_csm_xy (wks,time,FSNSC_diff_pct,res) ; draw plot
+  frame(wks)
+  
+  res@gsnMaximize         = True          ; expand plot size to maximum
+  res@gsnPaperOrientation = "landscape"
+  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+  res@vpHeightF           = 0.7
+  res@tiYAxisString = "CLDTOT (frac)"
+  res@trYMinF=0.52
+  res@trYMaxF=0.6
+  res@xyLineThicknessF = 8.0
+  res@xyLineColor       = "black"          ; change line color
+  plot = gsn_csm_xy (wks,time,CLDTOT_test_gavg,res) ; draw plot
+  res@xyLineColor       = "blue"          ; change line color
+  plot = gsn_csm_xy (wks,time,CLDTOT_cntl_gavg,res) ; draw plot
+;  res@xyLineColor       = "red"          ; change line color
+;  plot = gsn_csm_xy (wks,time,CLDTOT_diff,res) ; draw plot
+  frame(wks)
+  
+  res@gsnMaximize         = True          ; expand plot size to maximum
+  res@gsnPaperOrientation = "landscape"
+  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+  res@vpHeightF           = 0.7
+  res@tiYAxisString = "ASDIR (frac)"
+  res@trYMinF=0.55
+  res@trYMaxF=0.59
+  res@xyLineThicknessF = 8.0
+  res@xyLineColor       = "black"          ; change line color
+  plot = gsn_csm_xy (wks,time,ASDIR_test_gavg,res) ; draw plot
+  res@xyLineColor       = "blue"          ; change line color
+  plot = gsn_csm_xy (wks,time,ASDIR_cntl_gavg,res) ; draw plot
+;  res@xyLineColor       = "red"          ; change line color
+;  plot = gsn_csm_xy (wks,time,ASDIR_diff,res) ; draw plot
   frame(wks)
   
 
