@@ -1,14 +1,15 @@
 #!/bin/ksh
 
-type='h0zm'
-#type='h0'
+#type='h0zm'
+type='h0'
 
-runname='b40.rcp8_5.2deg.wcm.004'
+runname='b40.rcp4_5.2deg.wcm.carma.bc0tg.002'
 
 #rootpath='/data5/mmills/wa319/carma-soot'
 #rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-rootpath='/data/waccm'
+#rootpath='/data/waccm'
 #rootpath='/data/ccsm4'
+rootpath='/data5/mmills'
 
 wadir=$rootpath'/'$runname'/'$type
 #wadir=$rootpath'/'$runname'/atm/hist'
@@ -16,8 +17,8 @@ anndir=$rootpath'/'$runname'/'$type'.annual'
 searchstr='cam2.'$type
 addstr='annual'
 
-year1=2005
-year2=2050
+year1=2012
+year2=2024
 
 
 # script to average and standard deviation of waccm h0 files

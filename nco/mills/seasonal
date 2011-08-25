@@ -1,28 +1,33 @@
 #!/bin/ksh
 
-runname='bcrckt03'
+#type='h0zm'
+type='h0'
+
+#runname='bcrckt03'
 #runname='bccntl02'
+runname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003'
 
 #rootpath='/data5/mmills/wa319/carma-soot'
-rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+#rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+rootpath='/data5/mmills'
 
-searchstr='cam2.h0zm'
+searchstr='cam2.'$type
 
 # Dec, Jan, Feb
-monthstr1='-0[12].nc'
-monthstr2='-12.nc'
-addstr='DJF'
+#monthstr1='-0[12].nc'
+#monthstr2='-12.nc'
+#addstr='DJF'
 
 # Jun, Jul, Aug
-#monthstr1='-0[67].nc'
-#monthstr2='-08.nc'
-#addstr='JJA'
+monthstr1='-0[67].nc'
+monthstr2='-08.nc'
+addstr='JJA'
 
-year1=2035
-year2=2074
+year1=2013
+year2=2022
 
-wadir=$rootpath'/'$runname'/h0zm'
-anndir=$rootpath'/'$runname'/h0zm.'$addstr
+wadir=$rootpath'/'$runname'/'$type
+anndir=$rootpath'/'$runname'/'$type'.'$addstr
 
 # script to average and standard deviation of waccm h0 files
 
@@ -44,15 +49,21 @@ while [[ $year -le $year2 ]];do
       yearstr=$year
     fi
   
-  ncfiles1=$wadir'/'$runname'.'$searchstr'.'$yearstr*$monthstr1
-  ncfiles2=$wadir'/'$runname'.'$searchstr'.'$yearstr*$monthstr2
-  avgfile=$anndir'/'$runname'.'$searchstr'.'$yearstr'.'$addstr'.nc'
+    yearstrm1=$yearstr
+  
+#  if [[ year -gt $year1 ]]
+#    then
+    ncfiles1=$wadir'/'$runname'.'$searchstr'.'$yearstr*$monthstr1
+    ncfiles2=$wadir'/'$runname'.'$searchstr'.'$yearstrm1*$monthstr2
+    avgfile=$anndir'/'$runname'.'$searchstr'.'$yearstr'.'$addstr'.nc'
 
-  # create annual mean
-  echo averaging $ncfiles1 $ncfiles2
-  ncea $ncfiles1 $ncfiles2 $avgfile
-  echo created $avgfile
-   
+    # create annual mean
+    echo averaging $ncfiles1 $ncfiles2
+    ncea $ncfiles1 $ncfiles2 $avgfile
+    echo created $avgfile
+#  fi
+  
+  yearstrm1=$yearstr
   (( year+=1 ))
      
 done

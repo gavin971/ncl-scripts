@@ -1,0 +1,27 @@
+#!/bin/ksh
+
+### reads zonal means in h0zm and creates global means from all available years
+
+  echo globavg
+
+rootpath='/data5/mmills'
+runname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003'
+
+zmdir=$rootpath'/'$runname'/h0zm'
+gmdir=$rootpath'/'$runname'/h0gm'
+
+mkdir -p $gmdir
+
+avgfile=$gmdir'/'$runname'.cam2.h0.globavg.nc'
+tmpfile=$gmdir'/zmtmp.nc'
+
+echo $avgfile
+ncfiles=$zmdir'/'$runname'.cam2.h0zm.*.nc'
+echo "ncrcat -O $ncfiles $tmpfile"
+ncrcat -O $ncfiles $tmpfile
+  
+echo "ncwa -O -I -a lat -w gw $tmpfile $avgfile"
+ncwa -O -I -a lat -w gw $tmpfile $avgfile
+    
+rm $tmpfile
+
