@@ -1,13 +1,13 @@
 #!/bin/ksh
 
-#ensname='b40.1955-2005.2deg.wset.00[123]'
-#avgname='b40.1955-2005.2deg.wset.avg'
-#rootpath='/data/ccsm4'
+ensname='b40.1955-2005.2deg.wset.00[456]'
+avgname='b40.1955-2005.2deg.wset.avg456'
+rootpath='/data/ccsm4'
 
-ensname='b40.rcp4_5.2deg.wcm.00[123]'
-#ensname2='br04.20th.track1.2deg.wcm.pd.00[12]'
-avgname='b40.rcp4_5.2deg.wcm.avg'
-rootpath='/data/waccm'
+#ensname='b40.rcp4_5.2deg.wcm.00[123]'
+##ensname2='br04.20th.track1.2deg.wcm.pd.00[12]'
+#avgname='b40.rcp4_5.2deg.wcm.avg'
+#rootpath='/data/waccm'
 
 htype='h0'
 wadir=$rootpath'/'$ensname'/'$htype
@@ -15,8 +15,8 @@ wadir=$rootpath'/'$ensname'/'$htype
 avgdir=$rootpath'/'$avgname'/'$htype
 searchstr='cam2.'$htype
 
-year1=2009
-year2=2051
+year1=1955
+year2=2005
 
 
 # script to average and standard deviation of waccm h0 files
