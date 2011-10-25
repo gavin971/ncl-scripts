@@ -1,21 +1,23 @@
 #!/bin/ksh
 
-ensname='b40.1955-2005.2deg.wset.00[456]'
-avgname='b40.1955-2005.2deg.wset.avg456'
-rootpath='/data/ccsm4'
+ensname='b40.1850.2deg.wcm.qbosol.00[123]'
+#hno3_rename='b40.rcp2_6.2deg.wcm.002'
+#ensname2='b40.rcp2_6.2deg.wcm.00[34]'
+avgname='b40.1850.2deg.wcm.qbosol.avg'
+rootpath='/data/waccm'
 
 #ensname='b40.rcp4_5.2deg.wcm.00[123]'
 ##ensname2='br04.20th.track1.2deg.wcm.pd.00[12]'
 #avgname='b40.rcp4_5.2deg.wcm.avg'
 #rootpath='/data/waccm'
 
-htype='h0'
+htype='h0zm'
 wadir=$rootpath'/'$ensname'/'$htype
 #wadir2=$rootpath'/'$ensname2'/'$htype
 avgdir=$rootpath'/'$avgname'/'$htype
 searchstr='cam2.'$htype
 
-year1=1955
+year1=1980
 year2=2005
 
 
@@ -51,6 +53,7 @@ while [[ $year -le $year2 ]];do
       fi
       
     ncfiles=$wadir'/'$ensname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
+#    ncfiles_rename=$wadir'/'$hno3_rename'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
 #    ncfiles_tmp=$wadir'/'$ensname'.'$searchstr'.'$yearstr'-'$monthstr'_tmp.nc'
 #    ncfiles2=$wadir2'/'$ensname2'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
     avgfile=$avgdir'/'$avgname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
@@ -58,13 +61,24 @@ while [[ $year -le $year2 ]];do
     # "delete" missing variable to temporary file
 #    echo ncks -x -v LCLOUD,LINOZ_DO3,LINOZ_DO3_PSC,LINOZ_O3CLIM,LINOZ_O3COL,LINOZ_SSO3,LINOZ_SZA,NDROPCOL,NDROPMIX,NDROPSNK,NDROPSRC,WTKE $ncfiles $ncfiles_tmp
 #    ncks -O -x -v LCLOUD,LINOZ_DO3,LINOZ_DO3_PSC,LINOZ_O3CLIM,LINOZ_O3COL,LINOZ_SSO3,LINOZ_SZA,NDROPCOL,NDROPMIX,NDROPSNK,NDROPSRC,WTKE $ncfiles $ncfiles_tmp
-    # create ensemble mean
+
+     # "rename" condensed-phase HNO3 variables to new names
+#    echo ncrename -v .HNO3_CD1,HNO3_STS -v .HNO3_CD3,HNO3_NAT $ncfiles_rename
+#    ncrename -O -v .HNO3_CD1,HNO3_STS -v .HNO3_CD3,HNO3_NAT $ncfiles_rename
+
+    # "delete" missing variable to temporary file
+#    echo ncks -x -v NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_sulf $ncfiles $ncfiles_tmp
+#    ncks -O -x -v NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_sulf $ncfiles $ncfiles_tmp
+
+   # create ensemble mean
     echo ncea $ncfiles $avgfile
     ncea -O $ncfiles $avgfile
+
 #    echo ncea $ncfiles_tmp $ncfiles2 $avgfile
 #    ncea -O $ncfiles_tmp $ncfiles2 $avgfile
+
     # delete temporary file
-    echo rm $ncfiles_tmp
+#    echo rm $ncfiles_tmp
 #    rm $ncfiles_tmp
     
     (( month+=1 ))

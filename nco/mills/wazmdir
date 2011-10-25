@@ -5,7 +5,7 @@
 #rootpath='/data5/mmills'
 rootpath='/data/waccm'
 #rootpath='/data/ccsm4'
-caseid='b40.1850.2deg.wcm.qbosol.001'
+caseid='b40.1850.2deg.wcm.qbosol.002'
 
 hnum='h0'
 #hnum='h3iso'
