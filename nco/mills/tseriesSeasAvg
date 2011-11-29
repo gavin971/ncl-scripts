@@ -1,0 +1,36 @@
+#!/bin/sh
+
+###.......creates monthly means from all available years.......
+
+rootpath=/data/ccsm4
+runname=b40.20th.track1.1deg.009
+wadir=$rootpath/$runname/proc
+file=$wadir/$runname.cam2.h0.PSL.185001-200512
+file2=$wadir/$runname.cam2.h0.PSL.185001-186912
+file3=$wadir/$runname.cam2.h0.PSL.198601-200512
+echo $file
+
+let lim1=12*20-1
+let lim2=1986-1850
+let lim2=12*$lim2
+
+for idx in 01 02 12; do # DJF
+  echo ncks -O -F -d time,${idx},${lim1},12 $file.nc $file2.${idx}.nc
+  ncks -O -F -d time,${idx},${lim1},12 $file.nc $file2.${idx}.nc
+  echo ncra -O $file2.${idx}.nc $file2.avg_${idx}.nc
+  ncra -O $file2.${idx}.nc $file2.avg_${idx}.nc
+  
+  let lim3=$lim2+$idx
+  echo ncks -O -F -d time,${lim3},,12 $file.nc $file3.${idx}.nc
+  ncks -O -F -d time,${lim3},,12 $file.nc $file3.${idx}.nc
+  echo ncra -O $file3.${idx}.nc $file3.avg_${idx}.nc
+  ncra -O $file3.${idx}.nc $file3.avg_${idx}.nc
+done
+
+echo ncea -O $file2.avg_01.nc $file2.avg_02.nc $file2.avg_12.nc $file2.avg_DJF.nc
+ncea -O $file2.avg_01.nc $file2.avg_02.nc $file2.avg_12.nc $file2.avg_DJF.nc
+
+echo ncea -O $file3.avg_01.nc $file3.avg_02.nc $file3.avg_12.nc $file3.avg_DJF.nc
+ncea -O $file3.avg_01.nc $file3.avg_02.nc $file3.avg_12.nc $file3.avg_DJF.nc
+
+echo "Successfully completed script tseriesSeasAvg."
