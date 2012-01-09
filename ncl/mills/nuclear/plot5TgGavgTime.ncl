@@ -4,25 +4,38 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
 ;path="$MODEL_PATH/ccsm/run/"
 ;path="~/csm/"
-path="/data5/mmills/"
-
-;test="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.002"
-;cntl="b40.rcp4_5.2deg.wcm.carma.bc0tgIP.002"
-test1="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003"
-test2="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.006"
-cntl1="b40.rcp4_5.2deg.wcm.carma.bc0tg.002"
-cntl2="b40.rcp4_5.2deg.wcm.carma.bc0tg.003"
-
+path="/data4/mmills/"
+root="b40.rcp4_5.2deg.wcm.carma."
 sub="h0gm"
 
+ensemble=False
+if (ensemble) then
+  test1="bc5tgIP.003"
+  test2="bc5tgIP.006"
+  test3="bc5tgIP.007"
+  cntl1="bc0tg.002"
+  cntl2="bc0tg.003"
+  cntl3="bc0tg.001"
+else
+  test1="bc5tgIP.avg"
+  cntl1="bc0tg.avg"
+end if
+
 print("adding files...")
-testfile1=addfile(path+test1+"/"+sub+"/"+test1+".cam2.h0.globavg.nc","r")
-testfile2=addfile(path+test2+"/"+sub+"/"+test2+".cam2.h0.globavg.nc","r")
-cntlfile1=addfile(path+cntl1+"/"+sub+"/"+cntl1+".cam2.h0.globavg.nc","r")
-cntlfile2=addfile(path+cntl2+"/"+sub+"/"+cntl2+".cam2.h0.globavg.nc","r")
+testfile1=addfile(path+root+test1+"/"+sub+"/"+root+test1+".cam2.h0.globavg.nc","r")
+cntlfile1=addfile(path+root+cntl1+"/"+sub+"/"+root+cntl1+".cam2.h0.globavg.nc","r")
+
+if (ensemble) then
+  testfile2=addfile(path+root+test2+"/"+sub+"/"+root+test2+".cam2.h0.globavg.nc","r")
+  testfile3=addfile(path+root+test3+"/"+sub+"/"+root+test3+".cam2.h0.globavg.nc","r")
+  cntlfile2=addfile(path+root+cntl2+"/"+sub+"/"+root+cntl2+".cam2.h0.globavg.nc","r")
+  cntlfile3=addfile(path+root+cntl3+"/"+sub+"/"+root+cntl3+".cam2.h0.globavg.nc","r")
+end if
 
 gw=testfile1->gw
 lat=testfile1->lat
+time=testfile1->time
+time=time/365.0
 nLats=dimsizes(lat)
 
 print("reading FSNS_test1")
@@ -39,27 +52,8 @@ print("reading ASDIR_test1")
 ASDIR_test1 = testfile1->ASDIR
 print("reading date_x1")
 date_x1     = testfile1->date
-time        = testfile1->time
-time=time/365.0
 dx1=dimsizes(date_x1)
 print("dx1:"+dx1)
-
-print("reading FSNS_test2")
-FSNS_test2  = testfile2->FSNS
-print("reading FSNSC_test2")
-FSNSC_test2 = testfile2->FSNSC
-print("reading TS_test2")
-TS_test2    = testfile2->TS
-print("reading PRECT_test2")
-PRECT_test2 = testfile2->PRECT
-print("reading CLDTOT_test2")
-CLDTOT_test2 = testfile2->CLDTOT
-print("reading ASDIR_test2")
-ASDIR_test2 = testfile2->ASDIR
-print("reading date_x2")
-date_x2     = testfile2->date
-dx2=dimsizes(date_x2)
-print("dx2:"+dx2)
 
 print("reading FSNS_cntl1")
 FSNS_cntl1  = cntlfile1->FSNS
@@ -78,56 +72,134 @@ date_c1     = cntlfile1->date
 dc_1=dimsizes(date_c1)
 print("dc_1:"+dc_1)
 
-print("reading FSNS_cntl2")
-FSNS_cntl2  = cntlfile2->FSNS
-print("reading FSNSC_cntl2")
-FSNSC_cntl2 = cntlfile2->FSNSC
-print("reading TS_cntl2")
-TS_cntl2    = cntlfile2->TS
-print("reading PRECT_cntl2")
-PRECT_cntl2 = cntlfile2->PRECT
-print("reading CLDTOT_cntl2")
-CLDTOT_cntl2 = cntlfile2->CLDTOT
-print("reading ASDIR_cntl2")
-ASDIR_cntl2 = cntlfile2->ASDIR
-print("reading date_c2")
-date_c2     = cntlfile2->date
-dc_2=dimsizes(date_c2)
-print("dc_2:"+dc_2)
-
 dc1=ind(date_c1.eq.date_x1(0))
 dc2=ind(date_c1.eq.date_x1(dx1-1))
-
-dc3=ind(date_c2.eq.date_x2(0))
-dc4=ind(date_c2.eq.date_x2(dx2-1))
-
 print("dc1="+dc1)
 print("dc2="+dc2)
-print("dc3="+dc3)
-print("dc4="+dc4)
+
+if (ensemble) then
+  print("reading FSNS_test2")
+  FSNS_test2  = testfile2->FSNS
+  print("reading FSNSC_test2")
+  FSNSC_test2 = testfile2->FSNSC
+  print("reading TS_test2")
+  TS_test2    = testfile2->TS
+  print("reading PRECT_test2")
+  PRECT_test2 = testfile2->PRECT
+  print("reading CLDTOT_test2")
+  CLDTOT_test2 = testfile2->CLDTOT
+  print("reading ASDIR_test2")
+  ASDIR_test2 = testfile2->ASDIR
+  print("reading date_x2")
+  date_x2     = testfile2->date
+  dx2=dimsizes(date_x2)
+  print("dx2:"+dx2)
+
+  print("reading FSNS_test3")
+  FSNS_test3  = testfile3->FSNS
+  print("reading FSNSC_test3")
+  FSNSC_test3 = testfile3->FSNSC
+  print("reading TS_test3")
+  TS_test3    = testfile3->TS
+  print("reading PRECT_test3")
+  PRECT_test3 = testfile3->PRECT
+  print("reading CLDTOT_test3")
+  CLDTOT_test3 = testfile3->CLDTOT
+  print("reading ASDIR_test3")
+  ASDIR_test3 = testfile3->ASDIR
+  print("reading date_x3")
+  date_x3     = testfile3->date
+  dx3=dimsizes(date_x3)
+  print("dx3:"+dx3)
+
+  print("reading FSNS_cntl2")
+  FSNS_cntl2  = cntlfile2->FSNS
+  print("reading FSNSC_cntl2")
+  FSNSC_cntl2 = cntlfile2->FSNSC
+  print("reading TS_cntl2")
+  TS_cntl2    = cntlfile2->TS
+  print("reading PRECT_cntl2")
+  PRECT_cntl2 = cntlfile2->PRECT
+  print("reading CLDTOT_cntl2")
+  CLDTOT_cntl2 = cntlfile2->CLDTOT
+  print("reading ASDIR_cntl2")
+  ASDIR_cntl2 = cntlfile2->ASDIR
+  print("reading date_c2")
+  date_c2     = cntlfile2->date
+  dc_2=dimsizes(date_c2)
+  print("dc_2:"+dc_2)
+
+  print("reading FSNS_cntl3")
+  FSNS_cntl3  = cntlfile3->FSNS
+  print("reading FSNSC_cntl3")
+  FSNSC_cntl3 = cntlfile3->FSNSC
+  print("reading TS_cntl3")
+  TS_cntl3    = cntlfile3->TS
+  print("reading PRECT_cntl3")
+  PRECT_cntl3 = cntlfile3->PRECT
+  print("reading CLDTOT_cntl3")
+  CLDTOT_cntl3 = cntlfile3->CLDTOT
+  print("reading ASDIR_cntl3")
+  ASDIR_cntl3 = cntlfile3->ASDIR
+  print("reading date_c3")
+  date_c3     = cntlfile3->date
+  dc_3=dimsizes(date_c3)
+  print("dc_3:"+dc_3)
+
+  dc3=ind(date_c2.eq.date_x2(0))
+  dc4=ind(date_c2.eq.date_x2(dx2-1))
+
+  dc5=ind(date_c3.eq.date_x3(0))
+  dc6=ind(date_c3.eq.date_x3(dx3-1))
+
+  print("dc3="+dc3)
+  print("dc4="+dc4)
+  print("dc5="+dc5)
+  print("dc6="+dc6)
+end if
 
 print("1: "+dimsizes(TS_test1)+" "+dimsizes(TS_cntl1(dc1:dc2)))
-print("2: "+dimsizes(TS_test2)+" "+dimsizes(TS_cntl2(dc3:dc4)))
+if (ensemble) then
+  print("2: "+dimsizes(TS_test2)+" "+dimsizes(TS_cntl2(dc3:dc4)))
+  print("3: "+dimsizes(TS_test3)+" "+dimsizes(TS_cntl3(dc5:dc6)))
+end if
 
 print("calculating TS_diff")
 TS_diff1 = TS_test1 - TS_cntl1(dc1:dc2)
-TS_diff2 = TS_test2 - TS_cntl2(dc3:dc4)
+if (ensemble) then
+  TS_diff2 = TS_test2 - TS_cntl2(dc3:dc4)
+  TS_diff3 = TS_test3 - TS_cntl3(dc5:dc6)
+end if
 
 print("calculating PRECT_diff")
 PRECT_diff1 = (PRECT_test1 - PRECT_cntl1(dc1:dc2))*1000.*3600.*24.
-PRECT_diff2 = (PRECT_test2 - PRECT_cntl2(dc3:dc4))*1000.*3600.*24.
 PRECT_diff_pct1 = 100.*(PRECT_test1 - PRECT_cntl1(dc1:dc2))/PRECT_cntl1(dc1:dc2)
-PRECT_diff_pct2 = 100.*(PRECT_test2 - PRECT_cntl2(dc3:dc4))/PRECT_cntl2(dc3:dc4)
+if (ensemble) then
+  PRECT_diff2 = (PRECT_test2 - PRECT_cntl2(dc3:dc4))*1000.*3600.*24.
+  PRECT_diff3 = (PRECT_test3 - PRECT_cntl3(dc5:dc6))*1000.*3600.*24.
+  PRECT_diff_pct2 = 100.*(PRECT_test2 - PRECT_cntl2(dc3:dc4))/PRECT_cntl2(dc3:dc4)
+  PRECT_diff_pct3 = 100.*(PRECT_test3 - PRECT_cntl3(dc5:dc6))/PRECT_cntl3(dc5:dc6)
+end if
 
 print("calculating FSNS_diff")
 FSNS_diff1 = FSNS_test1 - FSNS_cntl1(dc1:dc2)
-;FSNS_diff2 = FSNS_test2 - FSNS_cntl2(dc3:dc4)
 FSNS_diff_pct1 = 100.*(FSNS_test1 - FSNS_cntl1(dc1:dc2))/FSNS_cntl1(dc1:dc2)
+if (ensemble) then
+  FSNS_diff2 = FSNS_test2 - FSNS_cntl2(dc3:dc4)
+  FSNS_diff3 = FSNS_test3 - FSNS_cntl3(dc5:dc6)
+  FSNS_diff_pct2 = 100.*(FSNS_test2 - FSNS_cntl2(dc3:dc4))/FSNS_cntl2(dc3:dc4)
+  FSNS_diff_pct3 = 100.*(FSNS_test3 - FSNS_cntl3(dc5:dc6))/FSNS_cntl3(dc5:dc6)
+end if
 
 print("calculating FSNSC_diff")
 FSNSC_diff1 = FSNSC_test1 - FSNSC_cntl1(dc1:dc2)
-;FSNSC_diff2 = FSNSC_test2 - FSNSC_cntl2(dc3:dc4)
 FSNSC_diff_pct1 = 100.*(FSNSC_test1 - FSNSC_cntl1(dc1:dc2))/FSNSC_cntl1(dc1:dc2)
+if (ensemble) then
+  FSNSC_diff2 = FSNSC_test2 - FSNSC_cntl2(dc3:dc4)
+  FSNSC_diff3 = FSNSC_test3 - FSNSC_cntl3(dc5:dc6)
+  FSNSC_diff_pct2 = 100.*(FSNSC_test2 - FSNSC_cntl2(dc3:dc4))/FSNSC_cntl2(dc3:dc4)
+  FSNSC_diff_pct3 = 100.*(FSNSC_test3 - FSNSC_cntl3(dc5:dc6))/FSNSC_cntl3(dc5:dc6)
+end if
 
 print("calculating CLDTOT_diff")
 CLDTOT_diff1  = CLDTOT_test1 - CLDTOT_cntl1(dc1:dc2)
@@ -185,8 +257,13 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   -8.305,-8.644,-8.644,-8.136,-7.797,-6.949,-6.78,-6.78,-6.78,-6.441,-5.932,-5.424,-5.254,-5.254,-5.254,-5.085,\
   -4.576,-4.068,-3.559,-3.559,-3.39,-3.051,-3.051,-2.712,-2.712,-2.712,-2.373,-2.203,-2.034,-2.034,-1.864,-1.864,\
   -1.525,-1.525,-1.186/)
-               
-  wks   = gsn_open_wks ("pdf","$IMAGE_PATH/TSvsRobock."+test1+"."+test2) ; open workstation
+ 
+  if (ensemble) then
+    pdffile="TSvsRobock."+test1+"."+test2+"."+test3
+  else         
+    pdffile="TSvsRobock."+test1
+  end if      
+  wks   = gsn_open_wks ("pdf","$IMAGE_PATH/"+pdffile) ; open workstation
 
   res                   = True                      ; plot mods desired
 ;  res@gsnPaperOrientation = "landscape"
@@ -215,14 +292,21 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@tiYAxisString = "Surface Temperature Anomaly (~S~o~N~C)"
   res@tiXAxisString = "Year"
                
+  print("plot = gsn_csm_xy (wks,TS_time,TS_rbck,res)")
   plot = gsn_csm_xy (wks,TS_time,TS_rbck,res) ; draw plot
   
   res@xyLineColor       = "black"          ; change line color
   res@xyLineThicknessF = 8.0
+  print("plot = gsn_csm_xy (wks,time,TS_diff1,res)")
   plot = gsn_csm_xy (wks,time,TS_diff1,res) ; draw  plot
   res@xyLineColor       = "green"          ; change line color
-  res@xyLineThicknessF = 8.0
-  plot = gsn_csm_xy (wks,time,TS_diff2,res) ; draw  plot
+  if (ensemble) then
+    print("plot = gsn_csm_xy (wks,time,TS_diff2,res)") 
+    plot = gsn_csm_xy (wks,time,TS_diff2,res) ; draw  plot
+    res@xyLineColor       = "blue"          ; change line color
+    print("plot = gsn_csm_xy (wks,time,TS_diff3,res)")
+    plot = gsn_csm_xy (wks,time,TS_diff3,res) ; draw  plot
+  end if
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
@@ -234,13 +318,20 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@tiYAxisString = "Precipitation Anomaly (mm/day)"
   res@xyLineThicknessF = 6.0
   res@xyLineColor       = "red"          ; change line color
+  print("plot = gsn_csm_xy (wks,PRECT_time,PRECT_rbck,res)")
   plot = gsn_csm_xy (wks,PRECT_time,PRECT_rbck,res) ; draw plot
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
+  print("plot = gsn_csm_xy (wks,time,PRECT_diff1,res)")
   plot = gsn_csm_xy (wks,time,PRECT_diff1,res) ; draw plot
-  res@xyLineThicknessF = 8.0
-  res@xyLineColor       = "green"          ; change line color
-  plot = gsn_csm_xy (wks,time,PRECT_diff2,res) ; draw plot
+  if (ensemble) then
+    res@xyLineColor       = "green"          ; change line color
+    print("plot = gsn_csm_xy (wks,time,PRECT_diff2,res)")
+    plot = gsn_csm_xy (wks,time,PRECT_diff2,res) ; draw plot
+    res@xyLineColor       = "blue"          ; change line color
+    print("plot = gsn_csm_xy (wks,time,PRECT_diff3,res)")
+    plot = gsn_csm_xy (wks,time,PRECT_diff3,res) ; draw plot
+  end if
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
@@ -252,41 +343,92 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@tiYAxisString = "Precipitation Anomaly (%)"
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
+  print("plot = gsn_csm_xy (wks,time,PRECT_diff_pct1,res)")
   plot = gsn_csm_xy (wks,time,PRECT_diff_pct1,res) ; draw plot
+  if (ensemble) then
+    res@xyLineColor       = "green"          ; change line color
+    plot = gsn_csm_xy (wks,time,PRECT_diff_pct2,res) ; draw plot
+    res@xyLineColor       = "blue"          ; change line color
+    plot = gsn_csm_xy (wks,time,PRECT_diff_pct3,res) ; draw plot
+  end if
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
   res@vpWidthF            = 1.2           ; change aspect ratio of plot
   res@vpHeightF           = 0.7
-  res@tiYAxisString = "SW Flux Anomaly at Surface (W/m~S~2~N~)"
+  res@tiYAxisString = "SW All-Sky Flux Anomaly at Surface (W/m~S~2~N~)"
   res@trYMinF = -23
   res@xyLineThicknessF = 6.0
   res@xyLineColor       = "red"          ; change line color
+  print("plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res)")
   plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res) ; draw plot
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
   plot = gsn_csm_xy (wks,time,FSNS_diff1,res) ; draw plot
-  res@xyLineThicknessF = 8.0
-;  res@xyLineColor       = "green"          ; change line color
-;  plot = gsn_csm_xy (wks,time,FSNS_diff2,res) ; draw plot
-  res@xyLineColor       = "blue"          ; change line color
-  plot = gsn_csm_xy (wks,time,FSNSC_diff1,res) ; draw plot
-;  res@xyLineColor       = "maroon"          ; change line color
-;  plot = gsn_csm_xy (wks,time,FSNSC_diff2,res) ; draw plot
+  if (ensemble) then
+    res@xyLineColor       = "green"          ; change line color
+    plot = gsn_csm_xy (wks,time,FSNS_diff2,res) ; draw plot
+    res@xyLineColor       = "blue"          ; change line color
+    plot = gsn_csm_xy (wks,time,FSNS_diff3,res) ; draw plot
+  end if
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
   res@vpWidthF            = 1.2           ; change aspect ratio of plot
   res@vpHeightF           = 0.7
-  res@tiYAxisString = "SW Flux Anomaly at Surface (%)"
+  res@tiYAxisString = "SW Clear-sky Flux Anomaly at Surface (W/m~S~2~N~)"
+  res@trYMinF = -23
+  res@xyLineThicknessF = 6.0
+  res@xyLineColor       = "red"          ; change line color
+  print("plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res)")
+  plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res) ; draw plot
+  res@xyLineThicknessF = 8.0
+  res@xyLineColor       = "black"          ; change line color
+  plot = gsn_csm_xy (wks,time,FSNSC_diff1,res) ; draw plot
+  if (ensemble) then
+    res@xyLineColor       = "green"          ; change line color
+    plot = gsn_csm_xy (wks,time,FSNSC_diff2,res) ; draw plot
+    res@xyLineColor       = "blue"          ; change line color
+    plot = gsn_csm_xy (wks,time,FSNSC_diff3,res) ; draw plot
+  end if
+  frame(wks)
+  
+  res@gsnMaximize         = True          ; expand plot size to maximum
+  res@gsnPaperOrientation = "landscape"
+  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+  res@vpHeightF           = 0.7
+  res@tiYAxisString = "SW All-sky Flux Anomaly at Surface (%)"
   res@trYMinF = -15
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
+  print("plot = gsn_csm_xy (wks,time,FSNS_diff_pct1,res)")
   plot = gsn_csm_xy (wks,time,FSNS_diff_pct1,res) ; draw plot
-  res@xyLineColor       = "blue"          ; change line color
+  if (ensemble) then
+    res@xyLineColor       = "green"          ; change line color
+    plot = gsn_csm_xy (wks,time,FSNS_diff_pct2,res) ; draw plot
+    res@xyLineColor       = "blue"          ; change line color
+    plot = gsn_csm_xy (wks,time,FSNS_diff_pct3,res) ; draw plot
+  end if
+  frame(wks)
+  
+  res@gsnMaximize         = True          ; expand plot size to maximum
+  res@gsnPaperOrientation = "landscape"
+  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+  res@vpHeightF           = 0.7
+  res@tiYAxisString = "SW Clear-sky Flux Anomaly at Surface (%)"
+  res@trYMinF = -15
+  res@xyLineThicknessF = 8.0
+  res@xyLineColor       = "black"          ; change line color
+  print("plot = gsn_csm_xy (wks,time,FSNSC_diff_pct1,res)")
   plot = gsn_csm_xy (wks,time,FSNSC_diff_pct1,res) ; draw plot
+  if (ensemble) then
+    res@xyLineColor       = "green"          ; change line color
+    plot = gsn_csm_xy (wks,time,FSNSC_diff_pct2,res) ; draw plot
+    res@xyLineColor       = "blue"          ; change line color
+    plot = gsn_csm_xy (wks,time,FSNSC_diff_pct3,res) ; draw plot
+  end if
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
@@ -298,6 +440,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@trYMaxF=0.6
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
+  print("plot = gsn_csm_xy (wks,time,CLDTOT_test1,res)")
   plot = gsn_csm_xy (wks,time,CLDTOT_test1,res) ; draw plot
   res@xyLineColor       = "blue"          ; change line color
   plot = gsn_csm_xy (wks,time,CLDTOT_cntl1,res) ; draw plot
@@ -314,6 +457,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@trYMaxF=0.59
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
+  print("plot = gsn_csm_xy (wks,time,ASDIR_test1,res)")
   plot = gsn_csm_xy (wks,time,ASDIR_test1,res) ; draw plot
   res@xyLineColor       = "blue"          ; change line color
   plot = gsn_csm_xy (wks,time,ASDIR_cntl1,res) ; draw plot
@@ -321,4 +465,10 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
 ;  plot = gsn_csm_xy (wks,time,ASDIR_diff1,res) ; draw plot
   frame(wks)
   
+  delete(wks)
+  
+  muttcmd="mutt mikejmills@mac.com -a $IMAGE_PATH/"+pdffile+".pdf -s "+pdffile+" < /dev/null"
+  print(muttcmd)
+  mutter=systemfunc(muttcmd)
+  print(mutter)
 
