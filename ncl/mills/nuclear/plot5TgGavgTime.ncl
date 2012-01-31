@@ -2,9 +2,17 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-;path="$MODEL_PATH/ccsm/run/"
+host   = systemfunc("hostname")
+ostype = systemfunc("echo $OSTYPE")
+
+if (host.eq."modeling1") then
+  path="/data4/mmills/"
+else
+  path="$MODEL_PATH/ccsm/case/"
+end if
 ;path="~/csm/"
-path="/data4/mmills/"
+print("path="+path)
+
 root="b40.rcp4_5.2deg.wcm.carma."
 sub="h0gm"
 
@@ -399,6 +407,23 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@gsnPaperOrientation = "landscape"
   res@vpWidthF            = 1.2           ; change aspect ratio of plot
   res@vpHeightF           = 0.7
+  res@tiYAxisString = "SW Flux Anomaly at Surface (W/m~S~2~N~)"
+  res@trYMinF = -23
+  res@xyLineThicknessF = 6.0
+  res@xyLineColor       = "red"          ; change line color
+  print("plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res)")
+  plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res) ; draw plot
+  res@xyLineThicknessF = 8.0
+  res@xyLineColor       = "black"          ; change line color
+  plot = gsn_csm_xy (wks,time,FSNS_diff1,res) ; draw plot
+  res@xyLineColor       = "blue"          ; change line color
+  plot = gsn_csm_xy (wks,time,FSNSC_diff1,res) ; draw plot
+  frame(wks)
+  
+  res@gsnMaximize         = True          ; expand plot size to maximum
+  res@gsnPaperOrientation = "landscape"
+  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+  res@vpHeightF           = 0.7
   res@tiYAxisString = "SW All-sky Flux Anomaly at Surface (%)"
   res@trYMinF = -15
   res@xyLineThicknessF = 8.0
@@ -430,6 +455,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
     plot = gsn_csm_xy (wks,time,FSNSC_diff_pct3,res) ; draw plot
   end if
   frame(wks)
+  
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
@@ -467,8 +493,16 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   
   delete(wks)
   
-  muttcmd="mutt mikejmills@mac.com -a $IMAGE_PATH/"+pdffile+".pdf -s "+pdffile+" < /dev/null"
-  print(muttcmd)
-  mutter=systemfunc(muttcmd)
-  print(mutter)
+  if (host.eq."modeling1") then
+    muttcmd="mutt mikejmills@mac.com -a $IMAGE_PATH/"+pdffile+".pdf -s "+pdffile+" < /dev/null"
+    print(muttcmd)
+    mutter=systemfunc(muttcmd)
+    print(mutter)
+  end if
 
+  if (ostype.eq."darwin") then
+    opencmd="open $IMAGE_PATH/"+pdffile+".pdf"
+    print(opencmd)
+    open=systemfunc(opencmd)
+    print(open)
+  end if
