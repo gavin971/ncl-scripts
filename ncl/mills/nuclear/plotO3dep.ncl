@@ -99,13 +99,15 @@ begin
  
 
   res@tmXBMaxTicks     = 10
-  res@tmXBMinorPerMajor= 11
+  res@tmXBMinorPerMajor= 3
+  res@tmYLMode="Manual"
+  
 ;  res@tmXBMode         = "Manual"         ; Define own tick mark labels.
 ;  res@tmXBTickStartF     = 15/365.
 ;  res@tmXBTickSpacingF = 1
 ;  res@tmXBTickEndF     = 10
   res@tmXBAutoPrecision= False
-  res@tmXBPrecision    = 1
+  res@tmXBPrecision    = 2
   
 ;  res@tmXBValues         = major_ticks
 ;  res@tmXBLabels         = new(ndays,string)
@@ -174,8 +176,8 @@ begin
   res@xyExplicitLegendLabels=(/"46~S~o~N~S", "46~S~o~N~N", "86~S~o~N~N","global mean"/)
   res@trXMinF = time(0)
   res@trXMaxF = time(dimsizes(time)-1)
-  res@trYMaxF = 10
-  res@trYMinF = -70
+  res@trYMaxF = 5
+  res@trYMinF = -65
   res@xyLineThicknessF = 3.0
 ;  res@tmXBLabelFontHeightF = 0.02
   print("plotting")
@@ -188,10 +190,10 @@ begin
 end
 
 ;path="$MODEL_PATH/ccsm/run/"
-path="/data5/mmills/"
+path="/data4/mmills/"
 ;historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIndPak.001"
 ;controlRun="b40.rcp4_5.2deg.wcm.001"
-historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003"
-controlRun="b40.rcp4_5.2deg.wcm.carma.bc0tg.002"
+historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
+controlRun="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg"
 
 plotO3Depletion(path, historyRun, controlRun)

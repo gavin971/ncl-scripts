@@ -209,11 +209,13 @@ begin
   pattern=subDir
   historyPath2=historyPath+historyRun+"/"
   analysisPath=historyPath2+"proc/"
+  print("mkdir -p "+analysisPath)
   a = systemfunc("mkdir -p "+analysisPath)
   
   historyPattern=historyPath2+subDir+"/*.cam2."+pattern+"*.nc"
   
   historyNames = systemfunc("ls " + historyPattern)
+  print(historyNames)
   print("opening history files...")
   history = addfiles(historyNames, "r")
   ListSetType(history, "cat")
@@ -227,6 +229,8 @@ begin
   Z0=calcZ3(history, historyNames)
   print("reading date...")
   date=addfiles_GetVar(history, historyNames, "date")
+  print("reading ODV_SOOT01...")
+  ODV_SOOT01=addfiles_GetVar(history, historyNames, "ODV_SOOT01")
   
   newfile=analysisPath+historyRun+".O3Col."+pattern+".nc"
   exists = isfilepresent(newfile)
@@ -240,6 +244,8 @@ begin
   saveFile->date=date
   print("saving ozone...")
   saveFile->O3_col=O3_col
+  print("saving black carbon optical depth...")
+  saveFile->ODV_SOOT01=ODV_SOOT01
   print("saving Z0...")
   saveFile->Z0=Z0
   print("Done!")
@@ -256,11 +262,12 @@ end
 ;historyRun="PassiveSoot"
 
 ;historyPath="$MODEL_PATH/ccsm/run/"
-historyPath="/data5/mmills/"
+historyPath="/data4/mmills/"
 ;historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIndPak.001"
 ;historyRun="b40.rcp4_5.2deg.wcm.001"
-;historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003"
-historyRun="b40.rcp4_5.2deg.wcm.carma.bc0tg.002"
+historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
+;historyRun="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg"
+;subDir="h0"
 subDir="h0zm"
 
 saveMeanFiles(historyRun,historyPath,subDir)
