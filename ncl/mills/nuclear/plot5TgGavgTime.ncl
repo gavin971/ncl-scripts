@@ -274,7 +274,6 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   wks   = gsn_open_wks ("pdf","$IMAGE_PATH/"+pdffile) ; open workstation
 
   res                   = True                      ; plot mods desired
-;  res@gsnPaperOrientation = "landscape"
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
 ;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
@@ -319,8 +318,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
-  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-  res@vpHeightF           = 0.8
+;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;  res@vpHeightF           = 0.8
   res@trYMaxF = 0.0
   res@trYMinF = -0.4
   res@tiYAxisString = "Precipitation Anomaly (mm/day)"
@@ -344,8 +343,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
-  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-  res@vpHeightF           = 0.8
+;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;  res@vpHeightF           = 0.8
   res@trYMaxF = 0.0
   res@trYMinF = -15
   res@tiYAxisString = "Precipitation Anomaly (%)"
@@ -363,8 +362,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
-  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-  res@vpHeightF           = 0.7
+;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;  res@vpHeightF           = 0.7
   res@tiYAxisString = "SW All-Sky Flux Anomaly at Surface (W/m~S~2~N~)"
   res@trYMinF = -23
   res@xyLineThicknessF = 6.0
@@ -384,8 +383,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
-  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-  res@vpHeightF           = 0.7
+;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;  res@vpHeightF           = 0.7
   res@tiYAxisString = "SW Clear-sky Flux Anomaly at Surface (W/m~S~2~N~)"
   res@trYMinF = -23
   res@xyLineThicknessF = 6.0
@@ -405,8 +404,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
-  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-  res@vpHeightF           = 0.7
+;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;  res@vpHeightF           = 0.7
   res@tiYAxisString = "SW Flux Anomaly at Surface (W/m~S~2~N~)"
   res@trYMinF = -23
   res@xyLineThicknessF = 6.0
@@ -422,8 +421,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
-  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-  res@vpHeightF           = 0.7
+;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;  res@vpHeightF           = 0.7
   res@tiYAxisString = "SW All-sky Flux Anomaly at Surface (%)"
   res@trYMinF = -15
   res@xyLineThicknessF = 8.0
@@ -440,8 +439,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
-  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-  res@vpHeightF           = 0.7
+;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;  res@vpHeightF           = 0.7
   res@tiYAxisString = "SW Clear-sky Flux Anomaly at Surface (%)"
   res@trYMinF = -15
   res@xyLineThicknessF = 8.0
@@ -455,12 +454,11 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
     plot = gsn_csm_xy (wks,time,FSNSC_diff_pct3,res) ; draw plot
   end if
   frame(wks)
-  
-  
+    
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
-  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-  res@vpHeightF           = 0.7
+;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;  res@vpHeightF           = 0.7
   res@tiYAxisString = "CLDTOT (frac)"
   res@trYMinF=0.52
   res@trYMaxF=0.6
@@ -476,8 +474,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
-  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-  res@vpHeightF           = 0.7
+;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;  res@vpHeightF           = 0.7
   res@tiYAxisString = "ASDIR (frac)"
   res@trYMinF=0.55
   res@trYMaxF=0.59
@@ -489,6 +487,21 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   plot = gsn_csm_xy (wks,time,ASDIR_cntl1,res) ; draw plot
 ;  res@xyLineColor       = "red"          ; change line color
 ;  plot = gsn_csm_xy (wks,time,ASDIR_diff1,res) ; draw plot
+  frame(wks)
+    
+  res@gsnMaximize         = True          ; expand plot size to maximum
+  res@gsnPaperOrientation = "landscape"
+;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;  res@vpHeightF           = 0.7
+  res@tiYAxisString = "Cloud fraction, albedo change (%)"
+  res@trYMinF=-0.5
+  res@trYMaxF=3.5
+  res@xyLineThicknessF = 8.0
+  res@xyLineColor       = "black"          ; change line color
+  print("plot = gsn_csm_xy (wks,time,100*(CLDTOT_test1-CLDTOT_cntl1),res)")
+  plot = gsn_csm_xy (wks,time,100*CLDTOT_diff1,res) ; draw plot
+  res@xyLineColor       = "blue"          ; change line color
+  plot = gsn_csm_xy (wks,time,100*ASDIR_diff1,res) ; draw plot
   frame(wks)
   
   delete(wks)

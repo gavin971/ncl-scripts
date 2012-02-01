@@ -30,7 +30,8 @@ begin
   O3_col_dpct&time = time
   
   
-  wks = gsn_open_wks("pdf", "$IMAGE_PATH/ContourO3dep."+historyRun)
+  pdffile = "$IMAGE_PATH/ContourO3dep."+historyRun
+  wks = gsn_open_wks("pdf", pdffile)
   gsn_define_colormap(wks,"posneg_1")
   res                     = True          ; plot mods desired
 
@@ -90,6 +91,15 @@ begin
   res@gsnRightString      = ""
   res@gsnCenterString      = "O3 Column Change (%)"
   plot = gsn_csm_lat_time(wks,O3_col_dpct(lat|:, time|:),res)      ; contour the variable
+  delete(plot)
+  
+  ostype = systemfunc("echo $OSTYPE")
+  if (ostype.eq."darwin") then
+    opencmd="open "+pdffile+".pdf"
+    print(opencmd)
+    open=systemfunc(opencmd)
+    print(open)
+  end if
 end
 
 undef("plotO3Change")
@@ -127,7 +137,13 @@ begin
     
 end
 
-rootPath="/data4/mmills/"
+host   = systemfunc("hostname")
+if (host.eq."modeling1") then
+  rootPath="/data4/mmills/"
+else
+  rootPath="$MODEL_PATH/ccsm/case/"
+end if
+
 historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
 controlRun="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg"
 plotO3Change(rootPath, historyRun, controlRun)

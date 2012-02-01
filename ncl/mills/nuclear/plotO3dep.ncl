@@ -71,8 +71,9 @@ begin
   lat=O3_col_x&lat
   O3_col_pct_loss!1="lat"
   O3_col_pct_loss&lat=lat 
-     
-  wks = gsn_open_wks("pdf", "$IMAGE_PATH/O3Depletion."+historyRun)
+  
+  pdffile="$IMAGE_PATH/O3Depletion."+historyRun
+  wks = gsn_open_wks("pdf", pdffile)
 
   res = True
   resP = True
@@ -186,11 +187,25 @@ begin
 ;  frame(wks)
   gsn_panel(wks, plot, (/ nPanel, 1 /), resP)
   delete(plot)
+  
+  ostype = systemfunc("echo $OSTYPE")
+  if (ostype.eq."darwin") then
+    opencmd="open "+pdffile+".pdf"
+    print(opencmd)
+    open=systemfunc(opencmd)
+    print(open)
+  end if
 
 end
 
-;path="$MODEL_PATH/ccsm/run/"
-path="/data4/mmills/"
+host   = systemfunc("hostname")
+
+if (host.eq."modeling1") then
+  path="/data4/mmills/"
+else
+  path="$MODEL_PATH/ccsm/case/"
+end if
+
 ;historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIndPak.001"
 ;controlRun="b40.rcp4_5.2deg.wcm.001"
 historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
