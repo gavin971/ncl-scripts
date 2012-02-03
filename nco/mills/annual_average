@@ -1,7 +1,19 @@
 #!/bin/ksh
 
-#rootpath='/data5/mmills/wa319/carma-soot'
-rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+export machine=`hostname`
+
+if [[ $machine = 'modeling1' ]];then
+  rootpath='/data5/mmills/wa319/carma-soot'
+fi
+
+if [[ $machine = 'cmip5' ]];then
+  rootpath='/data/waccm'
+fi
+
+if [[ $OSTYPE = 'darwin' ]];then
+  rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+fi
+
 runname='bccntl02'
 #runname='bcrckt03'
 #addstr='annual'

@@ -1,25 +1,39 @@
 #!/bin/ksh
 
-ensname='b40.1850.2deg.wcm.qbosol.00[123]'
+export machine=`hostname`
+
+if [[ $machine = 'modeling1' ]];then
+  rootpath='/data4/mmills'
+fi
+
+if [[ $machine = 'cmip5' ]];then
+  rootpath='/data/waccm'
+#  rootpath='/data/ccsm4'
+fi
+
+if [[ $OSTYPE = 'darwin' ]];then
+  rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+fi
+
+#ensname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.00[367]'
+ensname='b40.rcp4_5.2deg.wcm.carma.bc0tg.00[123]'
 #hno3_rename='b40.rcp2_6.2deg.wcm.002'
 #ensname2='b40.rcp2_6.2deg.wcm.00[34]'
-avgname='b40.1850.2deg.wcm.qbosol.avg'
-rootpath='/data/waccm'
+avgname='b40.rcp4_5.2deg.wcm.carma.bc0tg.avg'
 outpath='/data/ccsm4'
 
 #ensname='b40.rcp4_5.2deg.wcm.00[123]'
 ##ensname2='br04.20th.track1.2deg.wcm.pd.00[12]'
 #avgname='b40.rcp4_5.2deg.wcm.avg'
-#rootpath='/data/waccm'
 
-htype='h0zm'
+htype='h0'
 wadir=$rootpath'/'$ensname'/'$htype
 #wadir2=$rootpath'/'$ensname2'/'$htype
 avgdir=$outpath'/'$avgname'/'$htype
 searchstr='cam2.'$htype
 
-year1=1980
-year2=2005
+year1=2013
+year2=2022
 
 
 # script to average and standard deviation of waccm h0 files

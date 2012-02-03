@@ -4,8 +4,23 @@
 
   echo globavg
 
-rootpath='/data5/mmills'
-runname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003'
+export machine=`hostname`
+
+if [[ $machine = 'modeling1' ]];then
+  rootpath='/data4/mmills'
+fi
+
+if [[ $machine = 'cmip5' ]];then
+  rootpath='/data/waccm'
+#  rootpath='/data/ccsm4'
+fi
+
+if [[ $OSTYPE = 'darwin' ]];then
+  rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+fi
+
+#runname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg'
+runname='b40.rcp4_5.2deg.wcm.carma.bc0tg.avg'
 
 zmdir=$rootpath'/'$runname'/h0zm'
 gmdir=$rootpath'/'$runname'/h0gm'
@@ -23,5 +38,6 @@ ncrcat -O $ncfiles $tmpfile
 echo "ncwa -O -I -a lat -w gw $tmpfile $avgfile"
 ncwa -O -I -a lat -w gw $tmpfile $avgfile
     
+echo "rm $tmpfile"
 rm $tmpfile
 
