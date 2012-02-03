@@ -22,7 +22,7 @@ sulfIc66Path = ncpath + "expuT125E01.cam2.i.1997-04-01-00000.nc"
 sulfIc66File = addfile(sulfIc66Path,"r")
 lev66 = sulfIc66File->lev
 
- Gas species
+; Gas species
 fields = (/ "OCS", "S", "SO", "SO2", "SO3", "HSO3", "H2SO4" /)
 ;fields = (/ "VTH2d" /)
 
