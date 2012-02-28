@@ -15,11 +15,14 @@ print("    from " + srcIcPath)
 system("cp " + srcIcPath + " " + icPath)
 
 ; Open the initial conditions file.
-waccmIcFile = addfile(icPath, "w")
-camIcFile   = addfile(srcIcPath2, "r")
+WACCMicFile = addfile(icPath, "w")
+CAMicFile   = addfile(srcIcPath2, "r")
   
-levWaccm = waccmIcFile->lev
-levCam   = camIcFile->lev
+levWACCM = WACCMicFile->lev
+levCAM   = CAMicFile->lev
+nlevCAM  = dimsizes(levCAM)
+nlevWACCM  = dimsizes(levWACCM)
+print( "nlev CAM=" + nlevCAM + ", nlev WACCM=" + nlevWACCM )
   
 fields = (/ "H2SO4", "SO2", "DMS", "SOAG", "so4_a1", "pom_a1", "soa_a1", "bc_a1", \
  "dst_a1", "ncl_a1", "num_a1", "so4_a2", "soa_a2", "ncl_a2", "num_a2", "dst_a3", \
@@ -28,10 +31,15 @@ fields = (/ "H2SO4", "SO2", "DMS", "SOAG", "so4_a1", "pom_a1", "soa_a1", "bc_a1"
 nFields = dimsizes(fields)
 
 do i = 0, nFields - 1
-  print("interpolating "+fields(i))  
-  spec66=linint1_Wrap(levCam, camIcFile->$fields(i)$(time|:,lat|:,lon|:,lev|:), False, levWaccm, 0)
-  spec66@_FillValue=0.0d0
-  waccmIcFile->$fields(i)$ = spec66(time|:,lev|:,lat|:,lon|:)
+  print("interpolating "+fields(i))
+  specCAM = CAMicFile->$fields(i)$(time|:,lat|:,lon|:,lev|:)
+  specWACCM = linint1_Wrap(levCAM, specCAM(time|:,lat|:,lon|:,lev|:), False, levWACCM, 0)
+  print ("max=" + max(specWACCM) + ", min=" + min(specWACCM))
+; set values at levels above CAM top to a small number
+  specWACCM( time|:, lat|:, lon|:, {lev|0:levCAM(0)} ) = 1.0d-45
+; set values at lowest level to those at CAM lowest level  
+  specWACCM( time|:, lat|:, lon|:, lev|nlevWACCM - 1 ) = specCAM(time|:, lat|:, lon|:, lev|nlevCAM - 1)
+  WACCMicFile->$fields(i)$ = specWACCM(time|:,lev|:,lat|:,lon|:)
 end do  
   
 print("  IC Done.")
