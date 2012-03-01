@@ -18,16 +18,14 @@ begin
 
   host   = systemfunc("hostname")
   if (host.eq."modeling1") then
-    dataPath="~/Data/"
     rootPath="/data4/mmills/"
   else
-    dataPath="$DATA_PATH/"
     rootPath="$MODEL_PATH/ccsm/case/"
   end if
   
-;  dataFile=dataPath+"ChuckWilson/WilsonSO4vsN2O.txt"
-;  print(dataFile)
-;  wilson = readAsciiTable(dataFile,4,"float",1)
+  ; Observational data from Wilson et al. Steady-state aerosol distributions in 
+  ; the extra-tropical, lower stratosphere and the processes that maintain them. 
+  ; Atmos. Chem. Phys (2008), vol. 8, pp. 6617, figure 5.
   
   wilson = (/(/315.217, 0.133,   -0.090,  0.086/),\
              (/299.275, 0.143,   -0.032,  0.032/),\
@@ -43,10 +41,10 @@ begin
              (/51.449,  0.087,   -0.005,  0.008/)/)
 
 
-  subDir="allmonthly"
-
   historyPath = rootPath+historyRun1+"/proc/"
   historyFile = addfile(historyPath+historyRun1+".N2OSulfVMR.cam2.h0.nc","r")
+  lat = historyFile->lat
+  nlat = dimsizes(lat)
   N2O = historyFile->N2O
   PURSULVMR = historyFile->PURSULVMR
   SULVMR=PURSULVMR ; get metadata
@@ -62,6 +60,8 @@ begin
   if (historyRun2.ne."")
     historyPath = rootPath+historyRun2+"/proc/"
     historyFile2 = addfile(historyPath+historyRun2+".N2OSulfVMR.nc","r")
+    lat2 = historyFile2->lat
+    nlat2 = dimsizes(lat2)
     N2O_2 = historyFile2->N2O
     PURSULVMR_2 = historyFile2->PURSULVMR
     SULVMR_2=PURSULVMR_2 ; get metadata
@@ -85,7 +85,7 @@ begin
   res                   = True                     ; plot mods desired
   res@gsnDraw      = False                        ; don't draw yet
   res@gsnFrame     = False                        ; don't advance frame yet
-;  res@tiMainString      = "Scatter Plot"           ; add title
+;  res@tiMainString      = "Scatter Plot"          
   res@xyMarkLineMode   = "Markers"                ; choose which have markers
   res@xyMarker         =  1                      ; choose type of marker (dots)
 ;  res@xyMarkerSizeF     = 0.01                    ; Marker size (default 0.01)
@@ -104,14 +104,18 @@ begin
 ;  res@xyMarkers     = 16
   res@xyMarkLineMode   = "Lines"                ; choose lines
   res@xyMonoLineColor     = True
-  res@xyLineColor     = "red"                    ; Line color
+  res@xyLineColor     = "white"                    ; Line color
   
-  plot  = gsn_csm_xy (wks,N2O(0,{40:250},0,:)*1e9,SULVMR(0,{40:250},0,:)*1e9,res) ; create plot
-  do i = 0, nTimes-1
-    print((i+1)+" of "+nTimes)
-    do j = 21,45  ; 5S - 90N
-;      print(i+" "+j)
-      overlay(plot,gsn_csm_xy (wks,N2O(i,{40:250},j,:)*1e9,SULVMR(i,{40:250},j,:)*1e9,res))
+  plot  = gsn_csm_xy (wks,N2O(nTimes-1,{40:45},0,:)*1e9,SULVMR(nTimes-1,{40:45},0,:)*1e9,res) ; create plot
+  res@xyLineColor     = "red"                    ; Line color
+  do ii = 1, 12
+    i = nTimes-ii
+    print(ii+" of 12")
+    do j = 0,nlat-1
+      if (lat(j).ge.-5) then ; 5S - 90N, as per Wilson et al. observations
+        print("  "+lat(j))
+        overlay(plot,gsn_csm_xy (wks,N2O(i,{40:250},j,:)*1e9,SULVMR(i,{40:250},j,:)*1e9,res))
+      end if
     end do
   end do
   
@@ -119,9 +123,11 @@ begin
     res@xyLineColor     = "black"                    ; Line color
     do i = 0, nTimes2-1
       print((i+1)+" of "+nTimes2)
-      do j = 21,45 ; 5S - 90N
-  ;      print(i+" "+j)  
-        overlay(plot,gsn_csm_xy (wks,N2O_2(i,{40:250},j,:)*1e9,SULVMR_2(i,{40:250},j,:)*1e9,res))
+      do j = 0,nlat2-1
+        if (lat2(j).ge.-5) then ; 5S - 90N, as per Wilson et al. observations
+          print("  "+lat2(j))
+          overlay(plot,gsn_csm_xy (wks,N2O_2(i,{40:250},j,:)*1e9,SULVMR_2(i,{40:250},j,:)*1e9,res))
+        end if
       end do
     end do
   end if
