@@ -2,6 +2,7 @@
 ;
 ; Create some tracer distributions for use with WACCM/CARMA.
 
+host   = systemfunc("hostname")
 WACCM_RES = getenv("WACCM_RES")
 MODEL_PATH = getenv("MODEL_PATH")
 
@@ -11,8 +12,10 @@ if (ismissing(WACCM_RES)) then
 end if
 print("Using " + WACCM_RES + " resolution ...")
 
-if (ismissing(MODEL_PATH)) then
-  MODEL_PATH  = "/waccm/mmills"
+if (hostname.eq.""lou") then
+  PATH="~/csm/b40.rcp4_5.2deg.wcm.carma.bc0tg.001/rest/2013-01-01-00000/"
+else
+  PATH=MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic"
 end if
 
 ;load "soot.ncl"
@@ -35,27 +38,27 @@ print("Resolution: " + WACCM_RES)
 if (WACCM_RES .eq. "2x2.5") then 
 ;  newic("data/atm/waccm/ic/wa3_4x5_1950_spinup.cam2.i.1960-01-01-00000.nc")
 
-;  newic(MODEL_PATH+"/waccm/inputdata/atm/waccm/ic", \
+;  newic(PATH, \
 ;       "f2000.e10r02.2deg.waccm.005.cam2.i.0017-01-01-00000.nc", \
 ;       "f40.2000.2deg.waccm.carma.bc5_0tg.cam2.i.0017-01-01-00000.nc", \
 ;       4.50775e-06)
 
-;  newic(MODEL_PATH+"/waccm/inputdata/atm/waccm/ic", \
+;  newic(PATH, \
 ;       "b40.2000.2deg.wcm.carma.bc.002.0Tg.cam2.i.0001-05-15-00000.nc", \
 ;       "b40.2000.2deg.wcm.carma.bc.002.5Tg_4x5.cam2.i.0001-05-15-00000.nc", \
 ;       5.0, 4.0, 5.0)
 
-;  newic(MODEL_PATH+"/waccm/inputdata/atm/waccm/ic", \
+;  newic(PATH, \
 ;       "b40.2000.2deg.wcm.carma.bc.002.0Tg.cam2.i.0001-05-15-00000.nc", \
 ;       "b40.2000.2deg.wcm.carma.bc.002.5Tg_8x10.cam2.i.0001-05-15-00000.nc", \
 ;       5.0, 8.0, 10.0)
 
-;  newic(MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic", \
+;  newic(PATH, \
 ;       "b40.2000.2deg.wcm.carma.bc.002.0Tg.cam2.i.0001-05-15-00000.nc", \
 ;       "b40.2000.2deg.wcm.carma.bc.002.1Tg.cam2.i.0001-05-15-00000.nc", \
 ;       1.0)
 
-;  newic(MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic", \
+;  newic(PATH, \
 ;       "b40.rcp4_5.2deg.wcm.carma.bc0tg.001.cam2.i.2012-05-15-00000.nc", \
 ;       "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.cam2.i.2012-05-15-00000.nc", \
 ;       5.0)
@@ -66,9 +69,9 @@ if (WACCM_RES .eq. "2x2.5") then
 ;       0.0)
 
 ; 2/23/2011       
-  newicBCIndPak("/u/mjmills2/csm/b40.rcp4_5.2deg.wcm.carma.bc0tg.002/rest/2012-05-15-00000", \
-       "b40.rcp4_5.2deg.wcm.carma.bc0tg.002.cam2.i.2012-05-15-00000.nc", \
-       "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.002.cam2.i.2012-05-15-00000.nc", \
+  newicBCIndPak(PATH, \
+       "b40.rcp4_5.2deg.wcm.carma.bc0tg.001.cam2.i.2013-01-01-00000.nc", \
+       "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.001.cam2.i.2013-01-01-00000.nc", \
        5.0d0)
 
 
