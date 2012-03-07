@@ -19,20 +19,22 @@ PTOP    = 100.0                   ; pressure at the top of the model (non-zero) 
 REARTH  = 6.37122e6               ; Earth's radius (m)
 DG2RAD  = PI / 180.0              ; rad deg^-1
 
-maxpress=250.0
-minpress=130.0
+;maxpress=250.0
+;minpress=130.0
+maxpress=120.0
+minpress=110.0
 prstr=floattoint(minpress)+"-"+floattoint(maxpress)+"hPa"
 
-host   = systemfunc("hostname")
-if (hostname.eq.""modeling1") then
+host = systemfunc("hostname")
+if (host.eq."modeling1") then
   filePath = "/data4/mmills/f40.2008-2011.2deg.wcm.sd.carma.sulf.002/rest/"
 else
-  if (hostname.eq.""lou") then
+  if (host.eq."lou") then
     filePath = "~/csm/f40.2008-2011.2deg.wcm.sd.carma.sulf.002/rest/2011-06-13-00000/"
   else
-    filePath = "$MODEL_PATH/cesm/run/f40.2008-2011.2deg.wcm.sd.carma.sulf.002/rest"
-  endif
-endif
+    filePath = "$MODEL_PATH/cesm/run/f40.2008-2011.2deg.wcm.sd.carma.sulf.002/rest/"
+  end if
+end if
 
 icFileName="f40.2008-2011.2deg.wcm.sd.carma.sulf.002.cam2.i.2011-06-13-00000.nc"
 srcIcPath = filePath+icFileName
