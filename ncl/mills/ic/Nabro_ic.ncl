@@ -19,12 +19,26 @@ PTOP    = 100.0                   ; pressure at the top of the model (non-zero) 
 REARTH  = 6.37122e6               ; Earth's radius (m)
 DG2RAD  = PI / 180.0              ; rad deg^-1
 
-filePath = "/data4/mmills/f40.2008-2011.2deg.wcm.sd.carma.sulf.002/rest/"
+maxpress=250.0
+minpress=130.0
+prstr=floattoint(minpress)+"-"+floattoint(maxpress)+"hPa"
+
+host   = systemfunc("hostname")
+if (hostname.eq.""modeling1") then
+  filePath = "/data4/mmills/f40.2008-2011.2deg.wcm.sd.carma.sulf.002/rest/"
+else
+  if (hostname.eq.""lou") then
+    filePath = "~/csm/f40.2008-2011.2deg.wcm.sd.carma.sulf.002/rest/2011-06-13-00000/"
+  else
+    filePath = "$MODEL_PATH/cesm/run/f40.2008-2011.2deg.wcm.sd.carma.sulf.002/rest"
+  endif
+endif
+
 icFileName="f40.2008-2011.2deg.wcm.sd.carma.sulf.002.cam2.i.2011-06-13-00000.nc"
 srcIcPath = filePath+icFileName
 
 ; Copy it to create new IC file:
-icPath = filePath+"f40.2008-2011.2deg.wcm.sd.carma.sulf.002.Nabro.cam2.i.2011-06-13-00000.nc"
+icPath = filePath+"f40.2008-2011.2deg.wcm.sd.carma.sulf.002.Nabro"+prstr+".cam2.i.2011-06-13-00000.nc"
 print("copying IC file "+srcIcPath+" to "+icPath)
 system("cp " + srcIcPath + " " + icPath)
 
@@ -68,7 +82,7 @@ pdel!1="lev"
 pdel&lev=lev
 delete(P)
 
-airMass = (q(0, {130:250}, ilat, jlon)+1.0) * (pdel(0, {130:250}, ilat, jlon)/ G)
+airMass = (q(0, {minpress:maxpress}, ilat, jlon)+1.0) * (pdel(0, {minpress:maxpress}, ilat, jlon)/ G)
 columnAirMass = dim_sum_Wrap(airMass)
 print("columnAirMass ="+ columnAirMass+" kg/m2")
 totalAirMass = columnAirMass * dhdx /1e9
@@ -78,11 +92,11 @@ SO2_Nabro_mmr=1.3/totalAirMass
 print("SO2_Nabro_mmr ="+SO2_Nabro_mmr)
 
 SO2_Nabro = SO2
-SO2_Nabro(0, {130:250}, ilat, jlon) = SO2(0, {130:250}, ilat, jlon) + SO2_Nabro_mmr
+SO2_Nabro(0, {minpress:maxpress}, ilat, jlon) = SO2(0, {minpress:maxpress}, ilat, jlon) + SO2_Nabro_mmr
 
-SO2Mass = SO2(0, {130:250}, ilat, jlon) * (q(0, {130:250}, ilat, jlon)+1.0) * (pdel(0, {130:250}, ilat, jlon)/ G)
+SO2Mass = SO2(0, {minpress:maxpress}, ilat, jlon) * (q(0, {minpress:maxpress}, ilat, jlon)+1.0) * (pdel(0, {minpress:maxpress}, ilat, jlon)/ G)
 columnSO2Mass = dim_sum_Wrap(SO2Mass)
-SO2MassNabro = SO2_Nabro(0, {130:250}, ilat, jlon) * (q(0, {130:250}, ilat, jlon)+1.0) * (pdel(0, {130:250}, ilat, jlon)/ G)
+SO2MassNabro = SO2_Nabro(0, {minpress:maxpress}, ilat, jlon) * (q(0, {minpress:maxpress}, ilat, jlon)+1.0) * (pdel(0, {minpress:maxpress}, ilat, jlon)/ G)
 columnSO2MassNabro = dim_sum_Wrap(SO2MassNabro)
 totalSO2Mass = (columnSO2MassNabro - columnSO2Mass) * dhdx /1e9
 print("totalSO2Mass ="+ totalSO2Mass+" Tg")
@@ -111,7 +125,7 @@ icFile->SO2 = SO2_Nabro
        "Adapted from "+icFileName+nl+\
        "Nabro SO2 added by program Nabro_ic.ncl"
   globalAtt@notes = nl+\
-       "1.3 Tg of SO2 at "+lat(ilat)+"N, "+lon(jlon)+"E, 130-250 hPa on June 13, 2011"+nl+\ 
+       "1.3 Tg of SO2 at "+lat(ilat)+"N, "+lon(jlon)+"E, "+prstr+" on June 13, 2011"+nl+\ 
        "increasing SO2 mmr by "+SO2_Nabro_mmr+" over eruption site" ;
 
   fileattdef( icFile, globalAtt )
