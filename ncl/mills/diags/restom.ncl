@@ -5,22 +5,15 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 host=getenv("HOSTNAME")
 
-if (host.eq."cmip5") then
-  save_dir ="/data/$USER/"+run_name+"/analysis/"
-else
-  save_dir ="~/"+run_name+"/analysis/"
-end if
-
-year0 = 96
-nyears=281-year0+1
-
-run_name = "b40.1850.track1.2deg.wcm.007"
-rootpath="/data/waccm/"
+run_name = "f.e11.FW5.f19_f19.001"
+rootpath="/Volumes/MillsPassport/cesm/"
+year0 = 1
+nyears=8-year0+1
 
 in_dir =rootpath+run_name+"/h0/"
-  
+save_dir =rootpath+run_name+"/analysis/"
 savefile=save_dir+run_name+"_RESTOM.nc"
-
+  
 image_path=getenv("IMAGE_PATH")
 pdffile=image_path+"/"+run_name+"_RESTOM"
 print("Creating PDF file "+pdffile+".pdf")
@@ -59,15 +52,20 @@ if (nyears_a.ge.nyears) then
 else
 
   fin=addfile(infiles(0),"r")
+  print((/infiles(0)/))
+  print(fin->date)
   fsnt = fin->FSNT
   flnt = fin->FLNT
   ts = fin->TS
   landfrac = fin->LANDFRAC
-  year_in = fin->date/10000
+  year_in = fin->date ; get record coordinate
+  year_in = year_in/10000
+  print(year_in)
 
-  do i=nyears_a*12,dimsizes(infiles)-1,1
-    print((/infiles(i)/))
+  do i=nyears_a*12+1,dimsizes(infiles)-1,1
+;    print(i+" "+(/infiles(i)/))
     fin=addfile(infiles(i),"r")
+;    print(fin->date)
 
     temp=fsnt
     delete(fsnt)
@@ -91,6 +89,7 @@ else
 
     temp=year_in
     delete(year_in)
+;    print(i+" "+temp+" "+fin->date+" "+(fin->date)/10000)
     year_in = array_append_record(temp,(fin->date)/10000,0)
     delete(temp)
 
@@ -223,7 +222,7 @@ print(year+" "+restom_ann_w+" "+ts_ann_w+" "+ts_land_ann_w+" "+sst_ann_w)
 
 res1@tiMainString  = "RESTOM" ; title
 res1@gsnYRefLine           = 0.              ; reference line   
-res1@trYMinF = -4
+;res1@trYMinF = -4
 res1@trYMaxF = 6
 res1@vpXF              = 0.1    ; X,Y position of first plot
 res1@vpYF              = 0.91
@@ -277,6 +276,6 @@ delete(wks)
 print("gv "+pdffile+".pdf")
 print("mutt -a "+pdffile+".pdf mikejmills@mac.com < /dev/null")
 
-mutter=systemfunc("mutt -a " + pdffile + ".pdf mikejmills@mac.com < /dev/null")
-print(mutter)
+;mutter=systemfunc("mutt -a " + pdffile + ".pdf mikejmills@mac.com < /dev/null")
+;print(mutter)
 

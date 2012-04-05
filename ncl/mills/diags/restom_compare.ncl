@@ -9,18 +9,18 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 ;year0 = 96
 ;run_name = "b40.1850.track1.2deg.wcm.007"
 
-year0 = 2021
-year1 = 2078
+year0 = 1
+year1 = 8
 nyears=year1-year0+1
 
 run_name=new(2,string)
 rootpath=new(2,string)
 
-run_name(0) = "b40.rcp4_5.2deg.001"
-rootpath(0) = "/data1/tilmes/"
+run_name(0) = "f.e11.FW5.f19_f19.001"
+rootpath(0) = "/Volumes/MillsPassport/cesm/"
 
-run_name(1) = "b40.rcp4_5.2deg.g3solar.001"
-rootpath(1) = "/data5/mmills/"
+run_name(1) = "f.e11.FW.f19_f19.001"
+rootpath(1) = "/Volumes/MillsPassport/cesm/"
 
 in_dir   = rootpath+run_name+"/h0/"
 save_dir = rootpath+run_name+"/analysis/"
