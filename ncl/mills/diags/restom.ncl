@@ -5,10 +5,10 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 host=getenv("HOSTNAME")
 
-run_name = "f.e11.FW5.f19_f19.001"
+run_name = "f.e11.FW.f19_f19.001"
 rootpath="/Volumes/MillsPassport/cesm/"
 year0 = 1
-nyears=8-year0+1
+nyears=9-year0+1
 
 in_dir =rootpath+run_name+"/h0/"
 save_dir =rootpath+run_name+"/analysis/"
@@ -29,6 +29,7 @@ nyears=dimsizes(infiles)/12
 
 if (isfilepresent(savefile)) then
 
+  print("reading "+savefile)
   b = addfile(savefile,"r")
   year_a=b->year
   restom_ann_w_a=b->restom_ann_w
@@ -41,7 +42,7 @@ else
   nyears_a=0
 end if
 
-if (nyears_a.ge.nyears) then
+if (nyears_a.ge.nyears) then ; use only savefile if it has all history years
 
   year=year_a
   restom_ann_w=restom_ann_w_a
@@ -51,16 +52,17 @@ if (nyears_a.ge.nyears) then
   
 else
 
-  fin=addfile(infiles(0),"r")
-  print((/infiles(0)/))
-  print(fin->date)
+  i=nyears_a*12
+  fin=addfile(infiles(i),"r")
+  print((/infiles(i)/))
+;  print(fin->date)
   fsnt = fin->FSNT
   flnt = fin->FLNT
   ts = fin->TS
   landfrac = fin->LANDFRAC
   year_in = fin->date ; get record coordinate
   year_in = year_in/10000
-  print(year_in)
+;  print(year_in)
 
   do i=nyears_a*12+1,dimsizes(infiles)-1,1
 ;    print(i+" "+(/infiles(i)/))
@@ -135,6 +137,7 @@ else
       ts_ann_w(0:nyears_a-1) = ts_ann_w_a
       sst_ann_w(0:nyears_a-1) = sst_ann_w_a
       ts_land_ann_w(0:nyears_a-1) = ts_land_ann_w_a
+      year(0:nyears_a-1) = year_a
   end if
   
   do iyr=nyears_a,nyears-1
