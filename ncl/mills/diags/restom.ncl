@@ -5,12 +5,12 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 host=getenv("HOSTNAME")
 
-run_name = "f.e11.FW.f19_f19.001"
-rootpath="/Volumes/MillsPassport/cesm/"
+run_name = "f.e11.FW5.f19_f19.003"
+rootpath="/glade/proj2/acd/waccm/mmills/archive/"
 year0 = 1
-nyears=9-year0+1
+nyears=1-year0+1
 
-in_dir =rootpath+run_name+"/h0/"
+in_dir =rootpath+run_name+"/atm/hist/"
 save_dir =rootpath+run_name+"/analysis/"
 savefile=save_dir+run_name+"_RESTOM.nc"
   
@@ -279,6 +279,6 @@ delete(wks)
 print("gv "+pdffile+".pdf")
 print("mutt -a "+pdffile+".pdf mikejmills@mac.com < /dev/null")
 
-;mutter=systemfunc("mutt -a " + pdffile + ".pdf mikejmills@mac.com < /dev/null")
-;print(mutter)
+mutter=systemfunc("mutt -a " + pdffile + ".pdf mikejmills@mac.com < /dev/null")
+print(mutter)
 
