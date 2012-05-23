@@ -3,17 +3,29 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
+run_name = "f.e11.FW5.f19_f19.012"
+year0 = 1
+nyears=10-year0+1
+
+ostype=getenv("OSTYPE")
 host=getenv("HOSTNAME")
 
-run_name = "f.e11.FW5.f19_f19.003"
-rootpath="/glade/proj2/acd/waccm/mmills/archive/"
-year0 = 1
-nyears=1-year0+1
+if (ostype.eq."darwin") then
+  rootpath="/Volumes/MillsPassport/cesm/"
+else
+  if(str_index_of_substr(host,"mirage",-1).eq.0)
+    rootpath="/CESM/wawg/runs/"
+  else
+    rootpath="/data/waccm"  
+  end if
+end if
 
 in_dir =rootpath+run_name+"/atm/hist/"
+print("in_dir="+in_dir)
 save_dir =rootpath+run_name+"/analysis/"
 savefile=save_dir+run_name+"_RESTOM.nc"
-  
+print("savefile="+savefile)
+
 image_path=getenv("IMAGE_PATH")
 pdffile=image_path+"/"+run_name+"_RESTOM"
 print("Creating PDF file "+pdffile+".pdf")
