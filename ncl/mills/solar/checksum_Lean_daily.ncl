@@ -12,8 +12,8 @@ imagepath="$IMAGE_PATH/solar/"
 ;ncf = addfile(datapath+"spectral_irradiance_Lean_1950-2009_daily_c100507.nc","r")
 ncf = addfile(datapath+"spectral_irradiance_Lean_1950-2010_daily_c110328.nc","r")
 
-;print("reading ncf->ssi")
-;ssi=ncf->ssi
+print("reading ncf->ssi")
+ssi=ncf->ssi
 print("reading ncf->tsi")
 tsi=ncf->tsi
 print("dimsizes(tsi)="+dimsizes(tsi))
@@ -48,6 +48,8 @@ print("max="+max(date))
 
 ;ncf2 = addfile(datapath+"spectral_irradiance_Lean_1950-2010_daily_c110328.nc","r")
 ncf2 = addfile(datapath+"spectral_irradiance_Lean_1950-2011_daily_NoLeap_c120426.nc","r")
+print("reading ncf2->ssi")
+ssi2=ncf2->ssi
 print("reading ncf2->tsi")
 tsi2= ncf2->tsi
 print("dimsizes(tsi2)="+dimsizes(tsi2))
@@ -180,6 +182,25 @@ wks = gsn_open_wks("pdf", imagepath+"tsi_2007-2012")
   overlay(plot1,gsn_xy(wks, year3, tsi3, res))
   draw(plot1)
   frame(wks)
+  
+  delete(res@trYMinF)
+  delete(res@trYMaxF)
+  delete(res@gsnDraw)
+  delete(res@gsnFrame)
+  delete(res@xyLineColors)
+  delete(res@xyDashPatterns)  
+  res@tiYAxisString="TSI ratio (new/old)"
+  data2 = tsi2(0:dimsizes(tsi)-1)/tsi
+  plot2 = gsn_xy(wks, year(0:dimsizes(tsi)), data2, res)
+  res@trXMinF = 2004.d0
+  plot2 = gsn_xy(wks, year(0:dimsizes(tsi)), data2, res)
+  
+  res@trXMinF = 1950.d0
+  res@tiYAxisString="SSI ratio (new/old)"
+  data3 = ssi2(0:dimsizes(tsi)-1,1492)/ssi(:,1492)
+  plot3 = gsn_xy(wks, year(0:dimsizes(tsi)), data2, res)
+  res@trXMinF = 2004.d0
+  plot3 = gsn_xy(wks, year(0:dimsizes(tsi)), data2, res)
   
 delete(wks)
 delete(res)
