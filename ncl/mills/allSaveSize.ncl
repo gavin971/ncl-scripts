@@ -1,5 +1,5 @@
-load "ncl-scripts/common2.ncl"
-load "ncl-scripts/getHistoryPath.ncl"
+;load "ncl-scripts/common2.ncl"
+;load "ncl-scripts/getHistoryPath.ncl"
 
 ;=========================================
 
@@ -23,10 +23,15 @@ begin
   print(historyNames)
 
   ; Setup the same bin structure used during the model run.
-  nBins = 38
-  rmin  = 2e-8 ; cm
-  rmrat = 2.0
-  rho   = RHO_DUST  ; g/cm-3
+;  nBins = 38
+;  rmin  = 2e-8 ; cm
+;  rmrat = 2.0
+;  rho   = RHO_DUST  ; g/cm-3
+  
+  nBins = 30
+  rmin  = 3.43230298e-8 ; cm
+  rmrat = 2.4
+  rho   = 1.923  ; g/cm-3
   
   rmass = new(nBins, float)
   rmass!0 = "bins"
