@@ -86,32 +86,41 @@ end
 undef("setupair")
 procedure setupair(historyFile:file, P, arho)
 
-local hyam, hybm, P0, PS, Q, T, arho
+; Calculates pressure at the hybrid levels using the formula p = a(k)*p0 + b(k)*ps
+
+local hyam, hybm, P0, PS, T, arho
 
 begin
   hyam 	= historyFile->hyam
   hybm 	= historyFile->hybm
   P0 	= historyFile->P0
   PS 	= historyFile->PS
-  Q     = historyFile->Q
   T     = historyFile->T
  
   ; Calculate the air pressures at the interfaces.
-  P = pres_hybrid_ccm(PS(:,:,:), P0, hyam(:) ,hybm(:))
+  if (dimsizes(dimsizes(PS)).gt.1) then
+    P = pres_hybrid_ccm(PS, P0, hyam(:) ,hybm(:))
+  else
+    dims=dimsizes(P)
+    do col = 0,dims(0)-1
+      P(col,:) = doubletofloat(hyam(:)*P0 + hybm(:)*PS(col))
+    end do
+  end if
   
   ; Calculate the density assuming an ideal gas.
-  arho(:,:,:,:)  = P(:,:,:,:) / (RDAIR * T(:,:,:,:))
+  arho  = P / (RDAIR * T)
 end
 
 ;=========================================
 
 ; Get the number density for each bin.
 undef("getN")
-procedure getN(history:file, shortName:string, rmass:float, arho:float, N:float )
+procedure getN(history:file, shortName:string, rmass:float, arho:float, N:float, skipbin:integer )
   
 ;  rmass(nBins) = mass of 1 particle in each bin (g)
 ;  arho(:,:,:,:) = atmospheric density (g/cm3)
 ;  N( ,b) = number density of particles in each bin (#/cm3) 
+;  skipbin = bin to skip and interpolate (-1 to not skip any)
 local b, binName, nBins, mmr
 
 begin
@@ -120,17 +129,29 @@ begin
   nBins = dimsizes(rmass)
   
   do b = 0, nBins-1
+    if (b.ne.skipbin) then
       binName = shortName + sprinti("%2.2i", b+1)
 
       ; Get the mass mixing ratio.
       mmr = history->$binName$
 
       ; Compute the particle concentration.
-      N(:, :, :, :, b) = (mmr * arho) / rmass(b)
-;      ndsum(:,:,:,:)=ndsum(:,:,:,:)+N(:, :, :, :, b)
+      if (dimsizes(dimsizes(N)).eq.3) then
+        N(:, :, b) = (mmr * arho) / rmass(b)
+        print(binName+" max N="+max(N(:, :, b))+" min N="+min(N(:, :, b)))
+      else
+        N(:, :, :, :, b) = (mmr * arho) / rmass(b)
+  ;      ndsum(:,:,:,:)=ndsum(:,:,:,:)+N(:, :, :, :, b)
+        print(binName+" max N="+max(N(:, :, :, :, b))+" min N="+min(N(:, :, :, :, b)))
+      end if
       delete(mmr)
-      print(binName+" max N="+max(N(:, :, :, :, b))+" min N="+min(N(:, :, :, :, b)))
+    end if
   end do
+
+; HACK: interpolate missing bin 32: 
+  if (skipbin.gt.0) then 
+    N(:, :, :, :, skipbin) = sqrt(N(:, :, :, :, skipbin-1)*N(:, :, :, :, skipbin+1))
+  end if
  
 end 
 
@@ -260,58 +281,78 @@ begin
   ndim=dimsizes(wtp)
   
   do iTime=0,ndim(0)-1
-    print("iTime="+iTime)
+;    print("iTime="+iTime)
     do iLev=0,ndim(1)-1
-      do iLat=0,ndim(2)-1
-        do iLon=0,ndim(3)-1
-          i = 0
-          do while (wtp(iTime,iLev,iLat,iLon) .gt. DNWTP(i))
-            i=i+1
-          end do
-
-          sulfDens(iTime,iLev,iLat,iLon)=DNC0(i)+DNC1(i)*temp(iTime,iLev,iLat,iLon)
-
-          if (i.ne.1 .and. wtp(iTime,iLev,iLat,iLon).ne.DNWTP(i)) then
-            den1=DNC0(i-1)+DNC1(i-1)*temp(iTime,iLev,iLat,iLon)
-            frac=(DNWTP(i)-wtp(iTime,iLev,iLat,iLon))/(DNWTP(i)-DNWTP(i-1))
-            sulfDens(iTime,iLev,iLat,iLon) = den1 * frac + sulfDens(iTime,iLev,iLat,iLon) * (1.0-frac)
-          end if
+    
+      if (dimsizes(ndim) .eq. 2) then
+        i = 0
+        do while (wtp(iTime,iLev) .gt. DNWTP(i))
+          i=i+1
         end do
-      end do
-      print(" iLev="+iLev+": max="+max(sulfDens(iTime,iLev,:,:))+", min="+min(sulfDens(iTime,iLev,:,:)))
+
+        sulfDens(iTime,iLev)=DNC0(i)+DNC1(i)*temp(iTime,iLev)
+
+        if (i.ne.1 .and. wtp(iTime,iLev).ne.DNWTP(i)) then
+          den1=DNC0(i-1)+DNC1(i-1)*temp(iTime,iLev)
+          frac=(DNWTP(i)-wtp(iTime,iLev))/(DNWTP(i)-DNWTP(i-1))
+          sulfDens(iTime,iLev) = den1 * frac + sulfDens(iTime,iLev) * (1.0-frac)
+        end if      
+      else
+        do iLat=0,ndim(2)-1
+          do iLon=0,ndim(3)-1
+            i = 0
+            do while (wtp(iTime,iLev,iLat,iLon) .gt. DNWTP(i))
+              i=i+1
+            end do
+
+            sulfDens(iTime,iLev,iLat,iLon)=DNC0(i)+DNC1(i)*temp(iTime,iLev,iLat,iLon)
+
+            if (i.ne.1 .and. wtp(iTime,iLev,iLat,iLon).ne.DNWTP(i)) then
+              den1=DNC0(i-1)+DNC1(i-1)*temp(iTime,iLev,iLat,iLon)
+              frac=(DNWTP(i)-wtp(iTime,iLev,iLat,iLon))/(DNWTP(i)-DNWTP(i-1))
+              sulfDens(iTime,iLev,iLat,iLon) = den1 * frac + sulfDens(iTime,iLev,iLat,iLon) * (1.0-frac)
+            end if
+          end do
+        end do
+        print(" iLev="+iLev+": max="+max(sulfDens(iTime,iLev,:,:))+", min="+min(sulfDens(iTime,iLev,:,:)))
+      end if
     end do
-    print("iTime="+iTime+": max="+max(sulfDens(iTime,:,:,:))+", min="+min(sulfDens(iTime,:,:,:)))
+    if (dimsizes(ndim) .eq. 2) then
+      if ((mod(iTime, 100)) .eq. 0) then
+        print("iTime="+iTime+": max sulf dens="+max(sulfDens(iTime,:))+", min="+min(sulfDens(iTime,:)))
+      end if
+    else
+      print("iTime="+iTime+": max sulf dens="+max(sulfDens(iTime,:,:,:))+", min="+min(sulfDens(iTime,:,:,:)))
+    end if
   end do
   delete(DNWTP)
   delete(DNC0)
   delete(DNC1)
-  delete(ndim)
   delete(iTime)
   delete(iLev)
-  delete(iLat)
-  delete(iLon)
+  if (dimsizes(ndim) .eq. 4) then  
+    delete(iLat)
+    delete(iLon)
+  end if
   delete(den1)
   delete(frac)
   delete(i)
+  delete(ndim)
 end
 
 ;=========================================
 
-undef("calcSulfRad")
-procedure calcSulfRad(history:file, mixsulnd:float, wtpct:float, sulfDens:float, \
+undef("calcMixSulRad")
+procedure calcMixSulRad(history:file, mixsulnd:float, wtpct:float, sulfDens:float, \
      coreName:string, rmass:float, arho:float, sulfRad:float, coreRad:float, \
-     pureRad:float, skipbin:integer)
+     skipbin:integer)
 
 local b, binName, nBins, mmr, coremass, cpi, voltot
 
 begin
   cpi = 4./3. * PI
 
-  dims=dimsizes(wtpct)
-  ntime=dims(0)
-  nlev=dims(1)
-  nlat=dims(2)
-  nlon=dims(3)
+  ndims=dimsizes(dimsizes(wtpct))
   
   ; Iterate over the bins
   nBins = dimsizes(rmass)
@@ -326,33 +367,83 @@ begin
         mmr = history->$binName$
 
         ; Compute core mass (g/particle)
-        coremass = (mmr * arho) / (mixsulnd (:, :, :, :, b)>1e-30)
-        corevol = coremass/RHO_DUST
-        coreRad(:, :, :, :, b) = (corevol/cpi)^(1./3.)
-        print("bin "+b+", coreRad max="+max(coreRad(:, :, :, :, b))+" min="+min(coreRad(:, :, :, :, b)))
+        if (ndims.eq.2) then
+          coremass = (mmr * arho) / (mixsulnd (:, :, b)>1e-30)
+          corevol = coremass/RHO_DUST
+          coreRad(:, :, b) = (corevol/cpi)^(1./3.)
+          print("bin "+b+", coreRad max="+max(coreRad(:, :, b))+" min="+min(coreRad(:, :, b)))
 
-        if (.not.(isfilevar(history,"SULFRAD"))) then
-          voltot = corevol + (rmass(b)-coremass) * 100.0/wtpct / sulfDens
+          if (.not.(isfilevar(history,"SULFRAD"))) then
+            voltot = corevol + (rmass(b)-coremass) * 100.0/wtpct / sulfDens
 
-          sulfRad(:, :, :, :, b) = (voltot/cpi)^(1./3.)
-          print("bin "+b+", sulfRad max="+max(sulfRad(:, :, :, :, b))+" min="+min(sulfRad(:, :, :, :, b)))
+            sulfRad(:, :, b) = (voltot/cpi)^(1./3.)
+            print("bin "+b+", sulfRad max="+max(sulfRad(:, :, b))+" min="+min(sulfRad(:, :, b)))
+          end if
+        else
+          coremass = (mmr * arho) / (mixsulnd (:, :, :, :, b)>1e-30)
+          corevol = coremass/RHO_DUST
+          coreRad(:, :, :, :, b) = (corevol/cpi)^(1./3.)
+          print("bin "+b+", coreRad max="+max(coreRad(:, :, :, :, b))+" min="+min(coreRad(:, :, :, :, b)))
 
+          if (.not.(isfilevar(history,"SULFRAD"))) then
+            voltot = corevol + (rmass(b)-coremass) * 100.0/wtpct / sulfDens
+
+            sulfRad(:, :, :, :, b) = (voltot/cpi)^(1./3.)
+            print("bin "+b+", sulfRad max="+max(sulfRad(:, :, :, :, b))+" min="+min(sulfRad(:, :, :, :, b)))
+          end if
           delete(mmr)
-        end if
+        end if   
       end if
-      
-      if (.not.(isfilevar(history,"PURERAD"))) then
-        voltot = rmass(b) * 100.0/wtpct / sulfDens
-
-        pureRad(:, :, :, :, b) = (voltot/cpi)^(1./3.)
-        print("bin "+b+", pureRad max="+max(pureRad(:, :, :, :, b))+" min="+min(pureRad(:, :, :, :, b)))      
-      end if     
-      
+            
     end if
     
     if (skipbin.gt.0) then 
       sulfRad(:, :, :, :, skipbin) = sqrt(sulfRad(:, :, :, :, skipbin-1)*sulfRad(:, :, :, :, skipbin+1))
       coreRad(:, :, :, :, skipbin) = sqrt(coreRad(:, :, :, :, skipbin-1)*coreRad(:, :, :, :, skipbin+1))
+    end if
+    
+  end do
+  
+end
+;=========================================
+
+undef("calcPurSulRad")
+procedure calcPurSulRad(history:file, wtpct:float, sulfDens:float, \
+     rmass:float, arho:float, pureRad:float, skipbin:integer)
+
+local b, binName, nBins, mmr, coremass, cpi, voltot
+
+begin
+  cpi = 4./3. * PI
+
+  ndims=dimsizes(dimsizes(wtpct))
+    
+  ; Iterate over the bins
+  nBins = dimsizes(rmass)
+  print(dimsizes(pureRad))
+    
+  do b = 0, nBins-1
+;    print("bin "+b)
+    if (b.ne.skipbin) then
+      if (.not.(isfilevar(history,"PURERAD"))) then
+;        print(dimsizes(sulfDens))
+;        print(dimsizes(wtpct))
+        voltot = rmass(b) * 100.0/wtpct / sulfDens
+;        print(dimsizes(voltot))
+;        print(dimsizes(pureRad))
+
+        if (ndims.eq.2) then
+          pureRad(:, :, b) = (voltot/cpi)^(1./3.)
+          print("bin "+b+", pureRad max="+max(pureRad(:, :, b))+" min="+min(pureRad(:, :, b)))
+        else
+          pureRad(:, :, :, :, b) = (voltot/cpi)^(1./3.)
+          print("bin "+b+", pureRad max="+max(pureRad(:, :, :, :, b))+" min="+min(pureRad(:, :, :, :, b)))
+        end if   
+      end if     
+      
+    end if
+    
+    if (skipbin.gt.0) then 
       pureRad(:, :, :, :, skipbin) = sqrt(pureRad(:, :, :, :, skipbin-1)*pureRad(:, :, :, :, skipbin+1))
     end if
     
