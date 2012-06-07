@@ -13,10 +13,10 @@ begin
   print("k="+k+", reading data...")
 
   ; Get the osiris and WACCM data
-  waccmRun="f40.Nabro.2deg.wcm.sd.carma.sulf.005"
+  waccmRun="f40.Nabro.2deg.wcm.sd.carma.sulf.006"
   rootdir="/Volumes/Data/Models/cesm/run/"+waccmRun+"/"
   
-  osirisFile = addfile(rootdir+"Osiris/osiris_hs_nabro_20110601_20110822.nc","r")
+  osirisFile = addfile("$DATA_PATH/Osiris/osiris_hs_nabro_20110601_20110822.nc","r")
   extOsiris  = osirisFile->AEXT
   exterrOsiris  = osirisFile->AEXTerr
   lev = osirisFile->lev
@@ -28,7 +28,7 @@ begin
   week4=ind(date.ge.20110704.and.date.lt.20110711)
   postweek4=ind(date.ge.20110711)
   
-  waccmFile = addfile(rootdir+"hs/f40.Nabro.2deg.wcm.sd.carma.sulf.005.cam.hs.OsirisLevs.nc","r")
+  waccmFile = addfile(rootdir+"hs/"+waccmRun+".cam.hs.OsirisLevs.nc","r")
   extWaccm  = waccmFile->PURSULEX750
   
   extOsiris  = where(ismissing(extOsiris),0.,extOsiris)
@@ -45,7 +45,7 @@ begin
   ; Plot the correlation of the data.
   pdfpath="$IMG_PATH/"+waccmRun+"/Osiris/"
   a = systemfunc("mkdir -p "+pdfpath)
-  pdffile=pdfpath+"corr_ext_"+sprintf("%04.1f",lev(k)/1000.)+"km"
+  pdffile=pdfpath+waccmRun+".corr_ext_"+sprintf("%04.1f",lev(k)/1000.)+"km"
   print("Creating file "+pdffile+".pdf")
   wks  = gsn_open_wks("pdf", pdffile)    ; open a ncgm file
   gsn_define_colormap(wks, "rainbow+white+gray")  ; choose a colormap
@@ -82,10 +82,12 @@ begin
   
   print("Plotting week 1 scatterplot...")
   res@xyMarkerColor     = "blue"                    ; Marker color
+  res@xyMarkerSizeF     = 0.005                     ; Marker size (default 0.01)
   overlay(plot, gsn_csm_xy(wks, extWaccm(week1,k), extOsiris(week1,k), res))       ; scatterplot
   
   print("Plotting pre-Nabro scatterplot...")
   res@xyMarkerColor     = "gray"                    ; Marker color
+  res@xyMarkerSizeF     = 0.002                     ; Marker size (default 0.01)
   overlay(plot, gsn_csm_xy(wks, extWaccm(preNabro,k), extOsiris(preNabro,k), res))       ; scatterplot
   
   res@xyMarkLineModes   = "Lines"                ; choose which have markers
@@ -110,7 +112,7 @@ begin
 ;  bin = fspan(0, nBins-1, nBins)
 ;  bin(:) = bmin*exp(bin(:) * dbin)
   
-  pdffile=pdfpath+"hist_gsn_ext_"+sprintf("%04.1f",lev(k)/1000.)+"km"
+  pdffile=pdfpath+waccmRun+".hist_gsn_ext_"+sprintf("%04.1f",lev(k)/1000.)+"km"
   wks  = gsn_open_wks("pdf", pdffile)    ; open a ncgm file
   gsn_define_colormap(wks, "rainbow")  ; choose a colormap
 
@@ -157,7 +159,7 @@ begin
   delete(plot)
   delete(res)  
   
-  pdffile=pdfpath+"hist_ext_"+sprintf("%04.1f",lev(k)/1000.)+"km"
+  pdffile=pdfpath+waccmRun+".hist_ext_"+sprintf("%04.1f",lev(k)/1000.)+"km"
   wks  = gsn_open_wks("pdf", pdffile)    ; open a ncgm file
   gsn_define_colormap(wks, "rainbow")  ; choose a colormap
 
@@ -215,12 +217,12 @@ begin
 
 end
 
-;correlateWACCMtoOsiris(16) ; 16.5 km
-;correlateWACCMtoOsiris(17) ; 17.5 km
-;correlateWACCMtoOsiris(18) ; 18.5 km
+correlateWACCMtoOsiris(16) ; 16.5 km
+correlateWACCMtoOsiris(17) ; 17.5 km
+correlateWACCMtoOsiris(18) ; 18.5 km
 ;correlateWACCMtoOsiris(19) ; 19.5 km
-correlateWACCMtoOsiris(20) ; 20.5 km
-correlateWACCMtoOsiris(21) ; 21.5 km
+;correlateWACCMtoOsiris(20) ; 20.5 km
+;correlateWACCMtoOsiris(21) ; 21.5 km
 ;correlateWACCMtoOsiris(22) ; 22.5 km
 ;correlateWACCMtoOsiris(23) ; 23.5 km
 ;correlateWACCMtoOsiris(24) ; 24.5 km

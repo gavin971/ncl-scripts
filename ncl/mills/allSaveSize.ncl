@@ -423,7 +423,7 @@ begin
       
     end if
             
-    if (not(sathist)) then
+    if (.not.(sathist)) then
       delete(time)
     end if
   end do
@@ -444,5 +444,6 @@ end
 
 ;saveSize("125tabaz22","125tabaz22.cam2",-1) 
 
-historyPath="/Volumes/Data/Models/cesm/run/f40.Nabro.2deg.wcm.sd.carma.sulf.005/hs/"
-saveSize(historyPath,"f40.Nabro.2deg.wcm.sd.carma.sulf.005.cam.hs.nc",-1,True)
+;historyPath="/Volumes/Data/Models/cesm/run/f40.Nabro.2deg.wcm.sd.carma.sulf.006/hs/"
+historyPath="/Volumes/MillsPassport/cesm/f40.Nabro.2deg.wcm.sd.carma.sulf.006/hs/"
+saveSize(historyPath,"f40.Nabro.2deg.wcm.sd.carma.sulf.006.cam.hs.02.nc",-1,True)
