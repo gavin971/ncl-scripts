@@ -11,38 +11,39 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ; Generate the initial tracer distribution.
 
 
-ostype=getenv("OSTYPE")
-host=getenv("HOSTNAME")
+;ostype=getenv("OSTYPE")
+;host=getenv("HOSTNAME")
 
-if (ostype.eq."darwin") then
-  icpath1="/Volumes/MillsPassport/cesm/ic/"
-  icpath2=icpath1
-  icpath3=icpath1
-else
-  if(str_index_of_substr(host,"mirage",-1).eq.0)
+;if (ostype.eq."darwin") then
+;  icpath1="/Volumes/MillsPassport/cesm/ic/"
+;  icpath2=icpath1
+;  icpath3=icpath1
+;else
+;  if(str_index_of_substr(host,"mirage",-1).eq.0)
     icpath1="/glade/proj3/cseg/inputdata/ccsm4_init/b40.1850.track1.2deg.wcm.007/0156-01-01/"
     icpath2="/glade/proj3/cseg/inputdata/ccsm4_init/b40_1850_2d_r07c5cn_160jp/0070-01-01/"
     icpath3="/glade/proj3/cseg/inputdata/atm/waccm/ic/"
     templatefile="/glade/proj2/acd/fvitt/waccm-ic-L70/coords_1.9x2.5_L70.nc"
-  else if (host.eq."modeling1") then
-    icpath1="/data2/mmills/"  
-    icpath2=icpath1
-    icpath3=icpath1
-  else
-    icpath1="/data/waccm/"  
-    icpath2=icpath1
-    icpath3=icpath1
-  end if
-end if
+;  else if (host.eq."modeling1") then
+;    icpath1="/data2/mmills/"  
+;    icpath2=icpath1
+;    icpath3=icpath1
+;  else
+;    icpath1="/data/waccm/"  
+;    icpath2=icpath1
+;    icpath3=icpath1
+;  end if
+;end if
 srcIcWaccm = icpath1+"b40.1850.track1.2deg.wcm.007.cam2.i.0156-01-01-00000.nc"
-srcIcCam   = icpath2+"b40_1850_2d_r07c5cn_160jp.cam.i.0070-01-01-00000.nc"
+srcIcCam   = icpath2+"b40_1850_2d_r07c5cn_160jp.cam2.i.0070-01-01-00000.nc"
 outIcWaccm = icpath3+"b1850.waccm-mam3_1.9x2.5_L70.cam2.i.0156-01-01.c120523.nc"
 
-print("  Creating " + outIcWaccm)
-print("    from WACCM4 file " + srcIcWaccm)
-system("interpic -t " + templatefile + " " + srcIcWaccm + " " + outIcWaccm)
+;print("  Creating " + outIcWaccm)
+;print("    from WACCM4 file " + srcIcWaccm)
+;system("interpic -t " + templatefile + " " + srcIcWaccm + " " + outIcWaccm)
 
-print("    and CAM5 file " + srcIcCam)
+print("    WACCM file " + srcIcWaccm)
+print("    CAM5 file " + srcIcCam)
 
 ; Open the initial conditions file.
 WACCMicFile = addfile(outIcWaccm, "w")
