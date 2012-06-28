@@ -45,17 +45,46 @@ lat=testfile1->lat
 time=testfile1->time
 time=time/365.0
 nLats=dimsizes(lat)
+nTimes=dimsizes(time)
 
+; Net shortwave flux at the surface
 print("reading FSNS_test1")
 FSNS_test1  = testfile1->FSNS
+
+; Clear-sky net shortwave flux at the surface
 print("reading FSNSC_test1")
 FSNSC_test1 = testfile1->FSNSC
+
+; Downwelling shortwave flux at the surface
+print("reading FSDS_test1")
+FSDS_test1  = testfile1->FSDS
+
+; Clear-sky downwelling shortwave flux at the surface
+print("reading FSDSC_test1")
+FSDSC_test1 = testfile1->FSDSC
+
+; Downwelling shortwave flux at the TOA
+print("reading FSDTOA_test1")
+FSDTOA_test1  = testfile1->FSDTOA
+
+; Upwelling shortwave flux at the TOA
+print("reading FSUTOA_test1")
+FSUTOA_test1  = testfile1->FSUTOA
+
+albedo_test1 = FSUTOA_test1/FSDTOA_test1
+
 print("reading TS_test1")
 TS_test1    = testfile1->TS
 print("reading PRECT_test1")
 PRECT_test1 = testfile1->PRECT
 print("reading CLDTOT_test1")
 CLDTOT_test1 = testfile1->CLDTOT
+print("reading CLDLOW_test1")
+CLDLOW_test1 = testfile1->CLDLOW
+print("reading CLDMED_test1")
+CLDMED_test1 = testfile1->CLDMED
+print("reading CLDHGH_test1")
+CLDHGH_test1 = testfile1->CLDHGH
 print("reading ASDIR_test1")
 ASDIR_test1 = testfile1->ASDIR
 print("reading date_x1")
@@ -63,16 +92,44 @@ date_x1     = testfile1->date
 dx1=dimsizes(date_x1)
 print("dx1:"+dx1)
 
+; Net shortwave flux at the surface
 print("reading FSNS_cntl1")
 FSNS_cntl1  = cntlfile1->FSNS
+
+; Clear-sky net shortwave flux at the surface
 print("reading FSNSC_cntl1")
 FSNSC_cntl1 = cntlfile1->FSNSC
+
+; Downwelling shortwave flux at the surface
+print("reading FSDS_cntl1")
+FSDS_cntl1  = cntlfile1->FSDS
+
+; Clear-sky downwelling shortwave flux at the surface
+print("reading FSDSC_cntl1")
+FSDSC_cntl1 = cntlfile1->FSDSC
+
+; Downwelling shortwave flux at the TOA
+print("reading FSDTOA_cntl1")
+FSDTOA_cntl1  = cntlfile1->FSDTOA
+
+; Upwelling shortwave flux at the TOA
+print("reading FSUTOA_cntl1")
+FSUTOA_cntl1  = cntlfile1->FSUTOA
+
+albedo_cntl1 = FSUTOA_cntl1/FSDTOA_cntl1
+
 print("reading TS_cntl1")
 TS_cntl1    = cntlfile1->TS
 print("reading PRECT_cntl1")
 PRECT_cntl1 = cntlfile1->PRECT
 print("reading CLDTOT_cntl1")
 CLDTOT_cntl1 = cntlfile1->CLDTOT
+print("reading CLDLOW_cntl1")
+CLDLOW_cntl1 = cntlfile1->CLDLOW
+print("reading CLDMED_cntl1")
+CLDMED_cntl1 = cntlfile1->CLDMED
+print("reading CLDHGH_cntl1")
+CLDHGH_cntl1 = cntlfile1->CLDHGH
 print("reading ASDIR_cntl1")
 ASDIR_cntl1 = cntlfile1->ASDIR
 print("reading date_c1")
@@ -199,6 +256,16 @@ if (ensemble) then
   FSNS_diff_pct3 = 100.*(FSNS_test3 - FSNS_cntl3(dc5:dc6))/FSNS_cntl3(dc5:dc6)
 end if
 
+print("calculating FSDS_diff")
+FSDS_diff1 = FSDS_test1 - FSDS_cntl1(dc1:dc2)
+FSDS_diff_pct1 = 100.*(FSDS_test1 - FSDS_cntl1(dc1:dc2))/FSDS_cntl1(dc1:dc2)
+if (ensemble) then
+  FSDS_diff2 = FSDS_test2 - FSDS_cntl2(dc3:dc4)
+  FSDS_diff3 = FSDS_test3 - FSDS_cntl3(dc5:dc6)
+  FSDS_diff_pct2 = 100.*(FSDS_test2 - FSDS_cntl2(dc3:dc4))/FSDS_cntl2(dc3:dc4)
+  FSDS_diff_pct3 = 100.*(FSDS_test3 - FSDS_cntl3(dc5:dc6))/FSDS_cntl3(dc5:dc6)
+end if
+
 print("calculating FSNSC_diff")
 FSNSC_diff1 = FSNSC_test1 - FSNSC_cntl1(dc1:dc2)
 FSNSC_diff_pct1 = 100.*(FSNSC_test1 - FSNSC_cntl1(dc1:dc2))/FSNSC_cntl1(dc1:dc2)
@@ -207,6 +274,16 @@ if (ensemble) then
   FSNSC_diff3 = FSNSC_test3 - FSNSC_cntl3(dc5:dc6)
   FSNSC_diff_pct2 = 100.*(FSNSC_test2 - FSNSC_cntl2(dc3:dc4))/FSNSC_cntl2(dc3:dc4)
   FSNSC_diff_pct3 = 100.*(FSNSC_test3 - FSNSC_cntl3(dc5:dc6))/FSNSC_cntl3(dc5:dc6)
+end if
+
+print("calculating FSDSC_diff")
+FSDSC_diff1 = FSDSC_test1 - FSDSC_cntl1(dc1:dc2)
+FSDSC_diff_pct1 = 100.*(FSDSC_test1 - FSDSC_cntl1(dc1:dc2))/FSDSC_cntl1(dc1:dc2)
+if (ensemble) then
+  FSDSC_diff2 = FSDSC_test2 - FSDSC_cntl2(dc3:dc4)
+  FSDSC_diff3 = FSDSC_test3 - FSDSC_cntl3(dc5:dc6)
+  FSDSC_diff_pct2 = 100.*(FSDSC_test2 - FSDSC_cntl2(dc3:dc4))/FSDSC_cntl2(dc3:dc4)
+  FSDSC_diff_pct3 = 100.*(FSDSC_test3 - FSDSC_cntl3(dc5:dc6))/FSDSC_cntl3(dc5:dc6)
 end if
 
 print("calculating CLDTOT_diff")
@@ -275,7 +352,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
 
   res                   = True                      ; plot mods desired
   res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "landscape"
+  res@gsnPaperOrientation = "portrait"
 ;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
 ;  res@vpHeightF           = 0.8
   res@gsnFrame     = False                        ; don't advance frame yet
@@ -290,7 +367,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@tmXBAutoPrecision= False
   res@tmXBPrecision    = 2
   
-  res@trXMinF = 0
+  res@trXMinF = 0.0
   res@trXMaxF = max(time)
 
   res@trYMaxF = 0.2
@@ -317,7 +394,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "landscape"
+  res@gsnPaperOrientation = "portrait"
 ;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
 ;  res@vpHeightF           = 0.8
   res@trYMaxF = 0.0
@@ -342,11 +419,11 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "landscape"
+  res@gsnPaperOrientation = "portrait"
 ;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
 ;  res@vpHeightF           = 0.8
   res@trYMaxF = 0.0
-  res@trYMinF = -15
+  res@trYMinF = -15.0
   res@tiYAxisString = "Precipitation Anomaly (%)"
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
@@ -361,53 +438,28 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "landscape"
+  res@gsnPaperOrientation = "portrait"
 ;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
 ;  res@vpHeightF           = 0.7
-  res@tiYAxisString = "SW All-Sky Flux Anomaly at Surface (W/m~S~2~N~)"
-  res@trYMinF = -23
+  res@tiYAxisString = "SW Downwelling Flux Anomaly at Surface (W/m~S~2~N~)"
+  res@trYMinF = -23.0
   res@xyLineThicknessF = 6.0
   res@xyLineColor       = "red"          ; change line color
   print("plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res)")
   plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res) ; draw plot
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
-  plot = gsn_csm_xy (wks,time,FSNS_diff1,res) ; draw plot
-  if (ensemble) then
-    res@xyLineColor       = "green"          ; change line color
-    plot = gsn_csm_xy (wks,time,FSNS_diff2,res) ; draw plot
-    res@xyLineColor       = "blue"          ; change line color
-    plot = gsn_csm_xy (wks,time,FSNS_diff3,res) ; draw plot
-  end if
+  plot = gsn_csm_xy (wks,time,FSDS_diff1,res) ; draw plot
+  res@xyLineColor       = "blue"          ; change line color
+  plot = gsn_csm_xy (wks,time,FSDSC_diff1,res) ; draw plot
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "landscape"
+  res@gsnPaperOrientation = "portrait"
 ;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
 ;  res@vpHeightF           = 0.7
-  res@tiYAxisString = "SW Clear-sky Flux Anomaly at Surface (W/m~S~2~N~)"
-  res@trYMinF = -23
-  res@xyLineThicknessF = 6.0
-  res@xyLineColor       = "red"          ; change line color
-  print("plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res)")
-  plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res) ; draw plot
-  res@xyLineThicknessF = 8.0
-  res@xyLineColor       = "black"          ; change line color
-  plot = gsn_csm_xy (wks,time,FSNSC_diff1,res) ; draw plot
-  if (ensemble) then
-    res@xyLineColor       = "green"          ; change line color
-    plot = gsn_csm_xy (wks,time,FSNSC_diff2,res) ; draw plot
-    res@xyLineColor       = "blue"          ; change line color
-    plot = gsn_csm_xy (wks,time,FSNSC_diff3,res) ; draw plot
-  end if
-  frame(wks)
-  
-  res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "landscape"
-;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-;  res@vpHeightF           = 0.7
-  res@tiYAxisString = "SW Flux Anomaly at Surface (W/m~S~2~N~)"
-  res@trYMinF = -23
+  res@tiYAxisString = "SW Net Flux Anomaly at Surface (W/m~S~2~N~)"
+  res@trYMinF = -23.0
   res@xyLineThicknessF = 6.0
   res@xyLineColor       = "red"          ; change line color
   print("plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res)")
@@ -420,60 +472,115 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "landscape"
+  res@gsnPaperOrientation = "portrait"
+;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;  res@vpHeightF           = 0.7
+  res@tiYAxisString = "SW Downwelling Flux at Surface (W/m~S~2~N~)"
+  res@trYMinF = 120.0
+  res@trYMaxF = 280.0
+  data = new( (/4,nTimes/), float)
+  data(0,:)=FSDS_test1
+  data(1,:)=FSDS_cntl1
+  data(2,:)=FSDSC_test1
+  data(3,:)=FSDSC_cntl1
+  res@xyLineThicknessF = 6.0
+  res@xyMonoLineColor   = False
+  res@xyMonoDashPattern   = True
+  res@xyLineColors       = (/"red", "black", "blue", "DarkGreen"/)         ; change line color
+  res@pmLegendDisplayMode    = "Always"            ; turn on legend
+  res@xyExplicitLegendLabels = (/"All-sky 5Tg","All-sky control","Clear-sky 5Tg","Clear-sky control"/)         ; explicit labels
+  plot = gsn_csm_xy (wks,time,data,res) ; draw plot
+  frame(wks)
+  
+  res@gsnMaximize         = True          ; expand plot size to maximum
+  res@gsnPaperOrientation = "portrait"
+;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;  res@vpHeightF           = 0.7
+  res@tiYAxisString = "SW Net Flux at Surface (W/m~S~2~N~)"
+  res@trYMinF = 120.0
+  res@trYMaxF = 280.0
+  data = new( (/4,nTimes/), float)
+  data(0,:)=FSNS_test1
+  data(1,:)=FSNS_cntl1
+  data(2,:)=FSNSC_test1
+  data(3,:)=FSNSC_cntl1
+  plot = gsn_csm_xy (wks,time,data,res) ; draw plot
+  frame(wks)
+  
+  res@gsnMaximize         = True          ; expand plot size to maximum
+  res@gsnPaperOrientation = "portrait"
 ;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
 ;  res@vpHeightF           = 0.7
   res@tiYAxisString = "SW All-sky Flux Anomaly at Surface (%)"
-  res@trYMinF = -15
-  res@xyLineThicknessF = 8.0
-  res@xyLineColor       = "black"          ; change line color
-  print("plot = gsn_csm_xy (wks,time,FSNS_diff_pct1,res)")
-  plot = gsn_csm_xy (wks,time,FSNS_diff_pct1,res) ; draw plot
-  if (ensemble) then
-    res@xyLineColor       = "green"          ; change line color
-    plot = gsn_csm_xy (wks,time,FSNS_diff_pct2,res) ; draw plot
-    res@xyLineColor       = "blue"          ; change line color
-    plot = gsn_csm_xy (wks,time,FSNS_diff_pct3,res) ; draw plot
-  end if
+  res@trYMinF = -15.0
+  res@trYMaxF = 0.0
+  data(0,:)=(/FSNS_diff_pct1/)
+  data(1,:)=(/FSDS_diff_pct1/)
+  data(2,:)=(/FSNSC_diff_pct1/)
+  data(3,:)=(/FSDSC_diff_pct1/)
+  res@xyExplicitLegendLabels = (/"All-sky net","All-sky downwelling","Clear-sky net","Clear-sky downwelling"/)         ; explicit labels
+  plot = gsn_csm_xy (wks,time,data,res) ; draw plot
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "landscape"
+  res@gsnPaperOrientation = "portrait"
 ;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
 ;  res@vpHeightF           = 0.7
-  res@tiYAxisString = "SW Clear-sky Flux Anomaly at Surface (%)"
-  res@trYMinF = -15
-  res@xyLineThicknessF = 8.0
-  res@xyLineColor       = "black"          ; change line color
-  print("plot = gsn_csm_xy (wks,time,FSNSC_diff_pct1,res)")
-  plot = gsn_csm_xy (wks,time,FSNSC_diff_pct1,res) ; draw plot
-  if (ensemble) then
-    res@xyLineColor       = "green"          ; change line color
-    plot = gsn_csm_xy (wks,time,FSNSC_diff_pct2,res) ; draw plot
-    res@xyLineColor       = "blue"          ; change line color
-    plot = gsn_csm_xy (wks,time,FSNSC_diff_pct3,res) ; draw plot
-  end if
+  res@tiYAxisString = "SW Albedo"
+  delete(res@trYMinF)
+  delete(res@trYMaxF)
+  res@xyMonoLineColor   = False
+  res@xyMonoDashPattern   = True
+  delete(data)
+  data = new( (/2,nTimes/), float)
+  data(0,:)=(/albedo_test1/)
+  data(1,:)=(/albedo_cntl1/)
+  print("min(albedo_test1)="+min(albedo_test1)+", max(albedo_test1)="+max(albedo_test1))
+  print("min(albedo_cntl1)="+min(albedo_cntl1)+", max(albedo_cntl1)="+max(albedo_cntl1))
+  res@pmLegendDisplayMode    = "Always"            ; turn on legend
+  delete(res@xyExplicitLegendLabels)
+  res@xyExplicitLegendLabels = (/"5Tg","Control"/)         ; explicit labels
+  plot = gsn_csm_xy (wks,time,data,res) ; draw plot
   frame(wks)
     
   res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "landscape"
+  res@gsnPaperOrientation = "portrait"
 ;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
 ;  res@vpHeightF           = 0.7
   res@tiYAxisString = "CLDTOT (frac)"
-  res@trYMinF=0.52
-  res@trYMaxF=0.6
-  res@xyLineThicknessF = 8.0
-  res@xyLineColor       = "black"          ; change line color
-  print("plot = gsn_csm_xy (wks,time,CLDTOT_test1,res)")
-  plot = gsn_csm_xy (wks,time,CLDTOT_test1,res) ; draw plot
-  res@xyLineColor       = "blue"          ; change line color
-  plot = gsn_csm_xy (wks,time,CLDTOT_cntl1,res) ; draw plot
+  delete(res@trYMinF);=0.52
+  delete(res@trYMaxF);=0.6
+  delete(data)
+  data = new( (/8,nTimes/), float)
+  data(0,:)=CLDTOT_test1
+  data(1,:)=CLDTOT_cntl1
+  data(2,:)=CLDLOW_test1
+  data(3,:)=CLDLOW_cntl1
+  data(4,:)=CLDMED_test1
+  data(5,:)=CLDMED_cntl1
+  data(6,:)=CLDHGH_test1
+  data(7,:)=CLDHGH_cntl1
+  res@xyMonoLineColor   = False
+  res@xyMonoDashPattern = False
+  delete(res@xyLineColors)
+  res@xyLineColors      = (/"black", "black", "red", "red", "blue", "blue", "DarkGreen", "DarkGreen"/)         ; change line color
+  delete(res@xyDashPatterns)
+  res@xyDashPatterns    = (/0,1,0,1,0,1,0,1/)
+
+  res@pmLegendDisplayMode="Always"
+  delete(res@xyExplicitLegendLabels)
+  res@xyExplicitLegendLabels = (/"5Tg CLDTOT","Control CLDTOT","5Tg CLDLOW","Control CLDLOW","5Tg CLDMED","Control CLDMED","5Tg CLDHGH","Control CLDHGH"/)         ; explicit labels
+  print("plot = gsn_csm_xy (wks,time,data,res)")
+  plot = gsn_csm_xy (wks,time,data,res)
+;  plot = gsn_csm_xy (wks,time,CLDTOT_test1,res) ; draw plot
+;  res@xyLineColor       = "blue"          ; change line color
+;  plot = gsn_csm_xy (wks,time,CLDTOT_cntl1,res) ; draw plot
 ;  res@xyLineColor       = "red"          ; change line color
 ;  plot = gsn_csm_xy (wks,time,CLDTOT_diff1,res) ; draw plot
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "landscape"
+  res@gsnPaperOrientation = "portrait"
 ;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
 ;  res@vpHeightF           = 0.7
   res@tiYAxisString = "ASDIR (frac)"
@@ -481,6 +588,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@trYMaxF=0.59
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
+  delete(res@pmLegendDisplayMode)
   print("plot = gsn_csm_xy (wks,time,ASDIR_test1,res)")
   plot = gsn_csm_xy (wks,time,ASDIR_test1,res) ; draw plot
   res@xyLineColor       = "blue"          ; change line color
@@ -490,7 +598,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   frame(wks)
     
   res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "landscape"
+  res@gsnPaperOrientation = "portrait"
 ;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
 ;  res@vpHeightF           = 0.7
   res@tiYAxisString = "Cloud fraction, albedo change (%)"
