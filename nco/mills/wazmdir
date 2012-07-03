@@ -45,7 +45,7 @@ if  [ -n "$caseid" ] ; then
   for a in `ls -1 $wadir/*$hnum*.nc`; do
     oldfile=$a
     ls -sh $oldfile
-    newfile=`echo $oldfile | sed 's/'$hnum'/'$hnum'zm/g' | sed 's/atm\/hist/h0zm/g'`
+    newfile=`echo $oldfile | sed 's/'$hnum'/'$hnum'zm/g' | sed 's/hist/'$hnum'zm/g'`
 
     if [[ ! -e $newfile ]];then
       echo "ncwa -alon -O "$oldfile" "$newfile
