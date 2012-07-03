@@ -1,46 +1,61 @@
 #!/bin/ksh
+# Script creates zonal means from history files, skipping those previously created
+# Define environment variables, i.e.:
+#   setenv caseid b40.rcp4_5.2deg.wcm.carma.bc5tgIP.007
+#   setenv hnum h0
+#   setenv hnum h3iso
+#   setenv htype '.annual'
 
-export machine=`hostname`
+if  [ -n "$caseid" ] ; then
+  export machine=`hostname`
 
-if [[ $machine = 'modeling1' ]];then
-  rootpath='/data4/mmills'
-#  rootpath='/data5/mmills/wa319/carma-soot'
-fi
-
-if [[ $machine = 'cmip5' ]];then
-  rootpath='/data/waccm'
-#  rootpath='/data/ccsm4'
-fi
-
-if [[ $OSTYPE = 'darwin' ]];then
-  rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-fi
-
-#caseid='f40.2000.4deg.wcm.carma.sulf.004/run01'
-caseid='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.007'
-#caseid='geo-0-bhn'
-
-hnum='h3'
-#hnum='h3iso'
-
-#htype='.annual'
-htype=''
-
-wadir=$rootpath'/'$caseid'/'$hnum$htype
-outdir=$rootpath'/'$caseid'/'$hnum'zm'$htype
-
-mkdir -p $outdir
-
-for a in `ls -1 $wadir/*$hnum*.nc`; do
-  oldfile=$a
-  ls -sh $oldfile
-  newfile=`echo $oldfile | sed 's/'$hnum'/'$hnum'zm/g' | sed 's/atm\/hist/h0zm/g'` # | sed 's/data2/data3/g' | sed 's/fischer/mmills/g'`
-
-  if [[ ! -e $newfile ]];then
-    echo "ncwa -alon -O "$oldfile" "$newfile
-    ncwa -alon -O $oldfile $newfile
+  if [[ $machine = 'modeling1' ]];then
+    rootpath='/data4/mmills'
+#    rootpath='/data5/mmills/wa319/carma-soot'
   fi
-  
-  ls -sh $newfile
 
-done
+  if [[ $machine = 'cmip5' ]];then
+    rootpath='/data/waccm'
+#    rootpath='/data/ccsm4'
+  fi
+
+  if [[ $OSTYPE = 'darwin' ]];then
+    rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+  fi
+
+  if [ ! -n "$hnum" ] ; then
+    hnum='h0'
+  fi
+
+  if [ ! -n "$htype" ] ; then
+    htype=''
+  fi
+
+  wadir=$rootpath'/'$caseid'/'$hnum$htype
+  outdir=$rootpath'/'$caseid'/'$hnum'zm'$htype
+  
+  if [[ $machine = 'lou' ]];then
+    rootpath=$HOME'/csm'
+    wadir=$rootpath'/'$caseid'/atm/hist'
+    outdir=$rootpath'/'$caseid'/atm/'$hnum'zm'$htype
+  fi
+
+  mkdir -p $outdir
+
+  for a in `ls -1 $wadir/*$hnum*.nc`; do
+    oldfile=$a
+    ls -sh $oldfile
+    newfile=`echo $oldfile | sed 's/'$hnum'/'$hnum'zm/g' | sed 's/atm\/hist/h0zm/g'`
+
+    if [[ ! -e $newfile ]];then
+      echo "ncwa -alon -O "$oldfile" "$newfile
+      ncwa -alon -O $oldfile $newfile
+    fi
+  
+    ls -sh $newfile
+
+  done
+
+else
+  echo "caseid is not set"
+fi
