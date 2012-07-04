@@ -1,43 +1,55 @@
 #!/bin/ksh
 
 ### reads zonal means in h0zm and creates global means from all available years
+# Define environment variables, i.e.:
+#   setenv caseid b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg
 
-  echo globavg
+echo globavg
 
-export machine=`hostname`
+if  [ -n "$caseid" ] ; then
 
-if [[ $machine = 'modeling1' ]];then
-  rootpath='/data4/mmills'
-fi
+  export machine=`hostname`
 
-if [[ $machine = 'cmip5' ]];then
-  rootpath='/data/waccm'
-#  rootpath='/data/ccsm4'
-fi
+  if [[ $machine = 'modeling1' ]];then
+    rootpath='/data4/mmills'
+  fi
 
-if [[ $OSTYPE = 'darwin' ]];then
-  rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-fi
+  if [[ $machine = 'cmip5' ]];then
+    rootpath='/data/waccm'
+  #  rootpath='/data/ccsm4'
+  fi
 
-#runname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg'
-runname='b40.rcp4_5.2deg.wcm.carma.bc0tg.avg'
+  if [[ $OSTYPE = 'darwin' ]];then
+    rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+  fi
 
-zmdir=$rootpath'/'$runname'/h0zm'
-gmdir=$rootpath'/'$runname'/h0gm'
+  zmdir=$rootpath'/'$caseid'/h0zm'
+  gmdir=$rootpath'/'$caseid'/h0gm'
 
-mkdir -p $gmdir
+  if [[ $machine = 'lou' ]];then
+    rootpath=$HOME'/csm'
+    zmdir=$rootpath'/'$caseid'/atm/h0zm'
+    gmdir=$rootpath'/'$caseid'/atm/h0gm'
+  fi
 
-avgfile=$gmdir'/'$runname'.cam2.h0.globavg.nc'
-tmpfile=$gmdir'/zmtmp.nc'
+  mkdir -p $gmdir
 
-echo $avgfile
-ncfiles=$zmdir'/'$runname'.cam2.h0zm.*.nc'
-echo "ncrcat -O $ncfiles $tmpfile"
-ncrcat -O $ncfiles $tmpfile
-  
-echo "ncwa -O -I -a lat -w gw $tmpfile $avgfile"
-ncwa -O -I -a lat -w gw $tmpfile $avgfile
+  avgfile=$gmdir'/'$caseid'.cam2.h0.globavg.nc'
+  tmpfile=$gmdir'/zmtmp.nc'
+
+  echo $avgfile
+  ncfiles=$zmdir'/'$caseid'.cam2.h0zm.*.nc'
+  echo "ncrcat -O $ncfiles $tmpfile"
+  ncrcat -O $ncfiles $tmpfile
     
-echo "rm $tmpfile"
-rm $tmpfile
+  echo "ncwa -O -I -a lat -w gw -x -v nlon,wnummax $tmpfile $avgfile"
+  ncwa -O -I -a lat -w gw -x -v nlon,wnummax $tmpfile $avgfile
+    
+  echo "rm $tmpfile"
+  rm $tmpfile
+else
+  echo "caseid is not set, i.e.:"
+  echo " setenv caseid b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
+fi
+
 
