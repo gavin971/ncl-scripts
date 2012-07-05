@@ -34,7 +34,7 @@ wadir=$rootpath'/'$caseid1'/'$hnum$htype
 ensdir=$rootpath'/'$ensemble'/'$hnum$htype
 mkdir -p $ensdir
 
-for a in `ls -1 $wadir/*$hnum.202*.nc`; do
+for a in `ls -1 $wadir/*$hnum.*.nc`; do
   file1=$a
   ls -sh $file1
   file2=`echo $file1 | sed 's/'$caseid1'/'$caseid2'/g'`
@@ -44,8 +44,8 @@ for a in `ls -1 $wadir/*$hnum.202*.nc`; do
     ls -sh $file2
     if [[ -e $file3 ]];then
       ls -sh $file3
-      echo ncea -O -v FSDS,PRECC,PRECL,TS,TSMX,TSMN $file1 $file2 $file3 $fileavg
-      ncea -O -v FSDS,PRECC,PRECL,TS,TSMX,TSMN $file1 $file2 $file3 $fileavg
+      echo ncea -O -v date,FSDS,PRECC,PRECL,TS,TSMX,TSMN $file1 $file2 $file3 $fileavg
+      ncea -O -v date,FSDS,PRECC,PRECL,TS,TSMX,TSMN $file1 $file2 $file3 $fileavg
     else
       echo FATAL: missing file $file3
       exit
