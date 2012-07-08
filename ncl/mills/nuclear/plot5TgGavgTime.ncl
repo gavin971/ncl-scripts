@@ -304,6 +304,8 @@ TS_time = (/ 0.072,0.158,0.23,0.316,0.402,0.488,0.646,0.703,0.919,1.062,1.148,1.
       7.507,7.593,7.679,7.766,7.837,7.923,8.01,8.096,8.182,8.268,8.354,8.426,8.512,8.612,8.684,8.756,8.842,\
       8.928,9.014,9.1,9.172,9.258,9.344,9.502,9.603,9.703,9.761,9.861,9.947,10.019,10.091,10.191,10.278,10.349 /)
 
+TS_time=TS_time-134./365. ; Robock starts May 15, vs Jan 1
+
 TS_rbck = (/ 0.134,0,-0.249,-0.537,-0.982,-1.126,-1.097,-0.963,-0.968,-0.901,-1.136,-1.284,-1.308,\
   -1.313,-1.347,-1.313,-1.284,-1.27,-1.222,-1.141,-1.088,-1.073,-1.217,-1.284,-1.256,-1.265,-1.251,\
   -1.256,-1.38,-1.423,-1.337,-1.112,-1.097,-1.222,-1.323,-1.28,-1.16,-1.136,-1.097,-1.212,-1.26,\
@@ -325,6 +327,8 @@ PRECT_time = (/0.072,0.144,0.244,0.33,0.416,0.502,0.574,0.675,0.732,0.833,0.919,
   8.943,9.014,9.086,9.172,9.258,9.344,9.416,9.545,9.603,9.703,9.761,9.861,9.947,10.005,10.105,\
   10.177,10.263,10.364/)
   
+PREC_time=PREC_time-134./365. ; Robock starts May 15, vs Jan 1
+  
 PRECT_rbck = (/-0.002,-0.019,0.006,-0.045,-0.156,-0.173,-0.235,-0.235,-0.219,-0.225,-0.257,-0.204,-0.216,\
   -0.239,-0.227,-0.276,-0.268,-0.239,-0.256,-0.245,-0.241,-0.287,-0.277,-0.257,-0.245,-0.274,-0.267,\
   -0.284,-0.292,-0.288,-0.277,-0.263,-0.248,-0.29,-0.301,-0.28,-0.262,-0.277,-0.271,-0.283,-0.286,\
@@ -340,6 +344,9 @@ FSNS_time = (/0.014,0.243,0.329,0.414,0.486,0.643,0.814,0.986,1.143,1.329,1.471,
   2.486,2.643,2.814,2.986,3.129,3.3,3.471,3.643,3.8,3.986,4.143,4.3,4.471,4.657,4.814,4.986,5.143,5.3,\
   5.471,5.629,5.8,5.971,6.129,6.3,6.486,6.643,6.786,6.971,7.143,7.3,7.529,7.757,7.957,8.143,8.314,\
   8.457,8.629,8.786,8.971,9.129,9.3,9.471,9.629,9.8,9.971,10.129,10.286/)
+  
+FSNS_time=FSNS_time-134./365. ; Robock starts May 15, vs Jan 1
+  
 FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.39,-13.051,-12.881,-12.881,-13.22,\
   -12.542,-12.373,-11.864,-11.356,-12.034,-12.034,-11.695,-10.847,-10.339,-10,-10.339,-10.339,-10,-9.492,-8.814,\
   -8.305,-8.644,-8.644,-8.136,-7.797,-6.949,-6.78,-6.78,-6.78,-6.441,-5.932,-5.424,-5.254,-5.254,-5.254,-5.085,\
@@ -448,7 +455,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   txres@txFontColor="black"
   gsn_text_ndc(wks,"WACCM4",0.5,0.7,txres)
   txres@txFontColor="red"
-  gsn_text_ndc(wks,"Robock et al., 2007",0.65,0.42,txres)
+  gsn_text_ndc(wks,"Robock et al., 2007",0.51,0.43,txres)
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
@@ -477,31 +484,31 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   gsn_text_ndc(wks,"WACCM4 clear-sky",0.5,0.7,txres)
   frame(wks)
   
-  res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "portrait"
-;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-;  res@vpHeightF           = 0.7
-  res@tiYAxisString = "SW Net Flux Anomaly at Surface (W/m~S~2~N~)"
-  res@trYMinF = -20.0
-  res@xyLineThicknessF = 6.0
-  res@xyLineColor       = "red"          ; change line color
-  print("plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res)")
-  plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res) ; draw plot
-  res@xyLineThicknessF = 8.0
-  res@xyLineColor       = "black"          ; change line color
-  plot = gsn_csm_xy (wks,time,FSNS_diff1,res) ; draw plot
-  res@xyLineColor       = "blue"          ; change line color
-  plot = gsn_csm_xy (wks,time,FSNSC_diff1,res) ; draw plot
-;  drawNDCGrid(wks)
-;  ypos=0.9
-;  gsn_legend_ndc(wks,3,(/"Robock et al., 2007","WACCM4 all-sky","WACCM4 clear-sky"/),xpos,ypos,lgres)
-  txres@txFontColor="black"
-  gsn_text_ndc(wks,"WACCM4 all-sky",0.5,0.8,txres)
-  txres@txFontColor="red"
-  gsn_text_ndc(wks,"Robock et al., 2007",0.5,0.85,txres)
-  txres@txFontColor="blue"
-  gsn_text_ndc(wks,"WACCM4 clear-sky",0.5,0.75,txres)
-  frame(wks)
+;  res@gsnMaximize         = True          ; expand plot size to maximum
+;  res@gsnPaperOrientation = "portrait"
+;;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;;  res@vpHeightF           = 0.7
+;  res@tiYAxisString = "SW Net Flux Anomaly at Surface (W/m~S~2~N~)"
+;  res@trYMinF = -20.0
+;  res@xyLineThicknessF = 6.0
+;  res@xyLineColor       = "red"          ; change line color
+;  print("plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res)")
+;  plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res) ; draw plot
+;  res@xyLineThicknessF = 8.0
+;  res@xyLineColor       = "black"          ; change line color
+;  plot = gsn_csm_xy (wks,time,FSNS_diff1,res) ; draw plot
+;  res@xyLineColor       = "blue"          ; change line color
+;  plot = gsn_csm_xy (wks,time,FSNSC_diff1,res) ; draw plot
+;;  drawNDCGrid(wks)
+;;  ypos=0.9
+;;  gsn_legend_ndc(wks,3,(/"Robock et al., 2007","WACCM4 all-sky","WACCM4 clear-sky"/),xpos,ypos,lgres)
+;  txres@txFontColor="black"
+;  gsn_text_ndc(wks,"WACCM4 all-sky",0.5,0.8,txres)
+;  txres@txFontColor="red"
+;  gsn_text_ndc(wks,"Robock et al., 2007",0.5,0.85,txres)
+;  txres@txFontColor="blue"
+;  gsn_text_ndc(wks,"WACCM4 clear-sky",0.5,0.75,txres)
+;  frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "portrait"
@@ -541,20 +548,20 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   plot = gsn_csm_xy (wks,time,data,res) ; draw plot
   frame(wks)
   
-  res@gsnMaximize         = True          ; expand plot size to maximum
-  res@gsnPaperOrientation = "portrait"
-;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-;  res@vpHeightF           = 0.7
-  res@tiYAxisString = "SW All-sky Flux Anomaly at Surface (%)"
-  res@trYMinF = -15.0
-  res@trYMaxF = 0.0
-  data(0,:)=(/FSNS_diff_pct1/)
-  data(1,:)=(/FSDS_diff_pct1/)
-  data(2,:)=(/FSNSC_diff_pct1/)
-  data(3,:)=(/FSDSC_diff_pct1/)
-  res@xyExplicitLegendLabels = (/"All-sky net","All-sky downwelling","Clear-sky net","Clear-sky downwelling"/)         ; explicit labels
-  plot = gsn_csm_xy (wks,time,data,res) ; draw plot
-  frame(wks)
+;  res@gsnMaximize         = True          ; expand plot size to maximum
+;  res@gsnPaperOrientation = "portrait"
+;;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+;;  res@vpHeightF           = 0.7
+;  res@tiYAxisString = "SW All-sky Flux Anomaly at Surface (%)"
+;  delete(res@trYMinF)
+;  res@trYMaxF = 0.0
+;  data(0,:)=(/FSNS_diff_pct1/)
+;  data(1,:)=(/FSDS_diff_pct1/)
+;  data(2,:)=(/FSNSC_diff_pct1/)
+;  data(3,:)=(/FSDSC_diff_pct1/)
+;  res@xyExplicitLegendLabels = (/"All-sky net","All-sky downwelling","Clear-sky net","Clear-sky downwelling"/)         ; explicit labels
+;  plot = gsn_csm_xy (wks,time,data,res) ; draw plot
+;  frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "portrait"
