@@ -2,8 +2,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
 rootdir="/data/waccm"
-;case="b40.1955-2005.2deg.wcm.avg"
-case="b40.rcp4_5.2deg.wcm.avg"
+case1="b40.1955-2005.2deg.wcm.avg"
+case2="b40.rcp4_5.2deg.wcm.avg"
 
 ;rootdir="/data/ccsm4"
 ;case="b40.1955-2005.2deg.wset.avg"
@@ -12,13 +12,14 @@ season="DJF"
 ;season="JJA"
 
 ;dir1="h0zm.seasavg.1960-1979"
-;dir2="h0zm.seasavg.1986-2005"
-dir1="h0zm.seasavg.2005-2024"
+dir1="h0zm.seasavg.1986-2005"
+;dir1="h0zm.seasavg.2005-2024"
 dir2="h0zm.seasavg.2032-2051"
-infile=case+".cam2.h0zm."+season+".nc"
+infile1=case1+".cam2.h0zm."+season+".nc"
+infile2=case2+".cam2.h0zm."+season+".nc"
 
-file1=addfile(rootdir+"/"+case+"/"+dir1+"/"+infile,"r")
-file2=addfile(rootdir+"/"+case+"/"+dir2+"/"+infile,"r")
+file1=addfile(rootdir+"/"+case1+"/"+dir1+"/"+infile1,"r")
+file2=addfile(rootdir+"/"+case2+"/"+dir2+"/"+infile2,"r")
 
 U1=file1->U
 U2=file2->U
@@ -58,7 +59,7 @@ Udiff=Udiff-U1
   res2@cnLinesOn             = True
   res2@cnFillOn              = False
 
-  imagefile="$IMAGE_PATH/"+case+"_Ujet_"+season
+  imagefile="$IMAGE_PATH/"+case2+"_Ujet_"+season
   wks = gsn_open_wks("ps",imagefile)
   gsn_define_colormap(wks,"blwhre")                ; choose colormap
   
@@ -71,3 +72,8 @@ Udiff=Udiff-U1
   draw(plot1)
   frame(wks)
   delete(wks)
+  
+  muttcmd="mutt mikejmills@mac.com -a "+imagefile+".ps -s "+imagefile+" < /dev/null"
+  print(muttcmd)
+  mutter=systemfunc(muttcmd)
+  print(mutter)
