@@ -327,7 +327,7 @@ PRECT_time = (/0.072,0.144,0.244,0.33,0.416,0.502,0.574,0.675,0.732,0.833,0.919,
   8.943,9.014,9.086,9.172,9.258,9.344,9.416,9.545,9.603,9.703,9.761,9.861,9.947,10.005,10.105,\
   10.177,10.263,10.364/)
   
-PREC_time=PREC_time-134./365. ; Robock starts May 15, vs Jan 1
+PRECT_time=PRECT_time-134./365. ; Robock starts May 15, vs Jan 1
   
 PRECT_rbck = (/-0.002,-0.019,0.006,-0.045,-0.156,-0.173,-0.235,-0.235,-0.219,-0.225,-0.257,-0.204,-0.216,\
   -0.239,-0.227,-0.276,-0.268,-0.239,-0.256,-0.245,-0.241,-0.287,-0.277,-0.257,-0.245,-0.274,-0.267,\
@@ -383,7 +383,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@trYMaxF = 0.2
   res@trYMinF = -1.8
 
-  res@tiYAxisString = "Surface Temperature Anomaly (~S~o~N~C)"
+  res@tiYAxisString = "Surface Temperature Anomaly (K)"
   res@tiXAxisString = "Year"
                
   print("plot = gsn_csm_xy (wks,TS_time,TS_rbck,res)")
