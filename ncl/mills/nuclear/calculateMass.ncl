@@ -54,6 +54,9 @@ begin
     pm!1="time"
     pm!2="lat"
     pdel=pm(time|:,lev|1:dimsizes(lev),lat|:)-pm(time|:,lev|0:dimsizes(lev)-1,lat|:)
+    pdel!0="time"
+    pdel!1="lev"
+    pdel!2="lat"
   end if
   print("pdel:"+dimsizes(pdel))
   
@@ -65,7 +68,9 @@ end
 
 
 
-function calculateMass(historyPath:string, tracerNames[*]:string)
+function calculateMass(historyPath:string, tracerNames[*]:string, opt:logical)
+
+; opt: optional argument, true if IC file is to be added via opt@icfile
 
 local pi, dg2grad, g, re, historyNames, hists, lev, lat, lon, nLevs, nLats, nLons, \
   tracerMMR, cellMass, columnMass, dlat, dlon, dx, dy, dydx, wgt, mass, i, j, t, mass
@@ -88,6 +93,7 @@ begin
   print(" calculateMass: Reading data ...")
   historyNames = systemfunc("ls " + historyPath)
   history = addfiles(historyPath+historyNames, "r")
+  histtime=history[:]&time
   ListSetType(history, "cat")
   
   ; Read in the fields we will need.
@@ -97,13 +103,25 @@ begin
   rank=dimsizes(dimsizes(pdeldry))
 
   ; Create the output variable.
-  nTimes = dimsizes(history[:]->time)
-  print("nTimes:"+nTimes)
-  mass = new((/ nTracers, nTimes /), "float")
+  nTimes = dimsizes(histtime)
+  if (opt) then
+    nTimesMass=nTimes+1
+    time=new((/nTimesMass/),typeof(histtime))
+    time(0)=0
+    time(1:)=histtime
+    t1=1
+  else
+    nTimesMass=nTimes
+    time=histtime
+    t1=0 
+  end if
+  
+  print("nTimes:"+nTimes+" nTimesMass:"+nTimesMass)
+  mass = new((/ nTracers, nTimesMass /), "float")
   mass!0 = "tracer"
   mass&tracer = tracerNames
   mass!1 = "time"
-  mass&time = history[:]&time
+  mass&time = time
   mass@units = "kg"
 
   do t = 0, nTracers - 1
@@ -114,10 +132,10 @@ begin
     if (tracerNames(t) .eq. "TOTAL") then
 
       print("  Calculating subtotal ...")
-      mass(t, :) = mass(lastTotal, :)
+      mass(t, t1:) = mass(lastTotal, :)
       
       do t2 = lastTotal + 1, t-1
-        mass(t, :) = mass(t, :) + mass(t2, :) 
+        mass(t, t1:) = mass(t, :) + mass(t2, :) 
       end do
 
     else
@@ -237,13 +255,36 @@ begin
             columnMass(lat|j,time|i)=doubletofloat(wgt(j))*columnMass(lat|j,time|i)
           end do
         end do
-        mass(t, :) = dim_sum_Wrap(columnMass(time|:,lat|:))
+        mass(t, t1:) = (/dim_sum_Wrap(columnMass(time|:,lat|:))/)
       end if
+      
+    end if
+    
+    if (opt) then
+
+      icfile=addfile(opt@icfile,"r")
+      tracericMMR=icfile->$tracerNames(t)$
+      if (rank.eq.4) then
+        cellMass3D = (pdeldry(time|0, lat|:, lev|:) / g) * tracericMMR(time|0, lat|:, lev|:)
+        cellMass_zm = dim_avg_Wrap(cellMass3D(lat|:, lev|:, lon|:))
+      else
+        tracer_zm = dim_avg_Wrap(tracericMMR(time|0, lat|:, lev|:, lon|:))
+        cellMass_zm = (pdeldry(time|0, lat|:, lev|:) / g) * tracer_zm (lat|:, lev|:)     
+      end if
+      print("cellMass_zm:"+dimsizes(cellMass_zm))
+      cellMass_zm!0 = "lat"
+      cellMass_zm!1 = "lev"
+      columnMass_zm = dim_sum_Wrap(cellMass_zm(lat|:, lev|:))
+      wgt_zm = dh * 2. * pi * re
+      massic=dim_sum_Wrap(doubletofloat(wgt(:))*columnMass_zm(:))
+      print(massic)
+      mass(t,0)=doubletofloat(massic)
       
     end if
     
   end do
 
+;  print(mass&time)
   
   return(mass)
 end

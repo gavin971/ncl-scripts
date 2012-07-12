@@ -380,8 +380,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@trXMinF = 0.0
   res@trXMaxF = max(time)
 
-  res@trYMaxF = 0.2
-  res@trYMinF = -1.8
+  res@trYMaxF = 0.0
+  res@trYMinF = -1.7
 
   res@tiYAxisString = "Surface Temperature Anomaly (K)"
   res@tiXAxisString = "Year"
@@ -421,9 +421,9 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   txres = True
   txres@txFontHeightF = 0.03
   txres@txFontColor="black"
-  gsn_text_ndc(wks,"WACCM4",0.5,0.55,txres)
+  gsn_text_ndc(wks,"WACCM4",0.5,0.67,txres)
   txres@txFontColor="red"
-  gsn_text_ndc(wks,"Robock et al., 2007",0.5,0.62,txres)
+  gsn_text_ndc(wks,"Robock et al., 2007",0.5,0.75,txres)
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
@@ -455,7 +455,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   txres@txFontColor="black"
   gsn_text_ndc(wks,"WACCM4",0.5,0.7,txres)
   txres@txFontColor="red"
-  gsn_text_ndc(wks,"Robock et al., 2007",0.51,0.43,txres)
+  gsn_text_ndc(wks,"Robock et al., 2007",0.51,0.8,txres)
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
@@ -477,11 +477,11 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
 ;  ypos=0.8
 ;  gsn_legend_ndc(wks,3,(/"Robock et al., 2007","WACCM4 all-sky","WACCM4 clear-sky"/),xpos,ypos,lgres)
   txres@txFontColor="black"
-  gsn_text_ndc(wks,"WACCM4 all-sky",0.5,0.75,txres)
+  gsn_text_ndc(wks,"WACCM4 all-sky",0.4,0.75,txres)
   txres@txFontColor="red"
-  gsn_text_ndc(wks,"Robock et al., 2007",0.5,0.8,txres)
+  gsn_text_ndc(wks,"Robock et al., 2007",0.4,0.82,txres)
   txres@txFontColor="blue"
-  gsn_text_ndc(wks,"WACCM4 clear-sky",0.5,0.7,txres)
+  gsn_text_ndc(wks,"WACCM4 clear-sky",0.4,0.68,txres)
   frame(wks)
   
 ;  res@gsnMaximize         = True          ; expand plot size to maximum
