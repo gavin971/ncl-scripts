@@ -72,7 +72,7 @@ begin
   O3_col_pct_loss!1="lat"
   O3_col_pct_loss&lat=lat 
   
-  pdffile="$IMAGE_PATH/O3Depletion."+historyRun
+  pdffile="$IMAGE_PATH/O3Depletion."+historyRun+"-"+controlRun
   wks = gsn_open_wks("pdf", pdffile)
 
   res = True
@@ -209,6 +209,6 @@ end if
 ;historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIndPak.001"
 ;controlRun="b40.rcp4_5.2deg.wcm.001"
 historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
-controlRun="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg"
+controlRun="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
 
 plotO3Depletion(path, historyRun, controlRun)

@@ -363,8 +363,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res                   = True                      ; plot mods desired
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "portrait"
-;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-;  res@vpHeightF           = 0.8
+  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+  res@vpHeightF           = 0.7
   res@gsnFrame     = False                        ; don't advance frame yet
   res@xyLineThicknessF = 6.0
 ;  res@vpWidthF=0.85
@@ -421,15 +421,15 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   txres = True
   txres@txFontHeightF = 0.03
   txres@txFontColor="black"
-  gsn_text_ndc(wks,"WACCM4",0.5,0.67,txres)
+  gsn_text_ndc(wks,"WACCM4",0.5,0.87,txres)
   txres@txFontColor="red"
-  gsn_text_ndc(wks,"Robock et al., 2007",0.5,0.75,txres)
+  gsn_text_ndc(wks,"Robock et al., 2007",0.5,0.95,txres)
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "portrait"
-;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-;  res@vpHeightF           = 0.8
+  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+  res@vpHeightF           = 0.7
   res@trYMaxF = 0.0
   res@trYMinF = -0.32
   res@tiYAxisString = "Precipitation Anomaly (mm/day)"
@@ -453,15 +453,15 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
 ;  ypos=0.8
 ;  gsn_legend_ndc(wks,2,(/"Robock et al., 2007","WACCM4"/),xpos,ypos,lgres)
   txres@txFontColor="black"
-  gsn_text_ndc(wks,"WACCM4",0.5,0.7,txres)
+  gsn_text_ndc(wks,"WACCM4",0.5,0.87,txres)
   txres@txFontColor="red"
-  gsn_text_ndc(wks,"Robock et al., 2007",0.51,0.8,txres)
+  gsn_text_ndc(wks,"Robock et al., 2007",0.51,0.95,txres)
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "portrait"
-;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-;  res@vpHeightF           = 0.7
+  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+  res@vpHeightF           = 0.7
   res@tiYAxisString = "SW Downwelling Flux Anomaly at Surface (W/m~S~2~N~)"
   res@trYMinF = -20.0
   res@xyLineThicknessF = 6.0
@@ -477,38 +477,38 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
 ;  ypos=0.8
 ;  gsn_legend_ndc(wks,3,(/"Robock et al., 2007","WACCM4 all-sky","WACCM4 clear-sky"/),xpos,ypos,lgres)
   txres@txFontColor="black"
-  gsn_text_ndc(wks,"WACCM4 all-sky",0.4,0.75,txres)
+  gsn_text_ndc(wks,"WACCM4 all-sky",0.4,0.87,txres)
   txres@txFontColor="red"
-  gsn_text_ndc(wks,"Robock et al., 2007",0.4,0.82,txres)
+  gsn_text_ndc(wks,"Robock et al., 2007",0.4,0.95,txres)
   txres@txFontColor="blue"
-  gsn_text_ndc(wks,"WACCM4 clear-sky",0.4,0.68,txres)
+  gsn_text_ndc(wks,"WACCM4 clear-sky",0.4,0.79,txres)
   frame(wks)
   
-;  res@gsnMaximize         = True          ; expand plot size to maximum
-;  res@gsnPaperOrientation = "portrait"
-;;  res@vpWidthF            = 1.2           ; change aspect ratio of plot
-;;  res@vpHeightF           = 0.7
-;  res@tiYAxisString = "SW Net Flux Anomaly at Surface (W/m~S~2~N~)"
-;  res@trYMinF = -20.0
-;  res@xyLineThicknessF = 6.0
-;  res@xyLineColor       = "red"          ; change line color
-;  print("plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res)")
-;  plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res) ; draw plot
-;  res@xyLineThicknessF = 8.0
-;  res@xyLineColor       = "black"          ; change line color
-;  plot = gsn_csm_xy (wks,time,FSNS_diff1,res) ; draw plot
-;  res@xyLineColor       = "blue"          ; change line color
-;  plot = gsn_csm_xy (wks,time,FSNSC_diff1,res) ; draw plot
-;;  drawNDCGrid(wks)
-;;  ypos=0.9
-;;  gsn_legend_ndc(wks,3,(/"Robock et al., 2007","WACCM4 all-sky","WACCM4 clear-sky"/),xpos,ypos,lgres)
-;  txres@txFontColor="black"
-;  gsn_text_ndc(wks,"WACCM4 all-sky",0.5,0.8,txres)
-;  txres@txFontColor="red"
-;  gsn_text_ndc(wks,"Robock et al., 2007",0.5,0.85,txres)
-;  txres@txFontColor="blue"
-;  gsn_text_ndc(wks,"WACCM4 clear-sky",0.5,0.75,txres)
-;  frame(wks)
+  res@gsnMaximize         = True          ; expand plot size to maximum
+  res@gsnPaperOrientation = "portrait"
+  res@vpWidthF            = 1.2           ; change aspect ratio of plot
+  res@vpHeightF           = 0.7
+  res@tiYAxisString = "SW Net Flux Anomaly at Surface (W/m~S~2~N~)"
+  res@trYMinF = -20.0
+  res@xyLineThicknessF = 6.0
+  res@xyLineColor       = "red"          ; change line color
+  print("plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res)")
+  plot = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res) ; draw plot
+  res@xyLineThicknessF = 8.0
+  res@xyLineColor       = "black"          ; change line color
+  plot = gsn_csm_xy (wks,time,FSNS_diff1,res) ; draw plot
+  res@xyLineColor       = "blue"          ; change line color
+  plot = gsn_csm_xy (wks,time,FSNSC_diff1,res) ; draw plot
+;  drawNDCGrid(wks)
+;  ypos=0.9
+;  gsn_legend_ndc(wks,3,(/"Robock et al., 2007","WACCM4 all-sky","WACCM4 clear-sky"/),xpos,ypos,lgres)
+  txres@txFontColor="black"
+  gsn_text_ndc(wks,"WACCM4 all-sky",0.5,0.87,txres)
+  txres@txFontColor="red"
+  gsn_text_ndc(wks,"Robock et al., 2007",0.5,0.95,txres)
+  txres@txFontColor="blue"
+  gsn_text_ndc(wks,"WACCM4 clear-sky",0.5,0.79,txres)
+  frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "portrait"
