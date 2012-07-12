@@ -15,7 +15,7 @@ if [[ $OSTYPE = 'darwin' ]];then
   rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
 fi
 
-maxtimes=113
+#maxtimes=113
 
 caseid='b40.rcp4_5.2deg.wcm.carma.bc0tg.00[678]'
 infiles=$rootpath'/'$caseid'/h0gm/'$caseid'.cam2.h0.globavg.nc'
@@ -27,7 +27,7 @@ outfile=$outpath'/'$outid'.cam2.h0.globavg.nc'
 mkdir -p $outpath
 
 
-echo 'ncea -O -d time,0,'$maxtimes' '$infiles' '$outfile
-ncea -O -d time,0,$maxtimes $infiles $outfile
-#echo 'ncea -O '$infiles' '$outfile
-#ncea -O $infiles $outfile
+#echo 'ncea -O -d time,0,'$maxtimes' '$infiles' '$outfile
+#ncea -O -d time,0,$maxtimes $infiles $outfile
+echo 'ncea -O '$infiles' '$outfile
+ncea -O $infiles $outfile

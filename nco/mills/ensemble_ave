@@ -15,25 +15,65 @@ if [[ $OSTYPE = 'darwin' ]];then
   rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
 fi
 
-#ensname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.00[367]'
-ensname='b40.rcp4_5.2deg.wcm.carma.bc0tg.00[123]'
+if [ ! -n "$caseid" ] ; then
+  echo "caseid is not set, i.e.:"
+  echo " export caseid=bc5tgIP"
+  if  ! -n "$ensname" ] ; then
+    echo " ensname not set; exiting."
+    exit
+  fi
+  if  ! -n "$avgname" ] ; then
+    echo " avgname not set; exiting."
+    exit
+  fi
+fi
+
+if [ $caseid = 'bc5tgIP' ] ; then
+  ensname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.00[367]'
+  avgname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg'
+  if  ! -n "$year1" ] ; then
+    year1=2013
+  fi
+  if  ! -n "$year2" ] ; then
+    year2=2022
+  fi
+fi
+
+if [ $caseid = 'bc0tg' ] ; then
+  ensname='b40.rcp4_5.2deg.wcm.carma.bc0tg.00[678]'
+  avgname='b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678'
+  if  ! -n "$year1" ] ; then
+    year1=2013
+  fi
+  if  ! -n "$year2" ] ; then
+    year2=2022
+  fi
+fi
+
+if  ! -n "$year1" ] ; then
+  year1=2013
+fi
+if  ! -n "$year2" ] ; then
+  year2=2022
+fi
+
 #hno3_rename='b40.rcp2_6.2deg.wcm.002'
 #ensname2='b40.rcp2_6.2deg.wcm.00[34]'
-avgname='b40.rcp4_5.2deg.wcm.carma.bc0tg.avg'
-outpath='/data/ccsm4'
+#outpath='/data/ccsm4'
+outpath=$rootpath
 
 #ensname='b40.rcp4_5.2deg.wcm.00[123]'
 ##ensname2='br04.20th.track1.2deg.wcm.pd.00[12]'
 #avgname='b40.rcp4_5.2deg.wcm.avg'
 
-htype='h0'
-wadir=$rootpath'/'$ensname'/'$htype
-#wadir2=$rootpath'/'$ensname2'/'$htype
-avgdir=$outpath'/'$avgname'/'$htype
-searchstr='cam2.'$htype
+if [ ! -n "$hnum" ] ; then
+  hnum='h0'
+fi
 
-year1=2013
-year2=2022
+wadir=$rootpath'/'$ensname'/'$hnum
+#wadir2=$rootpath'/'$ensname2'/'$hnum
+avgdir=$outpath'/'$avgname'/'$hnum
+searchstr='cam2.'$hnum
 
 
 # script to average and standard deviation of waccm h0 files

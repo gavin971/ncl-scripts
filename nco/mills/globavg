@@ -1,8 +1,11 @@
 #!/bin/ksh
 
-### reads zonal means in h0zm and creates global means from all available years
+### reads zonal means in h0zm, h3zm and creates global means from all available years
+#
 # Define environment variables, i.e.:
-#   setenv caseid b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg
+#   export caseid=b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg
+# Optional history tape (default h0):
+#   export hnum=h3
 
 echo globavg
 
@@ -23,22 +26,26 @@ if  [ -n "$caseid" ] ; then
     rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
   fi
 
-  zmdir=$rootpath'/'$caseid'/h0zm'
-  gmdir=$rootpath'/'$caseid'/h0gm'
+  if [ ! -n "$hnum" ] ; then
+    hnum='h0'
+  fi
+
+  zmdir=$rootpath'/'$caseid'/'$hnum'zm'
+  gmdir=$rootpath'/'$caseid'/'$hnum'gm'
 
   if [[ $machine = 'lou' ]];then
     rootpath=$HOME'/csm'
-    zmdir=$rootpath'/'$caseid'/atm/h0zm'
-    gmdir=$rootpath'/'$caseid'/atm/h0gm'
+    zmdir=$rootpath'/'$caseid'/atm/'$hnum'zm'
+    gmdir=$rootpath'/'$caseid'/atm/'$hnum'gm'
   fi
 
   mkdir -p $gmdir
 
-  avgfile=$gmdir'/'$caseid'.cam2.h0.globavg.nc'
+  avgfile=$gmdir'/'$caseid'.cam2.'$hnum'.globavg.nc'
   tmpfile=$gmdir'/zmtmp.nc'
 
   echo $avgfile
-  ncfiles=$zmdir'/'$caseid'.cam2.h0zm.*.nc'
+  ncfiles=$zmdir'/'$caseid'.cam2.'$hnum'zm.*.nc'
   echo "ncrcat -O $ncfiles $tmpfile"
   ncrcat -O $ncfiles $tmpfile
     
