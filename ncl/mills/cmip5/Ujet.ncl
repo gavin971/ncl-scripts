@@ -1,20 +1,33 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-rootdir="/data/waccm"
-case1="b40.1955-2005.2deg.wcm.avg"
-case2="b40.rcp4_5.2deg.wcm.avg"
+; mid 21stC shift vs late 20thC
+;rootdir="/data/waccm"
+;case1="b40.1955-2005.2deg.wcm.avg"
+;case2="b40.rcp4_5.2deg.wcm.avg"
+;dir1="h0zm.seasavg.1986-2005"
+;dir2="h0zm.seasavg.2032-2051"
 
-;rootdir="/data/ccsm4"
-;case="b40.1955-2005.2deg.wset.avg"
+; Late 20thC WACCM shift
+;rootdir="/data/waccm"
+;case1="b40.1955-2005.2deg.wcm.avg"
+;case2=case1
+;dir1="h0zm.seasavg.1960-1979"
+;dir2="h0zm.seasavg.1986-2005"
+
+; Late 20thC WACCM shift
+rootdir="/data/ccsm4"
+case1="b40.1955-2005.2deg.wset.avg456"
+case2=case1
+dir1="h0zm.seasavg.1960-1979"
+dir2="h0zm.seasavg.1986-2005"
 
 season="DJF"
 ;season="JJA"
 
 ;dir1="h0zm.seasavg.1960-1979"
-dir1="h0zm.seasavg.1986-2005"
 ;dir1="h0zm.seasavg.2005-2024"
-dir2="h0zm.seasavg.2032-2051"
+
 infile1=case1+".cam2.h0zm."+season+".nc"
 infile2=case2+".cam2.h0zm."+season+".nc"
 
@@ -63,7 +76,7 @@ Udiff=Udiff-U1
   wks = gsn_open_wks("ps",imagefile)
   gsn_define_colormap(wks,"blwhre")                ; choose colormap
   
-  minP = 0.1
+  minP = 10
   maxP = 1013.
   
   plot1 = gsn_csm_pres_hgt(wks, Udiff({minP:maxP}, {-90.0:90.0}), res)
