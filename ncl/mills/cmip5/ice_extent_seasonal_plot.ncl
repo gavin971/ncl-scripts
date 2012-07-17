@@ -145,6 +145,10 @@ time = ispan(0,11,1)
   res@trXMaxF = 11
   res@trYMinF = 0
   res@trYMaxF = 27
+  res@tmXTMinorOn = False
+  res@tmXBLabels =(/"J","F","M","A","M","J","J","A","S","O","N","D"/)
+  res@tmXBMode   = "Explicit"         ; Define own tick mark labels.
+  res@tmXBValues = ispan(0,11,1)
   top_plot = gsn_csm_xy (wks,time,data,res)       ; create line plot
   
 ; Create a plot with the area between both curves filled in blue.
