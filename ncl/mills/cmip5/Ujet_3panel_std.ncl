@@ -8,14 +8,14 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 ;dir1="h0zm.seasavg.1986-2005"
 ;dir2="h0zm.seasavg.2032-2051"
 
-; Late 20thC WACCM4 shift
+; Late 20thC WACCM shift
 ;rootdir="/data/waccm"
 ;case1="b40.1955-2005.2deg.wcm.avg"
 ;case2=case1
 ;dir1="h0zm.seasavg.1960-1979"
 ;dir2="h0zm.seasavg.1986-2005"
 
-; Late 20thC CAM4 shift
+; Late 20thC WACCM shift
 rootdir="/data/ccsm4"
 case1="b40.1955-2005.2deg.wset.avg456"
 case2=case1
