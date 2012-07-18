@@ -15,8 +15,11 @@ if  [ -n "$caseid" ] ; then
   fi
 
   if [[ $machine = 'cmip5' ]];then
-    rootpath='/data/waccm'
-#    rootpath='/data/ccsm4'
+    if [[ $caseid =~ '*wcm*' ]]; then
+      rootpath='/data/waccm'
+    else
+      rootpath='/data/ccsm4'
+    fi
   fi
 
   if [[ $OSTYPE = 'darwin' ]];then
