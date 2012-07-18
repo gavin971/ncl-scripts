@@ -33,15 +33,34 @@ history1 = addfiles(infiles1, "r")
 ListSetType(history1, "cat")
 U1 = addfiles_GetVar(history1, infiles1, "U")
 U1avg=dim_avg_Wrap(U1(lev|:,lat|:,time|:))
-U1std=dim_stddev_Wrap(U1(lev|:,lat|:,time|:))
+;U1std=dim_stddev_Wrap(U1(lev|:,lat|:,time|:))
+U1var=dim_variance_Wrap(U1(lev|:,lat|:,time|:))
 
-ListSetType(history1, "cat")
+lev=U1avg&lev
+lev@units="hPa"
+lev@long_name="Pressure"
+
+U1avg&lev=lev
+U1var&lev=lev
+
 infiles2=systemfunc("ls "+rootdir+"b40.20th.track1.1deg.00[5-9]/proc/*.cam2.h0zm.U."+season+".1986-2005.nc")
 history2 = addfiles(infiles2, "r")
 ListSetType(history2, "cat")
 U2 = addfiles_GetVar(history2, infiles2, "U")
 U2avg=dim_avg_Wrap(U2(lev|:,lat|:,time|:))
-U2std=dim_stddev_Wrap(U2(lev|:,lat|:,time|:))
+;U2std=dim_stddev_Wrap(U2(lev|:,lat|:,time|:))
+U2var=dim_variance_Wrap(U2(lev|:,lat|:,time|:))
+U2avg&lev=lev
+U2var&lev=lev
+
+s1   = dimsizes (U1(time|:,lev|0,lat|0))        ; U1 and U2 can be of
+s2   = dimsizes (U2(time|:,lev|0,lat|0))        ; different sizes
+
+iflag= False               ; population variance similar
+siglvl = 0.05
+prob = ttest(U1avg,U1var,s1, U2avg,U2var,s2, iflag, False) 
+alpha = U1avg ; get metadata
+alpha = (/100.*(1. - prob)/) ; A significance of 0.05 returned by ttest would yield 95% for alpha
 
 
 ;infile1=case1+".cam2.h0zm."+season+".nc"
@@ -52,13 +71,6 @@ U2std=dim_stddev_Wrap(U2(lev|:,lat|:,time|:))
 
 ;U1=file1->U
 ;U2=file2->U
-lev=U1avg&lev
-lev@units="hPa"
-lev@long_name="Pressure"
-U1avg&lev=lev
-U2avg&lev=lev
-U1std&lev=lev
-U2std&lev=lev
 Udiff=U2avg ; get metadata
 Udiff=Udiff-U1avg
 ;Udiff!0=U1!0
@@ -98,7 +110,8 @@ Udiff=Udiff-U1avg
   maxP = 1013.
   
   plot1 = gsn_csm_pres_hgt(wks, Udiff({minP:maxP}, {-90.0:90.0}), res)
-  plot2 = gsn_csm_pres_hgt(wks, U1avg({minP:maxP}, {-90.0:90.0}), res2)
+;  plot2 = gsn_csm_pres_hgt(wks, U1avg({minP:maxP}, {-90.0:90.0}), res2)
+  plot2 = gsn_csm_pres_hgt(wks, alpha({minP:maxP}, {-90.0:90.0}), res2)
   overlay(plot1, plot2)
   draw(plot1)
   frame(wks)

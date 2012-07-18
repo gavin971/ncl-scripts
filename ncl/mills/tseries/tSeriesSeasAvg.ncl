@@ -106,7 +106,10 @@ begin
   
 end
 
-do i = 5,9
-  tSeriesSeasAvg("b40.20th.track1.1deg.00"+i, "DJF", "U", 1960, 1979)
-  tSeriesSeasAvg("b40.20th.track1.1deg.00"+i, "DJF", "U", 1986, 2005)
+;basecase="b40.20th.track1.1deg.00"
+;basecase="b40.1955-2005.2deg.wcm.00"
+basecase="b40.1955-2005.2deg.wset.00"
+do i = 4,6
+  tSeriesSeasAvg(basecase+i, "DJF", "U", 1960, 1979)
+  tSeriesSeasAvg(basecase+i, "DJF", "U", 1986, 2005)
 end do
