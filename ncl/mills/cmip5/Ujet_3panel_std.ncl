@@ -1,5 +1,13 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
+
+host=systemfunc("hostname")
+;print(host)
+
+season="DJF"
+;season="JJA"
 
 ; mid 21stC shift vs late 20thC
 ;rootdir="/data/waccm"
@@ -16,33 +24,43 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 ;dir2="h0zm.seasavg.1986-2005"
 
 ; Late 20thC WACCM shift
-rootdir="/data/ccsm4"
-case1="b40.1955-2005.2deg.wset.avg456"
-case2=case1
-dir1="h0zm.seasavg.1960-1979"
-dir2="h0zm.seasavg.1986-2005"
+;rootdir="/data/ccsm4"
+rootdir = "/Volumes/MillsPassport/cesm/case/"
+cases = "b40.20th.track1.1deg.00"+ispan(5,9,1)
+case = "b40.20th.track1.1deg.56789"
+infiles1 = systemfunc("ls "+rootdir+"b40.20th.track1.1deg.00[5-9]/proc/*.cam2.h0zm.U."+season+".1960-1979.nc")
+history1 = addfiles(infiles1, "r")
+ListSetType(history1, "cat")
+U1 = addfiles_GetVar(history1, infiles1, "U")
+U1avg=dim_avg_Wrap(U1(lev|:,lat|:,time|:))
+U1std=dim_stddev_Wrap(U1(lev|:,lat|:,time|:))
 
-season="DJF"
-;season="JJA"
+ListSetType(history1, "cat")
+infiles2=systemfunc("ls "+rootdir+"b40.20th.track1.1deg.00[5-9]/proc/*.cam2.h0zm.U."+season+".1986-2005.nc")
+history2 = addfiles(infiles2, "r")
+ListSetType(history2, "cat")
+U2 = addfiles_GetVar(history2, infiles2, "U")
+U2avg=dim_avg_Wrap(U2(lev|:,lat|:,time|:))
+U2std=dim_stddev_Wrap(U2(lev|:,lat|:,time|:))
 
-;dir1="h0zm.seasavg.1960-1979"
-;dir1="h0zm.seasavg.2005-2024"
 
-infile1=case1+".cam2.h0zm."+season+".nc"
-infile2=case2+".cam2.h0zm."+season+".nc"
+;infile1=case1+".cam2.h0zm."+season+".nc"
+;infile2=case2+".cam2.h0zm."+season+".nc"
 
-file1=addfile(rootdir+"/"+case1+"/"+dir1+"/"+infile1,"r")
-file2=addfile(rootdir+"/"+case2+"/"+dir2+"/"+infile2,"r")
+;file1=addfile(rootdir+"/"+case1+"/"+dir1+"/"+infile1,"r")
+;file2=addfile(rootdir+"/"+case2+"/"+dir2+"/"+infile2,"r")
 
-U1=file1->U
-U2=file2->U
-lev=U1&lev
+;U1=file1->U
+;U2=file2->U
+lev=U1avg&lev
 lev@units="hPa"
 lev@long_name="Pressure"
-U1&lev=lev
-U2&lev=lev
-Udiff=U2 ; get metadata
-Udiff=Udiff-U1
+U1avg&lev=lev
+U2avg&lev=lev
+U1std&lev=lev
+U2std&lev=lev
+Udiff=U2avg ; get metadata
+Udiff=Udiff-U1avg
 ;Udiff!0=U1!0
 ;Udiff!1=U1!1
 
@@ -72,7 +90,7 @@ Udiff=Udiff-U1
   res2@cnLinesOn             = True
   res2@cnFillOn              = False
 
-  imagefile="$IMAGE_PATH/"+case2+"_Ujet_"+season
+  imagefile="$IMAGE_PATH/"+case+"_Ujet_"+season
   wks = gsn_open_wks("ps",imagefile)
   gsn_define_colormap(wks,"blwhre")                ; choose colormap
   
@@ -80,7 +98,7 @@ Udiff=Udiff-U1
   maxP = 1013.
   
   plot1 = gsn_csm_pres_hgt(wks, Udiff({minP:maxP}, {-90.0:90.0}), res)
-  plot2 = gsn_csm_pres_hgt(wks, U1   ({minP:maxP}, {-90.0:90.0}), res2)
+  plot2 = gsn_csm_pres_hgt(wks, U1avg({minP:maxP}, {-90.0:90.0}), res2)
   overlay(plot1, plot2)
   draw(plot1)
   frame(wks)
@@ -88,5 +106,6 @@ Udiff=Udiff-U1
   
   muttcmd="mutt mikejmills@mac.com -a "+imagefile+".ps -s "+imagefile+" < /dev/null"
   print(muttcmd)
-  mutter=systemfunc(muttcmd)
-  print(mutter)
+  print("open "+imagefile+".ps")
+;  mutter=systemfunc(muttcmd)
+;  print(mutter)

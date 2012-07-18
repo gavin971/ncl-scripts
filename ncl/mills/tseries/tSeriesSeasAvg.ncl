@@ -2,12 +2,18 @@
 procedure tSeriesSeasAvg(case:string, season:string, field:string, yearMin:integer, yearMax:integer)
 
 begin
-  isWaccm=str_index_of_substr(case,"wcm",0)
+  host=systemfunc("hostname")
+  print(host)
 
-  if (ismissing(isWaccm)) then
-    rootdir="/data/ccsm4/"
+  if (host.eq."cmip5") then
+    isWaccm=str_index_of_substr(case,"wcm",0)
+    if (ismissing(isWaccm)) then
+       rootdir="/data/ccsm4/"
+    else
+       rootdir="/data/waccm/"
+    end if
   else
-    rootdir="/data/waccm/"
+    rootdir="/Volumes/MillsPassport/cesm/case/"
   end if
 ;  print(rootdir)
 
@@ -47,19 +53,22 @@ begin
   
   print(" ")
   print("get "+field)
-  field = a->$field$
-  lat = field&lat
-  lev = field&lev
+  fieldarr = a->$field$
+  lat = fieldarr&lat
+  lev = fieldarr&lev
   nlat=dimsizes(lat)
   nlev=dimsizes(lev)
   nyears=yearMax-yearMin+1
 
   fieldSeasAvg = new((/nyears,nlev,nlat/),"float")
-  fieldSeasAvg!0 = "year"
+  fieldSeasAvg!0 = "time"
   fieldSeasAvg!1 = "lev"
   fieldSeasAvg!2 = "lat"
   year2=ispan(yearMin,yearMax,1)
-  fieldSeasAvg&year = year2
+  year2!0="time"
+  date2=year2*10000+months(0)*100+1
+  date2!0="time"
+;  fieldSeasAvg&year = year2
   fieldSeasAvg&lev = lev
   fieldSeasAvg&lat = lat
   
@@ -72,14 +81,32 @@ begin
       print("FATAL: ds="+ds)
       exit
     end if
-    fieldSeasAvg(y,:,:)=dim_avg(field(lev|:,lat|:,time|indmonth))
+    fieldSeasAvg(y,:,:)=dim_avg(fieldarr(lev|:,lat|:,time|indmonth))
   end do
     
   outfile=rootdir+case+"/proc/"+case+".cam2.h0zm."+field+"."+season+"."+yearMin+"-"+yearMax+".nc"
+  if (isfilepresent(outfile)) then
+    print("deleting existing file "+outfile)
+    delfile=systemfunc("rm "+outfile)
+    print(delfile)
+  end if
   print("creating "+outfile)
   b=addfile(outfile,"c")
+  b->year=year2
+  b->date=date2
+  b->P0=a->P0
+  b->gw=a->gw
+  b->hyai=a->hyai
+  b->hyam=a->hyam
+  b->hybi=a->hybi
+  b->hybm=a->hybm
+  b->slat=a->slat
+  b->slon=a->slon  
   b->$field$=fieldSeasAvg
   
 end
 
-tSeriesSeasAvg("b40.20th.track1.1deg.005", "DJF", "U", 1960, 1979)
+do i = 5,9
+  tSeriesSeasAvg("b40.20th.track1.1deg.00"+i, "DJF", "U", 1960, 1979)
+  tSeriesSeasAvg("b40.20th.track1.1deg.00"+i, "DJF", "U", 1986, 2005)
+end do
