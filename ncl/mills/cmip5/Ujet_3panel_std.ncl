@@ -184,7 +184,17 @@ Udiff_wset=Udiff_wset-Uavg_wset60
   res3@gsnFrame              = False
   res3@cnLinesOn             = True
   res3@cnFillOn              = False
-
+  res3@cnLevelSelectionMode  = "ExplicitLevels" 
+  cnLevels = ispan(-30, 45, 5)
+  cnLineDashPatterns         = where(cnLevels.lt.0, 1, 0)
+  cnLineThicknesses         = where(cnLevels.eq.0, 2, 1)
+; Contours -30 to 45 by 5:
+  res3@cnLevels              = cnLevels
+  res3@cnMonoLineDashPattern = False
+  res3@cnLineDashPatterns    = cnLineDashPatterns
+  res3@cnMonoLineThickness   = False
+  res3@cnLineThicknesses     = cnLineThicknesses
+  
   imagefile="$IMAGE_PATH/3case_Ujet_"+season
   wks = gsn_open_wks("ps",imagefile)
   gsn_define_colormap(wks,"blwhre")                ; choose colormap
