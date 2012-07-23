@@ -295,9 +295,9 @@ else
   delete(wks)
 
   print("gv "+pdffile+".pdf")
-  print("mutt -a "+pdffile+".pdf mikejmills@mac.com < /dev/null")
+  print("mutt mikejmills@mac.com -a "+pdffile+".pdf -s "+pdffile+" < /dev/null")
 
-  mutter=systemfunc("mutt -a " + pdffile + ".pdf mikejmills@mac.com < /dev/null")
+  mutter=systemfunc("mutt mikejmills@mac.com -a " + pdffile + ".pdf -s "+pdffile+" < /dev/null")
   print(mutter)
 end if
 
