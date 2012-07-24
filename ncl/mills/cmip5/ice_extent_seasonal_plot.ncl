@@ -112,6 +112,12 @@ hindcast_mean=(/6.79222, 2.05835, 1.88318, 6.04499, 10.8974, 14.0386, 16.4871, 1
 ; observations (millions of sq km)
 obs_mean=(/5.08556, 3.02296, 4.36556, 7.33593, 10.7170, 13.8504, 16.3848, 18.0589, 18.7211, 18.2863, 16.2341, 11.1389/)
 
+waccmRatio=iextentSH20Cavg/extentSH1850avg
+ccsm4Ratio=ccsm4_20C_mean/ccsm4_1850_mean
+
+print()
+print("WACCM ratio, CCSM4 ratio")
+print(waccmRatio+"   "+ccsm4Ratio
 
 data = new((/6,12/),"float")
 data(0,:)=(/iextentSH1850avg/)
