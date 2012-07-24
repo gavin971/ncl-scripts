@@ -2,29 +2,36 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
+year1=1979
+year2=2005
+
+;year1=1960
+;year2=1979
+
+; WACCM4 1979-2005 ice extent
 basepath="/data/waccm/"
 cases20c=(/"b40.1955-2005.2deg.wcm.002","b40.1955-2005.2deg.wcm.003","b40.1955-2005.2deg.wcm.004"/)
+ncases=dimsizes(cases20c)
+delete(files)
 files=basepath+cases20c+"/proc/iextent_reg_avg_timeseries_sh.dat"
 ncol=7
 ignorelines=1
-iextent_table1=readAsciiTable(files(0),ncol,"float",ignorelines)
-;print(dimsizes(iextent_table1))
+print("reading "+files(0))
+iextent_table=readAsciiTable(files(0),ncol,"float",ignorelines)
 
-iextent_table2=readAsciiTable(files(1),ncol,"float",ignorelines)
-;print(dimsizes(iextent_table2))
-
-iextent_table12=array_append_record(iextent_table1, iextent_table2, 0)
-;print(dimsizes(iextent_table12))
-
-iextent_table3=readAsciiTable(files(2),ncol,"float",ignorelines)
-;print(dimsizes(iextent_table3))
-
-iextent_table=array_append_record(iextent_table12, iextent_table3, 0)
-;print(dimsizes(iextent_table))
+do i = 1, ncases-1
+  print("reading "+files(i))
+  iextent_table2=readAsciiTable(files(i),ncol,"float",ignorelines)
+  iextent_table12=array_append_record(iextent_table, iextent_table2, 0)
+  delete(iextent_table)
+  iextent_table=iextent_table12
+  delete(iextent_table12)
+  delete(iextent_table2)
+end do
 
 year=iextent_table(:,0)
 
-indrange=ind((year.gt.1979).and.(year.le.2006))
+indrange=ind((year.gt.year1).and.(year.le.year2+1))
 
 time=year(indrange)
 iextentSH=iextent_table(indrange,6)
@@ -46,11 +53,10 @@ timemn!1="month"
 timemn!0="year"
 time20Cavg=dim_avg_Wrap(timemn(month|:,year|:))
 
-delete([/iextent_table1,iextent_table2,iextent_table12,iextent_table3,iextent_table,time,year,iextentSH,iextentSHmn,year/])
-
 print("time20Cavg  iextentSH20Cavg  iextentSH20Cstd:")
 print(time20Cavg+"  "+iextentSH20Cavg+"  "+iextentSH20Cstd)
 
+; WACCM4 pre-industrial ice extent
 case1850="b40.1850.track1.2deg.wcm.007"
 file1850=basepath+case1850+"/proc/iextent_reg_avg_timeseries_sh.dat"
 ;print((/file1850/))
@@ -88,11 +94,75 @@ time1850avg=dim_avg_Wrap(time1850mn(month|:,year|:))
 print("time1850avg  iextentSH1850avg  iextentSH1850std:")
 print(time1850avg+"  "+iextentSH1850avg+"  "+iextentSH1850std)
 
+; CCSM4 1979-2005 ice extent
+basepath="/data/ccsm4/"
+delete(cases20c)
+cases20c=(/"b40.20th.track1.1deg.005","b40.20th.track1.1deg.006","b40.20th.track1.1deg.007",\
+           "b40.20th.track1.1deg.008","b40.20th.track1.1deg.009","b40.20th.track1.1deg.011",\
+           "b40.20th.track1.1deg.012"/)
+ncases=dimsizes(cases20c)
+delete(files)
+files=basepath+cases20c+"/proc/iextent_reg_avg_timeseries_sh.dat"
+ncol=7
+ignorelines=1
+print("reading "+files(0))
+delete(iextent_table)
+iextent_table=readAsciiTable(files(0),ncol,"float",ignorelines)
+
+do i = 1, ncases-1
+  print("reading "+files(i))
+  iextent_table2=readAsciiTable(files(i),ncol,"float",ignorelines)
+;  print("iextent_table2(:,0):"+iextent_table2(:,0))
+  iextent_table12=array_append_record(iextent_table, iextent_table2, 0)
+  delete(iextent_table)
+  iextent_table=iextent_table12
+  delete(iextent_table12)
+  delete(iextent_table2)
+end do
+;exit
+
+delete(year)
+year=iextent_table(:,0)
+
+;print("year:"+year)
+
+delete(indrange)
+indrange=ind((year.gt.year1).and.(year.le.year2+1))
+print(indrange)
+
+delete(time)
+time=year(indrange)
+
+;exit
+
+delete(iextentSH)
+iextentSH=iextent_table(indrange,6)
+
+;print(dimsizes(time))
+print("time(0:24) iextentSH(0:24):")
+print(time(0:24)+" "+iextentSH(0:24))
+
+delete(iextentSHmn)
+iextentSHmn=reshape(iextentSH,(/dimsizes(iextentSH)/12,12/))
+;print(iextentSH(0:11)+" -> "+iextentSHmn(0,0:11))
+;print(dimsizes(iextentSHmn))
+iextentSHmn!1="month"
+iextentSHmn!0="year"
+ccsm4_20C_mean=dim_avg_Wrap(iextentSHmn(month|:,year|:))
+ccsm4_20C_std=dim_stddev_Wrap(iextentSHmn(month|:,year|:))
+
+delete(timemn)
+timemn=reshape(time,(/dimsizes(time)/12,12/))
+timemn!1="month"
+timemn!0="year"
+ccsm4_time20Cavg=dim_avg_Wrap(timemn(month|:,year|:))
+
+
 ; CCSM4 1979-2005 ice extent (sq m):
-ccsm4_20C_mean=(/1.57043e+13,  1.04253e+13,  9.90689e+12,  1.39798e+13,  1.74110e+13, 1.98727e+13,  \
-                 2.17365e+13, 2.29591e+13,  2.33879e+13,  2.29711e+13,  2.17322e+13, 1.93954e+13 /)
-ccsm4_20C_std =(/5.70452e+11,  5.22612e+11,  5.54890e+11,  4.87493e+11,  4.70718e+11, 4.64405e+11,  \
-                 4.64461e+11, 4.45525e+11,  4.68508e+11,  4.38912e+11,  4.62639e+11, 4.94050e+11 /)
+;ccsm4_20C_mean=(/1.57043e+13,  1.04253e+13,  9.90689e+12,  1.39798e+13,  1.74110e+13, 1.98727e+13,  \
+;                 2.17365e+13, 2.29591e+13,  2.33879e+13,  2.29711e+13,  2.17322e+13, 1.93954e+13 /)
+;ccsm4_20C_std =(/5.70452e+11,  5.22612e+11,  5.54890e+11,  4.87493e+11,  4.70718e+11, 4.64405e+11,  \
+;                 4.64461e+11, 4.45525e+11,  4.68508e+11,  4.38912e+11,  4.62639e+11, 4.94050e+11 /)
 ccsm4_20C_mean=ccsm4_20C_mean/1e12 ; (m2 -> 1e6 km2)
 ccsm4_20C_std=ccsm4_20C_std/1e12 ; (m2 -> 1e6 km2)
 
@@ -112,12 +182,12 @@ hindcast_mean=(/6.79222, 2.05835, 1.88318, 6.04499, 10.8974, 14.0386, 16.4871, 1
 ; observations (millions of sq km)
 obs_mean=(/5.08556, 3.02296, 4.36556, 7.33593, 10.7170, 13.8504, 16.3848, 18.0589, 18.7211, 18.2863, 16.2341, 11.1389/)
 
-waccmRatio=iextentSH20Cavg/extentSH1850avg
+waccmRatio=iextentSH20Cavg/iextentSH1850avg
 ccsm4Ratio=ccsm4_20C_mean/ccsm4_1850_mean
 
-print()
+print(" ")
 print("WACCM ratio, CCSM4 ratio")
-print(waccmRatio+"   "+ccsm4Ratio
+print(waccmRatio+"   "+ccsm4Ratio)
 
 data = new((/6,12/),"float")
 data(0,:)=(/iextentSH1850avg/)
@@ -137,9 +207,10 @@ mnmx(5,:)=(/ccsm4_1850_mean-ccsm4_1850_std/)
 mnmx(6,:)=(/ccsm4_20C_mean+ccsm4_20C_std/)
 mnmx(7,:)=(/ccsm4_20C_mean-ccsm4_20C_std/)
 
+delete(time)
 time = ispan(0,11,1)
 
-  wks = gsn_open_wks("ps","$IMG_PATH/ice_extent_seasonal")                 ; create plot
+  wks = gsn_open_wks("ps","$IMG_PATH/ice_extent_seasonal_"+year1+"-"+year2)                 ; create plot
   
   res                    = True              ; plot mods desired
   res@gsnDraw            = False             ; don't draw yet
