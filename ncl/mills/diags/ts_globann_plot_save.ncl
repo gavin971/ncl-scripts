@@ -9,8 +9,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 begin
 
-year0 = (/1850, 1850, 1850, 1850, 1850, 1850, 1850, 1850, 1850, 1955, 1955, 1955, 1850/)
-yearmax=(/2005, 2005, 2005, 2005, 2005, 2005, 2005, 2005, 2005, 2005, 2005, 2005, 2005/)
+year0 = (/1850, 1850, 1850, 1850, 1850, 1850, 1850, 1791, 1850, 1955, 1955, 1955, 1850/)
+yearmax=(/2005, 2005, 2005, 2005, 2005, 2005, 2005, 1990, 2005, 2005, 2005, 2005, 2005/)
 run_names = (/\
               "b40.20th.track1.1deg.005",\
               "b40.20th.track1.1deg.006",\
@@ -58,7 +58,8 @@ outfile=addfile(outfilename,"c")
 ;con_names = (/"b40.1850.track1.1deg.006","Obs"/)
 
 maxyear=max(yearmax)
-minyear=min(year0)
+;minyear=min(year0)
+minyear=1850
 nyearsmax = maxyear-minyear+1
 filt121 = True
 nyrunave = 11
@@ -66,7 +67,8 @@ omask0 = False
 ;omask0 = True
 norm_plot = True
 ;norm_plot = False
-norm_plot_yrs_abs = (/1961,1990/)
+;norm_plot_yrs_abs = (/1961,1990/)
+norm_plot_yrs_abs = (/1861,1890/)
 
 ;var_names = (/"LWCF","RESTOM","FSNT","FLNT"/)
 var_names = (/"TS"/)
@@ -239,8 +241,8 @@ do ivar=0,nvarnames-1
 
   filename=  "$IMG_PATH/"+ps_pref+"_20th_gmean_ts_"+var_name
   print(filename)
-  wks   = gsn_open_wks ("ps", filename)
-  wks_s = gsn_open_wks ("ps", filename+"_smooth")
+  wks   = gsn_open_wks ("eps", filename)
+  wks_s = gsn_open_wks ("eps", filename+"_smooth")
 
   pi_ave = new(ncases,"string")
   var_ann_w = 0.
@@ -406,12 +408,16 @@ do ivar=0,nvarnames-1
           delete(var_c)
         end if
         
+;        print(run_names(icase)+" "+dimsizes(var_w))
         do iyr=0,nyears(icase)-1
           iyr2=iyr+year0(icase)-1850
-          do imonth=0,11
-;            print(run_names(icase)+" "+nyears(icase)+" "+year0(icase)+" "+iyr+" "+imonth)
-            var_ann_w(icase,iyr2) = mon_wgt(imonth)*dim_avg(var_w(iyr*12+imonth))+var_ann_w(icase,iyr2)
-          end do
+;          print(iyr+" "+iyr2+" "+iyr*12)
+          if (iyr2.ge.0) then
+            do imonth=0,11
+  ;            print(run_names(icase)+" "+nyears(icase)+" "+year0(icase)+" "+iyr+" "+imonth)
+              var_ann_w(icase,iyr2) = mon_wgt(imonth)*dim_avg(var_w(iyr*12+imonth))+var_ann_w(icase,iyr2)
+            end do
+          end if
 ;          print(run_names(icase)+" iyr:"+iyr+" iyr2:"+iyr2+" var:"+var_ann_w(icase,iyr2))
         end do
         if (ldtrend) then
@@ -458,7 +464,9 @@ do ivar=0,nvarnames-1
       
 ;      var_ann_w(icase,nyears(icase)-1:nyearsmax-1) = var_ann_w@_FillValue
       var_ann_w(icase,yearmax(icase)-1850:) = var_ann_w@_FillValue
-      var_ann_w(icase,:year0(icase)-1850) = var_ann_w@_FillValue
+      if (year0(icase).gt.1850) then
+        var_ann_w(icase,:year0(icase)-1850) = var_ann_w@_FillValue
+      end if
       
       TS=var_ann_w(icase,:)
       TS!0="year"
@@ -481,31 +489,7 @@ do ivar=0,nvarnames-1
       outfile->$varname$=TS
           
     end do
-    
-;    var_ann_w!0="case"   
-;    var_ann_w!1="year"
-;;    var_ann_w&case=run_names
-;    var_ann_w&year=year
-;    
-;    if (ip.eq.0) then ; Global and land
-;      var_ann_w@long_name="Global Average Surface Temperature (K)"
-;      outfile->TS=var_ann_w
-;    end if
-;    if (ip.eq.2) then ; NH
-;      var_ann_w@long_name="NH Average Surface Temperature (K)"
-;      outfile->TS_NH=var_ann_w
-;    end if
-;    if (ip.eq.3) then ; SH
-;      var_ann_w@long_name="SH Average Surface Temperature (K)"
-;      outfile->TS_SH=var_ann_w
-;    end if
-    
-    var_ann_w0=var_ann_w(0,norm_plot_yrs(0):norm_plot_yrs(1))
-    
-    TS_0=dim_avg(var_ann_w0)
-    print("TS_0="+TS_0)
-;    case_names(0)=case_names(0)+": TS~B~0~N~="+TS_0
-    
+        
 ; Averages for annual means.
 
     if (norm_plot) then
@@ -517,11 +501,16 @@ do ivar=0,nvarnames-1
         if (lrmcon.and.icase.ne.ncases-1.and.var_name.eq."TS") then
           var_ann_w(icase,:) =  var_ann_w(icase,:)-var_c_w(icase)
         else
-;          if (run_names(icase).eq."Obs") then
-            var_ann_w(icase,:) =  var_ann_w(icase,:)-dim_avg(var_ann_w(icase,norm_plot_yrs(0):norm_plot_yrs(1)))
-;          else
-;            var_ann_w(icase,:) =  var_ann_w(icase,:)-TS_0
-;          end if
+          if (isStrSubset (run_names(icase),"b40.1955-2005.2deg.wcm.")) then
+            TS_0=TS_WACCM20C
+          else
+            TS_0=dim_avg(var_ann_w(icase,norm_plot_yrs(0):norm_plot_yrs(1)))
+            if (run_names(icase).eq."b40.20th.track1.2deg.wcm.007") then
+              TS_WACCM20C=TS_0
+            end if
+          end if
+          print(run_names(icase)+" TS_0="+TS_0)
+          var_ann_w(icase,:) =  var_ann_w(icase,:)-TS_0
         end if
       end do
     end if
@@ -543,7 +532,7 @@ do ivar=0,nvarnames-1
       txres2@txFontColor = "black"
 ;      txres2@txAngleF      = -45.     ; Rotate text 45 degrees
       textstr="TS~B~0~N~="+TS_0
-      text_anno = gsn_add_text(wks,plot1(ip),textstr,1890,1.0,txres2)
+;      text_anno = gsn_add_text(wks,plot1(ip),textstr,1890,1.0,txres2)
     end if
 
     if (var_name.eq."TS") then
@@ -647,14 +636,17 @@ end if
   
 end do
 
-;print("TS_0="+TS_0)
 
 print("ps2pdf " + filename + ".ps" + " " + filename + ".pdf")
-pstest=systemfunc("ps2pdf " + filename + ".ps" + " " + filename + ".pdf")
+pstest=systemfunc("ps2pdf " + filename + ".eps" + " " + filename + ".pdf")
 print(pstest)
 
-print("mutt -a " + filename + ".ps mikejmills@mac.com -s "+filename+" < /dev/null")
-;mutter=systemfunc("mutt -a " + filename + ".ps mikejmills@mac.com -s "+filename+" < /dev/null")
-;print(mutter)
+print("mutt -a " + filename + ".eps mikejmills@mac.com -s "+filename+" < /dev/null")
+mutter=systemfunc("mutt -a " + filename + ".eps mikejmills@mac.com -s "+filename+" < /dev/null")
+print(mutter)
+
+print("mutt -a " + filename + ".pdf mikejmills@mac.com -s "+filename+" < /dev/null")
+mutter=systemfunc("mutt -a " + filename + ".eps mikejmills@mac.com -s "+filename+" < /dev/null")
+print(mutter)
 
 end

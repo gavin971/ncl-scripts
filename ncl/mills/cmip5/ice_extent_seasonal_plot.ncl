@@ -2,11 +2,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-year1=1979
-year2=2005
-
-;year1=1960
-;year2=1979
+year_bounds=(/(/1960, 1979/),(/1979,2005/)/)
 
 ; WACCM4 1979-2005 ice extent
 basepath="/data/waccm/"
@@ -31,30 +27,33 @@ end do
 
 year=iextent_table(:,0)
 
-indrange=ind((year.gt.year1).and.(year.le.year2+1))
+iextentSH20Cavg=new((/2,12/),"float")
+iextentSH20Cstd=new((/2,12/),"float")
+do i = 0, 1
+  indrange=ind((year.gt.year_bounds(i,0)).and.(year.le.year_bounds(i,1)+1))
 
-time=year(indrange)
-iextentSH=iextent_table(indrange,6)
+  time=year(indrange)
+  iextentSH=iextent_table(indrange,6)
 
-;print(dimsizes(time))
-print("time(0:24) iextentSH(0:24):")
-print(time(0:24)+" "+iextentSH(0:24))
+  ;print(dimsizes(time))
+  print("time(0:24) iextentSH(0:24):")
+  print(time(0:24)+" "+iextentSH(0:24))
 
-iextentSHmn=reshape(iextentSH,(/dimsizes(iextentSH)/12,12/))
-;print(iextentSH(0:11)+" -> "+iextentSHmn(0,0:11))
-;print(dimsizes(iextentSHmn))
-iextentSHmn!1="month"
-iextentSHmn!0="year"
-iextentSH20Cavg=dim_avg_Wrap(iextentSHmn(month|:,year|:))
-iextentSH20Cstd=dim_stddev_Wrap(iextentSHmn(month|:,year|:))
+  iextentSHmn=reshape(iextentSH,(/dimsizes(iextentSH)/12,12/))
+  ;print(iextentSH(0:11)+" -> "+iextentSHmn(0,0:11))
+  ;print(dimsizes(iextentSHmn))
+  iextentSHmn!1="month"
+  iextentSHmn!0="year"
+  iextentSH20Cavg(i,:)=dim_avg_Wrap(iextentSHmn(month|:,year|:))
+  iextentSH20Cstd(i,:)=dim_stddev_Wrap(iextentSHmn(month|:,year|:))
+  delete(indrange)
+  delete(time)
+  delete(iextentSH)
+  delete(iextentSHmn)
+end do
 
-timemn=reshape(time,(/dimsizes(time)/12,12/))
-timemn!1="month"
-timemn!0="year"
-time20Cavg=dim_avg_Wrap(timemn(month|:,year|:))
-
-print("time20Cavg  iextentSH20Cavg  iextentSH20Cstd:")
-print(time20Cavg+"  "+iextentSH20Cavg+"  "+iextentSH20Cstd)
+print("iextentSH20Cavg  iextentSH20Cstd:")
+print(iextentSH20Cavg(0,:)+"  "+iextentSH20Cstd(0,:)+"  "+iextentSH20Cavg(1,:)+"  "+iextentSH20Cstd(1,:))
 
 ; WACCM4 pre-industrial ice extent
 case1850="b40.1850.track1.2deg.wcm.007"
@@ -124,39 +123,30 @@ end do
 delete(year)
 year=iextent_table(:,0)
 
-;print("year:"+year)
+ccsm4_20C_mean=new((/2,12/),"float")
+ccsm4_20C_std=new((/2,12/),"float")
+do i = 0, 1
+  indrange=ind((year.gt.year_bounds(i,0)).and.(year.le.year_bounds(i,1)+1))
 
-delete(indrange)
-indrange=ind((year.gt.year1).and.(year.le.year2+1))
-print(indrange)
+  time=year(indrange)
+  iextentSH=iextent_table(indrange,6)
 
-delete(time)
-time=year(indrange)
+  ;print(dimsizes(time))
+  print("time(0:24) iextentSH(0:24):")
+  print(time(0:24)+" "+iextentSH(0:24))
 
-;exit
-
-delete(iextentSH)
-iextentSH=iextent_table(indrange,6)
-
-;print(dimsizes(time))
-print("time(0:24) iextentSH(0:24):")
-print(time(0:24)+" "+iextentSH(0:24))
-
-delete(iextentSHmn)
-iextentSHmn=reshape(iextentSH,(/dimsizes(iextentSH)/12,12/))
-;print(iextentSH(0:11)+" -> "+iextentSHmn(0,0:11))
-;print(dimsizes(iextentSHmn))
-iextentSHmn!1="month"
-iextentSHmn!0="year"
-ccsm4_20C_mean=dim_avg_Wrap(iextentSHmn(month|:,year|:))
-ccsm4_20C_std=dim_stddev_Wrap(iextentSHmn(month|:,year|:))
-
-delete(timemn)
-timemn=reshape(time,(/dimsizes(time)/12,12/))
-timemn!1="month"
-timemn!0="year"
-ccsm4_time20Cavg=dim_avg_Wrap(timemn(month|:,year|:))
-
+  iextentSHmn=reshape(iextentSH,(/dimsizes(iextentSH)/12,12/))
+  ;print(iextentSH(0:11)+" -> "+iextentSHmn(0,0:11))
+  ;print(dimsizes(iextentSHmn))
+  iextentSHmn!1="month"
+  iextentSHmn!0="year"
+  ccsm4_20C_mean(i,:)=dim_avg_Wrap(iextentSHmn(month|:,year|:))
+  ccsm4_20C_std(i,:)=dim_stddev_Wrap(iextentSHmn(month|:,year|:))
+  delete(indrange)
+  delete(time)
+  delete(iextentSH)
+  delete(iextentSHmn)
+end do
 
 ; CCSM4 1979-2005 ice extent (sq m):
 ;ccsm4_20C_mean=(/1.57043e+13,  1.04253e+13,  9.90689e+12,  1.39798e+13,  1.74110e+13, 1.98727e+13,  \
@@ -182,8 +172,12 @@ hindcast_mean=(/6.79222, 2.05835, 1.88318, 6.04499, 10.8974, 14.0386, 16.4871, 1
 ; observations (millions of sq km)
 obs_mean=(/5.08556, 3.02296, 4.36556, 7.33593, 10.7170, 13.8504, 16.3848, 18.0589, 18.7211, 18.2863, 16.2341, 11.1389/)
 
-waccmRatio=iextentSH20Cavg/iextentSH1850avg
-ccsm4Ratio=ccsm4_20C_mean/ccsm4_1850_mean
+waccmRatio=iextentSH20Cavg
+ccsm4Ratio=ccsm4_20C_mean
+do i = 0,1
+  waccmRatio(i,:)=iextentSH20Cavg(i,:)/iextentSH1850avg
+  ccsm4Ratio(i,:)=ccsm4_20C_mean(i,:)/ccsm4_1850_mean  
+end do
 
 print(" ")
 print("WACCM ratio, CCSM4 ratio")
@@ -191,31 +185,38 @@ print(waccmRatio+"   "+ccsm4Ratio)
 
 data = new((/6,12/),"float")
 data(0,:)=(/iextentSH1850avg/)
-data(1,:)=(/iextentSH20Cavg/)
+data(1,:)=(/iextentSH20Cavg(1,:)/)
 data(2,:)=(/ccsm4_1850_mean/)
-data(3,:)=(/ccsm4_20C_mean/)
+data(3,:)=(/ccsm4_20C_mean(1,:)/)
 data(4,:)=(/obs_mean/)
 data(5,:)=(/hindcast_mean/)
+
+data2 = new((/4,12/),"float")
+data2(0,:)=(/waccmRatio(0,:)/)
+data2(1,:)=(/waccmRatio(1,:)/)
+data2(2,:)=(/ccsm4Ratio(0,:)/)
+data2(3,:)=(/ccsm4Ratio(1,:)/)
+data2 = 100.0*(data2-1) ; convert ratio to percent loss
 
 mnmx = new((/8,12/),"float")
 mnmx(0,:)=(/iextentSH1850avg+iextentSH1850std/)
 mnmx(1,:)=(/iextentSH1850avg-iextentSH1850std/)
-mnmx(2,:)=(/iextentSH20Cavg+iextentSH20Cstd/)
-mnmx(3,:)=(/iextentSH20Cavg-iextentSH20Cstd/)
+mnmx(2,:)=(/iextentSH20Cavg(1,:)+iextentSH20Cstd(1,:)/)
+mnmx(3,:)=(/iextentSH20Cavg(1,:)-iextentSH20Cstd(1,:)/)
 mnmx(4,:)=(/ccsm4_1850_mean+ccsm4_1850_std/)
 mnmx(5,:)=(/ccsm4_1850_mean-ccsm4_1850_std/)
-mnmx(6,:)=(/ccsm4_20C_mean+ccsm4_20C_std/)
-mnmx(7,:)=(/ccsm4_20C_mean-ccsm4_20C_std/)
+mnmx(6,:)=(/ccsm4_20C_mean(1,:)+ccsm4_20C_std(1,:)/)
+mnmx(7,:)=(/ccsm4_20C_mean(1,:)-ccsm4_20C_std(1,:)/)
 
-delete(time)
 time = ispan(0,11,1)
+imagefile="$IMG_PATH/ice_extent_seasonal_"+year_bounds(1,0)+"-"+year_bounds(1,1)
 
-  wks = gsn_open_wks("ps","$IMG_PATH/ice_extent_seasonal_"+year1+"-"+year2)                 ; create plot
+  wks = gsn_open_wks("eps",imagefile)                 ; create plot
   
   res                    = True              ; plot mods desired
   res@gsnDraw            = False             ; don't draw yet
   res@gsnFrame           = False             ; don't advance frame yet
-  res@xyDashPatterns = (/0,1,0,1,0,1/)
+  res@xyDashPatterns = (/1,0,1,0,0,1/)
   res@xyLineColors = (/"red", "red", "blue", "blue", "black", "black"/)
   res@xyMonoLineColor = False
   res@xyLineThicknessF = 4
@@ -226,20 +227,24 @@ time = ispan(0,11,1)
   res@tmXBLabels =(/"J","F","M","A","M","J","J","A","S","O","N","D"/)
   res@tmXBMode   = "Explicit"         ; Define own tick mark labels.
   res@tmXBValues = ispan(0,11,1)
+  
+  plot = new(2,graphic)
+  
   top_plot = gsn_csm_xy (wks,time,data,res)       ; create line plot
   
 ; Create a plot with the area between both curves filled in blue.
-  delete(res@xyLineColors)
-  res@gsnXYFillColors = "LightPink"
-  res@xyLineColor     = -1                           ; We don't want the line, so make it transparent.
-  plot1  = gsn_csm_xy (wks,time,mnmx(0:1,:),res)  ; Create filled XY plot.
-  plot2  = gsn_csm_xy (wks,time,mnmx(2:3,:),res)  ; Create filled XY plot.
+  res2=res
+  delete(res2@xyLineColors)
+  res2@gsnXYFillColors = "LightPink"
+  res2@xyLineColor     = -1                           ; We don't want the line, so make it transparent.
+  plot1  = gsn_csm_xy (wks,time,mnmx(0:1,:),res2)  ; Create filled XY plot.
+  plot2  = gsn_csm_xy (wks,time,mnmx(2:3,:),res2)  ; Create filled XY plot.
 
 ; Create a plot with the area between both curves filled in pink.
-  res@gsnXYFillColors = "LightBlue"
-  res@xyLineColor     = -1                           ; We don't want the line, so make it transparent.
-  plot3  = gsn_csm_xy (wks,time,mnmx(4:5,:),res)  ; Create another filled XY plot.
-  plot4  = gsn_csm_xy (wks,time,mnmx(6:7,:),res)  ; Create another filled XY plot.
+  res2@gsnXYFillColors = "LightBlue"
+  res2@xyLineColor     = -1                           ; We don't want the line, so make it transparent.
+  plot3  = gsn_csm_xy (wks,time,mnmx(4:5,:),res2)  ; Create another filled XY plot.
+  plot(0)  = gsn_csm_xy (wks,time,mnmx(6:7,:),res2)  ; Create another filled XY plot.
 
 ;
 ; Overlay the top and mid plots on the bottom plot.
@@ -247,13 +252,31 @@ time = ispan(0,11,1)
 ; Don't draw anything yet, because we still need to
 ; attach a legend and some titles.
 ;
-  overlay(plot4,plot3)
-  overlay(plot4,plot2)
-  overlay(plot4,plot1)
-  overlay(plot4,top_plot)
+  overlay(plot(0),plot3)
+  overlay(plot(0),plot2)
+  overlay(plot(0),plot1)
+  overlay(plot(0),top_plot)
+  
+  delete(res@trYMinF)
+  delete(res@trYMaxF)
+  print(time)
+  print(data2)
+  plot(1) = gsn_csm_xy (wks,time,data2,res)       ; create line plot
 
+
+  resP                            = True
+  resP@gsnMaximize                = True
+  resP@gsnPanelXWhiteSpacePercent = 3
+  resP@gsnPaperOrientation        = "landscape"
+  resP@gsnPanelLabelBar           = True
   
-  pres = True
-  maximize_output(wks,pres)
+  gsn_panel(wks,plot,(/1,2/),resP)
+;  frame(wks)
   
-delete(wks)
+  delete(wks)
+  
+  muttcmd="mutt mikejmills@mac.com -a "+imagefile+".eps -s "+imagefile+" < /dev/null"
+  print(muttcmd)
+  mutter=systemfunc(muttcmd)
+  print(mutter)
+  print("gv "+imagefile+".eps")
