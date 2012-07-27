@@ -236,6 +236,7 @@ imagefile="$IMG_PATH/ice_extent_seasonal_"+year_bounds(1,0)+"-"+year_bounds(1,1)
   delete(res2@xyLineColors)
   res2@gsnXYFillColors = "LightPink"
   res2@xyLineColor     = -1                           ; We don't want the line, so make it transparent.
+  res2@tiYAxisString="SH Sea Ice Extent (x10~S~6~N~ km~S~2~N~)"
   plot1  = gsn_csm_xy (wks,time,mnmx(0:1,:),res2)  ; Create filled XY plot.
   plot2  = gsn_csm_xy (wks,time,mnmx(2:3,:),res2)  ; Create filled XY plot.
 
@@ -260,13 +261,14 @@ imagefile="$IMG_PATH/ice_extent_seasonal_"+year_bounds(1,0)+"-"+year_bounds(1,1)
   delete(res@trYMaxF)
   print(time)
   print(data2)
+  res@tiYAxisString="SH Sea Ice Extent Change (%)"
   plot(1) = gsn_csm_xy (wks,time,data2,res)       ; create line plot
 
 
   resP                            = True
   resP@gsnMaximize                = True
   resP@gsnPanelXWhiteSpacePercent = 3
-  resP@gsnPaperOrientation        = "landscape"
+  resP@gsnPaperOrientation        = "Portrait"
   resP@gsnPanelLabelBar           = True
   
   gsn_panel(wks,plot,(/1,2/),resP)
