@@ -1,10 +1,11 @@
 datapath="/Volumes/MillsPassport/cesm/case/"
 
 ccsmPI="b40.1850.track1.1deg.006"
-ccsm20th="b40.20th.track1.1deg.avg567891112"
+ccsm20th="b40.20th.track1.1deg.avg5678912"
 
 waccmPI="b40.1850.track1.2deg.wcm.007"
 waccm20th="b40.1955-2005.2deg.wcm.avg234"
+waccm20th_cases="b40.1955-2005.2deg.wcm.00"+ispan(2,4,1)
 
 subdir="/proc/tseries/monthly/"
 
@@ -111,3 +112,11 @@ print(avg(waccm20th_TS(indrange))+" "+avg(waccm20th_TSnh(indrange))+" "+avg(wacc
 print("TS diff "+(/avg(waccm20th_TS(indrange))-avg(waccmPI_TS)/))
 print("FS diff "+(/avg(waccm20th_FS(indrange))-avg(waccmPI_FS)/))
 print("FL diff "+(/avg(waccm20th_FL(indrange))-avg(waccmPI_FL)/))
+
+do i =0,2
+  delete(waccm20th_TSfile)
+  delete(waccm20th_TS)
+  waccm20th_TSfile=addfile(datapath+waccm20th_cases(i)+subdir+waccm20th_cases(i)+".cam2.h0gm.TS.195501-200512.nc","r")
+  waccm20th_TS=waccm20th_TSfile->TS
+  print(waccm20th_cases(i)+": TS diff "+(/avg(waccm20th_TS(indrange))-avg(waccmPI_TS)/))
+end do
