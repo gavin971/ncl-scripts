@@ -9,15 +9,20 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 begin
 
-year0 = (/1850, 1850, 1850, 1850, 1850, 1850, 1850, 1791, 1850, 1955, 1955, 1955, 1850/)
-yearmax=(/2005, 2005, 2005, 2005, 2005, 2005, 2005, 1990, 2005, 2005, 2005, 2005, 2005/)
+; for WACCM PI with same branch year:
+;year0 = (/1850, 1850, 1850, 1850, 1850, 1850, 1791, 1850, 1955, 1955, 1955, 1850/)
+;yearmax=(/2005, 2005, 2005, 2005, 2005, 2005, 1990, 2005, 2005, 2005, 2005, 2005/)
+
+; for WACCM PI with full 200 years:
+year0 = (/1850, 1850, 1850, 1850, 1850, 1850, 1850, 1850, 1955, 1955, 1955, 1850/)
+yearmax=(/2005, 2005, 2005, 2005, 2005, 2005, 2005, 2005, 2005, 2005, 2005, 2005/)
+
 run_names = (/\
               "b40.20th.track1.1deg.005",\
               "b40.20th.track1.1deg.006",\
               "b40.20th.track1.1deg.007",\
               "b40.20th.track1.1deg.008",\
               "b40.20th.track1.1deg.009",\
-              "b40.20th.track1.1deg.011",\
               "b40.20th.track1.1deg.012",\
               "b40.1850.track1.2deg.wcm.007",\
               "b40.20th.track1.2deg.wcm.007",\
@@ -31,7 +36,6 @@ case_names = (/\
                "CAM4 1deg 007",\
                "CAM4 1deg 008",\
                "CAM4 1deg 009",\
-               "CAM4 1deg 011",\
                "CAM4 1deg 012",\
                "WACCM4 Pre-Industrial",\
                "WACCM4 20thC",\
@@ -40,11 +44,11 @@ case_names = (/\
                "WACCM4 1955-2005 004",\
                "HadCRU"/)
 xyLineColors      = (/\
-                      "grey","grey","grey","grey","grey","grey","grey",\
+                      "grey","grey","grey","grey","grey","grey",\
                       "blue","darkgreen","red","red","red",\
                       "black"/)    
 
-xyDashPatterns = (/0,0,0,0,0,0,0,0,0,0,0,0,0/)
+xyDashPatterns = (/0,0,0,0,0,0,0,0,0,0,0,0/)
 
 outfilename="/data/mmills/TS.glob.ann.tseries.nc"
 print("rm "+outfilename)
@@ -67,8 +71,8 @@ omask0 = False
 ;omask0 = True
 norm_plot = True
 ;norm_plot = False
-;norm_plot_yrs_abs = (/1961,1990/)
-norm_plot_yrs_abs = (/1861,1890/)
+norm_plot_yrs_abs = (/1961,1990/)
+;norm_plot_yrs_abs = (/1861,1890/)
 
 ;var_names = (/"LWCF","RESTOM","FSNT","FLNT"/)
 var_names = (/"TS"/)
@@ -206,8 +210,8 @@ do ivar=0,nvarnames-1
   if (any(var_name.eq.(/"TS","TREFHT"/))) then
     if(norm_plot) then
       res@tiYAxisString = "TS anomaly (K)"
-      res@trYMinF = -1.2
-      res@trYMaxF = 1.8
+      res@trYMinF = -1.25
+      res@trYMaxF = 1.05
     else
       res@tiYAxisString = "TS (K)"
     end if
@@ -312,16 +316,20 @@ do ivar=0,nvarnames-1
             inptr = addfile(infiles,"r")
             var_in = inptr->FSDS(:,{lats:latn},{lonw:lone})
             var_in = var_ann_w@_FillValue
+            delete(infiles)
           else
             if (var_name.eq."AODVIS".and.icase.eq.2) then
               infiles = systemfunc("ls -1 "+in_dir+run_names(icase)+"/proc/*AEROD_v.20th.nc")
               inptr = addfile(infiles,"r")
               var_in = inptr->AEROD_v(:,{lats:latn},{lonw:lone})
+              delete(infiles)
             else
-              infiles = systemfunc("ls -1 "+in_dir+run_names(icase)+"/proc/tseries/monthly/*."+var_name+".*.nc")
+              infiles = systemfunc("ls -1 "+in_dir+run_names(icase)+"/proc/tseries/monthly/*.h0."+var_name+".*.nc")
               print("reading "+infiles)
               inptr = addfile(infiles,"r")
+              delete(infiles)
               var_in = inptr->$var_name$(:,{lats:latn},{lonw:lone})
+;              print(run_names(icase)+" var_in: "+dimsizes(var_in))
             end if
           end if
         end if
@@ -408,13 +416,13 @@ do ivar=0,nvarnames-1
           delete(var_c)
         end if
         
-;        print(run_names(icase)+" "+dimsizes(var_w))
+;        print(run_names(icase)+" var_w:"+dimsizes(var_w))
         do iyr=0,nyears(icase)-1
           iyr2=iyr+year0(icase)-1850
-;          print(iyr+" "+iyr2+" "+iyr*12)
+;          print(run_names(icase)+" "+nyears(icase)+" "+year0(icase)+" "+iyr+" "+iyr2+" "+iyr*12)
           if (iyr2.ge.0) then
             do imonth=0,11
-  ;            print(run_names(icase)+" "+nyears(icase)+" "+year0(icase)+" "+iyr+" "+imonth)
+;              print(run_names(icase)+" "+nyears(icase)+" "+year0(icase)+" "+iyr+" "+imonth)
               var_ann_w(icase,iyr2) = mon_wgt(imonth)*dim_avg(var_w(iyr*12+imonth))+var_ann_w(icase,iyr2)
             end do
           end if
@@ -468,7 +476,7 @@ do ivar=0,nvarnames-1
         var_ann_w(icase,:year0(icase)-1850) = var_ann_w@_FillValue
       end if
       
-      TS=var_ann_w(icase,:)
+      TS=(/var_ann_w(icase,:)/)
       TS!0="year"
       TS&year=year
       TS@_FillValue=var_ann_w@_FillValue
@@ -495,13 +503,14 @@ do ivar=0,nvarnames-1
     if (norm_plot) then
       do icase=0,ncases-1
   ;      print(run_names(icase)+" "+norm_plot_yrs(0)+" "+norm_plot_yrs(1))
-        print(dimsizes(var_ann_w))
+;        print(dimsizes(var_ann_w))
         pi_ave = " (PI ave = "+flt2string(dim_avg(var_ann_w(icase,norm_plot_yrs(0):norm_plot_yrs(1))))+")"
         res@xyExplicitLegendLabels(icase) = case_names(icase)+pi_ave(icase)
         if (lrmcon.and.icase.ne.ncases-1.and.var_name.eq."TS") then
           var_ann_w(icase,:) =  var_ann_w(icase,:)-var_c_w(icase)
         else
-          if (isStrSubset (run_names(icase),"b40.1955-2005.2deg.wcm.")) then
+          if (isStrSubset (run_names(icase),"b40.1955-2005.2deg.wcm.").and.\
+              norm_plot_yrs(0).lt.1960) then
             TS_0=TS_WACCM20C
           else
             TS_0=dim_avg(var_ann_w(icase,norm_plot_yrs(0):norm_plot_yrs(1)))
@@ -567,6 +576,11 @@ do ivar=0,nvarnames-1
       txres@txFontColor = "darkgreen"
 ;      gsn_text_ndc(wks_s,cor2,xcor(ip),ycor(ip)+0.02,txres) 
 end if
+
+    print(ptype(ip)+"")
+    print("HadCRU 1850-1870: "+avg(var_ann_w(ncases-1,ind(year.ge.1850.and.year.le.1870))))
+    print("HadCRU 1986-2005: "+avg(var_ann_w(ncases-1,ind(year.ge.1986.and.year.le.2005))))
+    print("HadCRU diff: "+(/avg(var_ann_w(ncases-1,ind(year.ge.1986.and.year.le.2005)))-avg(var_ann_w(ncases-1,ind(year.ge.1850.and.year.le.1870)))/))
     
     var_ann_w = (/0./)
 
@@ -642,11 +656,11 @@ pstest=systemfunc("ps2pdf " + filename + ".eps" + " " + filename + ".pdf")
 print(pstest)
 
 print("mutt -a " + filename + ".eps mikejmills@mac.com -s "+filename+" < /dev/null")
-mutter=systemfunc("mutt -a " + filename + ".eps mikejmills@mac.com -s "+filename+" < /dev/null")
+mutter=systemfunc("mutt -a " + filename + ".eps mikejmills@mac.com -s "+filename+".eps < /dev/null")
 print(mutter)
 
 print("mutt -a " + filename + ".pdf mikejmills@mac.com -s "+filename+" < /dev/null")
-mutter=systemfunc("mutt -a " + filename + ".eps mikejmills@mac.com -s "+filename+" < /dev/null")
+mutter=systemfunc("mutt -a " + filename + ".pdf mikejmills@mac.com -s "+filename+".pdf < /dev/null")
 print(mutter)
 
 end

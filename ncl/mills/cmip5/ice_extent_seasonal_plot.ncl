@@ -97,8 +97,7 @@ print(time1850avg+"  "+iextentSH1850avg+"  "+iextentSH1850std)
 basepath="/data/ccsm4/"
 delete(cases20c)
 cases20c=(/"b40.20th.track1.1deg.005","b40.20th.track1.1deg.006","b40.20th.track1.1deg.007",\
-           "b40.20th.track1.1deg.008","b40.20th.track1.1deg.009","b40.20th.track1.1deg.011",\
-           "b40.20th.track1.1deg.012"/)
+           "b40.20th.track1.1deg.008","b40.20th.track1.1deg.009","b40.20th.track1.1deg.012"/)
 ncases=dimsizes(cases20c)
 delete(files)
 files=basepath+cases20c+"/proc/iextent_reg_avg_timeseries_sh.dat"
