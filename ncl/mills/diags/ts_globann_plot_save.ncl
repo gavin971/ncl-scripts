@@ -518,7 +518,7 @@ do ivar=0,nvarnames-1
               TS_WACCM20C=TS_0
             end if
           end if
-          print(run_names(icase)+" TS_0="+TS_0)
+          print(run_names(icase)+" TS_0="+TS_0+" TS_mean(all)="+dim_avg(var_ann_w(icase,:)))
           var_ann_w(icase,:) =  var_ann_w(icase,:)-TS_0
         end if
       end do
