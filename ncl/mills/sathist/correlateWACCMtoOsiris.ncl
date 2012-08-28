@@ -13,14 +13,41 @@ begin
   print("k="+k+", reading data...")
 
   ; Get the osiris and WACCM data
-  waccmRun="f40.Nabro.2deg.wcm.sd.carma.sulf.006"
-  rootdir="/Volumes/Data/Models/cesm/run/"+waccmRun+"/"
+;  waccmRun="f40.Nabro.2deg.wcm.sd.carma.sulf.006"
+  waccmRun=getenv("caseid")
+  pathList=(/"/Volumes/MillsPassport/cesm/case/",\
+             "/Volumes/Data/Models/cesm/case/"/)
+
+  i=0
+  filePresent=False           
+  do while(i.lt.dimsizes(pathList).and..not.(filePresent))
+    rootdir=pathList(i)+waccmRun+"/"
+    filePresent=isfilepresent(rootdir)
+    print(i+" "+rootdir+" "+filePresent)
+    i=i+1
+  end do
+
+  if (.not.(filePresent)) then
+    print("file not found")
+    exit
+  end if
   
   osirisFile = addfile("$DATA_PATH/Osiris/osiris_hs_nabro_20110601_20110822.nc","r")
   extOsiris  = osirisFile->AEXT
   exterrOsiris  = osirisFile->AEXTerr
+  
+  waccmFile = addfile(rootdir+"hs/"+waccmRun+".cam.hs.OsirisLevs.nc","r")
+  extWaccm  = waccmFile->PURSULEX750
+
+  dimsOsiris=dimsizes(extOsiris)
+  dims=dimsizes(extWaccm)
+  ncol=min((/dims(0),dimsOsiris(0)/))
+  nlev=dims(1)
+  print("extOsiris:"+dimsOsiris)
+  print("extWaccm:"+dims)
+  
   lev = osirisFile->lev
-  date = osirisFile->date
+  date = osirisFile->date(0:ncol-1)
   preNabro=ind(date.lt.20110613)
   week1=ind(date.ge.20110613.and.date.lt.20110620)
   week2=ind(date.ge.20110620.and.date.lt.20110627)
@@ -28,18 +55,11 @@ begin
   week4=ind(date.ge.20110704.and.date.lt.20110711)
   postweek4=ind(date.ge.20110711)
   
-  waccmFile = addfile(rootdir+"hs/"+waccmRun+".cam.hs.OsirisLevs.nc","r")
-  extWaccm  = waccmFile->PURSULEX750
-  
   extOsiris  = where(ismissing(extOsiris),0.,extOsiris)
-  
-  dims=dimsizes(extOsiris)
-  ncol=dims(0)
-  nlev=dims(1)
-  
+    
   data = new((/ 2, ncol /), "float")
-  data(0, :) = extWaccm(:,k)
-  data(1, :) = (/extOsiris(:,k)/)
+  data(0, :) = extWaccm(0:ncol-1,k)
+  data(1, :) = (/extOsiris(0:ncol-1,k)/)
   data@_FillValue = -999.
   
   ; Plot the correlation of the data.
@@ -70,6 +90,7 @@ begin
   
   print("Plotting week 4 scatterplot...")
   res@xyMarkerColor     = "orange"                    ; Marker color
+;  plot = gsn_csm_xy(wks, extWaccm(week4,k), extOsiris(week4,k), res)       ; scatterplot
   overlay(plot, gsn_csm_xy(wks, extWaccm(week4,k), extOsiris(week4,k), res))       ; scatterplot
   
   print("Plotting week 3 scatterplot...")
@@ -220,9 +241,9 @@ end
 correlateWACCMtoOsiris(16) ; 16.5 km
 correlateWACCMtoOsiris(17) ; 17.5 km
 correlateWACCMtoOsiris(18) ; 18.5 km
-;correlateWACCMtoOsiris(19) ; 19.5 km
-;correlateWACCMtoOsiris(20) ; 20.5 km
-;correlateWACCMtoOsiris(21) ; 21.5 km
+correlateWACCMtoOsiris(19) ; 19.5 km
+correlateWACCMtoOsiris(20) ; 20.5 km
+correlateWACCMtoOsiris(21) ; 21.5 km
 ;correlateWACCMtoOsiris(22) ; 22.5 km
 ;correlateWACCMtoOsiris(23) ; 23.5 km
 ;correlateWACCMtoOsiris(24) ; 24.5 km
