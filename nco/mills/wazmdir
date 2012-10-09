@@ -9,13 +9,17 @@
 if  [ -n "$caseid" ] ; then
   export machine=`hostname`
 
+  if [[ $machine =~ 'mirage' ]];then
+    rootpath='/CESM/wawg/runs'
+  fi
+
   if [[ $machine = 'modeling1' ]];then
     rootpath='/data4/mmills'
 #    rootpath='/data5/mmills/wa319/carma-soot'
   fi
 
   if [[ $machine = 'cmip5' ]];then
-    if [[ $caseid =~ '*wcm*' ]]; then
+    if [[ $caseid =~ 'wcm' ]]; then
       rootpath='/data/waccm'
     else
       rootpath='/data/ccsm4'

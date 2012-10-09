@@ -1,73 +1,94 @@
 #!/bin/ksh
 
-export machine=`hostname`
+#runname='b40.1955-2005.2deg.wset.avg456'
 
-#type='h0zm'
-type='h0'
+if  [ -n "$caseid" ] ; then
+  export machine=`hostname`
 
-runname='b40.1955-2005.2deg.wset.avg456'
+  if [ ! -n "$hnum" ] ; then
+    hnum='h0'
+  fi
 
-if [[ $machine = 'modeling1' ]];then
-  rootpath='/data4/mmills'
+  if [ ! -n "$htype" ] ; then
+    htype=''
+  fi
+
+  if [[ $machine =~ 'mirage' ]];then
+    rootpath='/CESM/wawg/runs'
+  fi
+
+  if [[ $machine = 'modeling1' ]];then
+    rootpath='/data4/mmills'
+  fi
+
+  if [[ $machine = 'cmip5' ]];then
+    rootpath='/data/waccm'
+  fi
+
+  if [[ $OSTYPE = 'darwin' ]];then
+    rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+  fi
+
+  wadir=$rootpath'/'$caseid'/'$hnum$htype
+  #wadir=$rootpath'/'$caseid'/atm/hist'
+  anndir=$rootpath'/'$caseid'/'$hnum$htype'.annual'
+  searchstr='cam*.'$hnum$htype
+  addstr='annual'
+
+  if [ ! -n "$year1" ] ; then
+    year1=1
+  fi
+  if [ ! -n "$year2" ] ; then
+    year2=1
+  fi
+
+  # script to average and standard deviation of waccm h0 files
+  echo 'wadir = '$wadir
+  echo 'year1 = '$year1
+  echo 'year2 = '$year2
+  echo 'mkdir -p '$anndir
+  mkdir -p $anndir
+
+  year=$year1
+  while [[ $year -le $year2 ]];do
+
+    if [[ year -lt 10 ]]
+      then
+        yearstr='000'$year
+      elif [[ year -lt 100 ]]
+      then
+        yearstr='00'$year
+      elif [[ year -lt 1000 ]]
+      then
+        yearstr='0'$year
+      else
+        yearstr=$year
+      fi
+
+    ncfiles=$wadir'/'$caseid'.'$searchstr'.'$yearstr*'.nc'
+    avgfile=$anndir'/'$caseid'.'$searchstr'.'$yearstr'.'$addstr'.nc'
+
+    # create annual mean
+    echo averaging $ncfiles
+    ncea $ncfiles $avgfile
+    echo created $avgfile
+
+    (( year+=1 ))
+
+  done
+
+  echo "Annual averaging complete.  Now run fixdate.ncl to fix the dates!"
+
+  runname=$caseid
+  export runname
+  export anndir
+  export year1
+  export year2
+  export searchstr
+  export addstr
+
+  ncl $CODE_PATH/scripts/ncl/fixdate.ncl
+
+else
+  echo "caseid is not set"
 fi
-
-if [[ $machine = 'cmip5' ]];then
-  rootpath='/data/waccm'
-fi
-
-if [[ $OSTYPE = 'darwin' ]];then
-  rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-fi
-
-wadir=$rootpath'/'$runname'/'$type
-#wadir=$rootpath'/'$runname'/atm/hist'
-anndir=$rootpath'/'$runname'/'$type'.annual'
-searchstr='cam2.'$type
-addstr='annual'
-
-year1=1955
-year2=2005
-
-
-# script to average and standard deviation of waccm h0 files
-
-mkdir -p $anndir
-
-year=$year1
-while [[ $year -le $year2 ]];do
-
-  if [[ year -lt 10 ]]
-    then
-      yearstr='000'$year
-    elif [[ year -lt 100 ]]
-    then
-      yearstr='00'$year
-    elif [[ year -lt 1000 ]]
-    then
-      yearstr='0'$year
-    else
-      yearstr=$year
-    fi
-  
-  ncfiles=$wadir'/'$runname'.'$searchstr'.'$yearstr*'.nc'
-  avgfile=$anndir'/'$runname'.'$searchstr'.'$yearstr'.'$addstr'.nc'
-
-  # create annual mean
-  echo averaging $ncfiles
-  ncea $ncfiles $avgfile
-  echo created $avgfile
-   
-  (( year+=1 ))
-     
-done
-
-echo "Annual averaging complete.  Now run fixdate.ncl to fix the dates!"
-
-export runname
-export anndir
-export year1
-export year2
-export searchstr
-export addstr
-
-ncl $CODE_PATH/scripts/ncl/fixdate.ncl
