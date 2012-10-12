@@ -218,8 +218,6 @@ else
   res@gsnDraw               = False
   res@gsnFrame           = False   ; Don't advance the frame
 
-  ;res@trYMinF = -4
-  ;res@trYMaxF = 4
   res@gsnYRefLine           = 0.              ; reference line   
   res@gsnXYBarChart         = True            ; create bar chart
   res@gsnAboveYRefLineColor = "red"           ; above ref line fill red
@@ -243,8 +241,8 @@ else
 
   res1@tiMainString  = "RESTOM" ; title
   res1@gsnYRefLine           = 0.              ; reference line   
-  ;res1@trYMinF = -4
-  res1@trYMaxF = 6
+  res1@trYMinF = min((/-4,min(restom_ann_w)/))
+  res1@trYMaxF = max((/4,max(restom_ann_w)/))
   res1@vpXF              = 0.1    ; X,Y position of first plot
   res1@vpYF              = 0.91
   print("year:"+dimsizes(year))
