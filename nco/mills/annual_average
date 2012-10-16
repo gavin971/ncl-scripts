@@ -1,48 +1,65 @@
 #!/bin/ksh
-
-export machine=`hostname`
-
-if [[ $machine = 'modeling1' ]];then
-  rootpath='/data5/mmills/wa319/carma-soot'
-fi
-
-if [[ $machine = 'cmip5' ]];then
-  rootpath='/data/waccm'
-fi
-
-if [[ $OSTYPE = 'darwin' ]];then
-  rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-fi
-
-runname='bccntl02'
-#runname='bcrckt03'
-#addstr='annual'
-#addstr='JJA'
-addstr='DJF'
-wadir=$rootpath'/'$runname'/h0zm.'$addstr
-
 # script to average and standard deviation of waccm h0 files
 
-# calculate mean
+if  [ -n "$caseid" ] ; then
+  runname=$caseid
+  
+  export machine=`hostname`
 
-echo ncrcat -O $wadir'/'$runname'.cam2.h0zm.20'*'.'$addstr'.nc' annual_tmp.nc
-ncrcat -O $wadir'/'$runname'.cam2.h0zm.20'*'.'$addstr'.nc' annual_tmp.nc 
-avgfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'.nc'
+  if [ ! -n "$hnum" ] ; then
+    hnum='h0'
+  fi
 
-echo ncwa -O -a time annual_tmp.nc $avgfile
-ncwa -O -a time annual_tmp.nc $avgfile
-#echo created $avgfile
+  if [ ! -n "$addstr" ] ; then
+    addstr='annual'  # i.e. 'DJF'
+  fi
 
-# calculate standard deviation 
+  if [ ! -n "$subdir" ] ; then
+    subdir=''
+  fi
 
-ncbo -O --op_typ=sub annual_tmp.nc $avgfile tmp.nc
+  if [[ $machine =~ 'mirage' ]];then
+    rootpath='/CESM/wawg/runs'
+  fi
 
-sdfile=$wadir'/'$runname'.cam2.h0zm.'$addstr'_sd.nc'
-echo ncra -O -y rmssdn tmp.nc $sdfile
-ncra -O -y rmssdn tmp.nc $sdfile 
-#echo created $sdfile
+  if [[ $machine = 'modeling1' ]];then
+    rootpath='/data4/mmills'
+  fi
 
-rm -f tmp.nc
-rm -f annual_tmp.nc
+  if [[ $machine = 'cmip5' ]];then
+    rootpath='/data/waccm'
+  fi
+
+  if [[ $OSTYPE = 'darwin' ]];then
+    rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+  fi
+  
+  wadir=$rootpath'/'$runname'/'$subdir'/'$hnum'.'$addstr
+
+  # calculate mean
+
+  echo ncrcat -O $wadir'/'$runname'.cam.'$hnum'.'*'.'$addstr'.nc' $wadir'/'annual_tmp.nc
+  ncrcat -O $wadir'/'$runname'.cam.'$hnum'.'*'.'$addstr'.nc' $wadir'/'annual_tmp.nc 
+  avgfile=$wadir'/'$runname'.cam.'$hnum'.'$addstr'.nc'
+
+  echo ncwa -O -a time $wadir'/'annual_tmp.nc $avgfile
+  ncwa -O -a time $wadir'/'annual_tmp.nc $avgfile
+  #echo created $avgfile
+
+  # calculate standard deviation 
+
+  ncbo -O --op_typ=sub $wadir'/'annual_tmp.nc $avgfile $wadir'/'tmp.nc
+
+  sdfile=$wadir'/'$runname'.cam.'$hnum'.'$addstr'_sd.nc'
+  echo ncra -O -y rmssdn $wadir'/'tmp.nc $sdfile
+  ncra -O -y rmssdn $wadir'/'tmp.nc $sdfile 
+  #echo created $sdfile
+
+  rm -f $wadir'/'tmp.nc
+  rm -f $wadir'/'annual_tmp.nc
+  
+else
+  echo "environment variable caseid is not set"
+fi
 
 

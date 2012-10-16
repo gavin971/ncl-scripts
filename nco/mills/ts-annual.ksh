@@ -4,7 +4,7 @@
 runname='b40.1850.2deg.wset.003'
 wadir='/data3/mmills/'$runname'/h0'
 anndir='/data3/mmills/'$runname'/h0.annual'
-searchstr='cam2.h0'
+camstr='cam2.h0'
 addstr='TS.annual'
 
 year1=1
@@ -30,8 +30,8 @@ while [[ $year -le $year2 ]];do
       yearstr=$year
     fi
   
-  ncfiles=$wadir'/'$runname'.'$searchstr'.'$yearstr*'.nc'
-  avgfile=$anndir'/'$runname'.'$searchstr'.'$yearstr'.'$addstr'.nc'
+  ncfiles=$wadir'/'$runname'.'$camstr'.'$yearstr*'.nc'
+  avgfile=$anndir'/'$runname'.'$camstr'.'$yearstr'.'$addstr'.nc'
 
   # create annual mean
   echo averaging $ncfiles
@@ -48,11 +48,11 @@ export runname
 export anndir
 export year1
 export year2
-export searchstr
+export camstr
 export addstr
 
 ncl ~/ncl-scripts/fixdate.ncl
 
-#catfile=$anndir'/'$runname'.'$searchstr'.'$year1'-'$year2'.TS.nc'
+#catfile=$anndir'/'$runname'.'$camstr'.'$year1'-'$year2'.TS.nc'
 #echo creating $catfile
 #ncrcat -O $anndir'/*.'$addstr'.nc' $catfile

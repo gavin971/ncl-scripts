@@ -5,7 +5,8 @@ rootpath='/data/waccm'
 htype='h0zm'
 avgdir=$rootpath'/'$avgname'/'$htype
 scdir=$rootpath'/'$avgname'/sc'
-searchstr='cam2.'$htype
+searchstr='cam*.'$htype
+camstr='cam.'$htype
 
 mkdir -p $scdir
 
@@ -40,7 +41,7 @@ while [[ $year -le $year2 ]];do
       fi
       
     avgfile=$avgdir'/'$avgname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
-    scfile=$scdir'/'$avgname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
+    scfile=$scdir'/'$avgname'.'$camstr'.'$yearstr'-'$monthstr'.nc'
 
     # "delete" missing variable to temporary file
     echo ncks -v CO2,,H,NO,O,O2,O3,P0,QRS_TOT,date,datesec,hyam,hybm,lat,lev,lon,time $avgfile $scfile
@@ -68,5 +69,6 @@ echo "Concatenation complete.  Now run fixdate-sc.ncl to fix the dates!"
 export forcingfile
 export year1
 export year2
+export camstr
 
 ncl $CODE_PATH/scripts/ncl/fixdate-sc.ncl

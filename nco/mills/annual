@@ -13,6 +13,10 @@ if  [ -n "$caseid" ] ; then
     htype=''
   fi
 
+  if [ ! -n "$subdir" ] ; then
+    subdir=''
+  fi
+
   if [[ $machine =~ 'mirage' ]];then
     rootpath='/CESM/wawg/runs'
   fi
@@ -29,10 +33,11 @@ if  [ -n "$caseid" ] ; then
     rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
   fi
 
-  wadir=$rootpath'/'$caseid'/'$hnum$htype
+  wadir=$rootpath'/'$caseid'/'$subdir'/'$hnum$htype
   #wadir=$rootpath'/'$caseid'/atm/hist'
-  anndir=$rootpath'/'$caseid'/'$hnum$htype'.annual'
+  anndir=$rootpath'/'$caseid'/'$subdir'/'$hnum$htype'.annual'
   searchstr='cam*.'$hnum$htype
+  camstr='cam.'$hnum$htype
   addstr='annual'
 
   if [ ! -n "$year1" ] ; then
@@ -66,7 +71,7 @@ if  [ -n "$caseid" ] ; then
       fi
 
     ncfiles=$wadir'/'$caseid'.'$searchstr'.'$yearstr*'.nc'
-    avgfile=$anndir'/'$caseid'.'$searchstr'.'$yearstr'.'$addstr'.nc'
+    avgfile=$anndir'/'$caseid'.'$camstr'.'$yearstr'.'$addstr'.nc'
 
     # create annual mean
     echo averaging $ncfiles
@@ -84,11 +89,11 @@ if  [ -n "$caseid" ] ; then
   export anndir
   export year1
   export year2
-  export searchstr
+  export camstr
   export addstr
 
   ncl $CODE_PATH/scripts/ncl/fixdate.ncl
 
 else
-  echo "caseid is not set"
+  echo "environment variable caseid is not set"
 fi
