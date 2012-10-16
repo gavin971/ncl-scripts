@@ -46,7 +46,7 @@ do i = 0,35
   k=doubletoint(modtime2(i)/5-1)
   print(i+" "+j+" "+k+" "+modtime(i)+" "+modtime2(i))
   tind=ind(modtime.eq.modtime(i))
-  date_out(j)=monthday(0,doubletoint(modtime(i)))
+  date_out(j)=monthday(1,doubletoint(modtime(i)))
   time_out(j)=modtime(i)
   CO2_out(j,:,:)=dim_avg_Wrap(CO2(lev|:,lat|:,time|tind))
   H_out  (j,:,:)=dim_avg_Wrap(H  (lev|:,lat|:,time|tind))
@@ -61,7 +61,7 @@ do i = 37,72
   k=doubletoint(modtime2(i)/5-1)
   print(i+" "+j+" "+k+" "+modtime(i)+" "+modtime2(i))
   tind=ind(modtime.eq.modtime(i))
-  date_out(j)=monthday(0,doubletoint(modtime(i)))
+  date_out(j)=monthday(1,doubletoint(modtime(i)))
   time_out(j)=modtime(i)
   CO2_out(j,:,:)=dim_avg_Wrap(CO2(lev|:,lat|:,time|tind))
   H_out  (j,:,:)=dim_avg_Wrap(H  (lev|:,lat|:,time|tind))
@@ -76,7 +76,7 @@ j=doubletoint(modtime(i)/5-1)
 k=doubletoint(modtime2(i)/5-1)
 print(i+" "+j+" "+k+" "+modtime(i)+" "+modtime2(i))
 tind=ind(modtime.eq.modtime(i))
-date_out(j)=monthday(0,doubletoint(modtime(i)))
+date_out(j)=monthday(1,doubletoint(modtime(i)))
 time_out(j)=modtime(i)
 CO2_out(j,:,:)=dim_avg_Wrap(CO2(lev|:,lat|:,time|tind))
 H_out  (j,:,:)=dim_avg_Wrap(H  (lev|:,lat|:,time|tind))
@@ -93,7 +93,7 @@ O_out&time=time_out
 O3_out&time=time_out
 QRS_TOT_out&time=time_out
 
-c=addfile(rootdir+"ghg_forcing_2000_c121015.nc","c")
+c=addfile(rootdir+"ghg_forcing_2000_c121016.nc","c")
 
 nl = integertochar(10)  ; newline character
   
