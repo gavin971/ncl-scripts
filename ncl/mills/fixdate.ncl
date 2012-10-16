@@ -12,8 +12,8 @@ year1=stringtoint(getenv("year1"))
 print("year1="+(/year1/))
 year2=stringtoint(getenv("year2"))
 print("year2="+(/year2/))
-searchstr=getenv("searchstr")
-print("searchstr="+(/searchstr/))
+camstr=getenv("camstr")
+print("camstr="+(/camstr/))
 addstr=getenv("addstr")
 print("addstr="+(/addstr/))
 
@@ -33,7 +33,7 @@ do year = year1, year2
     end if
   end if
   
-  filename=wadir+"/"+runname+"."+searchstr+"."+yearstr+"."+addstr+".nc"
+  filename=wadir+"/"+runname+"."+camstr+"."+yearstr+"."+addstr+".nc"
   print(date+"  "+filename)
   a=addfile(filename,"w")
   a->date=(/date/)
