@@ -444,5 +444,6 @@ end
 
 ;saveSize("125tabaz22","125tabaz22.cam2",-1) 
 
-historyPath="/Volumes/Data/Models/cesm/case/f40.Nabro.2deg.wcm.sd.carma.sulf.009/hs/"
+;historyPath="/Volumes/Data/Models/cesm/case/f40.Nabro.2deg.wcm.sd.carma.sulf.009/hs/"
+historyPath="/glade/proj2/acd/waccm/mmills/runs/f40.Nabro.2deg.wcm.sd.carma.sulf.009b/hs/"
 saveSize(historyPath,"f40.Nabro.2deg.wcm.sd.carma.sulf.009.cam.hs.02.nc",-1,True)
