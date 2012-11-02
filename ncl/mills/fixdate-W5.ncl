@@ -6,9 +6,9 @@
 print("in fixdate-W5.ncl:")
 runname="b.e11.B1850W5CN.f19_g16.007"
 print("runname="+(/runname/))
-wadir="/glade/proj3/CESM/wawg/runs/b.e11.B1850W5CN.f19_g16.007/h0"
+wadir="/glade/proj3/CESM/wawg/runs/b.e11.B1850W5CN.f19_g16.007a/h0"
 print("wadir="+(/wadir/))
-year1=3
+year1=1
 print("year1="+(/year1/))
 year_end=21
 print("year_end="+(/year_end/))
@@ -22,7 +22,8 @@ do year = year1, year_end
       year2=100+year+1
     else
       month2=month+1
-      year2=100+year
+;      year2=100+year
+      year2=year
     end if
     
     date=year2*10000+month2*100+01
@@ -51,7 +52,8 @@ do year = year1, year_end
     print(date+"  "+filename)
     a=addfile(filename,"w")
     a->date=(/date/)
-    a->time=a->time+36500
+;    a->time=a->time+36500
+;    a->time=a->time-36500
     delete(a)
   end do
 end do
