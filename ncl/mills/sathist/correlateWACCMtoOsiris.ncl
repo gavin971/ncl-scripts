@@ -9,12 +9,21 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 undef("correlateWACCMtoOsiris")
-procedure correlateWACCMtoOsiris(k:integer)
+procedure correlateWACCMtoOsiris()
 
 begin
 
   print("")
-  print("k="+k+", reading data...")
+  k1=getenv("k")
+  
+  if ismissing(k1) then
+    k = 19
+    print("default k="+k+", reading data...")
+  else 
+;    print(typeof(k))
+    k=stringtointeger(k1)
+    print("k="+k+", reading data...")
+  end if
 
   ; Get the osiris and WACCM data
 ;  waccmRun="f40.Nabro.2deg.wcm.sd.carma.sulf.006"
@@ -110,7 +119,7 @@ begin
     return    
   end if
   
-  Week2Osiris=ind(date.ge.20110613.and.date.lt.20110620)
+  Week2Osiris=ind(date.ge.20110620.and.date.lt.20110627)
   nprofsWeek2Osiris=dimsizes(Week2Osiris)
   print("Week 2 Osiris:"+nprofsWeek2Osiris+" "+prof_num_osiris(Week2Osiris(0))+" "+prof_num_osiris(Week2Osiris(0)+nprofsWeek2Osiris-1))
   Week2Waccm=ind(prof_num_waccm.ge.prof_num_osiris(Week2Osiris(0)).and.prof_num_waccm.le.prof_num_osiris(Week2Osiris(0)+nprofsWeek2Osiris-1))
@@ -125,7 +134,7 @@ begin
     return    
   end if
   
-  Week3Osiris=ind(date.ge.20110620.and.date.lt.20110627)
+  Week3Osiris=ind(date.ge.20110627.and.date.lt.20110704)
   nprofsWeek3Osiris=dimsizes(Week3Osiris)
   print("week 3 Osiris:"+nprofsWeek3Osiris+" "+prof_num_osiris(Week3Osiris(0))+" "+prof_num_osiris(Week3Osiris(0)+nprofsWeek3Osiris-1))
   Week3Waccm=ind(prof_num_waccm.ge.prof_num_osiris(Week3Osiris(0)).and.prof_num_waccm.le.prof_num_osiris(Week3Osiris(0)+nprofsWeek3Osiris-1))
@@ -140,7 +149,7 @@ begin
     return    
   end if
   
-  Week4Osiris=ind(date.ge.20110627.and.date.lt.20110704)
+  Week4Osiris=ind(date.ge.20110704.and.date.lt.20110711)
   nprofsWeek4Osiris=dimsizes(Week4Osiris)
   print("week 4 Osiris:"+nprofsWeek4Osiris+" "+prof_num_osiris(Week4Osiris(0))+" "+prof_num_osiris(Week4Osiris(0)+nprofsWeek4Osiris-1))
   Week4Waccm=ind(prof_num_waccm.ge.prof_num_osiris(Week4Osiris(0)).and.prof_num_waccm.le.prof_num_osiris(Week4Osiris(0)+nprofsWeek4Osiris-1))
@@ -155,7 +164,7 @@ begin
     return    
   end if
   
-  PostWeek4Osiris=ind(date.ge.20110704.and.date.lt.20110711)
+  PostWeek4Osiris=ind(date.ge.20110711)
   nprofsPostWeek4Osiris=dimsizes(PostWeek4Osiris)
   print("post week 4 Osiris:"+nprofsPostWeek4Osiris+" "+prof_num_osiris(PostWeek4Osiris(0))+" "+prof_num_osiris(PostWeek4Osiris(0)+nprofsPostWeek4Osiris-1))
   PostWeek4Waccm=ind(prof_num_waccm.ge.prof_num_osiris(PostWeek4Osiris(0)).and.prof_num_waccm.le.prof_num_osiris(PostWeek4Osiris(0)+nprofsPostWeek4Osiris-1))
@@ -355,10 +364,12 @@ end
 
 ;correlateWACCMtoOsiris(16) ; 16.5 km
 ;correlateWACCMtoOsiris(17) ; 17.5 km
-correlateWACCMtoOsiris(18) ; 18.5 km
+;correlateWACCMtoOsiris(18) ; 18.5 km
 ;correlateWACCMtoOsiris(19) ; 19.5 km
 ;correlateWACCMtoOsiris(20) ; 20.5 km
 ;correlateWACCMtoOsiris(21) ; 21.5 km
 ;correlateWACCMtoOsiris(22) ; 22.5 km
 ;correlateWACCMtoOsiris(23) ; 23.5 km
 ;correlateWACCMtoOsiris(24) ; 24.5 km
+
+correlateWACCMtoOsiris()
