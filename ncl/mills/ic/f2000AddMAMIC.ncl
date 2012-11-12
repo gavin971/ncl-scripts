@@ -12,7 +12,7 @@ icpath="/Volumes/MillsPassport/cesm/ic/"
 icpath2=icpath
 srcIcPath  = icpath+"f2000.waccm-mam3_1.9x2.5_L70.cam2.i.0017-01-01.c120410.nc"
 srcIcPath2 = icpath2+"trop_strat_mam3_chem_2000-01-01_1.9x2.5_L30_c120222.nc"
-icPath     = icpath+"f2000.waccm-mam3_1.9x2.5_L70.cam2.i.0017-01-01.c120420.nc"
+icPath     = icpath+"f2000.waccm-mam3_1.9x2.5_L70_SOA.cam2.i.0017-01-01.c120420.nc"
 
 ; Copy the initial conditions file.
 print("  Creating " + icPath)
@@ -29,7 +29,7 @@ nlevCAM  = dimsizes(levCAM)
 nlevWACCM  = dimsizes(levWACCM)
 print( "nlev CAM=" + nlevCAM + ", nlev WACCM=" + nlevWACCM )
   
-fields = (/ "H2SO4", "SO2", "DMS", "SOAG", "so4_a1", "pom_a1", "soa_a1", "bc_a1", \
+fields = (/ "H2SO4", "SO2", "DMS", "SOAG", "SOA", "so4_a1", "pom_a1", "soa_a1", "bc_a1", \
  "dst_a1", "ncl_a1", "num_a1", "so4_a2", "soa_a2", "ncl_a2", "num_a2", "dst_a3", \
  "ncl_a3", "so4_a3", "num_a3" /)
 
