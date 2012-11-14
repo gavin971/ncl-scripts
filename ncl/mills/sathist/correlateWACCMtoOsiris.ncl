@@ -29,10 +29,7 @@ begin
 ;  waccmRun="f40.Nabro.2deg.wcm.sd.carma.sulf.006"
   waccmRun=getenv("caseid")
   print("waccmRun="+waccmRun)
-  
-  waccmRun=getenv("caseid")
-  print("waccmRun="+waccmRun)
-  
+    
 ;  pathList=(/"/Volumes/MillsPassport/cesm/case/",\
 ;             "/Volumes/Data/Models/cesm/case/"/)
 
@@ -78,6 +75,7 @@ begin
   print(" ")
   
   lev = osiris->lev
+  print("Altitude:"+sprintf("%04.1f",lev(k)/1000.)+" km")
   date = osiris->date
   date_waccm = waccm->date
   prof_num_osiris=osiris->prof_num
