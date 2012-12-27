@@ -13,6 +13,10 @@ if  [ -n "$caseid" ] ; then
 
   export machine=`hostname`
 
+  if [[ $machine =~ 'mirage' ]];then
+    rootpath='/CESM/wawg/runs'
+  fi
+
   if [[ $machine = 'modeling1' ]];then
     rootpath='/data4/mmills'
   fi
@@ -26,12 +30,20 @@ if  [ -n "$caseid" ] ; then
     rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
   fi
 
+  if [ ! -n "$runname" ] ; then
+    runname=''
+  fi
+
   if [ ! -n "$hnum" ] ; then
     hnum='h0'
   fi
 
-  zmdir=$rootpath'/'$caseid'/'$hnum'zm'
-  gmdir=$rootpath'/'$caseid'/'$hnum'gm'
+  if [ ! -n "$htype" ] ; then
+    htype=''
+  fi
+
+  zmdir=$rootpath'/'$caseid'/'$runname'/'$hnum'zm'$htype
+  gmdir=$rootpath'/'$caseid'/'$runname'/'$hnum'gm'$htype
 
   if [[ $machine = 'lou' ]];then
     rootpath=$HOME'/csm'
@@ -41,11 +53,11 @@ if  [ -n "$caseid" ] ; then
 
   mkdir -p $gmdir
 
-  avgfile=$gmdir'/'$caseid'.cam2.'$hnum'.globavg.nc'
+  avgfile=$gmdir'/'$caseid'.cam.'$hnum'.globavg.nc'
   tmpfile=$gmdir'/zmtmp.nc'
 
   echo $avgfile
-  ncfiles=$zmdir'/'$caseid'.cam2.'$hnum'zm.*.nc'
+  ncfiles=$zmdir'/'$caseid'.cam'*'.'$hnum'zm.*.nc'
   echo "ncrcat -O $ncfiles $tmpfile"
   ncrcat -O $ncfiles $tmpfile
     

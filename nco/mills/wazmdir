@@ -2,6 +2,7 @@
 # Script creates zonal means from history files, skipping those previously created
 # Define environment variables, i.e.:
 #   setenv caseid b40.rcp4_5.2deg.wcm.carma.bc5tgIP.007
+#   setenv runname run3
 #   setenv hnum h0
 #   setenv hnum h3iso
 #   setenv htype '.annual'
@@ -30,6 +31,10 @@ if  [ -n "$caseid" ] ; then
     rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
   fi
 
+  if [ ! -n "$runname" ] ; then
+    runname=''
+  fi
+
   if [ ! -n "$hnum" ] ; then
     hnum='h0'
   fi
@@ -38,8 +43,8 @@ if  [ -n "$caseid" ] ; then
     htype=''
   fi
 
-  wadir=$rootpath'/'$caseid'/'$hnum$htype
-  outdir=$rootpath'/'$caseid'/'$hnum'zm'$htype
+  wadir=$rootpath'/'$caseid'/'$runname'/'$hnum$htype
+  outdir=$rootpath'/'$caseid'/'$runname'/'$hnum'zm'$htype
   
   if [[ $machine = 'lou' ]];then
     rootpath=$HOME'/csm'
