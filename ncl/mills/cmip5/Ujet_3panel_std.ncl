@@ -23,7 +23,8 @@ season="DJF"
 ;case2=case1
 ;dir1="h0zm.seasavg.1960-1979"
 ;dir2="h0zm.seasavg.1986-2005"
-rootdir = "/Volumes/MillsPassport/cesm/case/"
+;rootdir = "/Volumes/MillsPassport/cesm/case/"
+rootdir = "/Volumes/Data/Models/cesm/case/"
 cases_wcm="b40.1955-2005.2deg.wcm.00[234]"
 infiles_wcm60 = systemfunc("ls "+rootdir+cases_wcm+"/proc/*.cam2.h0zm.U."+season+".1960-1979.nc")
 history_wcm60 = addfiles(infiles_wcm60, "r")
@@ -64,7 +65,7 @@ Udiff_wcm=Udiff_wcm-Uavg_wcm60
 ;=========
 ; Late 20thC CAM4 1-deg shift
 ;rootdir="/data/ccsm4"
-rootdir = "/Volumes/MillsPassport/cesm/case/"
+;rootdir = "/Volumes/MillsPassport/cesm/case/"
 cases_c1d="b40.20th.track1.1deg.00[5-9]"
 infiles_c1d60 = systemfunc("ls "+rootdir+cases_c1d+"/proc/*.cam2.h0zm.U."+season+".1960-1979.nc")
 history_c1d60 = addfiles(infiles_c1d60, "r")
@@ -103,7 +104,7 @@ Udiff_c1d=Udiff_c1d-Uavg_c1d60
 
 ;=========
 ; Late 20thC wset shift
-rootdir = "/Volumes/MillsPassport/cesm/case/"
+;rootdir = "/Volumes/MillsPassport/cesm/case/"
 cases_wset="b40.1955-2005.2deg.wset.00[456]"
 infiles_wset60 = systemfunc("ls "+rootdir+cases_wset+"/proc/*.cam2.h0zm.U."+season+".1960-1979.nc")
 history_wset60 = addfiles(infiles_wset60, "r")
@@ -216,6 +217,7 @@ Udiff_wset=Udiff_wset-Uavg_wset60
   opt = True
   opt@gsnShadeFillType = "pattern"      ; color is the default
   opt@gsnShadeLow = 17                 ; Fill pattern 17 is stippled  
+  ; see http://www.ncl.ucar.edu/Document/Graphics/Images/fillpatterns.png
   plot2(0) = gsn_contour_shade (plot2(0), 95., 105., opt)
   plot2(1) = gsn_contour_shade (plot2(1), 95., 105., opt)
   plot2(2) = gsn_contour_shade (plot2(2), 95., 105., opt)
