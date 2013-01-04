@@ -66,7 +66,8 @@ idims=dimsizes(iextent_table1850)
 ;print(iextent_table1850(0,:))
 
 year1850=iextent_table1850(:,0)
-indrange1850=ind((year1850.ge.296-27*3).and.(year1850.lt.296))
+;indrange1850=ind((year1850.ge.296-27*3).and.(year1850.lt.296))
+indrange1850=ind((year1850.ge.96).and.(year1850.lt.296))
 time1850=year1850(indrange1850)
 nmonths=dimsizes(time1850)
 ;print("time1850(0::12): ")
@@ -92,6 +93,9 @@ time1850avg=dim_avg_Wrap(time1850mn(month|:,year|:))
 
 print("time1850avg  iextentSH1850avg  iextentSH1850std:")
 print(time1850avg+"  "+iextentSH1850avg+"  "+iextentSH1850std)
+print(" ")
+print("Annual mean for WACCM4 PI SH ice extent (millions of sq km) ="+dim_avg(iextentSH1850avg)/1e12) ; (m2 -> 1e6 km2)
+print(" ")
 
 ; CCSM4 1979-2005 ice extent
 basepath="/data/ccsm4/"
@@ -165,6 +169,9 @@ iextentSH20Cstd=iextentSH20Cstd/1e12 ; (m2 -> 1e6 km2)
 ccsm4_1850_mean= (/17.5771, 12.3631, 11.7589, 15.8442, 19.4190, 22.0232, 23.9711, 25.1854, 25.5522, 25.0638, 23.7774, 21.4125/)
 ccsm4_1850_std = (/1.06718, 0.997159, 0.881124, 0.662999, 0.604378, 0.567596, 0.558846, 0.554561, 0.557567, 0.555505, 0.560376, 0.649233/)
 
+print("Annual mean for CCSM4 PI ice extent (millions of sq km) ="+dim_avg(ccsm4_1850_mean))
+return
+
 ; ice-ocean hindcast run (millions of sq km):
 hindcast_mean=(/6.79222, 2.05835, 1.88318, 6.04499, 10.8974, 14.0386, 16.4871, 18.1812, 18.9177, 18.6684, 17.0007, 12.9849/)
 
@@ -206,6 +213,23 @@ mnmx(4,:)=(/ccsm4_1850_mean+ccsm4_1850_std/)
 mnmx(5,:)=(/ccsm4_1850_mean-ccsm4_1850_std/)
 mnmx(6,:)=(/ccsm4_20C_mean(1,:)+ccsm4_20C_std(1,:)/)
 mnmx(7,:)=(/ccsm4_20C_mean(1,:)-ccsm4_20C_std(1,:)/)
+
+;outfile="$IMG_PATH/ice_extent_seasonal_"+year_bounds(1,0)+"-"+year_bounds(1,1)+".txt"
+;write_table(outfile,"w",iextentSH1850avg,"WACCM 1850,%7.3")
+;write_table(outfile,"a",iextentSH20Cavg, "WACCM 20th,%7.3")
+opt = False
+;opt@fout  = outfile
+;opt@title  = "WACCM 1850"
+print("-------")
+write_matrix(data, "12f7.3",opt)
+print("-------")
+;opt@title  = "WACCM 20th"
+write_matrix(data2,"12f7.3",opt)
+print("-------")
+write_matrix(mnmx,"12f7.3",opt)
+print("-------")
+
+;exit
 
 time = ispan(0,11,1)
 imagefile="$IMG_PATH/ice_extent_seasonal_"+year_bounds(1,0)+"-"+year_bounds(1,1)
@@ -276,8 +300,8 @@ imagefile="$IMG_PATH/ice_extent_seasonal_"+year_bounds(1,0)+"-"+year_bounds(1,1)
   
   delete(wks)
   
-  muttcmd="mutt mikejmills@mac.com -a "+imagefile+".eps -s "+imagefile+" < /dev/null"
-  print(muttcmd)
-  mutter=systemfunc(muttcmd)
-  print(mutter)
-  print("gv "+imagefile+".eps")
+  ;muttcmd="mutt mikejmills@mac.com -a "+imagefile+".eps -s "+imagefile+" < /dev/null"
+  ;print(muttcmd)
+  ;mutter=systemfunc(muttcmd)
+  ;print(mutter)
+  ;print("gv "+imagefile+".eps")
