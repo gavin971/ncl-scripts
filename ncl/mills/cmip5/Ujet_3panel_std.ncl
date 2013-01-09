@@ -141,7 +141,23 @@ alpha_wset = (/100.*(1. - prob_wset)/) ; A significance of 0.05 returned by ttes
 Udiff_wset=Uavg_wset86 ; get metadata
 Udiff_wset=Udiff_wset-Uavg_wset60
 
+;outfile=addfile("Ujet_3panel_std_wcm.nc","c")
+;outfile->Udiff=Udiff_wcm
+;outfile->alpha=alpha_wcm
+;outfile->Uavg=Uavg_wcm60
+;delete(outfile)
 
+;outfile=addfile("Ujet_3panel_std_c1d.nc","c")
+;outfile->Udiff=Udiff_c1d
+;outfile->alpha=alpha_c1d
+;outfile->Uavg=Uavg_c1d60
+;delete(outfile)
+
+;outfile=addfile("Ujet_3panel_std_wset.nc","c")
+;outfile->Udiff=Udiff_wset
+;outfile->alpha=alpha_wset
+;outfile->Uavg=Uavg_wset60
+;delete(outfile)
 
   res = True
   res@gsnDraw               = False
