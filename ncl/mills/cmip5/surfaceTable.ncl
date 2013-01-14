@@ -1,4 +1,4 @@
-
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 undef("surfaceTable")
 procedure surfaceTable(caseid:string,climopath:string)
@@ -12,6 +12,7 @@ begin
   
   a=addfile(climopath+"/"+caseid+"_ANN_climo.nc","r")
   gw=a->gw
+  lat=a->lat
   landfrac=a->LANDFRAC
   ocnfrac=a->OCNFRAC
   icefrac=a->ICEFRAC
@@ -19,7 +20,7 @@ begin
   PSL=a->PSL
   PRECT=a->PRECC ; get metadata
   PRECT=PRECT+a->PRECL
-  
+    
   dsize=dimsizes(TS)
   nlat=dsize(1)
   nlon=dsize(2)
@@ -44,7 +45,10 @@ begin
   TSocnfrac=TSocnfrac*ocnmask  
   TSicefrac=TSicefrac*icemask 
   
-  latbounds=(/(/-90,90/),(/20,90/),(/-20,20/),(/-90,-20/)/)
+  TS_zm=dim_avg_Wrap(TS(0,:,:))
+  
+  lb=21
+  latbounds=(/(/-90,90/),(/lb,90/),(/-lb,lb/),(/-90,-lb/)/)
   
   do i = 0,3
     print(" Latitude bounds: "+latbounds(i,0)+" to "+latbounds(i,1))
@@ -78,6 +82,11 @@ begin
     print("   PRECT  ="+PRECT_AVE)
     print("   TS_OCN ="+TS_OCN +", ocnfracave ="+ocnfracave)
     print("   TS_ICE ="+TS_ICE +", icefracave ="+icefracave)
+    
+    TS_AVE_zm=dim_avg_wgt_Wrap(TS_zm({latbounds(i,0):latbounds(i,1)}),gw({latbounds(i,0):latbounds(i,1)}),0)
+    print("   TS_AVE_zm ="+TS_AVE_zm)
+    print("   sum(gw)="+dim_sum(gw({latbounds(i,0):latbounds(i,1)})))
+;    print(lat({latbounds(i,0):latbounds(i,1)})+" "+TS_zm({latbounds(i,0):latbounds(i,1)})+" "+gw({latbounds(i,0):latbounds(i,1)}))
     
     delete(wgtbounds)
   end do
