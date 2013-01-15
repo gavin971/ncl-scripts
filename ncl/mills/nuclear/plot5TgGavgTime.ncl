@@ -356,7 +356,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   if (ensemble) then
     pdffile="TSvsRobock."+test1+"."+test2+"."+test3
   else         
-    pdffile="TSvsRobock."+test1
+    pdffile="TSvsRobock."+test1+"."+cntl1
   end if      
   wks   = gsn_open_wks ("pdf","$IMAGE_PATH/"+pdffile) ; open workstation
 

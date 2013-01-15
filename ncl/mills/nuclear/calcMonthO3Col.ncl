@@ -206,13 +206,20 @@ local historyPattern1,historyNames1,history1,historyPattern2,historyNames2, \
   history2,T,Tmean,pi,pm,press,temp,tmean,saveFile1,saveFile2
 
 begin
+  datestr=getenv("date")
+  
   pattern=subDir
   historyPath2=historyPath+historyRun+"/"
   analysisPath=historyPath2+"proc/"
   print("mkdir -p "+analysisPath)
   a = systemfunc("mkdir -p "+analysisPath)
   
-  historyPattern=historyPath2+subDir+"/*.cam2."+pattern+"*.nc"
+  if (ismissing(datestr)) then
+    historyPattern=historyPath2+subDir+"/*.cam2."+pattern+"*.nc"
+  else
+    historyPattern=historyPath2+subDir+"/*.cam2."+pattern+"."+datestr+"*.nc"  
+  end if
+  print("historyPattern: "+historyPattern)
   
   historyNames = systemfunc("ls " + historyPattern)
   print(historyNames)
@@ -232,7 +239,11 @@ begin
   print("reading ODV_SOOT01...")
   ODV_SOOT01=addfiles_GetVar(history, historyNames, "ODV_SOOT01")
   
-  newfile=analysisPath+historyRun+".O3Col."+pattern+".nc"
+  if (ismissing(datestr)) then
+    newfile=analysisPath+historyRun+".O3Col."+pattern+".nc"
+  else
+    newfile=analysisPath+historyRun+".O3Col."+pattern+"."+datestr+".nc"
+  end if
   exists = isfilepresent(newfile)
   if (exists) then
     print("Deleting existing file: "+newfile)
@@ -252,24 +263,30 @@ begin
 
 end
 
+historyRun=getenv("caseid")
 
-;historyPath="/Volumes/Data/Models/waccm/run/carma-soot/"
-;historyRun="Soot5Tg"
-;subDir="h0"
+if (ismissing(historyRun)) then
+  print("set environment variable caseid before running")
+else
 
-;saveMeanFiles(historyRun,historyPath,subDir)
+  host=systemfunc("hostname")
 
-;historyRun="PassiveSoot"
+  ;historyPath="/Volumes/Data/Models/waccm/run/carma-soot/"
 
-;historyPath="$MODEL_PATH/ccsm/run/"
-historyPath="/data4/mmills/"
-;historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIndPak.001"
-;historyRun="b40.rcp4_5.2deg.wcm.001"
-;historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
-historyRun="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
-;historyRun="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg"
-;subDir="h0"
-subDir="h0zm"
+  historyPath=getenv("hpath")
+  if (ismissing(historyPath)) then
+    historyPath="$MODEL_PATH/ccsm/run/"  
+    if (host.eq."modeling1") then
+      historyPath="/data4/mmills/"
+    end if
+  end if
 
-saveMeanFiles(historyRun,historyPath,subDir)
+  subDir=getenv("htype") ; i.e. h0, h0zm
+  
+  if (ismissing(subDir)) then
+    subDir="h0"
+  end if
+  
+  saveMeanFiles(historyRun,historyPath,subDir)
 
+end if
