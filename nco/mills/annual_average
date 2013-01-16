@@ -18,45 +18,58 @@ if  [ -n "$caseid" ] ; then
     subdir=''
   fi
 
-  if [[ $machine =~ 'mirage' ]];then
-    rootpath='/CESM/wawg/runs'
+  if [ ! -n "$rootpath" ] ; then
+  
+    if [[ $machine =~ 'mirage' ]];then
+      rootpath='/CESM/wawg/runs'
+    fi
+
+    if [[ $machine = 'modeling1' ]];then
+      rootpath='/data4/mmills'
+    fi
+
+    if [[ $machine = 'cmip5' ]];then
+      rootpath='/data/waccm'
+    fi
+
+    if [[ $OSTYPE = 'darwin' ]];then
+      rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+    fi
+  
   fi
 
-  if [[ $machine = 'modeling1' ]];then
-    rootpath='/data4/mmills'
-  fi
-
-  if [[ $machine = 'cmip5' ]];then
-    rootpath='/data/waccm'
-  fi
-
-  if [[ $OSTYPE = 'darwin' ]];then
-    rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+  if [ ! -n "$avgname" ] ; then
+    avgname=$runname
   fi
   
-  wadir=$rootpath'/'$runname'/'$subdir'/'$hnum'.'$addstr
+  # in_dir can be a set of paths, if wildcards are used in $runname
+  
+  in_dir=$rootpath'/'$runname'/'$subdir'/'$hnum'.'$addstr
+  outdir=$rootpath'/'$avgname'/'$subdir'/'$hnum'.'$addstr
+  
+  mkdir -p $outdir
 
   # calculate mean
 
-  echo ncrcat -O $wadir'/'$runname'.cam.'$hnum'.'*'.'$addstr'.nc' $wadir'/'annual_tmp.nc
-  ncrcat -O $wadir'/'$runname'.cam.'$hnum'.'*'.'$addstr'.nc' $wadir'/'annual_tmp.nc 
-  avgfile=$wadir'/'$runname'.cam.'$hnum'.'$addstr'.nc'
+  echo ncrcat -O $in_dir'/'$runname'.cam.'$hnum'.'*'.'$addstr'.nc' $outdir'/'annual_tmp.nc
+  ncrcat -O $in_dir'/'$runname'.cam.'$hnum'.'*'.'$addstr'.nc' $outdir'/'annual_tmp.nc 
+  avgfile=$outdir'/'$runname'.cam.'$hnum'.'$addstr'.nc'
 
-  echo ncwa -O -a time $wadir'/'annual_tmp.nc $avgfile
-  ncwa -O -a time $wadir'/'annual_tmp.nc $avgfile
+  echo ncwa -O -a time $outdir'/'annual_tmp.nc $avgfile
+  ncwa -O -a time $outdir'/'annual_tmp.nc $avgfile
   #echo created $avgfile
 
   # calculate standard deviation 
 
-  ncbo -O --op_typ=sub $wadir'/'annual_tmp.nc $avgfile $wadir'/'tmp.nc
+  ncbo -O --op_typ=sub $outdir'/'annual_tmp.nc $avgfile $outdir'/'tmp.nc
 
-  sdfile=$wadir'/'$runname'.cam.'$hnum'.'$addstr'_sd.nc'
-  echo ncra -O -y rmssdn $wadir'/'tmp.nc $sdfile
-  ncra -O -y rmssdn $wadir'/'tmp.nc $sdfile 
+  sdfile=$outdir'/'$runname'.cam.'$hnum'.'$addstr'_sd.nc'
+  echo ncra -O -y rmssdn $outdir'/'tmp.nc $sdfile
+  ncra -O -y rmssdn $outdir'/'tmp.nc $sdfile 
   #echo created $sdfile
 
-  rm -f $wadir'/'tmp.nc
-  rm -f $wadir'/'annual_tmp.nc
+  rm -f $outdir'/'tmp.nc
+  rm -f $outdir'/'annual_tmp.nc
   
 else
   echo "environment variable caseid is not set"

@@ -16,23 +16,29 @@ if  [ -n "$caseid" ] ; then
   if [ ! -n "$subdir" ] ; then
     subdir=''
   fi
+  
+  if [ ! -n "$rootpath" ] ; then
 
-  if [[ $machine =~ 'mirage' ]];then
-    rootpath='/CESM/wawg/runs'
+    if [[ $machine =~ 'mirage' ]];then
+      rootpath='/CESM/wawg/runs'
+    fi
+
+    if [[ $machine = 'modeling1' ]];then
+      rootpath='/data4/mmills'
+    fi
+
+    if [[ $machine = 'cmip5' ]];then
+      rootpath='/data/waccm'
+    fi
+
+    if [[ $OSTYPE = 'darwin' ]];then
+      rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+    fi
+
   fi
-
-  if [[ $machine = 'modeling1' ]];then
-    rootpath='/data4/mmills'
-  fi
-
-  if [[ $machine = 'cmip5' ]];then
-    rootpath='/data/waccm'
-  fi
-
-  if [[ $OSTYPE = 'darwin' ]];then
-    rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-  fi
-
+  
+  echo 'rootpath:'$rootpath
+  
   wadir=$rootpath'/'$caseid'/'$subdir'/'$hnum$htype
   #wadir=$rootpath'/'$caseid'/atm/hist'
   anndir=$rootpath'/'$caseid'/'$subdir'/'$hnum$htype'.annual'
@@ -75,7 +81,8 @@ if  [ -n "$caseid" ] ; then
 
     # create annual mean
     echo averaging $ncfiles
-    ncea $ncfiles $avgfile
+#    ncea -v $ncfiles $avgfile
+    ncea -v lat,lon,gw,TS,LANDFRAC,OCNFRAC,ICEFRAC,PSL,PRECC,PRECL $ncfiles $avgfile
     echo created $avgfile
 
     (( year+=1 ))
