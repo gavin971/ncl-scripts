@@ -10,13 +10,15 @@ begin
 
   threshold=0.9 ; fractional threshold for land, ice, and ocean masks
 
-  historyNames = systemfunc("ls " + path +"|grep -v h0.annual|grep "+caseid)
+  npaths=dimsizes(path)
+  
+  historyNames = systemfunc("find " + path + " -name *.nc")
   print((/historyNames/))
   nfiles=dimsizes(historyNames)
 
   lb=21
   latbounds=(/(/-90,90/),(/lb,90/),(/-lb,lb/),(/-90,-lb/)/)
-  a=addfile(path+"/"+historyNames(0),"r")
+  a=addfile(historyNames(0),"r")
   gw=a->gw
   lat=a->lat
   TS=a->TS
@@ -40,7 +42,7 @@ begin
     
     delete(a)
     print((/historyNames(ifile)/))
-    a=addfile(path+"/"+historyNames(ifile),"r")
+    a=addfile(historyNames(ifile),"r")
 
     landfrac=a->LANDFRAC
     ocnfrac=a->OCNFRAC
@@ -111,6 +113,7 @@ end
 ;surfAveStd("b40.1850.track1.1deg.006","/data/ccsm4/b40.1850.track1.1deg.006/climo/0800-0999")
 ;surfAveStd("b40.1850.2deg.wset.002","/data/ccsm4/b40.1850.2deg.wset.002/climo/0020-0104")
 
-surfAveStd("b40.1955-2005.2deg.wcm.00","/data/waccm/b40.1955-2005.2deg.wcm.00[234]/h0.annual")
-
-
+;surfAveStd("b40.1955-2005.2deg.wcm.00","/data/waccm/b40.1955-2005.2deg.wcm.00[234]/h0.annual")
+;surfAveStd("b40.1850.track1.1deg.006","/data/ccsm4/b40.1850.track1.1deg.006/h0.annual")
+;surfAveStd("b40.1850.2deg.wset.002","/data/ccsm4/b40.1850.2deg.wset.002/h0.annual")
+surfAveStd("b40.1955-2005.2deg.wset.avg456","/data/ccsm4/b40.1955-2005.2deg.wset.00[456]/h0.annual")
