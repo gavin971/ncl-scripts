@@ -116,4 +116,5 @@ end
 ;surfAveStd("b40.1955-2005.2deg.wcm.00","/data/waccm/b40.1955-2005.2deg.wcm.00[234]/h0.annual")
 ;surfAveStd("b40.1850.track1.1deg.006","/data/ccsm4/b40.1850.track1.1deg.006/h0.annual")
 ;surfAveStd("b40.1850.2deg.wset.002","/data/ccsm4/b40.1850.2deg.wset.002/h0.annual")
-surfAveStd("b40.1955-2005.2deg.wset.avg456","/data/ccsm4/b40.1955-2005.2deg.wset.00[456]/h0.annual")
+;surfAveStd("b40.1955-2005.2deg.wset.avg456","/data/ccsm4/b40.1955-2005.2deg.wset.00[456]/h0.annual")
+surfAveStd("b40.20th.track1.1deg.avg567","/data/ccsm4/b40.20th.track1.1deg.00[567]/h0.annual")
