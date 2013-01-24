@@ -458,6 +458,13 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   gsn_text_ndc(wks,"Robock et al., 2007",0.51,0.95,txres)
   frame(wks)
   
+  res@tiYAxisString = "Precipitation Anomaly (%)"
+  delete(res@trYMaxF)
+  delete(res@trYMinF)
+  print("plot = gsn_csm_xy (wks,time,PRECT_diff_pct1,res)")
+  plot = gsn_csm_xy (wks,time,PRECT_diff_pct1,res) ; draw plot
+  frame(wks)
+  
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "portrait"
   res@vpWidthF            = 1.2           ; change aspect ratio of plot
@@ -497,8 +504,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@xyLineThicknessF = 8.0
   res@xyLineColor       = "black"          ; change line color
   plot = gsn_csm_xy (wks,time,FSNS_diff1,res) ; draw plot
-  res@xyLineColor       = "blue"          ; change line color
-  plot = gsn_csm_xy (wks,time,FSNSC_diff1,res) ; draw plot
+;  res@xyLineColor       = "blue"          ; change line color
+;  plot = gsn_csm_xy (wks,time,FSNSC_diff1,res) ; draw plot
 ;  drawNDCGrid(wks)
 ;  ypos=0.9
 ;  gsn_legend_ndc(wks,3,(/"Robock et al., 2007","WACCM4 all-sky","WACCM4 clear-sky"/),xpos,ypos,lgres)
@@ -506,8 +513,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   gsn_text_ndc(wks,"WACCM4 all-sky",0.5,0.87,txres)
   txres@txFontColor="red"
   gsn_text_ndc(wks,"Robock et al., 2007",0.5,0.95,txres)
-  txres@txFontColor="blue"
-  gsn_text_ndc(wks,"WACCM4 clear-sky",0.5,0.79,txres)
+;  txres@txFontColor="blue"
+;  gsn_text_ndc(wks,"WACCM4 clear-sky",0.5,0.79,txres)
   frame(wks)
   
   res@gsnMaximize         = True          ; expand plot size to maximum
