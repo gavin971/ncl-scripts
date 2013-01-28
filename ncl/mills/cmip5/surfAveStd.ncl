@@ -1,7 +1,7 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 undef("surfAveStd")
-procedure surfAveStd(caseid:string,path:string)
+procedure surfAveStd(caseid:string,root:string,path:string)
 
 begin
 
@@ -12,7 +12,7 @@ begin
 
   npaths=dimsizes(path)
   
-  historyNames = systemfunc("find " + path + " -name *.nc")
+  historyNames = systemfunc("find " + root + path + " -name *.nc")
   print((/historyNames/))
   nfiles=dimsizes(historyNames)
 
@@ -91,30 +91,60 @@ begin
 
     end do
   end do
-    
+  
+  delete(a)
+  
   PRECT_AVE=PRECT_AVE*1e3*60*60*24.
   SST=TS_OCN-273.15
   print(" ")
   print((/caseid/))
 
+  surfvars=new((/4,5,2/), typeof(TS_AVE))
+;  TSgstd=TSgave
+;  TSlave=TSgave
+;  TSlstd=TSgave
+;  SSTave=TSgave
+;  SSTstd=TSgave
+;  PSLave=TSgave
+;  PSLstd=TSgave
+;  PRECTave=TSgave
+;  PRECTstd=TSgave
+  
   do i = 0,3
     print(" ")
     print(" Latitude bounds: "+latbounds(i,0)+" to "+latbounds(i,1))
+    surfvars(i,0,0)=avg(TS_AVE(:,i))
+    surfvars(i,0,1)=stddev(TS_AVE(:,i))
+    surfvars(i,1,0)=avg(TS_LAND(:,i))
+    surfvars(i,1,1)=stddev(TS_LAND(:,i))
+    surfvars(i,2,0)=avg(SST(:,i))
+    surfvars(i,2,1)=stddev(SST(:,i))
+    surfvars(i,3,0)=avg(PSL_AVE(:,i))
+    surfvars(i,3,1)=stddev(PSL_AVE(:,i))
+    surfvars(i,4,0)=avg(PRECT_AVE(:,i))
+    surfvars(i,4,1)=stddev(PRECT_AVE(:,i))
+    
     print("  TS_AVE: "+avg(TS_AVE(:,i))+", stddev="+stddev(TS_AVE(:,i)))
     print("  TS_LAND: "+avg(TS_LAND(:,i))+", stddev="+stddev(TS_LAND(:,i)))
     print("  SST: "+avg(SST(:,i))+", stddev="+stddev(SST(:,i)))
     print("  PSL_AVE: "+avg(PSL_AVE(:,i))+", stddev="+stddev(PSL_AVE(:,i)))
     print("  PRECT_AVE: "+avg(PRECT_AVE(:,i))+", stddev="+stddev(PRECT_AVE(:,i)))
   end do
-    
+  
+  c = systemfunc("mkdir -p "+root+caseid+"/proc")
+  delete(c)
+  
+  b=addfile(root+caseid+"/proc/"+caseid+".surfvars.nc","c")
+  b->latbounds=latbounds
+  b->surfvars=surfvars
+  delete(b)    
 end
 
-;surfAveStd("b40.1850.track1.2deg.wcm.007","/data/waccm/b40.1850.track1.2deg.wcm.007/h0.annual")
-;surfAveStd("b40.1850.track1.1deg.006","/data/ccsm4/b40.1850.track1.1deg.006/climo/0800-0999")
-;surfAveStd("b40.1850.2deg.wset.002","/data/ccsm4/b40.1850.2deg.wset.002/climo/0020-0104")
+;surfAveStd("b40.1850.track1.2deg.wcm.007","/data/waccm/","b40.1850.track1.2deg.wcm.007/h0.annual")
 
-;surfAveStd("b40.1955-2005.2deg.wcm.00","/data/waccm/b40.1955-2005.2deg.wcm.00[234]/h0.annual")
-;surfAveStd("b40.1850.track1.1deg.006","/data/ccsm4/b40.1850.track1.1deg.006/h0.annual")
-;surfAveStd("b40.1850.2deg.wset.002","/data/ccsm4/b40.1850.2deg.wset.002/h0.annual")
-;surfAveStd("b40.1955-2005.2deg.wset.avg456","/data/ccsm4/b40.1955-2005.2deg.wset.00[456]/h0.annual")
-surfAveStd("b40.20th.track1.1deg.avg567","/data/ccsm4/b40.20th.track1.1deg.00[567]/h0.annual")
+;surfAveStd("b40.1955-2005.2deg.wcm.avg","/data/waccm/","b40.1955-2005.2deg.wcm.00[234]/h0.annual")
+;surfAveStd("b40.1850.track1.1deg.006","/data/ccsm4/","b40.1850.track1.1deg.006/h0.annual")
+;surfAveStd("b40.1850.2deg.wset.002","/data/ccsm4/","b40.1850.2deg.wset.002/h0.annual")
+surfAveStd("b40.1955-2005.2deg.wset.avg456","/data/ccsm4/","b40.1955-2005.2deg.wset.00[456]/h0.annual")
+
+;surfAveStd("b40.20th.track1.1deg.avg567","/data/ccsm4/","b40.20th.track1.1deg.00[567]/h0.annual")
