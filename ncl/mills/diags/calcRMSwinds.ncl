@@ -1,31 +1,38 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
-;caseid="b.e11.B1850W5CN.f19_g16.test_lim.001"
-;filter=".h1.001"
+caseid = getenv("caseid") ; e.g. b.e11.B1850W5CN.f19_g16.test_lim.001
 
-rootdir="/glade/p/cesm/wawg/waccm/"
-run_name = getenv("caseid")
+if (ismissing(caseid)) then
 
-if (ismissing(run_name)) then
   print("set environment variable caseid before running")
+  
 else
-  filter = getenv("filter")
+  
+  rootdir = getenv("rootdir")
+  if (ismissing(filter)) then
+    rootdir="/glade/p/cesm/wawg/waccm/"
+    print("environment variable rootdir not found, defaulting to "+filter)
+  end if
+
+  filter = getenv("filter") ; e.g. ".h1.001[5-9]"
   if (ismissing(filter)) then
     filter=".h1."
     print("environment variable filter not found, defaulting to "+filter)
   end if
-  outfilter = getenv("outfilter")
+  
+  outfilter = getenv("outfilter") ; e.g. "h1.0015-0019"
   if (ismissing(outfilter)) then
     outfilter = ""
+    print("environment variable outfilter not found")
   end if
   
-  outfilepath=rootdir+run_name+"/atm/proc/"
+  outfilepath=rootdir+caseid+"/atm/proc/"
   a=systemfunc("mkdir -p "+outfilepath)
-  outfilename=outfilepath+run_name+"."+outfilter+".Urms.nc"
+  outfilename=outfilepath+caseid+"."+outfilter+".Urms.nc"
   print("creating output file: "+outfilename)
   outfile=addfile(outfilename,"c")
 
-  fils = systemfunc("ls "+rootdir+run_name+"/atm/hist/*"+filter+"*.nc")
+  fils = systemfunc("ls "+rootdir+caseid+"/atm/hist/*"+filter+"*.nc")
   f1   = addfile(fils(0),"r")
   outfile->hyam=f1->hyam
   outfile->hybm=f1->hybm
