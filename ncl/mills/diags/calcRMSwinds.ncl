@@ -19,7 +19,9 @@ else
     outfilter = ""
   end if
   
-  outfilename=rootdir+run_name+"/atm/proc/"+run_name+"."+outfilter+".Urms.nc"
+  outfilepath=rootdir+run_name+"/atm/proc/"
+  a=systemfunc("mkdir -p "+outfilepath)
+  outfilename=outfilepath+run_name+"."+outfilter+".Urms.nc"
   print("creating output file: "+outfilename)
   outfile=addfile(outfilename,"c")
 
