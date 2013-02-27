@@ -47,12 +47,17 @@ do i = 0, dimsizes(dateList)-1
 
   res@cnFillOn              = True     ; turn on color fill
   res@cnLinesOn             = True    ; turn of contour lines
-  res@cnLevelSelectionMode  = "ExplicitLevels"
-  res@cnLevels = (/2.5,5.5,7.5,10.5,13.5,16.5,19.5,22.5,25.5/)
+;  res@cnLevelSelectionMode  = "ExplicitLevels"
+;  res@cnLevels = (/2.5,5.5,7.5,10.5,13.5,16.5,19.5,22.5,25.5/)
+  res@cnLevelSelectionMode  = "ManualLevels"
+  res@cnLevelSpacingF = 3
+  res@cnMinLevelValF  = 3
+  res@cnMaxLevelValF  = 27
 
   res@gsnSpreadColors       = False     ; use full range of color map
 
   res@lbLabelStride         = 1
+  res@lbOrientation         = "Vertical"
 
   res@pmTickMarkDisplayMode = "Always"; use NCL default lat/lon labels
 
@@ -69,11 +74,14 @@ do i = 0, dimsizes(dateList)-1
 ;  res@mpMaxLonF            = 120.
 
 ; Change color map using named colors
-  colors = (/"white","black", \
-             "green4","yellow", \
-             "orange","red", \
-             "purple","sienna1", \
-             "cadetblue","darkorange4","midnightblue","black"/)
+;  colors = (/"white","black", \
+;             "green4","yellow", \
+;             "orange","red", \
+;             "purple","tan1", \
+;             "tan3","tan4","black","white"/)
+  colors = (/"white","black","blue","green","yellow", \
+             "orange","orangered","red","red4", \
+             "sienna4","black","white","purple"/)
 
   gsn_define_colormap(wks,colors)                  ; change colormap 
 
@@ -81,7 +89,7 @@ do i = 0, dimsizes(dateList)-1
   if (i.eq.0) then 
     res@lbLabelBarOn=True
   end if
-  res@lbTopMarginF=0.4
+;  res@lbTopMarginF=0.4
 ;  res@lbLeftMarginF=1
 ;  res@lbRightMarginF=50
   res@gsnLeftString=" "
@@ -98,7 +106,8 @@ do i = 0, dimsizes(dateList)-1
   diffUVI=exptUVI(et,:,:)
   diffUVI=diffUVI-cntlUVI(ct,:,:)
   delete(res@cnLevels)
-  res@cnLevels = (/0,1,2,3,4,4.5,5,5.5,6/)
+  res@cnLevelSelectionMode  = "ExplicitLevels"
+  res@cnLevels = (/-0.5,1,2,3,4,4.5,5,5.5,6/)
   res@gsnCenterString="UVI "+monthList(i)+", Year 3 - Control"
   if (i.eq.0) then 
     res@lbLabelBarOn=True
@@ -108,7 +117,18 @@ do i = 0, dimsizes(dateList)-1
     
 end do
 
+;lbres                           = True
+;lbres@lbAutoManage              = False         ; we control label bar
+;lbres@lbFillColors              = fill_colors   ; use nice strided colors  
+;lbres@lbPerimOn                 = False         ; Turn off labelbar perimeter.
+;lbres@lbMonoFillPattern         = True          ; one pattern, all solid
+;lblabels    = "" + fspan(3,27,9)
+
+;nboxes=8
+;gsn_labelbar_ndc(wks,nboxes,lblabels,0.5,0.2,lbres)
+
 pres                        = True
 pres@gsnMaximize            = True
 pres@gsnPaperOrientation    = "landscape"
 gsn_panel(wks, plot, (/ 3, 2 /), pres)
+;frame(wks)

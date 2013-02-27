@@ -5,12 +5,14 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-datapath="$MODEL_PATH/ccsm/inputdata/atm/waccm/solar/"
+datapath="$MODEL_PATH/ccsm/inputdata/atm/cam/solar/"
 imagepath="$IMAGE_PATH/solar/"
 
 ;ncf = addfile(datapath+"spectral_irradiance_Lean_1950-2140_daily_c100804.nc","r")
 ;ncf = addfile(datapath+"spectral_irradiance_Lean_1950-2009_daily_c100507.nc","r")
-ncf = addfile(datapath+"spectral_irradiance_Lean_1950-2010_daily_c110328.nc","r")
+;ncf = addfile(datapath+"spectral_irradiance_Lean_1950-2010_daily_c110328.nc","r")
+ncf  = addfile(datapath+"spectral_irradiance_Lean_1950-2011_daily_Leap_c120426.nc","r")
+ncf2 = addfile(datapath+"spectral_irradiance_Lean_1950-2012_daily_Leap_c130227.nc","r")
 
 print("reading ncf->ssi")
 ssi=ncf->ssi
@@ -47,7 +49,7 @@ print("max="+max(date))
 ;tsi_diff3=tsi-tsi_sum2
 
 ;ncf2 = addfile(datapath+"spectral_irradiance_Lean_1950-2010_daily_c110328.nc","r")
-ncf2 = addfile(datapath+"spectral_irradiance_Lean_1950-2011_daily_NoLeap_c120426.nc","r")
+;ncf2 = addfile(datapath+"spectral_irradiance_Lean_1950-2011_daily_NoLeap_c120426.nc","r")
 print("reading ncf2->ssi")
 ssi2=ncf2->ssi
 print("reading ncf2->tsi")
@@ -128,7 +130,7 @@ year3 = yyyymmdd_to_yyyyfrac(date3, 0.)
 ;delete(wks)
 ;delete(res)
   
-wks = gsn_open_wks("pdf", imagepath+"tsi_2007-2012")
+wks = gsn_open_wks("pdf", imagepath+"tsi_2007-2013")
   res                   = True                      ; plot mods desired
 ;  res@gsnDraw           = False
 ;  res@gsnFrame          = False
@@ -136,7 +138,7 @@ wks = gsn_open_wks("pdf", imagepath+"tsi_2007-2012")
 ;  res@vpWidthF              = 1.0
   res@trXMinF = 2007.d0
 ;  res@trXMaxF = 2010.d0
-  res@trXMaxF = 2012.d0
+  res@trXMaxF = 2013.d0
 
 
 ;  res@trXMinF = 1830.d0
