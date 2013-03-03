@@ -71,7 +71,7 @@ begin
         t2=(year+1)*365+183-1      
       end if
       do ln=0,nlon-1
-         if (LANDFRAC(0,lt,ln).gt.0.90) then
+         if (LANDFRAC(0,lt,ln).gt.0.001) then
            r0 = dim_numrun_n(growday(t1:t2,lt,ln), 0, 0) ; count number of warm "runs"
            ndays=365
            do while (r0(ndays-1).eq.0.and.ndays.ge.1)
@@ -123,3 +123,25 @@ calcGrowingSeason(caseid)
 
 caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.007"
 calcGrowingSeason(caseid)
+
+path="$MODEL_PATH/ccsm/case/"
+
+cmd="ncea -O "+path+"b40.rcp4_5.2deg.wcm.carma.bc0tg.00[678]/proc/*.cam.growseas.2014-2018avg.nc "\
+   +path+"b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678/proc/b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678.cam.growseas.2014-2018avg.nc"
+print(cmd)
+a=systemfunc(cmd)
+
+cmd="ncea -O "+path+"b40.rcp4_5.2deg.wcm.carma.bc5tgIP.00[367]/proc/*.cam.growseas.2014-2018avg.nc "\
+   +path+"b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg/proc/b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg.cam.growseas.2014-2018avg.nc"
+print(cmd)
+b=systemfunc(cmd)
+
+cmd="ncea -O "+path+"b40.rcp4_5.2deg.wcm.carma.bc0tg.00[678]/proc/*.cam.growseas.2013-2022.nc "\
+   +path+"b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678/proc/b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678.cam.growseas.2013-2022.nc"
+print(cmd)
+c=systemfunc(cmd)
+
+cmd="ncea -O "+path+"b40.rcp4_5.2deg.wcm.carma.bc5tgIP.00[367]/proc/*.cam.growseas.2013-2022.nc "\
+   +path+"b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg/proc/b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg.cam.growseas.2013-2022.nc"
+print(cmd)
+d=systemfunc(cmd)
