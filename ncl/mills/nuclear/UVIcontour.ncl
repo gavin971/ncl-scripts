@@ -90,11 +90,14 @@ do i = 0, dimsizes(dateList)-1
     res@lbLabelBarOn=True
   end if
 ;  res@lbTopMarginF=0.4
+  res@lbBottomMarginF=-1.8
 ;  res@lbLeftMarginF=1
 ;  res@lbRightMarginF=50
+  res@lbLabelFontHeightF   = 0.018
   res@gsnLeftString=" "
   res@gsnRightString=" "
   res@gsnCenterString="UVI "+monthList(i)+", Control"
+  res@gsnCenterStringFontHeightF = 0.02
   plot(i) = gsn_csm_contour_map_ce(wks,cntlUVI(ct,:,:), res)
   
   res@gsnCenterString="UVI "+monthList(i)+", Year 3"
@@ -109,6 +112,7 @@ do i = 0, dimsizes(dateList)-1
   res@cnLevelSelectionMode  = "ExplicitLevels"
   res@cnLevels = (/-0.5,1,2,3,4,4.5,5,5.5,6/)
   res@gsnCenterString="UVI "+monthList(i)+", Year 3 - Control"
+  res@lbBottomMarginF= 0.0
   if (i.eq.0) then 
     res@lbLabelBarOn=True
   end if
