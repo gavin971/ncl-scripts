@@ -28,6 +28,11 @@ begin
   b=systemfunc("rm "+fileout)
   print("creating "+fileout)
   c=addfile(fileout,"c")
+ 
+; Create an UNLIMITED record dimension in the output netCDF file.  This is critical if 
+;  the user plans to ever use NCO to concatenate the file along the time/record dimension.
+  filedimdef(c,"time",-1,True)
+
   years=ispan(2013,2021,1)
   date=years*10000+0701
   date!0="time"
@@ -83,6 +88,19 @@ begin
   
   print("Saving growseas to "+fileout)
   c->GROWSEAS=growseas
+  
+  fileout2=path+caseid+"/proc/"+caseid+".cam.growseas.2014-2018avg.nc"
+  print("rm "+fileout2)
+  b=systemfunc("rm "+fileout2)
+  print("creating "+fileout2)
+  d=addfile(fileout2,"c")
+ 
+  print("Averaging growseas over years 2014-2018")
+  
+  growseasavg=dim_avg_n_Wrap(growseas(1:5,:,:),0)
+  print("Saving growseas to "+fileout2)
+  d->GROWSEAS=growseasavg 
+  
   print("Done!")
 
   return
