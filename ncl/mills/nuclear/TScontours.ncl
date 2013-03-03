@@ -8,32 +8,34 @@ path="$MODEL_PATH/ccsm/case/"
 cntlCase="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
 
+cntlFilepathDJF=path+cntlCase+"/proc/"+cntlCase+".cam2.h0.2014-2018DJF.nc"
+exptFilepathDJF=path+exptCase+"/proc/"+exptCase+".cam2.h0.2014-2018DJF.nc"
 
-;cntlFilepath=path+cntlCase+"/proc/"+cntlCase+".cam.growseas.2014-2018avg.nc"
-;exptFilepath=path+exptCase+"/proc/"+exptCase+".cam.growseas.2014-2018avg.nc"
+cntlFileDJF=addfile(cntlFilepathDJF,"r")
+exptFileDJF=addfile(exptFilepathDJF,"r")
 
-cntlFilepath=path+cntlCase+"/proc/"+cntlCase+".cam.growseas.2014-2021avg.nc"
-exptFilepath=path+exptCase+"/proc/"+exptCase+".cam.growseas.2014-2021avg.nc"
+cTSDJF=cntlFileDJF->TS
+eTSDJF=exptFileDJF->TS
+dTSDJF=eTSDJF ; get metadata
+dTSDJF=dTSDJF-cTSDJF
 
-cntlFile=addfile(cntlFilepath,"r")
-exptFile=addfile(exptFilepath,"r")
+cntlFilepathJJA=path+cntlCase+"/proc/"+cntlCase+".cam2.h0.2014-2018JJA.nc"
+exptFilepathJJA=path+exptCase+"/proc/"+exptCase+".cam2.h0.2014-2018JJA.nc"
 
-cGS=cntlFile->GROWSEAS
-eGS=exptFile->GROWSEAS
-dims=dimsizes(dimsizes(eGS))
-if (dims.eq.3) then
-  dGS=eGS(0,:,:) ; get metadata
-  dGS=dGS-cGS(0,:,:)
-else
-  dGS=eGS ; get metadata
-  dGS=dGS-cGS
-end if
+cntlFileJJA=addfile(cntlFilepathJJA,"r")
+exptFileJJA=addfile(exptFilepathJJA,"r")
+
+cTSJJA=cntlFileJJA->TS
+eTSJJA=exptFileJJA->TS
+dTSJJA=eTSJJA ; get metadata
+dTSJJA=dTSJJA-cTSJJA
+
 
 ;************************************************
 ; create plot
 ;************************************************
-;wks = gsn_open_wks("eps", "$IMG_PATH/nuclearGrowingSeason")                ; open an eps file
-wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearGrowingSeason")                ; open a pdf file
+;wks = gsn_open_wks("eps", "$IMG_PATH/nuclearTSdiff")                ; open an eps file
+wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearTSdiff")                ; open a pdf file
 
 nPanel=2
 plot = new(2, graphic)
@@ -47,10 +49,9 @@ res@gsnFrame  = False
 res@cnFillOn              = True     ; turn on color fill
 res@cnLinesOn             = True    ; turn of contour lines
 res@cnLevelSelectionMode  = "ExplicitLevels"
-;res@cnLevels = (/-40,-30,-20,-10,-5,-2, 2,5,10,20,30,40/)
-res@cnLevels = (/-60,-50,-40,-30,-20, -10, 10,20/)
+res@cnLevels = (/-8,-6,-5,-4, -3, -2.5,-2, -1.5, -1, -0.5, 0.5, 1/)
 
-res@gsnSpreadColors       = True     ; use full range of color map
+res@gsnSpreadColors       = False     ; use full range of color map
 
 res@lbLabelStride         = 1
 res@lbOrientation         = "Vertical"
@@ -64,13 +65,11 @@ res@pmTickMarkDisplayMode = "Always"; use NCL default lat/lon labels
 ; res@mpLimitMode="LatLon" for you. If you are plotting a different projection,
 ; you may have to set this resource.
 
-res@mpMinLatF            = 10      ; range to zoom in on
-res@mpMaxLatF            = 77
 
 ;gsn_define_colormap(wks,"BlWhRe")                  ; change colormap 
 ; Change color map using named colors
-  colors = (/"white","black","darkorchid","blue","dodgerblue3", \
-             "dodgerblue1","cyan3","cyan","white", \
+  colors = (/"white","black","darkorchid","orchid","blue","dodgerblue3", \
+             "dodgerblue2","dodgerblue1","cyan4","cyan3","cyan2","cyan1","white", \
              "yellow","orange"/)
 
   gsn_define_colormap(wks,colors)                  ; change colormap 
@@ -79,24 +78,22 @@ res@mpMaxLatF            = 77
 res@gsnLeftString        = " "
 res@gsnRightString       = " "
 res@gsnCenterString      = " "
-res@tmXBLabelsOn         = False
-res@lbLabelBarOn         = False
-res@tmXBMajorLengthF     = 0.0
-plot(0) = gsn_csm_contour_map_ce(wks,dGS, res)
-
-res@mpMinLatF            = -77      ; range to zoom in on
-res@mpMaxLatF            = -10
 res@tmXBLabelsOn         = True
 res@lbLabelBarOn         = True
-res@lbOrientation        = "Horizontal"
-res@lbTopMarginF         = -1.9
-res@lbBottomMarginF      = 1.7
-res@lbLeftMarginF        = 4.0
-res@lbRightMarginF       = -1.0
+res@lbTopMarginF         = 0.0
+res@lbBottomMarginF      = -2.8
+;res@lbRightMarginF         = 0.3
+res@tmXBMajorLengthF     = 0.0
+plot(0) = gsn_csm_contour_map_ce(wks,dTSJJA(0,:,:), res)
+
+res@tmXBLabelsOn         = False
+res@lbLabelBarOn         = True
+res@lbOrientation        = "Vertical"
+res@lbTopMarginF         = 5
+res@lbBottomMarginF      = -7
 res@lbLabelFontHeightF   = 0.01
-;res@lbPerimOn            = True
 ;delete(res@tmXBMajorLengthF)
-plot(1) = gsn_csm_contour_map_ce(wks,dGS, res)
+plot(1) = gsn_csm_contour_map_ce(wks,dTSDJF(0,:,:), res)
 
 pres                        = True
 pres@gsnMaximize            = True

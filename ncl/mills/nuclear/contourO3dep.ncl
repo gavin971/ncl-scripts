@@ -31,25 +31,34 @@ begin
   
   
   pdffile = "$IMAGE_PATH/ContourO3dep."+historyRun
+;  wks = gsn_open_wks("eps", pdffile)
   wks = gsn_open_wks("pdf", pdffile)
-  gsn_define_colormap(wks,"posneg_1")
+  
+;  gsn_define_colormap(wks,"posneg_1")
+;gsn_define_colormap(wks,"BlWhRe")                  ; change colormap 
+; Change color map using named colors
+  colors = (/"white","black","black","darkorchid4","darkorchid2","blue","dodgerblue3", \
+             "dodgerblue1","cyan3","cyan2","cyan","white", \
+             "yellow","orange"/)
+  gsn_define_colormap(wks,colors)                  ; change colormap 
+
   res                     = True          ; plot mods desired
 
   res@cnFillOn            = True          ; turn on color
 ;  res@lbLabelBarOn        = False         ; turn off color labelbar
-  res@gsnSpreadColors     = True          ; use full range of colormap
+  res@gsnSpreadColors     = False          ; use full range of colormap
   res@gsnMaximize         = True          ; expand plot size to maximum
   res@gsnPaperOrientation = "landscape"
   res@vpWidthF            = 1.2           ; change aspect ratio of plot
   res@vpHeightF           = 0.55
-  res@gsnLeftStringFontHeightF = 24
-  res@gsnRightStringFontHeightF = 24
+;  res@gsnLeftStringFontHeightF = 24
+;  res@gsnRightStringFontHeightF = 24
   res@tiXAxisString       = ""
-  res@tiYAxisString       = "Latitude"
+  res@tiYAxisString       = ""
   res@cnLineLabelPlacementMode= "Computed"
   res@cnLineLabelDensityF = 5
-  res@tmXBLabelFontHeightF =0.015
-  res@tmYLLabelFontHeightF =0.03
+  res@tmXBLabelFontHeightF =0.025
+  res@tmYLLabelFontHeightF =0.025
  
   res@tmXBMaxTicks      = 10
   res@tmXBMinorPerMajor = 3
@@ -63,7 +72,7 @@ begin
   res@cnMinLevelValF=120
   res@cnMaxLevelValF=510
   res@cnLevelSpacingF     = 30.
-  res@gsnRightString      = "O3 Column(DU)"
+  res@gsnRightString      = "O~B~3~N~ Column (DU)"
   res@lbLabelAngleF       = 60
   res@gsnLeftString       = "Control run"
 ;  plot = gsn_csm_lat_time(wks,O3_col_c(lat|:, time|:),res)      ; contour the variable
@@ -73,23 +82,27 @@ begin
 ;  res@cnLevelSelectionMode = "ManualLevels" 
 ;  res@cnMinLevelValF=-330
 ;  res@cnMaxLevelValF=180
-  res@cnLevelSelectionMode = "ExplicitLevels" 
-  res@cnLevels          = (/-350,-300,-250,-200,-150,-100,-75, -50,-40,-30,-20,-10,-5,-2,0,10,20,40,80,120,160/) 
-  res@cnLineThicknesses = (/  1 ,  1 ,  1 ,  1 ,  1 ,  1 , 1 ,  1 , 1 , 1 , 1 , 1 , 1, 1,2, 1, 1, 1, 1, 1 , 1/)
-  res@cnMonoLineThickness = False
-  res@cnLevelSpacingF     = 30.
-  res@gsnLeftString       = "Soot run - Control run"
+;  res@cnLevelSelectionMode = "ExplicitLevels" 
+;  res@cnLevels          = (/-350,-300,-250,-200,-150,-100,-75, -50,-40,-30,-20,-10,-5,-2,0,10,20,40,80,120,160/) 
+;  res@cnLineThicknesses = (/  1 ,  1 ,  1 ,  1 ,  1 ,  1 , 1 ,  1 , 1 , 1 , 1 , 1 , 1, 1,2, 1, 1, 1, 1, 1 , 1/)
+;  res@cnMonoLineThickness = False
+;  res@cnLevelSpacingF     = 30.
+;  res@gsnLeftString       = "Soot run - Control run"
 ;  plot = gsn_csm_lat_time(wks,O3_col_diff(lat|:, time|:),res)      ; contour the variable
 
   res@cnLevelSelectionMode = "ExplicitLevels" 
   delete(res@cnLevels)
-  res@cnLevels          = (/-70, -60,-50,-40,-30,-20,-10,-5,-2,0,2,5/)
-  delete(res@cnLineThicknesses)
-  res@cnLineThicknesses = (/ 1,  1 , 1 , 1 , 1 , 1 , 1 , 1, 1,4, 1, 1/)
+  res@cnLevels          = (/-70, -60,-50,-40,-30,-20,-10,-5,-2,2,5/)
+;  delete(res@cnLineThicknesses)
+;  res@cnLineThicknesses = (/ 1,  1 , 1 , 1 , 1 , 1 , 1 , 1, 1,4, 1, 1/)
   res@cnMonoLineThickness = False
   res@gsnLeftString       = ""
   res@gsnRightString      = ""
-  res@gsnCenterString      = "O3 Column Change (%)"
+  res@gsnCenterString      = "O~B~3~N~ Column Change (%)"
+  res@gsnCenterStringFontHeightF   = 0.025
+  res@lbLabelFontHeightF   = 0.025
+  res@tmYLLabels=(/"90~S~o~N~S","60~S~o~N~S","30~S~o~N~S","0","30~S~o~N~N",\
+    "60~S~o~N~N","90~S~o~N~N"/)
   plot = gsn_csm_lat_time(wks,O3_col_dpct(lat|:, time|:),res)      ; contour the variable
   delete(plot)
   
@@ -145,5 +158,5 @@ else
 end if
 
 historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
-controlRun="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg"
+controlRun="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
 plotO3Change(rootPath, historyRun, controlRun)
