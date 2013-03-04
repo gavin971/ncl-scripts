@@ -46,7 +46,11 @@ Tdiff&time=BCmmr&time
 ;wks = gsn_open_wks("eps", "$IMG_PATH/nuclearBCmmrAltVsTime")                ; open an eps file
 wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearBCmmrAltVsTime")                ; open a pdf file
 ;gsn_define_colormap(wks,"BlAqGrYeOrReVi200")
-gsn_define_colormap(wks,"hotres")
+;gsn_define_colormap(wks,"hotres")
+; Change color map using named colors
+colors = (/"white","black","lightblue","white","yellow1", \
+           "yellow3","orange1","orange2","orangered","red1","red2","red4"/)
+gsn_define_colormap(wks,colors)                  ; change colormap 
 
 nPanel=2
 plot = new(nPanel, graphic)
@@ -66,9 +70,9 @@ res@tmXBMode    = "Manual"
 res@tmXBTickSpacingF  = 1.0
 res@tmXBTickStartF = 1.0
 res@cnLevelSelectionMode = "ExplicitLevels" 
-res@cnLevels  = (/1,2,3,5,7,10,20,30,50,70,100/) 
+res@cnLevels  = (/-1,1,3,5,7,10,30,50,70/) 
 res@trYMinF = 0.001
-res@trYMaxF = 500.
+;res@trYMaxF = 500.
 res@gsnLeftString=" "
 res@gsnRightString=" "
 res@tiXAxisString       = ""
