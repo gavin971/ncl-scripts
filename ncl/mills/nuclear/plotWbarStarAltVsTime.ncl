@@ -17,28 +17,45 @@ cntlFile=addfile(cntlFilepath,"r")
 eWstar = exptFile->WSTAR
 cWstar = cntlFile->WSTAR
 
-time   = exptFile->time
-time = time/365.
-time@units="Years"
 press = exptFile->lev
 press@units="hPa"
 press@long_name="Pressure"
+nlev=dimsizes(press)
 
-eWstar!1="press"
-eWstar&press=press
-eWstar&time=time
+;eWstar!1="press"
+;eWstar&press=press
+;eWstar&time=time
 
-cWstar!1="press"
-cWstar&press=press
-cWstar&time=time
+;cWstar!1="press"
+;cWstar&press=press
+;cWstar&time=time
 
 eWstar_tropics=dim_avg_Wrap(eWstar(:,:,{-22:22}))
 cWstar_tropics=dim_avg_Wrap(cWstar(:,:,{-22:22}))
 eWstar_tropics=eWstar_tropics*1000.0
 cWstar_tropics=cWstar_tropics*1000.0
 
-dWstar_tropics = eWstar_tropics ; get metadata
-dWstar_tropics = dWstar_tropics-cWstar_tropics
+eWstar_ann=new((/9*12,nlev/),typeof(eWstar))
+eWstar_ann!1="press"
+eWstar_ann&press=press
+eWstar_ann!0="time"
+time=fspan(0.5,9.5,9*12)
+time@units="years"
+;printVarSummary(eWstar_ann)
+;printVarSummary(time)
+eWstar_ann&time=time
+
+cWstar_ann=eWstar_ann
+do i = 0,9*12-1
+  i2=i+11
+;  print(i+" "+i2+" "+9*12)
+  cWstar_ann(i,:)=dim_avg_n(cWstar_tropics(i:i2,:),0)
+  eWstar_ann(i,:)=dim_avg_n(eWstar_tropics(i:i2,:),0)
+end do
+
+
+dWstar_ann = eWstar_ann ; get metadata
+dWstar_ann = dWstar_ann-cWstar_ann
 
 
 ;************************************************
@@ -75,8 +92,8 @@ res@tmXBTickStartF = 1.0
 res@cnLevelSelectionMode = "ManualLevels" 
 res@cnMinLevelValF = 0.05
 res@cnLevelSpacingF = 0.05
-res@cnMaxLevelValF = 1.0
-res@trYMinF = 5.
+res@cnMaxLevelValF = 0.85
+res@trYMinF = 4.
 res@trYMaxF = 100.
 res@gsnLeftString=" "
 res@gsnRightString=" "
@@ -84,25 +101,32 @@ res@tiXAxisString       = ""
 res@lbLabelBarOn         = True
 res@lbOrientation        = "Vertical"
 res@lbTopMarginF         =  0.0
-res@lbBottomMarginF      = -3.0
+res@lbBottomMarginF      = -1.7
 res@lbRightMarginF       = -0.1
 res@lbLeftMarginF        = 0.3
-plot(0) = gsn_csm_pres_hgt(wks,cWstar_tropics(press|:, time|:),res)      ; contour the variable
+res@tmXBMajorLengthF     = 0.0
+res@tmXBMinorLengthF     = 0.0
+res@tmXBAutoPrecision    = False
+res@tmXBPrecision        = 1
+plot(0) = gsn_csm_pres_hgt(wks,cWstar_ann(press|:, time|:),res)      ; contour the variable
 
 res@lbLabelBarOn         = True
 res@lbTopMarginF         = 5
 res@lbBottomMarginF      = -7
 res@tiXAxisString       = ""
-plot(1) = gsn_csm_pres_hgt(wks,eWstar_tropics(press|:, time|:),res)      ; contour the variable
+plot(1) = gsn_csm_pres_hgt(wks,eWstar_ann(press|:, time|:),res)      ; contour the variable
 
-res@cnMinLevelValF = -0.5
-res@cnLevelSpacingF = 0.05
-res@cnMaxLevelValF = 0.5
+;res@cnMinLevelValF = -0.4
+;res@cnLevelSpacingF = 0.05
+;res@cnMaxLevelValF = 0.4
+res@cnLevelSelectionMode = "ExplicitLevels" 
+delete(res@cnLevelSpacingF)
+res@cnLevels =(/-0.35,-0.3,-0.25,-0.2,-0.15,-0.1,-0.05,0.05,0.1,.15,.2,.25,.3,.35/)
 res@lbLabelBarOn         = True
-res@lbTopMarginF         = 5
-res@lbBottomMarginF      = -7
+res@lbTopMarginF         = 0
+res@lbBottomMarginF      = 0
 res@tiXAxisString       = "Time (years)"
-plot(2) = gsn_csm_pres_hgt(wks,dWstar_tropics(press|:, time|:),res)      ; contour the variable
+plot(2) = gsn_csm_pres_hgt(wks,dWstar_ann(press|:, time|:),res)      ; contour the variable
 
 resP = True
 resP@gsnMaximize         = True          ; expand plot size to maximum
