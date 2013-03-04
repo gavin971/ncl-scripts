@@ -45,6 +45,9 @@ begin
   res                     = True          ; plot mods desired
 
   res@cnFillOn            = True          ; turn on color
+  res@cnLinesOn             = True     ; turn on contour lines
+  res@cnLineLabelsOn        = True     ; turn on contour line labels
+  res@cnLineLabelFontHeightF=0.012
 ;  res@lbLabelBarOn        = False         ; turn off color labelbar
   res@gsnSpreadColors     = False          ; use full range of colormap
   res@gsnMaximize         = True          ; expand plot size to maximum
