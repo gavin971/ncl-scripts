@@ -1,7 +1,8 @@
-load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
-load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
-load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
+;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
+;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
+;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
+load "../common.ncl"
 
 path="$MODEL_PATH/ccsm/case/"
 
@@ -35,22 +36,30 @@ cWstar_tropics=dim_avg_Wrap(cWstar(:,:,{-22:22}))
 eWstar_tropics=eWstar_tropics*1000.0
 cWstar_tropics=cWstar_tropics*1000.0
 
-eWstar_ann=new((/9*12,nlev/),typeof(eWstar))
+;ntimes=9*12
+ntimes=10
+eWstar_ann=new((/ntimes,nlev/),typeof(eWstar))
 eWstar_ann!1="press"
 eWstar_ann&press=press
 eWstar_ann!0="time"
-time=fspan(0.5,9.5,9*12)
+time=fspan(0.5,9.5,ntimes)
 time@units="years"
 ;printVarSummary(eWstar_ann)
 ;printVarSummary(time)
 eWstar_ann&time=time
 
 cWstar_ann=eWstar_ann
-do i = 0,9*12-1
-  i2=i+11
+do i = 0,ntimes-1
+  if (ntimes.eq.10) then
+    i1=i*12
+    i2=(i+1)*12-1
+  else ; boxcar smooth
+    i1=i
+    i2=i+11
+  end if
 ;  print(i+" "+i2+" "+9*12)
-  cWstar_ann(i,:)=dim_avg_n(cWstar_tropics(i:i2,:),0)
-  eWstar_ann(i,:)=dim_avg_n(eWstar_tropics(i:i2,:),0)
+  cWstar_ann(i,:)=dim_avg_n(cWstar_tropics(i1:i2,:),0)
+  eWstar_ann(i,:)=dim_avg_n(eWstar_tropics(i1:i2,:),0)
 end do
 
 
@@ -66,6 +75,7 @@ wks = gsn_open_wks("pdf", "$IMG_PATH/WbarStarAltVsTime."+exptCase)              
 ;gsn_define_colormap(wks,"BlAqGrYeOrReVi200")
 ;gsn_define_colormap(wks,"hotres")
 gsn_define_colormap(wks,"nrl_sirkes")
+;gsn_define_colormap(wks,"WhViBlGrYeOrReWh")
 
 ; Change color map using named colors
 ;colors = (/"white","black","lightblue","white","yellow1", \
@@ -76,13 +86,16 @@ nPanel=3
 plot = new(nPanel, graphic)
 
 res                       = True     ; plot mods desired
-res@vpHeightF             = 0.5 / nPanel              ; change aspect ratio
+;res@vpHeightF             = 0.82 / nPanel    ; change aspect ratio
+res@vpHeightF             = 0.62 / nPanel    ; change aspect ratio
+;res@vpWidthF              = 1.0              ; change aspect ratio
 res@gsnDraw = False
 res@gsnFrame = False
 res@cnFillOn              = True     ; turn on color fill
 res@cnLinesOn             = True     ; turn on contour lines
 res@cnLineLabelsOn        = True     ; turn on contour line labels
 res@cnLineLabelFontHeightF=0.01
+res@cnLineLabelFormat="@f"
 res@tmYLMode    = "Explicit" 
 res@tmYLValues  = (/    1E-5 ,   1E-4  , 0.001 , 0.01 , 0.1 , 1., 10., 100./)
 res@tmYLLabels  = (/"10~S~-5","10~S~-4","0.001","0.01","0.1","1","10","100"/)
@@ -94,28 +107,58 @@ res@cnMinLevelValF = 0.05
 res@cnLevelSpacingF = 0.05
 res@cnMaxLevelValF = 0.85
 res@trYMinF = 4.
-res@trYMaxF = 100.
+res@trYMaxF = 110.
 res@gsnLeftString=" "
 res@gsnRightString=" "
 res@tiXAxisString       = ""
 res@lbLabelBarOn         = True
 res@lbOrientation        = "Vertical"
 res@lbTopMarginF         =  0.0
-res@lbBottomMarginF      = -1.7
-res@lbRightMarginF       = -0.1
-res@lbLeftMarginF        = 0.3
-res@tmXBMajorLengthF     = 0.0
-res@tmXBMinorLengthF     = 0.0
+res@lbBottomMarginF      = -1.6
+res@lbRightMarginF       = 0.03
+res@lbLeftMarginF        = 0.30
+res@lbLabelFontHeightF   = 0.01
+res@tiYAxisString        = "Pressure (mb)"
+res@tiYAxisFontHeightF   = 0.014
+res@tiXAxisFontHeightF   = 0.014
+;res@lbTitleOn            = True
+;res@lbTitleString        = "mm/s"
+;res@lbTitlePosition      = "Right"
+;res@tmXBMajorLengthF     = 0.005
+;res@tmXBMinorLengthF     = 0.0
+res@tmXBMinorOn          = False
+res@tmYLMinorOn          = True
 res@tmXBAutoPrecision    = False
 res@tmXBPrecision        = 1
+res@vpYF                 = 0.95
+;res@tmXBMajorLengthF     = 0.0
+;res@tmXTMajorLengthF     = 0.05
+;res@tmYLMajorLengthF     = 0.007
+;res@tmYRMajorLengthF     = 0.007
+res@tmXBOn       = True
+res@tmXBLabelsOn = False
+res@tmXTOn       = True
+res@tmXTLabelsOn = True
+res@tiYAxisOn    = False
 plot(0) = gsn_csm_pres_hgt(wks,cWstar_ann(press|:, time|:),res)      ; contour the variable
 
+;==================================================================================
 res@lbLabelBarOn         = True
-res@lbTopMarginF         = 5
+res@lbTopMarginF         = 7
 res@lbBottomMarginF      = -7
-res@tiXAxisString       = ""
+res@tiXAxisString        = ""
+;res@tmXBMajorLengthF     = 0.0
+;res@tmXTMajorLengthF     = 0.0
+;res@vpYF                 = 0.675
+res@vpYF                 = 0.743
+res@tmXBOn       = True
+res@tmXBLabelsOn = False
+res@tmXTOn       = True
+res@tmXTLabelsOn = False
+res@tiYAxisOn    = True
 plot(1) = gsn_csm_pres_hgt(wks,eWstar_ann(press|:, time|:),res)      ; contour the variable
 
+;==================================================================================
 ;res@cnMinLevelValF = -0.4
 ;res@cnLevelSpacingF = 0.05
 ;res@cnMaxLevelValF = 0.4
@@ -123,13 +166,28 @@ res@cnLevelSelectionMode = "ExplicitLevels"
 delete(res@cnLevelSpacingF)
 res@cnLevels =(/-0.35,-0.3,-0.25,-0.2,-0.15,-0.1,-0.05,0.05,0.1,.15,.2,.25,.3,.35/)
 res@lbLabelBarOn         = True
-res@lbTopMarginF         = 0
-res@lbBottomMarginF      = 0
-res@tiXAxisString       = "Time (years)"
+res@lbRightMarginF       = -0.03
+res@lbLeftMarginF        = 0.33
+res@lbTopMarginF         = 0.0
+res@lbBottomMarginF      = -0.3
+res@tiXAxisString        = "Time (years)"
+;delete(res@tmXBMajorLengthF)
+;res@vpYF                 = 0.4
+res@vpYF                 = 0.535
+res@tmXBOn       = True
+res@tmXBLabelsOn = True
+res@tmXTOn       = True
+res@tmXTLabelsOn = False
+res@tiYAxisOn    = False
 plot(2) = gsn_csm_pres_hgt(wks,dWstar_ann(press|:, time|:),res)      ; contour the variable
 
-resP = True
-resP@gsnMaximize         = True          ; expand plot size to maximum
-resP@gsnPaperOrientation = "landscape"
-gsn_panel(wks, plot, (/ nPanel, 1 /), resP)
-delete(plot)  
+;==================================================================================
+;frame(wks)
+;resP = True
+;resP@gsnMaximize         = True          ; expand plot size to maximum
+;resP@gsnPaperOrientation = "landscape"
+;gsn_panel(wks, plot, (/ nPanel, 1 /), resP)
+; See what happens in PS file when you maximize all the plots.
+psres = True   
+maximize_output(wks,psres) 
+;draw(wks)
