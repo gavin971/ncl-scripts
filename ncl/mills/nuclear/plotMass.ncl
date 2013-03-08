@@ -29,10 +29,13 @@ begin
 ;  print(historyNames)
   history = addfiles(historyPath+historyNames, "r")
   ListSetType(history, "cat")
-  nTimes = dimsizes(history[:]&time) 
+;  nTimes = dimsizes(history[:]&time) 
+  time1 = addfiles_GetVar(history, historyPath+historyNames, "time")
+  nTimes = dimsizes(time1) 
   if (opt) then ; add time 0 for IC
     nTimes=nTimes+1
   end if
+  print("nTimes="+nTimes)
 
   ; Create arrays to store all the mass data.
   mass = new((/ nRuns, nTracers, nTimes /), "float")
@@ -59,6 +62,7 @@ begin
     
     massfilepath = basePath + runNames(i) + "/proc/"
     massfile = runNames(i) +".mass.nc"
+    print("mkdir -p "+massfilepath)
     a = systemfunc("mkdir -p "+massfilepath)
     
     exists = isfilepresent(massfilepath+massfile)
@@ -71,6 +75,7 @@ begin
       delete(mfileid)
     else
       historyPath = basePath + runNames(i) + "/" + historyPattern + "/"
+      print("calling calculateMass, historyPath="+historyPath)
       test = calculateMass(historyPath, tracerNames, opt)
       time=test&time
       time@units="days"
@@ -164,6 +169,7 @@ begin
   
 end
 
+rootpath="$MODEL_PATH/cesm/case/"
 opt=True
-opt@icfile="/data4/mmills/b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg/ic/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.001.cam2.i.2013-01-01-00000.nc"
-plotMass( "/data4/mmills/", "h0zm", "b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg", "SOOT01", opt )
+opt@icfile=rootpath+"/b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg/ic/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.001.cam2.i.2013-01-01-00000.nc"
+plotMass( rootpath, "h0zm", "b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003", "SOOT01", opt )

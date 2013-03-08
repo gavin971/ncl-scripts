@@ -60,6 +60,7 @@ begin
   end if
   print("pdel:"+dimsizes(pdel))
   
+  print("returning from calcPdel")
 ;  print(pdel(0,:,0,0))
   
   return(pdel)
@@ -93,22 +94,34 @@ begin
   print(" calculateMass: Reading data ...")
   historyNames = systemfunc("ls " + historyPath)
   history = addfiles(historyPath+historyNames, "r")
-  histtime=history[:]&time
   ListSetType(history, "cat")
+;  histtime=history[:]&time
+  histtime=addfiles_GetVar(history, historyPath+historyNames, "time")
+;  print(histtime)
   
   ; Read in the fields we will need.
 ;  pdeldry = addfiles_GetVar(history, historyNames, "PDELDRY")
+  print("calling calcPdel")
   pdeldry = calcPdel(historyPath)
+  print("returned from calcPdel")
   
   rank=dimsizes(dimsizes(pdeldry))
+  print("rank="+rank)
 
   ; Create the output variable.
   nTimes = dimsizes(histtime)
+  print("nTimes="+nTimes)
+  print("opt="+opt)
   if (opt) then
     nTimesMass=nTimes+1
-    time=new((/nTimesMass/),typeof(histtime))
-    time(0)=0
+    print("nTimesMass="+nTimesMass)
+;    print(histtime)
+    time=new((/nTimesMass/), typeof(histtime))
+    print("time(0)=0")
+    time(0)=0.0
+    print("time(1:)=histtime")
     time(1:)=histtime
+    print("t1=1")
     t1=1
   else
     nTimesMass=nTimes

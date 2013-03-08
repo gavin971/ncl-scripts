@@ -17,8 +17,10 @@ print("path="+path)
 root="b40.rcp4_5.2deg.wcm.carma."
 sub="h0gm"
 
-test1="bc5tgIP.avg"
-cntl1="bc0tg.avg678"
+;test1="bc5tgIP.avg"
+;cntl1="bc0tg.avg678"
+test1="bc5tgIP.003"
+cntl1="bc0tg.006"
 
 massfilepath=path+root+test1+"/proc/"
 massfile=root+test1+".mass.nc"
@@ -28,17 +30,30 @@ dmass = mfileid->SOOT01
 delete(mfileid)
       
 print("adding test file...")
-testfile1=addfile(path+root+test1+"/"+sub+"/"+root+test1+".cam2.h0.globavg.nc","r")
+testfile1=addfile(path+root+test1+"/"+sub+"/"+root+test1+".cam.h0.globavg.nc","r")
 print("adding control file...")
-cntlfile1=addfile(path+root+cntl1+"/"+sub+"/"+root+cntl1+".cam2.h0.globavg.nc","r")
+cntlfile1=addfile(path+root+cntl1+"/"+sub+"/"+root+cntl1+".cam.h0.globavg.nc","r")
 
 gw=testfile1->gw
 lat=testfile1->lat
-;time=testfile1->time
-time=cntlfile1->time
+timetest=testfile1->time
+timecntl=cntlfile1->time
+dst=dimsizes(timetest)
+dsc=dimsizes(timecntl)
+print("ntimes test:"+dst)
+print("ntimes control:"+dsc)
+if (dst(0).le.dsc(0)) then
+  print("using time from "+test1)
+  time=timetest
+else
+  print("using time from "+cntl1)
+  time=timecntl
+end if
+
 time=time/365.0
 nLats=dimsizes(lat)
 nTimes=dimsizes(time)
+print("nTimes="+nTimes)
 
 ; Net shortwave flux at the surface
 print("reading FSNS_test1")
