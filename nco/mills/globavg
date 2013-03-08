@@ -13,6 +13,18 @@ if  [ -n "$caseid" ] ; then
 
   export machine=`hostname`
 
+  if [[ $machine =~ 'yslogin' ]];then
+    rootpath='/glade/p/cesm/wawg/waccm'
+  fi
+
+  if [[ $machine =~ 'geyser' ]];then
+    rootpath='/glade/p/cesm/wawg/mmills/run'
+  fi
+
+  if [[ $machine =~ 'caldera' ]];then
+    rootpath='/glade/p/cesm/wawg/mmills/run'
+  fi
+
   if [[ $machine =~ 'mirage' ]];then
     rootpath='/CESM/wawg/runs'
   fi
