@@ -5,7 +5,6 @@
 load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
-load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 load "./calculateMass.ncl"
 
 
@@ -169,7 +168,9 @@ begin
   
 end
 
-rootpath="$MODEL_PATH/cesm/case/"
+;rootpath="$MODEL_PATH/cesm/case/"
+rootpath="$MODEL_PATH/"
+caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003"
 opt=True
 opt@icfile=rootpath+"/b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg/ic/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.001.cam2.i.2013-01-01-00000.nc"
-plotMass( rootpath, "h0zm", "b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003", "SOOT01", opt )
+plotMass( rootpath, "h0zm", caseid, "SOOT01", opt )

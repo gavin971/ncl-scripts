@@ -1,15 +1,17 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 host   = systemfunc("hostname")
 ostype = systemfunc("echo $OSTYPE")
 
 if (host.eq."modeling1") then
   path="/data4/mmills/"
+else if (isStrSubset(host,"caldera").or.isStrSubset(host,"geyser").or.isStrSubset(host,"yslogin")) then
+  path="$MODEL_PATH/"
 else
-  path="$MODEL_PATH/ccsm/case/"
+  path="$MODEL_PATH/ccsm/case/"  
+end if
 end if
 ;path="~/csm/"
 print("path="+path)
@@ -221,7 +223,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   overlay(baseplot, gsn_csm_xy (wks, dmass&time/365., dmass/1e9,res)) ; draw  plot
   
   res@tiYAxisString = "SW Net Flux (W/m~S~2~N~)"
-  res@trYMaxF = -0.01
+;  res@trYMaxF = -0.01
+  res@trYMaxF = 2.0
   res@trYMinF = -17.0
   res@tmYLAutoPrecision = False
   res@tmYLPrecision=2
