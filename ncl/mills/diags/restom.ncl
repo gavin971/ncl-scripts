@@ -15,19 +15,27 @@ else
   ostype=getenv("OSTYPE")
   host=getenv("HOSTNAME")
 
-  if (ostype.eq."darwin") then
-    rootpath="/Volumes/MillsPassport/cesm/"
-  else
-    if(str_index_of_substr(host,"mirage",-1).eq.0)
-      rootpath="/CESM/wawg/runs/"
+  rootpath=getenv("rootpath")
+  if (ismissing(rootpath)) then
+    if (ostype.eq."darwin") then
+      rootpath="/Volumes/MillsPassport/cesm/"
     else
-      rootpath="/data/waccm"  
+      if(isStrSubset(host,"cmip5"))
+        rootpath="/data/waccm/"
+      else
+        rootpath="/glade/p/cesm/wawg/waccm/"  
+      end if
     end if
   end if
+  
+  subdir=getenv("subdir")
+  if (ismissing(subdir)) then
+    subdir="atm/hist"
+  end if
 
-  in_dir =rootpath+run_name+"/h0/"
+  in_dir =rootpath+run_name+"/"+subdir+"/"
   print("in_dir="+in_dir)
-  save_dir =rootpath+run_name+"/analysis/"
+  save_dir =rootpath+run_name+"/atm/proc/"
   savefile=save_dir+run_name+"_RESTOM.nc"
   print("savefile="+savefile)
 

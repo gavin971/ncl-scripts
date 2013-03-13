@@ -65,7 +65,7 @@ begin
     a = systemfunc("mkdir -p "+massfilepath)
     
     exists = isfilepresent(massfilepath+massfile)
-    if (exists) then
+    if (exists .and. .not.(opt@overwritemass)) then
       print("reading "+massfilepath+massfile)
       mfileid = addfile(massfilepath+massfile, "r")
       do j = 0, nTracers - 1
@@ -85,8 +85,11 @@ begin
       print(i)
       mass(i, :, :) = (/test/)
 
+      print("rm "+massfilepath+massfile)
+      rm=systemfunc("rm "+massfilepath+massfile)
       print("creating "+massfilepath+massfile)
       mfileid = addfile(massfilepath+massfile, "c")
+      
       do j = 0, nTracers - 1
         dmass(i, j, :) = (/mass(i, j, :)/) ;- mass(i, j, 0)
 
@@ -173,4 +176,5 @@ rootpath="$MODEL_PATH/"
 caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003"
 opt=True
 opt@icfile=rootpath+"/b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg/ic/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.001.cam2.i.2013-01-01-00000.nc"
+opt@overwritemass=True
 plotMass( rootpath, "h0zm", caseid, "SOOT01", opt )
