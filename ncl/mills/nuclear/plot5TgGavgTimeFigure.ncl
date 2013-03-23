@@ -19,88 +19,81 @@ print("path="+path)
 root="b40.rcp4_5.2deg.wcm.carma."
 sub="h0gm"
 
-;test1="bc5tgIP.avg"
-;cntl1="bc0tg.avg678"
-test1="bc5tgIP.003"
-cntl1="bc0tg.006"
+test1="bc5tgIP"
+cntl1="bc0tg"
 
-massfilepath=path+root+test1+"/proc/"
-massfile=root+test1+".mass.nc"
+massfilepath=path+root+test1+".avg/proc/"
+
+massfile=root+test1+".mass.avg.nc"
 print("reading "+massfilepath+massfile)
 mfileid = addfile(massfilepath+massfile, "r")
 dmass = mfileid->SOOT01
 delete(mfileid)
+nTimes = dimsizes(dmass)
+
+dmass_range = new((/2,nTimes/), typeof(dmass))
+
+massfile=root+test1+".mass.max.nc"
+print("reading "+massfilepath+massfile)
+mfileid = addfile(massfilepath+massfile, "r")
+dmass_range(0,0:nTimes-1) = mfileid->SOOT01(0:nTimes-1)
+delete(mfileid)
+
+massfile=root+test1+".mass.min.nc"
+print("reading "+massfilepath+massfile)
+mfileid = addfile(massfilepath+massfile, "r")
+dmass_range(1,0:nTimes-1) = mfileid->SOOT01(0:nTimes-1)
+delete(mfileid)
       
-print("adding test file...")
-testfile1=addfile(path+root+test1+"/"+sub+"/"+root+test1+".cam.h0.globavg.nc","r")
-print("adding control file...")
-cntlfile1=addfile(path+root+cntl1+"/"+sub+"/"+root+cntl1+".cam.h0.globavg.nc","r")
+avgfile=path+root+test1+".avg/"+sub+"/"+root+test1+"-"+cntl1+".cam.h0.avg.nc"
+maxfile=path+root+test1+".avg/"+sub+"/"+root+test1+"-"+cntl1+".cam.h0.max.nc"
+minfile=path+root+test1+".avg/"+sub+"/"+root+test1+"-"+cntl1+".cam.h0.min.nc"
+print("adding avg file: "+avgfile)
+avgfileh=addfile(avgfile,"r")
+print("adding max file: "+maxfile)
+maxfileh=addfile(maxfile,"r")
+print("adding min file: "+minfile)
+minfileh=addfile(minfile,"r")
 
-gw=testfile1->gw
-lat=testfile1->lat
-timetest=testfile1->time
-timecntl=cntlfile1->time
-dst=dimsizes(timetest)
-dsc=dimsizes(timecntl)
-print("ntimes test:"+dst)
-print("ntimes control:"+dsc)
-if (dst(0).le.dsc(0)) then
-  print("using time from "+test1)
-  time=timetest
-else
-  print("using time from "+cntl1)
-  time=timecntl
-end if
+gw   = avgfileh->gw
+lat  = avgfileh->lat
+time = avgfileh->time
 
-time=time/365.0
-nLats=dimsizes(lat)
-nTimes=dimsizes(time)
+time   = time/365.0
+nLats  = dimsizes(lat)
+nTimes = dimsizes(time)
 print("nTimes="+nTimes)
 
 ; Net shortwave flux at the surface
-print("reading FSNS_test1")
-FSNS_test1  = testfile1->FSNS(0:nTimes-1)
+print("reading FSNS_diff")
+FSNS_diff = avgfileh->FSNS(0:nTimes-1)
+FSNS_range = new((/2,nTimes/), typeof(FSNS_diff))
+print("reading FSNS_max")
+FSNS_range(0,0:nTimes-1) = maxfileh->FSNS(0:nTimes-1)
+print("reading FSNS_min")
+FSNS_range(1,0:nTimes-1) = minfileh->FSNS(0:nTimes-1)
 
-print("reading TS_test1")
-TS_test1    = testfile1->TS(0:nTimes-1)
-print("reading PRECT_test1")
-PRECT_test1 = testfile1->PRECT(0:nTimes-1)
-print("reading date_x1")
-date_x1     = testfile1->date(0:nTimes-1)
-dx1=dimsizes(date_x1)
-print("dx1:"+dx1)
+; Surface temperature
+print("reading TS_diff")
+TS_diff = avgfileh->TS(0:nTimes-1)
+TS_range = new((/2,nTimes/), typeof(TS_diff))
+print("reading TS_max")
+TS_range(0,0:nTimes-1) = maxfileh->TS(0:nTimes-1)
+print("reading TS_min")
+TS_range(1,0:nTimes-1) = minfileh->TS(0:nTimes-1)
 
-; Net shortwave flux at the surface
-print("reading FSNS_cntl1")
-FSNS_cntl1  = cntlfile1->FSNS
+; Total precipitation
+print("reading PRECT_diff")
+PRECT_diff = avgfileh->PRECT(0:nTimes-1)
+PRECT_range = new((/2,nTimes/), typeof(PRECT_diff))
+print("reading PRECT_max")
+PRECT_range(0,0:nTimes-1) = maxfileh->PRECT(0:nTimes-1)
+print("reading PRECT_min")
+PRECT_range(1,0:nTimes-1) = minfileh->PRECT(0:nTimes-1)
 
-print("reading TS_cntl1")
-TS_cntl1    = cntlfile1->TS
-print("reading PRECT_cntl1")
-PRECT_cntl1 = cntlfile1->PRECT
-print("reading date_c1")
-date_c1     = cntlfile1->date
-dc_1=dimsizes(date_c1)
-print("dc_1:"+dc_1)
-
-dc1=ind(date_c1.eq.date_x1(0))
-dc2=ind(date_c1.eq.date_x1(dx1-1))
-print("dc1="+dc1)
-print("dc2="+dc2)
-
-
-print("1: "+dimsizes(TS_test1)+" "+dimsizes(TS_cntl1(dc1:dc2)))
-
-print("calculating TS_diff")
-TS_diff1 = TS_test1 - TS_cntl1(dc1:dc2)
-
-print("calculating PRECT_diff")
-PRECT_diff1 = (PRECT_test1 - PRECT_cntl1(dc1:dc2))*1000.*3600.*24.
-PRECT_diff_pct1 = 100.*(PRECT_test1 - PRECT_cntl1(dc1:dc2))/PRECT_cntl1(dc1:dc2)
-
-print("calculating FSNS_diff")
-FSNS_diff1 = FSNS_test1 - FSNS_cntl1(dc1:dc2)
-FSNS_diff_pct1 = 100.*(FSNS_test1 - FSNS_cntl1(dc1:dc2))/FSNS_cntl1(dc1:dc2)
+; convert m/s to mm/day
+PRECT_diff = PRECT_diff * 24. * 3600. * 1000.
+PRECT_range = PRECT_range * 24. * 3600. * 1000.
 
 ; Global mass burden from Robock 5Tg study
 robock = (/ (/0.353, 4.948/), (/0.409, 4.892/), (/0.465, 4.837/), (/0.539, 4.795/), (/0.613, 4.768/), \
@@ -172,7 +165,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   -4.576,-4.068,-3.559,-3.559,-3.39,-3.051,-3.051,-2.712,-2.712,-2.712,-2.373,-2.203,-2.034,-2.034,-1.864,-1.864,\
   -1.525,-1.525,-1.186/)
  
-  pdffile="TSvsRobockFigure."+test1+"."+cntl1
+  pdffile="TSvsRobockFigure."+test1+"-"+cntl1
   wks   = gsn_open_wks ("pdf","$IMAGE_PATH/"+pdffile) ; open workstation
 
   nl = integertochar(10)  ; newline character
@@ -184,13 +177,13 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   
   resP@txString = "Years after conflict"
   resP@gsnAttachPlotsXAxis =True
-  resP@gsnPaperOrientation = "portrait"
+  resP@gsnPaperOrientation = "landscape"
   resP@gsnMaximize         = True          ; expand plot size to maximum
  
   
   res                   = True                      ; plot mods desired
   res@vpWidthF            = 1.3           ; change aspect ratio of plot
-  res@vpHeightF           = 0.6
+  res@vpHeightF           = 0.3
   res@gsnDraw = False
   res@gsnFrame     = False                        ; don't advance frame yet
   res@xyLineThicknessF = 6.0
@@ -216,58 +209,80 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@tmYLPrecision = 1
   res@tmYLAutoPrecision = False
   res@tiYAxisString = "Mass burden (Tg)"
-  print("baseplot = gsn_csm_xy (wks, robock(:,0), robock(:,1), res)")
-  baseplot = gsn_csm_xy (wks, robock(:,0), robock(:,1), res) ; draw plot
-  res@xyLineColor       = "black"          ; change line color
-  print("overlay(baseplot, gsn_csm_xy (wks, dmass&time/365., dmass/1e9,res))")
-  overlay(baseplot, gsn_csm_xy (wks, dmass&time/365., dmass/1e9,res)) ; draw  plot
+  
+  res2=res
+  res2@xyLineThicknessF = 0.5
+  res2@xyMonoDashPattern = True
+  res2@xyLineColor       = "lightblue"
+  res2@gsnXYFillColors = (/"lightblue"/)
+
+  res3=res
+  res2@xyLineThicknessF = 3.0
+  res3@xyLineColor       = "midnightblue"
+  
+  baseplot = gsn_csm_xy (wks, dmass&time/365., dmass_range/1e9,res2) ; draw plot
+  overlay(baseplot, gsn_csm_xy (wks, robock(:,0), robock(:,1), res)) ; draw  plot
+  overlay(baseplot, gsn_csm_xy (wks, dmass&time/365., dmass/1e9,res3)) ; draw  plot
   
   res@tiYAxisString = "SW Net Flux (W/m~S~2~N~)"
 ;  res@trYMaxF = -0.01
   res@trYMaxF = 2.0
   res@trYMinF = -17.0
-  res@tmYLAutoPrecision = False
   res@tmYLPrecision=2
-  res@xyLineColor       = "red"          ; change line color
-  print("plot(0) = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res)")
-  plot(0) = gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res) ; draw plot
-  res@xyLineColor       = "black"          ; change line color
-  print("overlay(plot(0), gsn_csm_xy (wks,time,FSNS_diff1,res))")
-  overlay(plot(0), gsn_csm_xy (wks,time,FSNS_diff1,res)) ; draw plot
+  res2@trYMaxF = 2.0
+  res2@trYMinF = -17.0
+  res2@tiYAxisString = "SW Net Flux (W/m~S~2~N~)"
+  res2@tmYLPrecision=2
+  res3@trYMaxF = 2.0
+  res3@trYMinF = -17.0
+  res3@tiYAxisString = "SW Net Flux (W/m~S~2~N~)"
+  res3@tmYLPrecision=2
+  
+  plot(0) = gsn_csm_xy (wks,time,FSNS_range,res2) ; draw plot
+  overlay(plot(0), gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res)) ; draw plot
+  overlay(plot(0), gsn_csm_xy (wks,time,FSNS_diff,res3)) ; draw plot
   
   res@tiYAxisString = "Surface Temperature (K)"
-  res@trYMaxF = 0.05
-  res@trYMinF = -1.7
-  res@tmYLPrecision = 2
-  res@tmYLAutoPrecision = False
-  res@xyLineColor       = "red"          ; change line color
-  print("plot(1) = gsn_csm_xy (wks,TS_time,TS_rbck,res)")
-  plot(1) = gsn_csm_xy (wks,TS_time,TS_rbck,res) ; draw plot  
-  res@xyLineColor       = "black"          ; change line color
-  print("overlay(plot(1), gsn_csm_xy (wks,time,TS_diff1,res))")
-  overlay(plot(1), gsn_csm_xy (wks,time,TS_diff1,res)) ; draw  plot
+  res@trYMaxF = 0.1
+  res@trYMinF = -2.0
+  res2@trYMaxF = 0.1
+  res2@tiYAxisString = "Surface Temperature (K)"
+  res2@trYMinF = -2.0
+  res3@trYMaxF = 0.1
+  res3@trYMinF = -2.0
+  res3@tiYAxisString = "Surface Temperature (K)"
+;  res@tmYLPrecision = 2
+;  res@tmYLAutoPrecision = False
+  plot(1) = gsn_csm_xy (wks,time,TS_range,res2) ; draw plot  
+  overlay(plot(1), gsn_csm_xy (wks,TS_time,TS_rbck,res))
+  overlay(plot(1), gsn_csm_xy (wks,time,TS_diff,res3)) ; draw  plot
   
   res@trYMaxF = 0.01
   res@trYMinF = -0.32
   res@tmYLPrecision = 1
-  res@tmYLAutoPrecision = False
+;  res@tmYLAutoPrecision = False
   res@tiYAxisString = "Precipitation (mm/day)"
-  res@xyLineColor       = "red"          ; change line color
-  print("plot(2) = gsn_csm_xy (wks,PRECT_time,PRECT_rbck,res)")
-  plot(2) = gsn_csm_xy (wks,PRECT_time,PRECT_rbck,res) ; draw plot
-  res@xyLineColor       = "black"          ; change line color
-  print("overlay(plot(2), gsn_csm_xy (wks,time,PRECT_diff1,res))")
-  overlay(plot(2), gsn_csm_xy (wks,time,PRECT_diff1,res)) ; draw plot
+  res2@trYMaxF = 0.01
+  res2@trYMinF = -0.32
+  res2@tmYLPrecision = 1
+  res2@tiYAxisString = "Precipitation (mm/day)"
+  res3@trYMaxF = 0.01
+  res3@trYMinF = -0.32
+  res3@tiYAxisString = "Precipitation (mm/day)"
+  res3@tmYLPrecision = 1
+  plot(2) = gsn_csm_xy (wks,time,PRECT_range,res2) ; draw plot
+  overlay(plot(2), gsn_csm_xy (wks,PRECT_time,PRECT_rbck,res)) ; draw plot
+  overlay(plot(2), gsn_csm_xy (wks,time,PRECT_diff,res3)) ; draw plot
   
   newplot = gsn_attach_plots(baseplot,plot,res,resP)
   draw(baseplot)
   
   txres = True
   txres@txFontHeightF = 0.017
-  txres@txFontColor="black"
-  gsn_text_ndc(wks,"CESM1(WACCM)",0.43,0.80,txres)
+  txres@txFontColor="midnightblue"
+  gsn_text_ndc(wks,"CESM1(WACCM)",0.73,0.90,txres)
   txres@txFontColor="red"
-  gsn_text_ndc(wks,"GISS ModelE",0.43,0.77,txres)
+  gsn_text_ndc(wks,"GISS ModelE",0.73,0.87,txres)
     
   delete(wks)
   
@@ -284,3 +299,5 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
     open=systemfunc(opencmd)
     print(open)
   end if
+  
+;  print(PRECT_diff+" "+PRECT_range(0,:)+" "+PRECT_range(1,:))

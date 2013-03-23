@@ -89,6 +89,9 @@ begin
       rm=systemfunc("rm "+massfilepath+massfile)
       print("creating "+massfilepath+massfile)
       mfileid = addfile(massfilepath+massfile, "c")
+      ; Create an UNLIMITED record dimension in the output netCDF file.  This is critical if 
+      ;  the user plans to ever use NCO to concatenate the file along the time/record dimension.
+      filedimdef(mfileid,"time",-1,True)
       
       do j = 0, nTracers - 1
         dmass(i, j, :) = (/mass(i, j, :)/) ;- mass(i, j, 0)
@@ -177,4 +180,10 @@ caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003"
 opt=True
 opt@icfile=rootpath+"/b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg/ic/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.001.cam2.i.2013-01-01-00000.nc"
 opt@overwritemass=True
+plotMass( rootpath, "h0zm", caseid, "SOOT01", opt )
+
+caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.006"
+plotMass( rootpath, "h0zm", caseid, "SOOT01", opt )
+
+caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.007"
 plotMass( rootpath, "h0zm", caseid, "SOOT01", opt )
