@@ -55,28 +55,30 @@ if  [ -n "$caseid" ] ; then
     htype=''
   fi
 
-  wadir=$rootpath'/'$caseid'/'$runname'/'$hnum$htype
-  outdir=$rootpath'/'$caseid'/'$runname'/'$hnum'zm'$htype
-  
-  if [[ $machine = 'lou' ]];then
-    rootpath=$HOME'/csm'
-    wadir=$rootpath'/'$caseid'/atm/hist'
-    outdir=$rootpath'/'$caseid'/atm/'$hnum'zm'$htype
+  if [ ! -n "$wadir" ] ; then
+    wadir=$rootpath'/'$caseid'/'$runname'/'$hnum$htype'/'
   fi
-
+  
+  if [ ! -n "$outdir" ] ; then
+    outdir=$rootpath'/'$caseid'/'$runname'/'$hnum'zm'$htype'/'
+  fi
+  
   mkdir -p $outdir
+  
+  cd $wadir
+  pwd
 
-  for a in `ls -1 $wadir/*$hnum*.nc`; do
+  for a in `ls -1 *$hnum*.nc`; do
     oldfile=$a
     ls -sh $oldfile
-    newfile=`echo $oldfile | sed 's/'$hnum'/'$hnum'zm/g' | sed 's/hist/'$hnum'zm/g'`
+    newfile=`echo $oldfile | sed 's/'$hnum'/'$hnum'zm/g'`
 
-    if [[ ! -e $newfile ]];then
-      echo "ncwa -alon -O "$oldfile" "$newfile
-      ncwa -alon -O $oldfile $newfile
+    if [[ ! -e $outdir$newfile ]];then
+      echo "ncwa -alon -O "$oldfile" "$outdir$newfile
+      ncwa -alon -O $oldfile $outdir$newfile
     fi
   
-    ls -sh $newfile
+    ls -sh $outdir$newfile
 
   done
 

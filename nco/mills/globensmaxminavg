@@ -1,0 +1,55 @@
+#!/bin/ksh
+
+#export machine=`hostname`
+
+#if [[ $machine = 'modeling1' ]];then
+#  rootpath='/data4/mmills'
+#fi
+
+rootpath=$MODEL_PATH
+
+testid='b40.rcp4_5.2deg.wcm.carma.bc5tgIP'
+test1='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003'
+test2='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.006'
+test3='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.007'
+cntlid='bc0tg'
+cntl1='b40.rcp4_5.2deg.wcm.carma.bc0tg.006'
+cntl2='b40.rcp4_5.2deg.wcm.carma.bc0tg.007'
+cntl3='b40.rcp4_5.2deg.wcm.carma.bc0tg.008'
+
+# Create difference files
+tfile1=$rootpath'/'$test1'/h0gm/'$test1'.cam.h0.globavg.nc'
+cfile1=$rootpath'/'$cntl1'/h0gm/'$cntl1'.cam.h0.globavg.nc'
+dfile1=$rootpath'/'$test1'/h0gm/'$test1'-'$cntl1'.cam.h0.globavg.nc'
+echo 'ncdiff -O '$tfile1' '$cfile1' '$dfile1
+ncdiff -O $tfile1 $cfile1 $dfile1
+
+tfile2=$rootpath'/'$test2'/h0gm/'$test2'.cam.h0.globavg.nc'
+cfile2=$rootpath'/'$cntl2'/h0gm/'$cntl2'.cam.h0.globavg.nc'
+dfile2=$rootpath'/'$test2'/h0gm/'$test2'-'$cntl2'.cam.h0.globavg.nc'
+echo 'ncdiff -O '$tfile2' '$cfile2' '$dfile2
+ncdiff -O $tfile2 $cfile2 $dfile2
+
+tfile3=$rootpath'/'$test3'/h0gm/'$test3'.cam.h0.globavg.nc'
+cfile3=$rootpath'/'$cntl3'/h0gm/'$cntl3'.cam.h0.globavg.nc'
+dfile3=$rootpath'/'$test3'/h0gm/'$test3'-'$cntl3'.cam.h0.globavg.nc'
+echo 'ncdiff -O '$tfile3' '$cfile3' '$dfile3
+ncdiff -O $tfile3 $cfile3 $dfile3
+
+outid=$testid'.avg'
+outpath=$rootpath'/'$outid'/h0gm'
+echo 'mkdir -p '$outpath
+mkdir -p $outpath
+
+outfile=$outpath'/'$testid'-'$cntlid'.cam.h0.avg.nc'
+echo 'ncea -O '$dfile1' '$dfile2' '$dfile3' '$outfile
+ncea -O $dfile1 $dfile2 $dfile3 $outfile
+
+outfile=$outpath'/'$testid'-'$cntlid'.cam.h0.max.nc'
+echo 'ncea -O -y max '$dfile1' '$dfile2' '$dfile3' '$outfile
+ncea -O -y max $dfile1 $dfile2 $dfile3 $outfile
+
+outfile=$outpath'/'$testid'-'$cntlid'.cam.h0.min.nc'
+echo 'ncea -O -y min '$dfile1' '$dfile2' '$dfile3' '$outfile
+ncea -O -y min $dfile1 $dfile2 $dfile3 $outfile
+
