@@ -4,13 +4,15 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
 host   = systemfunc("hostname")
 ostype = systemfunc("echo $OSTYPE")
+MODEL_PATH=getenv("MODEL_PATH")
+IMAGE_PATH=getenv("IMG_PATH")
 
 if (host.eq."modeling1") then
   path="/data4/mmills/"
 else if (isStrSubset(host,"caldera").or.isStrSubset(host,"geyser").or.isStrSubset(host,"yslogin")) then
-  path="$MODEL_PATH/"
+  path=MODEL_PATH+"/"
 else
-  path="$MODEL_PATH/ccsm/case/"  
+  path=MODEL_PATH+"/cesm/case/"  
 end if
 end if
 ;path="~/csm/"
@@ -166,7 +168,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   -1.525,-1.525,-1.186/)
  
   pdffile="TSvsRobockFigure."+test1+"-"+cntl1
-  wks   = gsn_open_wks ("pdf","$IMAGE_PATH/"+pdffile) ; open workstation
+  wks   = gsn_open_wks ("pdf",IMAGE_PATH+"/"+pdffile) ; open workstation
 
   nl = integertochar(10)  ; newline character
 
@@ -186,7 +188,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@vpHeightF           = 0.3
   res@gsnDraw = False
   res@gsnFrame     = False                        ; don't advance frame yet
-  res@xyLineThicknessF = 6.0
+  res@xyLineThicknessF = 5.0
 ;  res@vpWidthF=0.85
 
   res@xyLineColor       = "red"          ; change line color
@@ -200,6 +202,8 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   
   res@trXMinF = 0.0
   res@trXMaxF = max(time)
+  res@trYMinF = 0.0
+  res@trYMaxF = 5.0
   res@tiXAxisString = "Year"
 ;  res@tmXTLabelsOn = True
 ;  res@tmYRLabelsOn = True
@@ -217,84 +221,87 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res2@gsnXYFillColors = (/"lightblue"/)
 
   res3=res
-  res2@xyLineThicknessF = 3.0
+  res3@xyLineThicknessF = 4.0
   res3@xyLineColor       = "midnightblue"
   
   baseplot = gsn_csm_xy (wks, dmass&time/365., dmass_range/1e9,res2) ; draw plot
   overlay(baseplot, gsn_csm_xy (wks, robock(:,0), robock(:,1), res)) ; draw  plot
   overlay(baseplot, gsn_csm_xy (wks, dmass&time/365., dmass/1e9,res3)) ; draw  plot
   
-  res@tiYAxisString = "SW Net Flux (W/m~S~2~N~)"
+  res@tiYAxisString = "SW Flux (W m~S~-2~N~)"
 ;  res@trYMaxF = -0.01
   res@trYMaxF = 2.0
   res@trYMinF = -17.0
   res@tmYLPrecision=2
-  res2@trYMaxF = 2.0
-  res2@trYMinF = -17.0
-  res2@tiYAxisString = "SW Net Flux (W/m~S~2~N~)"
-  res2@tmYLPrecision=2
-  res3@trYMaxF = 2.0
-  res3@trYMinF = -17.0
-  res3@tiYAxisString = "SW Net Flux (W/m~S~2~N~)"
-  res3@tmYLPrecision=2
+  
+  res2=res
+  res2@xyLineThicknessF = 0.5
+  res2@xyMonoDashPattern = True
+  res2@xyLineColor       = "lightblue"
+  res2@gsnXYFillColors = (/"lightblue"/)
+  res3=res
+  res3@xyLineThicknessF = 3.0
+  res3@xyLineColor       = "midnightblue"
   
   plot(0) = gsn_csm_xy (wks,time,FSNS_range,res2) ; draw plot
   overlay(plot(0), gsn_csm_xy (wks,FSNS_time,FSNS_rbck,res)) ; draw plot
   overlay(plot(0), gsn_csm_xy (wks,time,FSNS_diff,res3)) ; draw plot
   
-  res@tiYAxisString = "Surface Temperature (K)"
+  res@tiYAxisString = "Temperature (K)"
   res@trYMaxF = 0.1
-  res@trYMinF = -2.0
-  res2@trYMaxF = 0.1
-  res2@tiYAxisString = "Surface Temperature (K)"
-  res2@trYMinF = -2.0
-  res3@trYMaxF = 0.1
-  res3@trYMinF = -2.0
-  res3@tiYAxisString = "Surface Temperature (K)"
-;  res@tmYLPrecision = 2
-;  res@tmYLAutoPrecision = False
+  res@trYMinF = -2.1
+
+  res2=res
+  res2@xyLineThicknessF = 0.5
+  res2@xyMonoDashPattern = True
+  res2@xyLineColor       = "lightblue"
+  res2@gsnXYFillColors = (/"lightblue"/)
+  res3=res
+  res3@xyLineThicknessF = 3.0
+  res3@xyLineColor       = "midnightblue"
   plot(1) = gsn_csm_xy (wks,time,TS_range,res2) ; draw plot  
   overlay(plot(1), gsn_csm_xy (wks,TS_time,TS_rbck,res))
   overlay(plot(1), gsn_csm_xy (wks,time,TS_diff,res3)) ; draw  plot
   
-  res@trYMaxF = 0.01
+  res@trYMaxF = 0.05
   res@trYMinF = -0.32
   res@tmYLPrecision = 1
-;  res@tmYLAutoPrecision = False
-  res@tiYAxisString = "Precipitation (mm/day)"
-  res2@trYMaxF = 0.01
-  res2@trYMinF = -0.32
-  res2@tmYLPrecision = 1
-  res2@tiYAxisString = "Precipitation (mm/day)"
-  res3@trYMaxF = 0.01
-  res3@trYMinF = -0.32
-  res3@tiYAxisString = "Precipitation (mm/day)"
-  res3@tmYLPrecision = 1
+  res@tiYAxisString = "Precipitation (mm d~S~-1~N~)"
+
+  res2=res
+  res2@xyLineThicknessF = 0.5
+  res2@xyMonoDashPattern = True
+  res2@xyLineColor       = "lightblue"
+  res2@gsnXYFillColors = (/"lightblue"/)
+  res3=res
+  res3@xyLineThicknessF = 3.0
+  res3@xyLineColor       = "midnightblue"
   plot(2) = gsn_csm_xy (wks,time,PRECT_range,res2) ; draw plot
   overlay(plot(2), gsn_csm_xy (wks,PRECT_time,PRECT_rbck,res)) ; draw plot
   overlay(plot(2), gsn_csm_xy (wks,time,PRECT_diff,res3)) ; draw plot
   
+  resP@tiYAxisFontHeightF=0.015
   newplot = gsn_attach_plots(baseplot,plot,res,resP)
   draw(baseplot)
   
   txres = True
-  txres@txFontHeightF = 0.017
+  txres@txFontHeightF = 0.02
   txres@txFontColor="midnightblue"
-  gsn_text_ndc(wks,"CESM1(WACCM)",0.73,0.90,txres)
+  gsn_text_ndc(wks,"CESM1(WACCM)",0.73,0.88,txres)
   txres@txFontColor="red"
-  gsn_text_ndc(wks,"GISS ModelE",0.73,0.87,txres)
+  gsn_text_ndc(wks,"GISS ModelE",0.73,0.84,txres)
     
   delete(wks)
   
   if (host.eq."modeling1") then
-    muttcmd="mutt mikejmills@mac.com -a $IMAGE_PATH/"+pdffile+".pdf -s "+pdffile+" < /dev/null"
+    muttcmd="mutt mikejmills@mac.com -a "+IMAGE_PATH+"/"+pdffile+".pdf -s "+pdffile+" < /dev/null"
     print(muttcmd)
     mutter=systemfunc(muttcmd)
     print(mutter)
   end if
 
   if (ostype.eq."darwin") then
-    opencmd="open $IMAGE_PATH/"+pdffile+".pdf"
+    opencmd="open "+IMAGE_PATH+"/"+pdffile+".pdf"
     print(opencmd)
     open=systemfunc(opencmd)
     print(open)
