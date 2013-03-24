@@ -47,9 +47,9 @@ mfileid = addfile(massfilepath+massfile, "r")
 dmass_range(1,0:nTimes-1) = mfileid->SOOT01(0:nTimes-1)
 delete(mfileid)
       
-avgfile=path+root+test1+".avg/"+sub+"/"+root+test1+"-"+cntl1+".cam.h0.avg.nc"
-maxfile=path+root+test1+".avg/"+sub+"/"+root+test1+"-"+cntl1+".cam.h0.max.nc"
-minfile=path+root+test1+".avg/"+sub+"/"+root+test1+"-"+cntl1+".cam.h0.min.nc"
+avgfile=path+root+test1+".avg/"+sub+"/"+test1+"-"+cntl1+".cam.h0.avg.nc"
+maxfile=path+root+test1+".avg/"+sub+"/"+test1+"-"+cntl1+".cam.h0.max.nc"
+minfile=path+root+test1+".avg/"+sub+"/"+test1+"-"+cntl1+".cam.h0.min.nc"
 print("adding avg file: "+avgfile)
 avgfileh=addfile(avgfile,"r")
 print("adding max file: "+maxfile)
@@ -181,9 +181,12 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   resP@gsnAttachPlotsXAxis =True
   resP@gsnPaperOrientation = "landscape"
   resP@gsnMaximize         = True          ; expand plot size to maximum
+  resP@tmYMajorGrid = True
  
   
   res                   = True                      ; plot mods desired
+  res@tmYMajorGrid = True
+  res@tmYMajorGridLineDashPattern = 2
   res@vpWidthF            = 1.3           ; change aspect ratio of plot
   res@vpHeightF           = 0.3
   res@gsnDraw = False
@@ -233,6 +236,10 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@trYMaxF = 2.0
   res@trYMinF = -17.0
   res@tmYLPrecision=2
+  res@tmYLMode = "Manual"
+  res@tmYLTickStartF = -20.0
+  res@tmYLTickSpacingF = 5.0
+  res@tmYLMinorPerMajor = 4
   
   res2=res
   res2@xyLineThicknessF = 0.5
@@ -249,7 +256,10 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   
   res@tiYAxisString = "Temperature (K)"
   res@trYMaxF = 0.1
-  res@trYMinF = -2.1
+  res@trYMinF = -1.9
+  res@tmYLMode = "Manual"
+  res@tmYLTickStartF = -2.0
+  res@tmYLTickSpacingF = 0.5
 
   res2=res
   res2@xyLineThicknessF = 0.5
@@ -267,6 +277,7 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   res@trYMinF = -0.32
   res@tmYLPrecision = 1
   res@tiYAxisString = "Precipitation (mm d~S~-1~N~)"
+  res@tmYLMode = "Automatic"
 
   res2=res
   res2@xyLineThicknessF = 0.5
@@ -287,9 +298,9 @@ FSNS_rbck = (/-0.339,-0.339,-6.949,-16.441,-14.746,-13.729,-13.729,-12.881,-13.3
   txres = True
   txres@txFontHeightF = 0.02
   txres@txFontColor="midnightblue"
-  gsn_text_ndc(wks,"CESM1(WACCM)",0.73,0.88,txres)
+  gsn_text_ndc(wks,"CESM1(WACCM)",0.5,0.861,txres)
   txres@txFontColor="red"
-  gsn_text_ndc(wks,"GISS ModelE",0.73,0.84,txres)
+  gsn_text_ndc(wks,"GISS ModelE",0.5,0.825,txres)
     
   delete(wks)
   
