@@ -1,6 +1,6 @@
 
 oldfile = "/glade/p/cesm/cseg//inputdata/atm/cam/chem/trop_mozart_aero/emis/ar5_mam3_so2_elev_1850-2005_c090804.nc"
-newfile = "/glade/p/cesm/wawg/mmills/inputdata/ar5_mam3_so2_stratvolc_1850-2100_c130329.nc"
+newfile = "/glade/p/cesm/wawg/mmills/inputdata/ar5_mam3_so2_stratvolc_1850-2100_pin20_30_c130331.nc"
 
 oldfileh = addfile(oldfile,"r")
 lat = oldfileh->lat
@@ -9,12 +9,12 @@ lon = oldfileh->lon
 date = (/ 18490115, 19910614, 19910615, 19910616, 21001215 /)
 date!0="time"
 
-altitude= (/ 8.0, 17.0, 18.5 /)
+altitude= (/ 10.0, 25.0, 30.5 /)
 altitude@long_name = "altitude midlevel"
 altitude@units = "km"
 altitude!0="altitude"
 
-altitude_int= (/ 0.0, 16.0, 18.0, 19.0 /)
+altitude_int= (/ 0.0, 20.0, 30.0, 31.0 /)
 altitude_int@long_name = "altitude interval"
 altitude_int@units = "km"
 altitude_int!0="altitude_int"
@@ -33,8 +33,11 @@ stratvolc!3="lon"
 stratvolc&altitude=altitude
 stratvolc&lat=lat
 stratvolc&lon=lon
+stratvolc@long_name = "SO2 elevated emissions from explosive volcanoes" 
+stratvolc@units = "molecules/cm3/s"
 
-stratvolc(2,1,{15.1417},{120.35})=1.92e10
+
+stratvolc(2,1,{15.1417},{120.35})=3.84e6
 
 print("rm "+newfile)
 a=systemfunc("rm "+newfile)
