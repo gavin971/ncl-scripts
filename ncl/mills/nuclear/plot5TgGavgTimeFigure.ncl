@@ -32,6 +32,7 @@ mfileid = addfile(massfilepath+massfile, "r")
 dmass = mfileid->SOOT01
 delete(mfileid)
 nTimes = dimsizes(dmass)
+print("nTimes="+nTimes)
 
 dmass_range = new((/2,nTimes/), typeof(dmass))
 
