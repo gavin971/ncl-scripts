@@ -23,7 +23,7 @@ else
       if(isStrSubset(host,"cmip5"))
         rootpath="/data/waccm/"
       else
-        rootpath="/glade/p/cesm/wawg/waccm/"  
+        rootpath="/glade/p/cesm/wawg/runs/cesm1_2/"  
       end if
     end if
   end if
@@ -36,6 +36,8 @@ else
   in_dir =rootpath+run_name+"/"+subdir+"/"
   print("in_dir="+in_dir)
   save_dir =rootpath+run_name+"/atm/proc/"
+  print("mkdir -p "+save_dir)
+  a = systemfunc("mkdir -p "+save_dir)
   savefile=save_dir+run_name+"_RESTOM.nc"
   print("savefile="+savefile)
 
@@ -192,7 +194,6 @@ else
 
   ;  year = ispan (year0,nyears+year0-1,1)  
 
-    a = systemfunc("mkdir -p "+save_dir)
     ; Remove any preexisting file.
     print("  Deleting " + savefile)
     system("/bin/rm " + savefile)
