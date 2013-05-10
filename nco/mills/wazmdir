@@ -9,38 +9,42 @@
 
 if  [ -n "$caseid" ] ; then
   export machine=`hostname`
+  
+  if [ ! -n "$rootpath" ] ; then
 
-  if [[ $machine =~ 'yslogin' ]];then
-    rootpath='/glade/p/cesm/wawg/mmills/run'
-  fi
-
-  if [[ $machine =~ 'geyser' ]];then
-    rootpath='/glade/p/cesm/wawg/mmills/run'
-  fi
-
-  if [[ $machine =~ 'caldera' ]];then
-    rootpath='/glade/p/cesm/wawg/mmills/run'
-  fi
-
-  if [[ $machine =~ 'mirage' ]];then
-    rootpath='/CESM/wawg/runs'
-  fi
-
-  if [[ $machine = 'modeling1' ]];then
-    rootpath='/data4/mmills'
-#    rootpath='/data5/mmills/wa319/carma-soot'
-  fi
-
-  if [[ $machine = 'cmip5' ]];then
-    if [[ $caseid =~ 'wcm' ]]; then
-      rootpath='/data/waccm'
-    else
-      rootpath='/data/ccsm4'
+    if [[ $machine =~ 'yslogin' ]];then
+      rootpath='/glade/p/cesm/wawg/mmills/run'
     fi
-  fi
 
-  if [[ $OSTYPE = 'darwin' ]];then
-    rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+    if [[ $machine =~ 'geyser' ]];then
+      rootpath='/glade/p/cesm/wawg/mmills/run'
+    fi
+
+    if [[ $machine =~ 'caldera' ]];then
+      rootpath='/glade/p/cesm/wawg/mmills/run'
+    fi
+
+    if [[ $machine =~ 'mirage' ]];then
+      rootpath='/CESM/wawg/runs'
+    fi
+
+    if [[ $machine = 'modeling1' ]];then
+      rootpath='/data4/mmills'
+  #    rootpath='/data5/mmills/wa319/carma-soot'
+    fi
+
+    if [[ $machine = 'cmip5' ]];then
+      if [[ $caseid =~ 'wcm' ]]; then
+        rootpath='/data/waccm'
+      else
+        rootpath='/data/ccsm4'
+      fi
+    fi
+
+    if [[ $OSTYPE = 'darwin' ]];then
+      rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+    fi
+    
   fi
 
   if [ ! -n "$runname" ] ; then
@@ -56,11 +60,11 @@ if  [ -n "$caseid" ] ; then
   fi
 
   if [ ! -n "$wadir" ] ; then
-    wadir=$rootpath'/'$caseid'/'$runname'/'$hnum$htype'/'
+    wadir=$rootpath'/'$caseid'/'$runname'/atm/hist/'
   fi
   
   if [ ! -n "$outdir" ] ; then
-    outdir=$rootpath'/'$caseid'/'$runname'/'$hnum'zm'$htype'/'
+    outdir=$rootpath'/'$caseid'/'$runname'/atm/proc/'$hnum'zm'$htype'/'
   fi
   
   mkdir -p $outdir
@@ -74,7 +78,7 @@ if  [ -n "$caseid" ] ; then
     newfile=`echo $oldfile | sed 's/'$hnum'/'$hnum'zm/g'`
 
     if [[ ! -e $outdir$newfile ]];then
-      echo "ncwa -alon -O "$oldfile" "$outdir$newfile
+      echo "ncwa -alon -O "$oldfile" "$outdir"/"$newfile
       ncwa -alon -O $oldfile $outdir$newfile
     fi
   
