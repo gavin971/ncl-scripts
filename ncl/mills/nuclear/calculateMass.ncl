@@ -189,11 +189,17 @@ begin
         cellMass&lon = lon
       end if
     
-      print("    column mass ...")
+      if (ismissing(opt@lev1)) then
+        lev1=2000.
+      else 
+        lev1=opt@lev1
+      end if
+      print("    column mass ... lev1="+lev1+" hPa")
+      
       if (rank.eq.4) then      
-        columnMass = dim_sum_Wrap(cellMass(time|:, lat|:, lon|:, lev|:))
+        columnMass = dim_sum_Wrap(cellMass(time|:, lat|:, lon|:, {lev|:lev1}))
       else
-        columnMass = dim_sum_Wrap(cellMass(time|:, lat|:, lev|:))
+        columnMass = dim_sum_Wrap(cellMass(time|:, lat|:, {lev|:lev1}))
       end if
           
       ; Calculate the total mass of the tracer.

@@ -1,6 +1,6 @@
 
 oldfile = "/glade/p/cesm/cseg//inputdata/atm/cam/chem/trop_mozart_aero/emis/ar5_mam3_so2_elev_1850-2005_c090804.nc"
-newfile = "/glade/p/cesm/wawg/mmills/inputdata/ar5_mam3_so2_stratvolc_1850-2100_10xpin20_30_c130408.nc"
+newfile = "/glade/p/cesm/wawg/mmills/inputdata/ar5_mam3_so2_stratvolc_1850-2100_10xpin20_30_c130514.nc"
 
 oldfileh = addfile(oldfile,"r")
 lat = oldfileh->lat
@@ -36,7 +36,8 @@ stratvolc&lon=lon
 stratvolc@long_name = "SO2 elevated emissions from explosive volcanoes" 
 stratvolc@units = "molecules/cm3/s"
 
-rate=3.84e7 ; molec/cm3/s
+;rate=3.84e7 ; molec/cm3/s
+rate=3.84e10 ; molec/cm3/s
 stratvolc(2,1,{15.1417},{120.35})=rate
 
 print("rm "+newfile)
