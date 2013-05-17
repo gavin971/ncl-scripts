@@ -69,7 +69,7 @@ begin
       end do
       delete(mfileid)
     else
-      historyPath = basePath + runNames(i) + "/" + historyPattern + "/"
+      historyPath = basePath + runNames(i) + "/" + historyPattern + "/*"
       print("calling calculateMass, historyPath="+historyPath)
       test = calculateMass(historyPath, tracerNames, opt)
       time=test&time

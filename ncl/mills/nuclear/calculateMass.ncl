@@ -18,19 +18,22 @@ begin
 
   historyNames = systemfunc("ls " + historyPath)
   print("historyNames:"+dimsizes(historyNames))
-  history = addfiles(historyPath+historyNames, "r")
+;  history = addfiles(historyPath+historyNames, "r")
+  history = addfiles(historyNames, "r")
   ListSetType(history, "cat")
   
   ; Read in the fields we will need.
   print(" calcPdel: Reading PS")
-  ps = addfiles_GetVar(history, historyPath+historyNames, "PS")
+;  ps = addfiles_GetVar(history, historyPath+historyNames, "PS")
+  ps = addfiles_GetVar(history, historyNames, "PS")
   print("ps:"+dimsizes(ps))
   rank=dimsizes(dimsizes(ps))
   p0 = history[0]->P0
   hyai = history[0]->hyai
   hybi = history[0]->hybi
   print(" calcPdel: Reading time")
-  time = addfiles_GetVar(history, historyPath+historyNames, "time")
+;  time = addfiles_GetVar(history, historyPath+historyNames, "time")
+  time = addfiles_GetVar(history, historyNames, "time")
   print("time:"+dimsizes(time))
   lev = history[0]->lev
   lat = history[0]->lat
@@ -89,10 +92,12 @@ begin
   ; a time evolution of the mass.
   print(" calculateMass: Reading data ...")
   historyNames = systemfunc("ls " + historyPath)
-  history = addfiles(historyPath+historyNames, "r")
+;  history = addfiles(historyPath+historyNames, "r")
+  history = addfiles(historyNames, "r")
   ListSetType(history, "cat")
 ;  histtime=history[:]&time
-  histtime=addfiles_GetVar(history, historyPath+historyNames, "time")
+;  histtime=addfiles_GetVar(history, historyPath+historyNames, "time")
+  histtime=addfiles_GetVar(history, historyNames, "time")
 ;  print(histtime)
   
   ; Read in the fields we will need.
@@ -150,8 +155,13 @@ begin
     else
     
       print("  Calculating mass for " + tracerNames(t) + " ...")
-      tracerMMR = addfiles_GetVar(history, historyPath+historyNames, tracerNames(t))
-  
+;      tracerMMR = addfiles_GetVar(history, historyPath+historyNames, tracerNames(t))
+      tracerMMR = addfiles_GetVar(history, historyNames, tracerNames(t))
+      print("   units=" + tracerMMR@units)
+      if (tracerMMR@units .eq. "mol/mol") then
+        tracerMMR = tracerMMR * tracerNames@molwts(t)/28.964
+        tracerMMR@units = "kg/kg"
+      end if
       ; Determine some of the dimensions.
       lev = tracerMMR&lev
       lat = tracerMMR&lat
@@ -279,6 +289,11 @@ begin
 
       icfile=addfile(opt@icfile,"r")
       tracericMMR=icfile->$tracerNames(t)$
+      print(" IC file "+tracerNames(t)+" units=" + tracerMMR@units)
+      if (tracerMMR@units .eq. "mol/mol") then
+        tracerMMR = tracerMMR * tracerNames@molwts(t)/28.964
+        tracerMMR@units = "kg/kg"
+      end if
       if (rank.eq.4) then
         cellMass3D = (pdeldry(time|0, lat|:, lev|:) / g) * tracericMMR(time|0, lat|:, lev|:)
         cellMass_zm = dim_avg_Wrap(cellMass3D(lat|:, lev|:, lon|:))

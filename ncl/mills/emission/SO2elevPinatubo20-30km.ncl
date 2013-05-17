@@ -1,6 +1,6 @@
 
 oldfile = "/glade/p/cesm/cseg//inputdata/atm/cam/chem/trop_mozart_aero/emis/ar5_mam3_so2_elev_1850-2005_c090804.nc"
-newfile = "/glade/p/cesm/wawg/mmills/inputdata/ar5_mam3_so2_stratvolc_1850-2100_pin20_30_c130331.nc"
+newfile = "/glade/p/cesm/wawg/mmills/inputdata/ar5_mam3_so2_stratvolc_1850-2100_pin20_30_c130515.nc"
 
 oldfileh = addfile(oldfile,"r")
 lat = oldfileh->lat
@@ -24,7 +24,7 @@ nlats=dimsizes(lat)
 nlons=dimsizes(lon)
 nalts=dimsizes(altitude)
 
-stratvolc = new( (/ ntimes, nalts, nlats, nlons /), float)
+stratvolc = new( (/ ntimes, nalts, nlats, nlons /), double)
 stratvolc(:,:,:,:) = 0.0
 stratvolc!0="time"
 stratvolc!1="altitude"
@@ -36,8 +36,9 @@ stratvolc&lon=lon
 stratvolc@long_name = "SO2 elevated emissions from explosive volcanoes" 
 stratvolc@units = "molecules/cm3/s"
 
-
-stratvolc(2,1,{15.1417},{120.35})=3.84e6
+;rate=3.84e6
+rate=3.84d9
+stratvolc(2,1,{15.1417},{120.35})=rate
 
 print("rm "+newfile)
 a=systemfunc("rm "+newfile)
@@ -67,10 +68,10 @@ filedimdef(newfileh,"time",-1,True)
   globalAtt@title = nl+\
       "Stratospheric volcano SO2 emissions" 
   globalAtt@history = nl+\
-      "Created by SO2elevPinatubo.ncl"
+      "Created by SO2elevPinatubo20-30km.ncl"
   globalAtt@notes = nl+\
       "This file includes emissions for the following eruptions:"+nl+\ 
-      "  Pinatubo: June 15, 1991, 20 Tg, 16-18km, 1.92e10 molec/cm3/s"
+      "  Pinatubo (15.1417N, 120.35W): June 15, 1991, 20 Tg, 20-30km, "+rate+" molec/cm3/s"
   fileattdef( newfileh, globalAtt )
 
 newfileh->date = date
