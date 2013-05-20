@@ -31,41 +31,107 @@ begin
   ; NOTE: Convert arho and amass are in cgs units.
   print("")
   print("  Reading pressure variables ...")
-  hyai 	= history->hyai
-  hybi 	= history->hybi
+  hyam 	= history->hyam
+  hybm 	= history->hybm
   P0 	= history->P0
   PS 	= history->PS
-  print("  Reading so4 variables ...")
-  so4_a1= history->so4_a1        ; kg/kg air
-  so4_a2= history->so4_a2        ; kg/kg air
-  so4_a3= history->so4_a3        ; kg/kg air
-  print("  Summing so4 variables ...")
-  so4 = so4_a1 + so4_a2 + so4_a3 ; kg/kg air
-  print("  Reading dgnd variables ...")
-  dgnd_a1= history->dgnd_a1      ; diameter (m)
-  dgnd_a2= history->dgnd_a2      ; diameter (m)
-  dgnd_a3= history->dgnd_a3      ; diameter (m)
-  print("  Reading num variables ...")
-  num_a1= history->num_a1        ; kg/kg air
-  num_a2= history->num_a2        ; kg/kg air
-  num_a3= history->num_a3        ; kg/kg air
+  if (isfilevar(history,"so4")) then
+    print("  Reading so4 ...")
+    so4 = history->so4
+    printVarSummary(so4)
+  else
+    print("  Reading so4 variables ...")
+    so4_a1= history->so4_a1        ; kg/kg air
+    so4_a2= history->so4_a2        ; kg/kg air
+    so4_a3= history->so4_a3        ; kg/kg air
+    print("  Summing so4 variables ...")
+    so4 = so4_a1 ; get metadata
+    so4 = so4_a1 + so4_a2 + so4_a3 ; kg/kg air
+    so4@long_name="so4 concentration"
+    print("  Saving so4 ...")
+    printVarSummary(so4)
+    history->so4 = so4
+  end if
+;  print("  Reading dgnd variables ...")
+;  dgnd_a1= history->dgnd_a1      ; diameter (m)
+;  dgnd_a2= history->dgnd_a2      ; diameter (m)
+;  dgnd_a3= history->dgnd_a3      ; diameter (m)
+;  print("  Reading num variables ...")
+;  num_a1= history->num_a1        ; kg/kg air
+;  num_a2= history->num_a2        ; kg/kg air
+;  num_a3= history->num_a3        ; kg/kg air
   
 
   ; Calculate the air pressures at the interfaces.
-  print("  Calculating air pressure ...")
-  P = pres_hybrid_ccm(PS(:,:,:), P0, hyai(:) ,hybi(:))
-  delete(PS)
+  if (isfilevar(history,"P")) then
+    print("  Reading P ...")
+    P = history->P
+    history->P@units="Pa"
+    P@units="Pa"
+  else
+    print("  Calculating air pressure ...")
+    P = so4 ; get metadata
+    P = pres_hybrid_ccm(PS(:,:,:), P0, hyam(:) ,hybm(:))
+    delete(PS)
+    P@long_name="Pressure"
+    P@units="Pa"   
+    print("  Saving P ...")
+    printVarSummary(P)
+    history->P = P
+  end if
 ;  pdel = P(:, 1:nLevs, :, :) - P(:, 0:nLevs-1, :, :)
   
   ; Calculate the atmospheric density (g/cm3) assuming an ideal gas.
-  print("  Calculating air density ...")
-  arhomass(:,:,:,:)  = P(:,:,:,:) / (RDAIR * T(:,:,:,:))
-  arhomass@units = "g/cm3"
+  if (isfilevar(history,"arhomass")) then
+    print("  Reading arhomass ...")
+    arhomass = history->arhomass
+    arhomass = arhomass / 1.e3 ; kg/m3 -> g/cm3
+    print("  Saving arhomass ...")
+    printVarSummary(arhomass)    
+    history->arhomass=arhomass
+  else
+    print("  Reading T ...")
+    T = history->T
+    printVarSummary(T)
+    arhomass = T ; get metadata
+    print("  Calculating air density ...")
+    arhomass(:,:,:,:)  = P(:,:,:,:) / (RDAIR * T(:,:,:,:)) / 1.e3 ; kg/m3 -> g/cm3
+    arhomass@long_name="air density"
+    arhomass@units = "g/cm3"
+    print("  Saving arhomass ...")
+    printVarSummary(arhomass)    
+    history->arhomass=arhomass
+  end if
   
-  so4_nd = so4 * arhomass * AVOGAD / MWNH4HSO4
-  so4_nd@units = "molec/cm3"
+  if (isfilevar(history,"so4_nd")) then
+    print("  Reading so4_nd ...")
+    so4_nd = history->so4_nd
+    so4_nd = so4_nd / 1.e3 ; kg/m3 -> g/cm3
+    print("  Saving so4_nd ...")
+    printVarSummary(so4_nd)    
+    history->so4_nd=so4_nd
+  else
+    print("  Calculating sulfate molec/cm3 ...")
+    so4_nd = so4 ; get metadata
+    so4_nd = so4(:,:,:,:) * arhomass(:,:,:,:) * AVOGAD / MWNH4HSO4
+    so4_nd@long_name="so4 number density"
+    so4_nd@units = "molec/cm3"
+    print("  Saving so4_nd ...")
+    printVarSummary(so4_nd)    
+    history->so4_nd=so4_nd
+  end if
 
   
-  
 end
+
+rootpath="/glade/scratch/mmills/archive/b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001/atm/proc/h0mam/"
+historyNames=systemfunc("ls "+rootpath)
+nfiles=dimsizes(historyNames)
+
+do i = 0,nfiles-1
+  i1=i+1
+  print("File "+i1+" of "+nfiles+":"+historyNames(i))
+;filename="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001.cam.h0.1991-03.nc"
+  calcAerProp(rootpath,historyNames(i))
+end do
 
