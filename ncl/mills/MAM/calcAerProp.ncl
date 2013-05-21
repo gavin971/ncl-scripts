@@ -85,10 +85,7 @@ begin
   if (isfilevar(history,"arhomass")) then
     print("  Reading arhomass ...")
     arhomass = history->arhomass
-    arhomass = arhomass / 1.e3 ; kg/m3 -> g/cm3
-    print("  Saving arhomass ...")
     printVarSummary(arhomass)    
-    history->arhomass=arhomass
   else
     print("  Reading T ...")
     T = history->T
@@ -106,14 +103,11 @@ begin
   if (isfilevar(history,"so4_nd")) then
     print("  Reading so4_nd ...")
     so4_nd = history->so4_nd
-    so4_nd = so4_nd / 1.e3 ; kg/m3 -> g/cm3
-    print("  Saving so4_nd ...")
     printVarSummary(so4_nd)    
-    history->so4_nd=so4_nd
   else
     print("  Calculating sulfate molec/cm3 ...")
     so4_nd = so4 ; get metadata
-    so4_nd = so4(:,:,:,:) * arhomass(:,:,:,:) * AVOGAD / MWNH4HSO4
+    so4_nd = so4(:,:,:,:) * arhomass(:,:,:,:) * AVOGAD / 1.e3 / MWNH4HSO4
     so4_nd@long_name="so4 number density"
     so4_nd@units = "molec/cm3"
     print("  Saving so4_nd ...")
@@ -124,14 +118,16 @@ begin
   
 end
 
-rootpath="/glade/scratch/mmills/archive/b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001/atm/proc/h0mam/"
+;caseid="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001"
+;caseid="b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001"
+caseid="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnh1um.qboon.001"
+rootpath="/glade/scratch/mmills/archive/"+caseid+"/atm/proc/h0mam/"
 historyNames=systemfunc("ls "+rootpath)
 nfiles=dimsizes(historyNames)
 
 do i = 0,nfiles-1
   i1=i+1
   print("File "+i1+" of "+nfiles+":"+historyNames(i))
-;filename="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001.cam.h0.1991-03.nc"
   calcAerProp(rootpath,historyNames(i))
 end do
 
