@@ -92,6 +92,7 @@ begin
   ; a time evolution of the mass.
   print(" calculateMass: Reading data ...")
   historyNames = systemfunc("ls " + historyPath)
+;  print(historyNames)
 ;  history = addfiles(historyPath+historyNames, "r")
   history = addfiles(historyNames, "r")
   ListSetType(history, "cat")

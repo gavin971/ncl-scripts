@@ -120,7 +120,9 @@ end
 
 ;caseid="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001"
 ;caseid="b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001"
-caseid="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnh1um.qboon.001"
+;caseid="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnh1um.qboon.001"
+caseid=getenv("caseid")
+print(caseid)
 rootpath="/glade/scratch/mmills/archive/"+caseid+"/atm/proc/h0mam/"
 historyNames=systemfunc("ls "+rootpath)
 nfiles=dimsizes(historyNames)
