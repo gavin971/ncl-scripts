@@ -124,8 +124,19 @@ end
 caseid=getenv("caseid")
 print(caseid)
 rootpath="/glade/scratch/mmills/archive/"+caseid+"/atm/proc/h0mam/"
+copypattern="/glade/scratch/mmills/archive/"+caseid+"/atm/hist/*h0*"
+print("===========================================================")
+print("mkdir -p "+rootpath)
+mkdir=systemfunc("mkdir -p "+rootpath)
+print("===========================================================")
+print("cp -n -v "+copypattern+" "+rootpath)
+cp=systemfunc("cp -n -v "+copypattern+" "+rootpath)
+print(cp)
+print("===========================================================")
 historyNames=systemfunc("ls "+rootpath)
+print(historyNames)
 nfiles=dimsizes(historyNames)
+print("===========================================================")
 
 do i = 0,nfiles-1
   i1=i+1

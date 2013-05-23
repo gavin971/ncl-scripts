@@ -14,37 +14,7 @@ begin
 
   nRuns = dimsizes(runNames)
   nTracers = dimsizes(tracerNames)
-  
-  ; To figure out the size of the array that we will need, open the first
-  ; set f history files.
-  historyPath = basePath + runNames(0) + "/atm/hist/*." + historyPattern + ".*"
-  print(historyPath)
-  historyNames = systemfunc("ls " + historyPath)
-;  print(historyNames)
-;  history = addfiles(historyPath+historyNames, "r")
-  history = addfiles(historyNames, "r")
-  ListSetType(history, "cat")
-;  nTimes = dimsizes(history[:]&time) 
-;  time1 = addfiles_GetVar(history, historyPath+historyNames, "time")
-  time1 = addfiles_GetVar(history, historyNames, "time")
-  nTimes = dimsizes(time1) 
-  print("nTimes="+nTimes)
-  
-  dmass = new((/ nRuns, nTimes /), "float")
-  dmass!0 = "run"
-  dmass&run = runNames
-  dmass!1 = "time"
-  dmass@units = "kg"
-  dmass(:,:)=0.0e0
-  dmass&time=time1
-  
-  sulfur=new((/nTracers*nRuns,nTimes/),float)
-  sulfur!1 = "time"
-  sulfur@units = "kg"
-  sulfur(:,:)=0.0e0
-  sulfur&time=time1
-  printVarSummary(sulfur)
-  
+    
   ; Calculate the tracer masses for all the runs.
   do i = 0, nRuns - 1
     print("")
@@ -52,16 +22,36 @@ begin
     print("Run :  " + runNames(i))
     
     massfilepath = basePath + runNames(i) + "/atm/proc/"
-    massfile = runNames(i) + "." + historyPattern + ".mass.nc"
-    
+    massfile = runNames(i) + "." + historyPattern + ".mass.nc"    
     exists = isfilepresent(massfilepath+massfile)
+    
     if (exists .and. .not.(opt@overwritemass)) then
       print("reading "+massfilepath+massfile)
       mfileid = addfile(massfilepath+massfile, "r")
       time=mfileid->time
       nt=dimsizes(time)
       print("  nt="+nt+" units="+time@units)
-;      sulfur=new((/nTracers,nt/),float)
+      
+      if (i .eq. 0) then
+        nTimes=nt
+        print("nTimes="+nTimes)
+
+        dmass = new((/ nRuns, nTimes /), "float")
+        dmass!0 = "run"
+        dmass&run = runNames
+        dmass!1 = "time"
+        dmass@units = "kg"
+        dmass(:,:)=0.0e0
+        dmass&time=time
+
+        sulfur=new((/nTracers*nRuns,nTimes/),float)
+        sulfur!1 = "time"
+        sulfur@units = "kg"
+        sulfur(:,:)=0.0e0
+        sulfur&time=time
+        printVarSummary(sulfur)        
+      end if
+      
       ntmin=min((/nt,nTimes/))-1
       t1=opt@timeoffset(i)
       t2=opt@timeoffset(i)+ntmin
@@ -70,7 +60,6 @@ begin
       do j = 0, nTracers - 1
         k=j+i*nTracers
         tracer = mfileid->$tracerNames(j)$
-;        printVarSummary(tracer)
         sulfur(k, t3:ntmin+t3) = tracer(t1:t2)*32.064999/tracerNames@molwts(j)
         if (j .ne. 0) then
           sulfur(k,:)=sulfur(k-1,:)+sulfur(k,:)
@@ -88,11 +77,29 @@ begin
       test = calculateMass(historyPath, tracerNames, opt)
       print("return from calculateMass")
       printVarSummary(test)
-      printVarSummary(sulfur)
-;      sulfur=test
-;      sulfur(:,:)=0.0
       time=test&time
       nt=dimsizes(time)
+      
+      if (i .eq. 0) then
+        nTimes=nt
+        print("nTimes="+nTimes)
+
+        dmass = new((/ nRuns, nTimes /), "float")
+        dmass!0 = "run"
+        dmass&run = runNames
+        dmass!1 = "time"
+        dmass@units = "kg"
+        dmass(:,:)=0.0e0
+        dmass&time=time
+
+        sulfur=new((/nTracers*nRuns,nTimes/),float)
+        sulfur!1 = "time"
+        sulfur@units = "kg"
+        sulfur(:,:)=0.0e0
+        sulfur&time=time
+        printVarSummary(sulfur)        
+      end if
+      
       print(" time@units:"+time@units+" nt="+nt)
       print(" dimsizes(test):"+dimsizes(test))
       ntmin=min((/nt,nTimes/))-1
@@ -163,7 +170,6 @@ begin
       
     delete(so4_tot)
     delete(time)
-;    delete(sulfur)
 ;    delete(res)
       
   end do ;i = 0, nRuns - 1
@@ -185,7 +191,7 @@ begin
 ;                            6.0,5.0,4.0,2.0,1.0,\
 ;                            6.0,5.0,4.0,2.0,1.0/)
   res@gsnLeftString = " "
-  res@gsnCenterString = "Mass burden (Tg)"
+  res@gsnCenterString = "Mass burden (Tg S)"
   res@gsnRightString  = " "
   res@xyLineColors    = (/"black","blue","green4","red",\
                           "black","blue","green4","red",\
@@ -195,7 +201,7 @@ begin
   res@xyDashPatterns = (/0,0,0,0,1,1,1,1,2,2,2,2/)
   res@trXMinF = 0.1
   res@trXMaxF = 2.0
-  plot = gsn_csm_xy(wks, time1/365., sulfur(:, :) /1e9, res)
+  plot = gsn_csm_xy(wks, sulfur&time/365., sulfur(:, :) /1e9, res)
 
   delete(res)
   res = True
@@ -210,11 +216,12 @@ begin
 ;  res@xyLineColors    = (/"black","blue","red"/)
 ;  res@xyMonoLineColor = False
 ;  res@xyMonoDashPattern = True
+  res@trXMinF = 0.1
   res@trXMaxF = 2.0
   res@xyLineThicknessF = 4.0
 
   res@gsnLeftString = " "
-  res@gsnCenterString = "Mass burden (Tg)"
+  res@gsnCenterString = "Sulfate mass burden (Tg S)"
   res@gsnRightString = " "
   plot = gsn_csm_xy(wks, dmass&time/365., dmass(:, :) /1e9, res)
 
@@ -225,8 +232,9 @@ end
 
 rootpath="/glade/scratch/mmills/archive/"
 ;caseid="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001"
-caseid=(/"b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001", \
-         "b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001" /);, \
+caseid = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001", \
+            "b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001" , \
+            "b.e11.B55TRW5CN.f19_g16.Pin17-25.dgnh1um.noqbo.001" /)
 ;         "b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnh1um.qboon.001" /);, \
 ;         "b.e11.B55TRW5CN.f19_g16.MJMtest.013", \
 ;         "b.e11.B55TRW5CN.f19_g16.MJMtest.010" /)
