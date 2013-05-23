@@ -54,7 +54,9 @@ print("   Min obs:"+min(tobsTropics))
 ; Normalize against 1989-1990
 t3=floattoint(365.25*(1989-1958)+0.5)
 t4=floattoint(365.25*(1991-1958)-30.5)
-tobsTropics=tobsTropics-dim_avg_Wrap(tobs({t3:t4},:,{-25:25}))
+tobsNormTime=dim_avg_Wrap(tobs({t3:t4},:,{-25:25}))
+tobsNorm=dim_avg_n_Wrap(tobsNormTime,0)
+;tobsTropics=tobsTropics-tobsNorm
 print("   Max obs:"+max(tobsTropics))
 print("   Min obs:"+min(tobsTropics))
 
@@ -86,7 +88,7 @@ do l = 0, nLevs - 1
 
     delete(date)
   end do
-  temp(l, nRuns, :) = (/tobsTropics(:,{levels(l)})/)
+  temp(l, nRuns, :) = (/tobsTropics(:,{levels(l)})/) - tobsNorm({levels(l)})
 ;  print("   Max obs:"+max(temp(l, nRuns, :)))
 ;  print("   Min obs:"+min(temp(l, nRuns, :)))
   res = True
@@ -100,6 +102,14 @@ do l = 0, nLevs - 1
   res@xyLineThicknesses = (/4.0, 4.0, 4.0, 8.0/)
   res@trXMinF = 1991.0
   res@trXMaxF = 1993.0
+  res@trYMinF = -2.0
+  if (l .eq. 3) then
+    delete(res@trYMinF)
+  end if
+  res@tmXMajorGrid = True
+  res@tmXMajorGridLineDashPattern = 2             ; select short dash lines
+  res@tmYMajorGrid = True
+  res@tmYMajorGridLineDashPattern = 2             ; select short dash lines
 ;  print("   Max all runs:"+max(temp(l, :, :)))
 ;  print("   Min all runs:"+min(temp(l, :, :)))
   res@gsnLeftString = " "
