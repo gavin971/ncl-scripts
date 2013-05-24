@@ -67,6 +67,7 @@ if  [ -n "$caseid" ] ; then
     outdir=$rootpath'/'$caseid'/'$runname'/atm/proc/'$hnum'zm'$htype'/'
   fi
   
+  echo "mkdir -p $outdir"
   mkdir -p $outdir
   
   cd $wadir
