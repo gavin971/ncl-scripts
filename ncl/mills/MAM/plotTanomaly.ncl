@@ -10,7 +10,7 @@ nRuns = dimsizes(runNames)
 cntlRun  =    "b.e11.B55TRW5CN.f19_g16.MJMtest.013"          
 rootpath =    "/glade/scratch/mmills/archive/"
 
-levels = (/ 30., 50., 70., 100. /)
+levels = (/ 30., 50., 70., 100., 1013.25 /)
 nLevs = dimsizes(levels)
 
 filename=cntlRun+".cam.h0.tropicsavg.nc"
@@ -22,6 +22,7 @@ d1=ind(date.eq.19910201)
 d2=ind(date.eq.19930101)
 nTimes=d2-d1+1
 tempcntl=fileid->T(d1:d2,:)
+TScntl=fileid->TS(d1:d2)
 datecntl=date(d1:d2)
 time=fileid->time(d1:d2)
 ;print(time)
@@ -66,8 +67,6 @@ wks = gsn_open_wks("pdf", "$IMAGE_PATH/"+pdffile)
 do l = 0, nLevs - 1
   print("")
   print("Level :  " + levels(l))
-  print("   Control Max:"+max(tempcntl(:,{levels(l)})))
-  print("   Control Min:"+min(tempcntl(:,{levels(l)})))
   do i = 0, nRuns - 1
     print("")
     print("  Run :  " + runNames(i))
@@ -81,14 +80,19 @@ do l = 0, nLevs - 1
     d1=ind(date.eq.19910201)
     d2=ind(date.eq.19930101)
 
-    temp(l, i, :) = (/fileid->T(d1:d2,{levels(l)})/)
-;    print("   Max:"+max(temp(l, i, :)))
-;    print("   Min:"+min(temp(l, i, :)))
-    temp(l, i, :) = temp(l, i, :) - (/tempcntl(:,{levels(l)})/)
-
+    if (levels(l).eq.1013.25) then
+      temp(l, i, :) = (/fileid->TS(d1:d2)/)
+      temp(l, i, :) = temp(l, i, :) - (/TScntl(:)/)
+    else
+      temp(l, i, :) = (/fileid->T(d1:d2,{levels(l)})/)
+      temp(l, i, :) = temp(l, i, :) - (/tempcntl(:,{levels(l)})/)
+    end if
+    
     delete(date)
   end do
-  temp(l, nRuns, :) = (/tobsTropics(:,{levels(l)})/) - tobsNorm({levels(l)})
+  if (levels(l).ne.1013.25) then
+    temp(l, nRuns, :) = (/tobsTropics(:,{levels(l)})/) - tobsNorm({levels(l)})
+  end if
 ;  print("   Max obs:"+max(temp(l, nRuns, :)))
 ;  print("   Min obs:"+min(temp(l, nRuns, :)))
   res = True
@@ -103,7 +107,7 @@ do l = 0, nLevs - 1
   res@trXMinF = 1991.0
   res@trXMaxF = 1993.0
   res@trYMinF = -2.0
-  if (l .eq. 3) then
+  if (l .ge. 3) then
     delete(res@trYMinF)
   end if
   res@tmXMajorGrid = True
