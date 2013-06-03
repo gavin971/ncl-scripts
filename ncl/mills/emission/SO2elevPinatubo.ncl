@@ -1,20 +1,29 @@
+z1=16 ; lower bound of SO2 emission (km)
+z2=20 ; upper bound of SO2 emission (km), must be less than 31 km
+PinFac = 1.0 ; emission relative to Pinatubo
+TgSO2 = 20.*PinFac ; Tg of SO2
 
 oldfile = "/glade/p/cesm/cseg//inputdata/atm/cam/chem/trop_mozart_aero/emis/ar5_mam3_so2_elev_1850-2005_c090804.nc"
-newfile = "/glade/p/cesm/wawg/mmills/inputdata/ar5_mam3_so2_stratvolc_1850-2100_pin20_30_c130515.nc"
+newfile = "/glade/p/cesm/wawg/mmills/inputdata/ar5_mam3_so2_stratvolc_1850-2100_pin"+z1+"-"+z2+"_c130524.nc"
 
 oldfileh = addfile(oldfile,"r")
 lat = oldfileh->lat
 lon = oldfileh->lon
 
+depth = (z2-z1)*1.0e5 ; emission depth in cm
+volume = 5.66e14 * depth ; cm3
+rate = PinFac * 1.88e35 / 86400. / volume ; molec/cm3/s
+print("rate="+rate)
+
 date = (/ 18490115, 19910614, 19910615, 19910616, 21001215 /)
 date!0="time"
 
-altitude= (/ 10.0, 25.0, 30.5 /)
+altitude= (/ z1/2., z1+(z2-z1)/2.0, z2+(31.0-z2)/2.0 /)
 altitude@long_name = "altitude midlevel"
 altitude@units = "km"
 altitude!0="altitude"
 
-altitude_int= (/ 0.0, 20.0, 30.0, 31.0 /)
+altitude_int= (/ 0.0, z1, z2, 31.0 /)
 altitude_int@long_name = "altitude interval"
 altitude_int@units = "km"
 altitude_int!0="altitude_int"
@@ -36,8 +45,6 @@ stratvolc&lon=lon
 stratvolc@long_name = "SO2 elevated emissions from explosive volcanoes" 
 stratvolc@units = "molecules/cm3/s"
 
-;rate=3.84e6
-rate=3.84d9
 stratvolc(2,1,{15.1417},{120.35})=rate
 
 print("rm "+newfile)
@@ -68,10 +75,10 @@ filedimdef(newfileh,"time",-1,True)
   globalAtt@title = nl+\
       "Stratospheric volcano SO2 emissions" 
   globalAtt@history = nl+\
-      "Created by SO2elevPinatubo20-30km.ncl"
+      "Created by SO2elevPinatubo.ncl"
   globalAtt@notes = nl+\
       "This file includes emissions for the following eruptions:"+nl+\ 
-      "  Pinatubo (15.1417N, 120.35W): June 15, 1991, 20 Tg, 20-30km, "+rate+" molec/cm3/s"
+      "  "+PinFac+" x Pinatubo (15.1417N, 120.35W): June 15, 1991, "+TgSO2+" Tg SO2, "+z1+"-"+z2+"km, "+rate+" molec/cm3/s"
   fileattdef( newfileh, globalAtt )
 
 newfileh->date = date
