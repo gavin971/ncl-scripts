@@ -2,7 +2,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-path="$MODEL_PATH/ccsm/case/"
+path="$MODEL_PATH/"
 
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
 exptFilepath=path+exptCase+"/proc/"+exptCase+".h0zm.ODV_SOOT01.nc"
@@ -20,8 +20,8 @@ BCOD&time@units="Years"
 ;  gsn_define_colormap(wks,"posneg_1")
 ;gsn_define_colormap(wks,"BlWhRe")                  ; change colormap 
 ; Change color map using named colors
-  colors = (/"white","black","yellow1","yellow2","yellow3", \
-             "orange1","orange2","orange3","orangered","red1","red2","red3","red4" /)
+  colors = (/"white","black","white","yellow1","yellow2","yellow3", \
+             "orange1","orange2","orange3","orangered","red1","red3","red4" /)
   gsn_define_colormap(wks,colors)                  ; change colormap 
 
   res                     = True          ; plot mods desired
@@ -53,6 +53,11 @@ BCOD&time@units="Years"
   res@tmXBTickSpacingF  = 1.0
   res@tmXBTickStartF = 1.0
 
+res@trXMaxF = 16.0
+res@tmXBPrecision = 2
+res@tmXBAutoPrecision = False
+res@tmXBMinorOn = False
+
 ;===================================================================  
     
 ; Define our own contour levels.  
@@ -66,7 +71,7 @@ BCOD&time@units="Years"
   res@gsnLeftString       = "Soot run"
 
   res@cnLevelSelectionMode = "ExplicitLevels" 
-  delete(res@cnLevels)
+;  delete(res@cnLevels)
   res@cnLevels          = (/0.01,0.02,0.03,0.04,0.05,0.07,0.09,0.11,0.13,0.15/)
 ;  delete(res@cnLineThicknesses)
 ;  res@cnLineThicknesses = (/ 1,  1 , 1 , 1 , 1 , 1 , 1 , 1, 1,4, 1, 1/)
@@ -88,4 +93,4 @@ BCOD&time@units="Years"
     open=systemfunc(opencmd)
     print(open)
   end if
-end
+;end

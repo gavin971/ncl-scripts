@@ -92,7 +92,7 @@ dataRel=(dataRel-1.)*100.
   
   res@trXMinF = 0.0
   res@trXMaxF = max(time)
-  res@tiXAxisString = "Years after conflict"
+  res@tiXAxisString = "Time (years)"
   res@tiYAxisString = "Ice Extent"
     
   res2=res
