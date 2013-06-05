@@ -46,6 +46,7 @@ time=date-date(0)
 
 dataNH=new((/6,ndims(0)/),float)
 dataSH=new((/6,ndims(0)/),float)
+dataRel=new((/6,ndims(0)/),float)
 
 dataNH(0,:)=dim_min(iextNHExpt)
 dataNH(1,:)=dim_max(iextNHExpt)
@@ -60,6 +61,15 @@ dataSH(2,:)=dim_min(iextSHCntl)
 dataSH(3,:)=dim_max(iextSHCntl)
 dataSH(4,:)=dim_avg(iextSHExpt)
 dataSH(5,:)=dim_avg(iextSHCntl)
+
+dataRel(0,:)=dataNH(0,:)/dataNH(5,:)
+dataRel(1,:)=dataNH(1,:)/dataNH(5,:)
+dataRel(2,:)=dataSH(0,:)/dataSH(5,:)
+dataRel(3,:)=dataSH(1,:)/dataSH(5,:)
+dataRel(4,:)=dataNH(4,:)/dataNH(5,:)
+dataRel(5,:)=dataSH(4,:)/dataSH(5,:)
+
+dataRel=(dataRel-1.)*100.
 
   ; Create a panel plot
   resP = True
@@ -97,15 +107,42 @@ dataSH(5,:)=dim_avg(iextSHCntl)
   pdffile="iceExtentTimeSeries"
   wks   = gsn_open_wks ("pdf",IMAGE_PATH+"/"+pdffile) ; open workstation
   res@trYMinF = 8.5
-  res@trYMaxF = 20
+  res@trYMaxF = 20.0
   plot1 = gsn_csm_xy (wks,time,dataNH,res2) ; draw plot
 
-  res@trYMinF = 4
+  res@trYMinF = 4.0
   res@trYMaxF = 24.5
   plot2 = gsn_csm_xy (wks,time,dataSH,res2) ; draw plot
   resP@tiYAxisFontHeightF=0.015
   newplot = gsn_attach_plots(plot1,plot2,res,resP)
   draw(plot1)
+  
+;  delete(wks)
+;  pdffile="iceExtentTimeSeriesPercent"
+;  wks   = gsn_open_wks ("pdf",IMAGE_PATH+"/"+pdffile) ; open workstation  
+
+  frame(wks)
+  
+  delete(res)
+  res                   = True
+  res@tmYMajorGrid = True
+  res@tmYMajorGridLineDashPattern = 2
+  res@vpWidthF            = 0.7           ; change aspect ratio of plot
+  res@vpHeightF           = 0.5
+  res@xyLineThicknessF = 5.0
+  res@trXMinF = 0.0
+  res@trXMaxF = max(time)
+  res@trYMinF = -15
+  res@trYMaxF = 85
+  res@tiXAxisString = "Years after conflict"
+  res@tiYAxisString = "Ice Extent Change (%)"
+  res@xyLineThicknesses = (/0.5,0.5,0.5,0.5,3.0,3.0/)
+  res@xyMonoDashPattern = True
+  res@xyMonoLineColor   = False            ; same color for all lines
+  res@xyLineColors      = (/"lightblue","lightblue","pink","pink","midnightblue","red"/)
+  res@gsnXYFillColors   = (/"lightblue","transparent","pink","transparent","transparent"/)
+  
+  plot = gsn_csm_xy (wks,time,dataRel,res)
   
 delete(wks)
   
