@@ -80,7 +80,7 @@ if  [ -n "$caseid" ] ; then
 
     if [[ ! -e $outdir$newfile ]];then
       echo "ncwa -alon -O "$oldfile" "$outdir"/"$newfile
-      ncwa -alon -O $oldfile $outdir$newfile
+      ncwa -alon -O $oldfile $outdir/$newfile
     fi
   
     ls -sh $outdir$newfile
