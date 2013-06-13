@@ -15,7 +15,7 @@ cntlFile=addfile(cntlFilepath,"r")
 exptFile=addfile(exptFilepath,"r")
 
 cntlUVI=cntlFile->uvi
-exptUVI=exptFile->UVI
+exptUVI=exptFile->UVI ; upper case UVI includes adjustment for soot optical depth
 printVarSummary(exptUVI)
 
 cntlDate=cntlFile->date

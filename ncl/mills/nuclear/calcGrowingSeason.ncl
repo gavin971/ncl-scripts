@@ -7,7 +7,7 @@ undef("calcGrowingSeason")
 procedure calcGrowingSeason(caseid:string)
 
 begin
-  path="$MODEL_PATH/ccsm/case/"
+  path="$MODEL_PATH/"
   filename1=path+"b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg/h0/b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg.cam2.h0.2013-07.nc"
   a1=addfile(filename1,"r")
   print("reading LANDFRAC")
@@ -101,30 +101,42 @@ begin
   print("Saving growseas to "+fileout2)
   d->GROWSEAS=growseasavg 
   
+; Year 6 output
+  
+  fileout3=path+caseid+"/proc/"+caseid+".cam.growseas.2018.nc"
+  print("rm "+fileout3)
+  b=systemfunc("rm "+fileout3)
+  print("creating "+fileout3)
+  e=addfile(fileout3,"c")
+ 
+  growseasY6=growseas(5,:,:)
+  print("Saving growseas to "+fileout3)
+  e->GROWSEAS=growseasY6 
+  
   print("Done!")
 
   return
 end
 
 caseid="b40.rcp4_5.2deg.wcm.carma.bc0tg.006"
-calcGrowingSeason(caseid)
+;calcGrowingSeason(caseid)
 
 caseid="b40.rcp4_5.2deg.wcm.carma.bc0tg.007"
-calcGrowingSeason(caseid)
+;calcGrowingSeason(caseid)
 
 caseid="b40.rcp4_5.2deg.wcm.carma.bc0tg.008"
-calcGrowingSeason(caseid)
+;calcGrowingSeason(caseid)
 
 caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003"
-calcGrowingSeason(caseid)
+;calcGrowingSeason(caseid)
 
 caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.006"
-calcGrowingSeason(caseid)
+;calcGrowingSeason(caseid)
 
 caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.007"
-calcGrowingSeason(caseid)
+;calcGrowingSeason(caseid)
 
-path="$MODEL_PATH/ccsm/case/"
+path="$MODEL_PATH/"
 
 cmd="ncea -O "+path+"b40.rcp4_5.2deg.wcm.carma.bc0tg.00[678]/proc/*.cam.growseas.2014-2018avg.nc "\
    +path+"b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678/proc/b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678.cam.growseas.2014-2018avg.nc"
@@ -145,3 +157,14 @@ cmd="ncea -O "+path+"b40.rcp4_5.2deg.wcm.carma.bc5tgIP.00[367]/proc/*.cam.growse
    +path+"b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg/proc/b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg.cam.growseas.2013-2022.nc"
 print(cmd)
 d=systemfunc(cmd)
+
+cmd="ncea -O "+path+"b40.rcp4_5.2deg.wcm.carma.bc0tg.00[678]/proc/*.cam.growseas.2018.nc "\
+   +path+"b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678/proc/b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678.cam.growseas.2018.nc"
+print(cmd)
+e=systemfunc(cmd)
+
+cmd="ncea -O "+path+"b40.rcp4_5.2deg.wcm.carma.bc5tgIP.00[367]/proc/*.cam.growseas.2018.nc "\
+   +path+"b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg/proc/b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg.cam.growseas.2018.nc"
+print(cmd)
+f=systemfunc(cmd)
+
