@@ -133,6 +133,9 @@ begin
       mfileid->so4_tot=so4_tot
       delete(mfileid)
 
+      printVarSummary(dmass)
+      printVarSummary(so4_tot)
+      print("i="+i+" t3="+t3+" ntmin="+ntmin+" t1="+t1+" t2="+t2)
       dmass(i,t3:ntmin+t3)=so4_tot(t1:t2)
       
       do j = 0, nTracers - 1
@@ -191,17 +194,30 @@ begin
 ;                            6.0,5.0,4.0,2.0,1.0,\
 ;                            6.0,5.0,4.0,2.0,1.0/)
   res@gsnLeftString = " "
-  res@gsnCenterString = "Mass burden (Tg S)"
+  res@gsnCenterString = " "
   res@gsnRightString  = " "
+  res@tiYAxisString = "Mass burden (Tg S)"
+  res@tiXAxisString = "Year"
   res@xyLineColors    = (/"black","blue","green4","red",\
                           "black","blue","green4","red",\
                           "black","blue","green4","red"/)
   res@xyMonoLineColor = False
   res@xyMonoDashPattern = False
   res@xyDashPatterns = (/0,0,0,0,1,1,1,1,2,2,2,2/)
-  res@trXMinF = 0.1
-  res@trXMaxF = 2.0
-  plot = gsn_csm_xy(wks, sulfur&time/365., sulfur(:, :) /1e9, res)
+  res@trXMinF = 1991.0
+  res@trXMaxF = 1993.0
+  res@tmXBMinorOn = False
+;  res@tmXBMinorPerMajor = 11
+  res@tmXBMaxTicks = 25
+  res@tmXBMode= "Explicit"
+  res@tmXBValues =fspan(1991,1993,25)
+  res@tmXBLabelFontHeightF = 0.015
+  res@tmXBLabels = (/"1991","F","M","A","M","J","J","A","S","O","N","D", \
+                     "1992","F","M","A","M","J","J","A","S","O","N","D", \
+                     "1993"/)
+  plot = gsn_csm_xy(wks, 1991.+sulfur&time/365., sulfur(0:nTracers-1, :) /1e9, res)
+  
+  plot = gsn_csm_xy(wks, 1991.+sulfur&time/365., sulfur(:, :) /1e9, res)
 
   delete(res)
   res = True
@@ -214,27 +230,44 @@ begin
 
 ;  res@trXMinF = 0
 ;  res@xyLineColors    = (/"black","blue","red"/)
-;  res@xyMonoLineColor = False
-;  res@xyMonoDashPattern = True
-  res@trXMinF = 0.1
-  res@trXMaxF = 2.0
+  res@xyLineColors    = (/"blue","green4","red"/)
+  res@xyMonoLineColor = False
+  res@xyMonoDashPattern = True
+  res@trXMinF = 1991.0
+  res@trXMaxF = 1993.0
   res@xyLineThicknessF = 4.0
 
   res@gsnLeftString = " "
-  res@gsnCenterString = "Sulfate mass burden (Tg S)"
+  res@gsnCenterString = " "
   res@gsnRightString = " "
-  plot = gsn_csm_xy(wks, dmass&time/365., dmass(:, :) /1e9, res)
+  res@tiYAxisString = "Sulfate mass burden (Tg S)"
+  res@tiXAxisString = "Year"
+  res@tmXBMinorOn = False
+;  res@tmXBMinorPerMajor = 11
+  res@tmXBMaxTicks = 25
+  res@tmXBMode= "Explicit"
+  res@tmXBValues =fspan(1991,1993,25)
+  res@tmXBLabelFontHeightF = 0.015
+  res@tmXBLabels = (/"1991","F","M","A","M","J","J","A","S","O","N","D", \
+                     "1992","F","M","A","M","J","J","A","S","O","N","D", \
+                     "1993"/)
+  plot = gsn_csm_xy(wks, 1991.+dmass&time/365., dmass(:, :) /1e9, res)
 
   delete(wks)
 
 end
 
 
-rootpath="/glade/scratch/mmills/archive/"
+;rootpath="/glade/scratch/mmills/archive/"
+rootpath="/glade/p/cesm/wawg/mmills/run/"
+;caseid = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh400nm.noqbo.001" /)
+caseid = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh400nm.noqbo.001", \
+            "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh1um.noqbo.001" , \
+            "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh10um.noqbo.001" /)
 ;caseid="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001"
-caseid = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001", \
-            "b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001" , \
-            "b.e11.B55TRW5CN.f19_g16.Pin17-25.dgnh1um.noqbo.001" /)
+;caseid = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001", \
+;            "b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001" , \
+;            "b.e11.B55TRW5CN.f19_g16.Pin17-25.dgnh1um.noqbo.001" /)
 ;         "b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnh1um.qboon.001" /);, \
 ;         "b.e11.B55TRW5CN.f19_g16.MJMtest.013", \
 ;         "b.e11.B55TRW5CN.f19_g16.MJMtest.010" /)
@@ -244,8 +277,10 @@ opt=False
 opt@overwritemass=False
 ;opt@lev1=100.0
 opt@lev1=1100.0
-opt@timeoffset=(/0,0,0,3*12,12/)
-opt@timeoffset2=(/0,15,0,3*12,12/)
+opt@timeoffset=(/0,0,0/)
+opt@timeoffset2=(/0,0,0/)
+;opt@timeoffset=(/0,0,0,3*12,12/)
+;opt@timeoffset2=(/0,15,0,3*12,12/)
 ;plotMass( rootpath, "h0zm", caseid, tracers, opt )
 plotMass( rootpath, "h3", caseid, tracers, opt )
 

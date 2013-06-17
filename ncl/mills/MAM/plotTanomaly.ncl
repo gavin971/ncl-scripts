@@ -2,13 +2,20 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
-runNames = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001", \
-              "b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001" , \
-              "b.e11.B55TRW5CN.f19_g16.Pin17-25.dgnh1um.noqbo.001" /)
+;runNames = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001", \
+;              "b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001" , \
+;              "b.e11.B55TRW5CN.f19_g16.Pin17-25.dgnh1um.noqbo.001" /)
+runNames = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh400nm.noqbo.001", \
+              "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh1um.noqbo.001" , \
+              "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh10um.noqbo.001" /)
 nRuns = dimsizes(runNames)
 
 cntlRun  =    "b.e11.B55TRW5CN.f19_g16.MJMtest.013"          
-rootpath =    "/glade/scratch/mmills/archive/"
+;cntlRunNames  =   (/"b.e11.B55TRW5CN.f19_g16.novolc.dgnh400nm.noqbo.001" , \
+;              "b.e11.B55TRW5CN.f19_g16.MJMtest.013c" , \
+;              "b.e11.B55TRW5CN.f19_g16.novolc.dgnh10um.noqbo.001" /)         
+;rootpath =    "/glade/scratch/mmills/archive/"
+rootpath="/glade/p/cesm/wawg/mmills/run/"
 
 levels = (/ 30., 50., 70., 100., 1013.25 /)
 nLevs = dimsizes(levels)
@@ -106,6 +113,15 @@ do l = 0, nLevs - 1
   res@xyLineThicknesses = (/4.0, 4.0, 4.0, 8.0/)
   res@trXMinF = 1991.0
   res@trXMaxF = 1993.0
+  res@tmXBMinorOn = False
+;  res@tmXBMinorPerMajor = 11
+  res@tmXBMaxTicks = 25
+  res@tmXBMode= "Explicit"
+  res@tmXBValues =fspan(1991,1993,25)
+  res@tmXBLabelFontHeightF = 0.015
+  res@tmXBLabels = (/"1991","F","M","A","M","J","J","A","S","O","N","D", \
+                     "1992","F","M","A","M","J","J","A","S","O","N","D", \
+                     "1993"/)
   res@trYMinF = -2.0
   if (l .ge. 3) then
     delete(res@trYMinF)
@@ -117,8 +133,10 @@ do l = 0, nLevs - 1
 ;  print("   Max all runs:"+max(temp(l, :, :)))
 ;  print("   Min all runs:"+min(temp(l, :, :)))
   res@gsnLeftString = " "
-  res@gsnCenterString = "Temperature anomaly (K) at "+levels(l)+" hPa"
+  res@gsnCenterString = levels(l)+" hPa"
   res@gsnRightString = " "
+  res@tiXAxisString = "Year"
+  res@tiYAxisString = "Temperature anomaly (K)"
 ;  print(temp&time)
   plot = gsn_csm_xy(wks, 1991+temp&time/365., temp(l, :, :), res)
   
