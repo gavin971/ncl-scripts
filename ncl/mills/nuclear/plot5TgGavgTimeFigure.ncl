@@ -9,14 +9,18 @@ IMAGE_PATH=getenv("IMG_PATH")
 
 if (host.eq."modeling1") then
   path="/data4/mmills/"
+  stenkepath=""
 else if (isStrSubset(host,"caldera").or.isStrSubset(host,"geyser").or.isStrSubset(host,"yslogin")) then
-  path=MODEL_PATH+"/"
-else
-  path=MODEL_PATH+"/cesm/case/"  
-end if
+    path=MODEL_PATH+"/"
+    stenkepath="/glade/p/cesm/wawg/mmills/stenke/monthly/"
+  else
+    path=MODEL_PATH+"/cesm/case/"  
+    stenkepath=""
+  end if
 end if
 ;path="~/csm/"
 print("path="+path)
+print("stenkepath="+stenkepath)
 
 root="b40.rcp4_5.2deg.wcm.carma."
 sub="h0gm"
@@ -58,6 +62,22 @@ maxfileh=addfile(maxfile,"r")
 print("adding min file: "+minfile)
 minfileh=addfile(minfile,"r")
 
+massfile=stenkepath+"5Tg_100nm_soot_burden.nc"
+print("reading "+massfile)
+mfileid = addfile(massfile, "r")
+; Stenke war starts on May 15
+stenke_year=mfileid->time-120./365.  ; Set May 1 to day 1 match other parameters
+nTimes_stenke=dimsizes(stenke_year)
+stenke_mass=new((/2,nTimes_stenke/),"float")
+stenke_mass(1,:)=mfileid->TotSoot
+delete(mfileid)
+
+massfile=stenkepath+"5Tg_200nm_soot_burden.nc"
+print("reading "+massfile)
+mfileid = addfile(massfile, "r")
+stenke_mass(0,:)=mfileid->TotSoot
+delete(mfileid)
+
 gw   = avgfileh->gw
 lat  = avgfileh->lat
 time = avgfileh->time
@@ -68,34 +88,87 @@ nTimes = dimsizes(time)
 print("nTimes="+nTimes)
 
 ; Net shortwave flux at the surface
-FSNS_range = new((/6,nTimes/), float)
+FSNS_range = new((/8,nTimes/), float)
 print("reading FSNS_max")
 FSNS_range(2,0:nTimes-1) = maxfileh->FSNS(0:nTimes-1)
 print("reading FSNS_min")
 FSNS_range(3,0:nTimes-1) = minfileh->FSNS(0:nTimes-1)
 print("reading FSNS_diff")
-FSNS_range(5,0:nTimes-1) = avgfileh->FSNS(0:nTimes-1)
+FSNS_range(7,0:nTimes-1) = avgfileh->FSNS(0:nTimes-1)
+stenkefileh=addfile(stenkepath+"5Tg_100nm_monthly_global_shortwave_radiation.nc","r")
+stenkefilec=addfile(stenkepath+"CTRL_monthly_global_shortwave_radiation.nc","r")
+delete(nTimes_stenke)
+nTimes_stenke=dimsizes(stenkefileh->time)
+print("nTimes_stenke="+nTimes_stenke)
+FSNS_range(5,0:nTimes_stenke-1) = stenkefileh->srads(0:nTimes_stenke-1,0,0) - \
+                                  stenkefilec->srads(0:nTimes_stenke-1,0,0)
+delete(stenkefileh)
+stenkefileh=addfile(stenkepath+"5Tg_200nm_monthly_global_shortwave_radiation.nc","r")
+FSNS_range(4,0:nTimes_stenke-1) = stenkefileh->srads(0:nTimes_stenke-1,0,0) - \
+                                  stenkefilec->srads(0:nTimes_stenke-1,0,0)
+delete(stenkefileh)
+delete(stenkefilec)
 
 ; Surface temperature
-TS_range = new((/6,nTimes/), float)
+TS_range = new((/8,nTimes/), float)
 print("reading TS_max")
 TS_range(2,0:nTimes-1) = maxfileh->TS(0:nTimes-1)
 print("reading TS_min")
 TS_range(3,0:nTimes-1) = minfileh->TS(0:nTimes-1)
 print("reading TS_diff")
-TS_range(5,0:nTimes-1) = avgfileh->TS(0:nTimes-1)
+TS_range(7,0:nTimes-1) = avgfileh->TS(0:nTimes-1)
+stenkefileh=addfile(stenkepath+"5Tg_100nm_monthly_global_surface_temperature.nc","r")
+stenkefilec=addfile(stenkepath+"CTRL_monthly_global_surface_temperature.nc","r")
+delete(nTimes_stenke)
+nTimes_stenke=dimsizes(stenkefileh->time)
+print("nTimes_stenke="+nTimes_stenke)
+TS_range(5,0:nTimes_stenke-1) = stenkefileh->tsurf(0:nTimes_stenke-1,0,0) - \
+                                  stenkefilec->tsurf(0:nTimes_stenke-1,0,0)
+delete(stenkefileh)
+stenkefileh=addfile(stenkepath+"5Tg_200nm_monthly_global_surface_temperature.nc","r")
+TS_range(4,0:nTimes_stenke-1) = stenkefileh->tsurf(0:nTimes_stenke-1,0,0) - \
+                                  stenkefilec->tsurf(0:nTimes_stenke-1,0,0)
+delete(stenkefileh)
+delete(stenkefilec)
 
 ; Total precipitation
-PRECT_range = new((/6,nTimes/), float)
+PRECT_range = new((/8,nTimes/), float)
 print("reading PRECT_max")
-PRECT_range(2,0:nTimes-1) = maxfileh->PRECT(0:nTimes-1)
+PRECT_range(2,0:nTimes-1) = maxfileh->PRECT(0:nTimes-1) * 24. * 3600. * 1000.; convert m/s to mm/day
 print("reading PRECT_min")
-PRECT_range(3,0:nTimes-1) = minfileh->PRECT(0:nTimes-1)
+PRECT_range(3,0:nTimes-1) = minfileh->PRECT(0:nTimes-1) * 24. * 3600. * 1000.; convert m/s to mm/day
 print("reading PRECT_diff")
-PRECT_range(5,0:nTimes-1) = avgfileh->PRECT(0:nTimes-1)
+PRECT_range(7,0:nTimes-1) = avgfileh->PRECT(0:nTimes-1) * 24. * 3600. * 1000.; convert m/s to mm/day
+stenkefileh=addfile(stenkepath+"5Tg_100nm_monthly_global_precipitation.nc","r")
+stenkefilec=addfile(stenkepath+"CTRL_monthly_global_precipitation.nc","r")
+delete(nTimes_stenke)
+nTimes_stenke=dimsizes(stenkefileh->time)
+print("nTimes_stenke="+nTimes_stenke)
+apr=stenkefileh->aprl-stenkefilec->aprl
+apr=apr+stenkefileh->aprc-stenkefilec->aprc
+apr=apr*3600.*24.; convert kg/m2/s to mm/day
+;print("100 nm:)
+;print(apr(:,0,0))
+PRECT_range(5,0:nTimes_stenke-1) = (/apr(:,0,0)/)
+delete(stenkefileh)
+stenkefileh=addfile(stenkepath+"5Tg_200nm_monthly_global_precipitation.nc","r")
+apr=stenkefileh->aprl-stenkefilec->aprl
+apr=apr+stenkefileh->aprc-stenkefilec->aprc
+apr=apr*3600.*24.; convert kg/m2/s to mm/day
+;print("100 nm:)
+;print(apr(:,0,0))
+PRECT_range(4,0:nTimes_stenke-1) = (/apr(:,0,0)/)
+
+print("max PRECT 200:"+max(PRECT_range(4,0:nTimes_stenke-1)))
+print("min PRECT 200:"+min(PRECT_range(4,0:nTimes_stenke-1)))
+print("max PRECT 100:"+max(PRECT_range(5,0:nTimes_stenke-1)))
+print("min PRECT 100:"+min(PRECT_range(5,0:nTimes_stenke-1)))
+
+delete(stenkefileh)
+delete(stenkefilec)
 
 ; convert m/s to mm/day
-PRECT_range = PRECT_range * 24. * 3600. * 1000.
+;PRECT_range = PRECT_range * 24. * 3600. * 1000.
 
 ; Global mass burden from Robock 5Tg study
 robock = (/ (/0.353, 4.948/), (/0.409, 4.892/), (/0.465, 4.837/), (/0.539, 4.795/), (/0.613, 4.768/), \
@@ -241,16 +314,19 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   printVarSummary(Oman)
   FSNS_range(0,0:120) = Oman(0:120,6)+Oman(0:120,7) ; max
   FSNS_range(1,0:120) = Oman(0:120,6)+Oman(0:120,8) ; min
-  FSNS_range(4,0:120) = (/Oman(0:120,6)/)           ; avg
+  FSNS_range(6,0:120) = (/Oman(0:120,6)/)           ; avg
 
   TS_range(0,0:120) = Oman(0:120,0)+Oman(0:120,1) ; max
   TS_range(1,0:120) = Oman(0:120,0)+Oman(0:120,2) ; min
-  TS_range(4,0:120) = (/Oman(0:120,0)/)           ; avg
+  TS_range(6,0:120) = (/Oman(0:120,0)/)           ; avg
 
   pdffile="TSvsRobockFigure."+test1+"-"+cntl1
   PRECT_range(0,0:120) = Oman(0:120,3)+Oman(0:120,4) ; max
   PRECT_range(1,0:120) = Oman(0:120,3)+Oman(0:120,5) ; min
-  PRECT_range(4,0:120) = (/Oman(0:120,3)/)           ; avg
+  PRECT_range(6,0:120) = (/Oman(0:120,3)/)           ; avg
+  
+;  print("PRECT_range(4:7,0:36):")
+;  print(PRECT_range(4,0:36)+" "+PRECT_range(5,0:36)+" "+PRECT_range(6,0:36)+" "+PRECT_range(7,0:36))
 
   wks   = gsn_open_wks ("pdf",IMAGE_PATH+"/"+pdffile) ; open workstation
 
@@ -261,7 +337,7 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   nPanel=3
   plot = new(nPanel, graphic)
   
-  resP@txString = "Years after conflict"
+  resP@txString = "Time (years)"
   resP@gsnAttachPlotsXAxis =True
   resP@gsnPaperOrientation = "landscape"
   resP@gsnMaximize         = True          ; expand plot size to maximum
@@ -311,8 +387,15 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   res3=res
   res3@xyLineThicknessF = 4.0
   res3@xyLineColor       = "midnightblue"
+
+  res4=res
+  res4@xyLineThicknessF   = 4.0
+  res4@xyMonoLineColor    = False   ; different colors for different lines
+  res4@xyMonoDashPattern  = True 
+  res4@xyLineColors       = (/"green3","grey30"/)
   
   baseplot = gsn_csm_xy (wks, dmass&time/365., dmass_range/1e9,res2) ; draw plot
+  overlay(baseplot, gsn_csm_xy (wks, stenke_year, stenke_mass,res4)) ; draw  plot
   overlay(baseplot, gsn_csm_xy (wks, robock(:,0), robock(:,1), res)) ; draw  plot
   overlay(baseplot, gsn_csm_xy (wks, dmass&time/365., dmass/1e9,res3)) ; draw  plot
   
@@ -327,12 +410,14 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   res2@tmYLMinorPerMajor = 4
   
   res2@xyMonoLineThickness = False
-  res2@xyLineThicknesses = (/0.5,0.5,0.5,0.5,3.0,3.0/)
+  res2@xyLineThicknesses = (/0.5,0.5,0.5,0.5,3.0,3.0,3.0,3.0/)
   res2@xyMonoDashPattern = True
-  res2@xyMonoLineColor   = False            ; same color for all lines
-  res2@xyLineColors       = (/"pink","pink","lightblue","lightblue","red","midnightblue"/)
+  res2@xyMonoLineColor   = False            ; different colors for different lines
+  res2@xyLineColors       = (/"pink","pink","lightblue","lightblue","green3","grey30", \
+                              "red","midnightblue"/)
   delete(res2@gsnXYFillColors)
-  res2@gsnXYFillColors = (/"pink","transparent","lightblue","transparent","transparent"/)
+  res2@gsnXYFillColors = (/"pink","transparent","lightblue","transparent","transparent", \
+                           "transparent","transparent"/)
   
   plot(0) = gsn_csm_xy (wks,time,FSNS_range,res2) ; draw plot
   
@@ -360,9 +445,13 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   txres = True
   txres@txFontHeightF = 0.02
   txres@txFontColor="midnightblue"
-  gsn_text_ndc(wks,"CESM1(WACCM)",0.5,0.861,txres)
+  gsn_text_ndc(wks,"CESM1(WACCM)",0.75,0.897,txres)
   txres@txFontColor="red"
-  gsn_text_ndc(wks,"GISS ModelE",0.5,0.825,txres)
+  gsn_text_ndc(wks,"GISS ModelE",0.75,0.861,txres)
+  txres@txFontColor="grey30"
+  gsn_text_ndc(wks,"SOCOL3, 100 nm",0.75,0.822,txres)
+  txres@txFontColor="green3"
+  gsn_text_ndc(wks,"SOCOL3, 200 nm",0.75,0.783,txres)
     
   delete(wks)
   
