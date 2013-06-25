@@ -320,7 +320,7 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   TS_range(1,0:120) = Oman(0:120,0)+Oman(0:120,2) ; min
   TS_range(6,0:120) = (/Oman(0:120,0)/)           ; avg
 
-  pdffile="TSvsRobockFigure."+test1+"-"+cntl1
+  pdffile="5TgGaveRobockStenkeFigure."+test1+"-"+cntl1
   PRECT_range(0,0:120) = Oman(0:120,3)+Oman(0:120,4) ; max
   PRECT_range(1,0:120) = Oman(0:120,3)+Oman(0:120,5) ; min
   PRECT_range(6,0:120) = (/Oman(0:120,3)/)           ; avg
@@ -449,9 +449,9 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   txres@txFontColor="red"
   gsn_text_ndc(wks,"GISS ModelE",0.75,0.861,txres)
   txres@txFontColor="grey30"
-  gsn_text_ndc(wks,"SOCOL3, 100 nm",0.75,0.822,txres)
+  gsn_text_ndc(wks,"SOCOL3, r=50 nm",0.75,0.822,txres)
   txres@txFontColor="green3"
-  gsn_text_ndc(wks,"SOCOL3, 200 nm",0.75,0.783,txres)
+  gsn_text_ndc(wks,"SOCOL3, r=100 nm",0.75,0.783,txres)
     
   delete(wks)
   
