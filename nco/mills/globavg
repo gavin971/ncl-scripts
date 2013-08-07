@@ -7,6 +7,7 @@
 # Optional history tape (default h0):
 #   export hnum=h3
 
+echo " "
 echo globavg
 
 if  [ -n "$caseid" ] ; then
@@ -74,20 +75,26 @@ if  [ -n "$caseid" ] ; then
   avgfile=$gmdir'/'$caseid'.cam.'$hnum'.globavg.nc'
   tmpfile=$gmdir'/zmtmp.nc'
 
-  echo $avgfile
+  echo " "
+  echo "avgfile= $avgfile"
   ncfiles=$zmdir'/*.cam'*'.'$hnum'zm.*.nc'
+  echo " "
   echo "ncrcat -O $ncfiles $tmpfile"
   ncrcat -O $ncfiles $tmpfile
     
+  echo " "
   echo "ncwa -O -I -a lat -w gw -x -v nlon,wnummax $tmpfile $avgfile"
   ncwa -O -I -a lat -w gw -x -v nlon,wnummax $tmpfile $avgfile
     
   avgfile=$tmdir'/'$caseid'.cam.'$hnum'.tropicsavg.nc'
-  echo $avgfile
+  echo " "
+  echo "avgfile= $avgfile"
     
+  echo " "
   echo "ncwa -O -I -a lat -w gw -d lat,-23.4378,23.4378 -x -v nlon,wnummax $tmpfile $avgfile"
   ncwa -O -I -a lat -w gw -d lat,-23.4378,23.4378 -x -v nlon,wnummax $tmpfile $avgfile
     
+  echo " "
   echo "rm $tmpfile"
   rm $tmpfile
 else

@@ -5,10 +5,6 @@
 #   setenv runname run3
 #   setenv hnum h0
 #   setenv hnum h3iso
-#   setenv htype '.annual'
-
-echo " "
-echo wazmdir
 
 if  [ -n "$caseid" ] ; then
   export machine=`hostname`
@@ -16,7 +12,7 @@ if  [ -n "$caseid" ] ; then
   if [ ! -n "$rootpath" ] ; then
 
     if [[ $machine =~ 'yslogin' ]];then
-      rootpath='/glade/p/cesm/wawg/mmills/run'
+      rootpath='/glade/scratch/burakows/'
     fi
 
     if [[ $machine =~ 'geyser' ]];then
@@ -55,43 +51,50 @@ if  [ -n "$caseid" ] ; then
   fi
 
   if [ ! -n "$hnum" ] ; then
-    hnum='h0'
-  fi
-
-  if [ ! -n "$htype" ] ; then
-    htype=''
+    hnum='d03'
   fi
 
   if [ ! -n "$wadir" ] ; then
-    wadir=$rootpath'/'$caseid'/'$runname'/atm/hist/'
+    wadir=$rootpath'/'$caseid'/'$runname'/run/'$hnum'/'
   fi
   
-  if [ ! -n "$outdir" ] ; then
-    outdir=$rootpath'/'$caseid'/'$runname'/atm/proc/'$hnum'zm'$htype'/'
+  if [ ! -n "$maxdir" ] ; then
+    maxdir=$rootpath'/'$caseid'/'$runname'/run/'$hnum'_dmax/'
   fi
   
-  echo " "
-  echo "mkdir -p $outdir"
-  mkdir -p $outdir
+  if [ ! -n "$mindir" ] ; then
+    mindir=$rootpath'/'$caseid'/'$runname'/run/'$hnum'_dmin/'
+  fi
+  
+  echo "mkdir -p $maxdir"
+  mkdir -p $maxdir
+  
+  echo "mkdir -p $mindir"
+  mkdir -p $mindir
   
   cd $wadir
-  echo " "
-  echo "working directory:"
   pwd
 
-  for a in `ls -1 *$hnum*.nc`; do
+  for a in `ls -1 *$hnum*`; do
     oldfile=$a
     ls -sh $oldfile
-    newfile=`echo $oldfile | sed 's/'$hnum'/'$hnum'zm/g'`
+    maxfile=`echo $oldfile | sed 's/'$hnum'/'$hnum'_dmax/g'`
+    minfile=`echo $oldfile | sed 's/'$hnum'/'$hnum'_dmin/g'`
 
-    if [[ ! -e $outdir$newfile ]];then
-      echo " "
-      echo "ncwa -alon -O "$oldfile" "$outdir"/"$newfile
-      ncwa -alon -O $oldfile $outdir/$newfile
+    if [[ ! -e $maxdir$maxfile ]];then
+      echo "ncra -a time -y max -v T2 -O "$oldfile" "$maxdir"/"$maxfile
+      ncra -a time -y max -v T2 -O $oldfile $maxdir/$maxfile
     fi
   
-    ls -sh $outdir$newfile
+    ls -sh $maxdir$maxfile
 
+    if [[ ! -e $mindir$minfile ]];then
+      echo "ncra -a time -y min -v T2 -O "$oldfile" "$mindir"/"$minfile
+      ncra -a time -y min -v T2 -O $oldfile $mindir/$minfile
+    fi
+  
+    ls -sh $mindir$minfile
+    
   done
 
 else
