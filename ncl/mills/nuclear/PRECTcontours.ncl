@@ -3,26 +3,38 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
-path="$MODEL_PATH/ccsm/case/"
+;path="$MODEL_PATH/ccsm/case/"
+path="$MODEL_PATH/"
 
 cntlCase="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
 
-cntlFilepathDJF=path+cntlCase+"/proc/"+cntlCase+".cam2.h0.2014-2018DJF.nc"
-exptFilepathDJF=path+exptCase+"/proc/"+exptCase+".cam2.h0.2014-2018DJF.nc"
+;yearstring="2014-2018"
+;yearstring="2017"
+;yearstring="2018"
+yearstring="2014"
 
-cntlFileDJF=addfile(cntlFilepathDJF,"r")
-exptFileDJF=addfile(exptFilepathDJF,"r")
+doDJF=False
 
-cPRECTDJF=cntlFileDJF->PRECT
-ePRECTDJF=exptFileDJF->PRECT
-dPRECTDJF=ePRECTDJF ; get metadata
-dPRECTDJF=dPRECTDJF-cPRECTDJF
-dPRECTDJFpct=dPRECTDJF ; get metadata
-dPRECTDJFpct=100.*dPRECTDJFpct/cPRECTDJF
+if (doDJF) then
+  cntlFilepathDJF=path+cntlCase+"/proc/"+cntlCase+".cam2.h0."+yearstring+"DJF.nc"
+  exptFilepathDJF=path+exptCase+"/proc/"+exptCase+".cam2.h0."+yearstring+"DJF.nc"
 
-cntlFilepathJJA=path+cntlCase+"/proc/"+cntlCase+".cam2.h0.2014-2018JJA.nc"
-exptFilepathJJA=path+exptCase+"/proc/"+exptCase+".cam2.h0.2014-2018JJA.nc"
+  cntlFileDJF=addfile(cntlFilepathDJF,"r")
+  exptFileDJF=addfile(exptFilepathDJF,"r")
+
+  cPRECTDJF=cntlFileDJF->PRECT
+  ePRECTDJF=exptFileDJF->PRECT
+  dPRECTDJF=ePRECTDJF ; get metadata
+  dPRECTDJF=dPRECTDJF-cPRECTDJF
+  dPRECTDJFpct=dPRECTDJF ; get metadata
+  dPRECTDJFpct=100.*dPRECTDJFpct/cPRECTDJF
+  ; Convert m/s to mm/day
+  dPRECTDJF=dPRECTDJF*1000.*24.*3600.
+end if
+
+cntlFilepathJJA=path+cntlCase+"/proc/"+cntlCase+".cam2.h0."+yearstring+"JJA.nc"
+exptFilepathJJA=path+exptCase+"/proc/"+exptCase+".cam2.h0."+yearstring+"JJA.nc"
 
 cntlFileJJA=addfile(cntlFilepathJJA,"r")
 exptFileJJA=addfile(exptFilepathJJA,"r")
@@ -35,14 +47,13 @@ dPRECTJJApct=dPRECTJJA ; get metadata
 dPRECTJJApct=100.*dPRECTJJApct/cPRECTJJA
 
 ; Convert m/s to mm/day
-dPRECTDJF=dPRECTDJF*1000.*24.*3600.
 dPRECTJJA=dPRECTJJA*1000.*24.*3600.
 
 ;************************************************
 ; create plot
 ;************************************************
 ;wks = gsn_open_wks("eps", "$IMG_PATH/nuclearTSdiff")                ; open an eps file
-wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearPRECTdiff")                ; open a pdf file
+wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearPRECTdiff"+yearstring)                ; open a pdf file
 
 nPanel=2
 plot = new(2, graphic)

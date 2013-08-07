@@ -5,17 +5,19 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ;runNames = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001", \
 ;              "b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001" , \
 ;              "b.e11.B55TRW5CN.f19_g16.Pin17-25.dgnh1um.noqbo.001" /)
-runNames = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh400nm.noqbo.001", \
-              "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh1um.noqbo.001" , \
-              "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh10um.noqbo.001" /)
+;runNames = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh400nm.noqbo.001", \
+;              "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh1um.noqbo.001" , \
+;              "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh10um.noqbo.001" /)
+runNames = "b.e12.B55TRW5CN.f19_g16.course.001"
 nRuns = dimsizes(runNames)
 
-cntlRun  =    "b.e11.B55TRW5CN.f19_g16.MJMtest.013"          
+;cntlRun  =    "b.e11.B55TRW5CN.f19_g16.MJMtest.013"          
 ;cntlRunNames  =   (/"b.e11.B55TRW5CN.f19_g16.novolc.dgnh400nm.noqbo.001" , \
 ;              "b.e11.B55TRW5CN.f19_g16.MJMtest.013c" , \
 ;              "b.e11.B55TRW5CN.f19_g16.novolc.dgnh10um.noqbo.001" /)         
-;rootpath =    "/glade/scratch/mmills/archive/"
-rootpath="/glade/p/cesm/wawg/mmills/run/"
+cntlRun  =    "b.e12.B55TRW5CN.f19_g16.CourseBkgd.001"          
+rootpath =    "/glade/scratch/mmills/archive/"
+;rootpath="/glade/p/cesm/wawg/mmills/run/"
 
 levels = (/ 30., 50., 70., 100., 1013.25 /)
 nLevs = dimsizes(levels)
