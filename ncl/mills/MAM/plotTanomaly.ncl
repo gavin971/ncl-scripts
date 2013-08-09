@@ -44,8 +44,8 @@ nTimes=d2-d1+1
 datecntl=date(d1:d2)
 time=fileid->time(d1:d2)
 ;print(time)
-time=time-fileid->time(d1-1)
-time@units="days since "+date(d1-1)+" 00:00:00"
+time=time-fileid->time(0)
+time@units="days since "+date(0)+" 00:00:00"
 ;print(time)
 delete(date)
 delete(fileid)
@@ -62,21 +62,34 @@ print(temp&time)
 
 obsfile="/glade/p/cesm/wawg/mmills/inputdata/rich_gridded_2009.nc"
 fileid=addfile(obsfile,"r")
-t1=floattoint(365.25*(year1-1958)+0.5)
-t2=floattoint(365.25*(year2-1958)-30.5)
+t1=floattoint(12*(year1-1958))
+t2=floattoint(12*(year2-1958)-1)
 anomalies=fileid->anomalies ; ( time, pressure, lat, lon )
-delete(fileid)
 anomalies@_FillValue = -1e+30
-tobs=dim_avg_Wrap(anomalies(:,:,:,:))
-tobsTropics=dim_avg_Wrap(tobs({t1:t2},:,{-25:25}))
-print("   Max obs:"+max(tobsTropics))
-print("   Min obs:"+min(tobsTropics))
-; Normalize against 1989-1990
-t3=floattoint(365.25*(1989-1958)+0.5)
-t4=floattoint(365.25*(1991-1958)-30.5)
-tobsNormTime=dim_avg_Wrap(tobs({t3:t4},:,{-25:25}))
-tobsNorm=dim_avg_n_Wrap(tobsNormTime,0)
-;tobsTropics=tobsTropics-tobsNorm
+latobs = anomalies&lat
+gwobs = latRegWgt(latobs,"float",0) 
+gwobs&lat=latobs
+tobsTropicsAll=wgt_areaave_Wrap(anomalies(:,:,{-25:25},:),gwobs({-25:25}),1.0,0)
+;print("   Max obs:"+max(tobsTropics))
+;print("   Min obs:"+min(tobsTropics))
+; Normalize against 1986-1990
+t3=floattoint(12*(1986-1958))
+t4=floattoint(12*(1990-1958))
+tobsNorm=new((/12,12/),"float")
+printVarSummary(tobsTropicsAll)
+print("t3="+t3+", t4="+t4)
+do mon=0,11 
+  do lev=0,11
+    tobsNorm(mon,lev)=avg(tobsTropicsAll(t3+mon:t4+mon:12,lev))
+  end do
+end do
+tobsTropics=tobsTropicsAll(t1:t2,:)
+do yr = 0,year2-1-year1
+  tobsTropics(yr*12:yr*12+11,:) = tobsTropics(yr*12:yr*12+11,:) - tobsNorm(:,:)
+end do
+delete(fileid)
+delete(latobs)
+delete(gwobs)
 print("   Max obs:"+max(tobsTropics))
 print("   Min obs:"+min(tobsTropics))
 
@@ -86,14 +99,20 @@ var_in = fileid->temp(:,0,:,:)
 delete(fileid)
 latobs = var_in&latitude
 gwobs = latRegWgt(latobs,"float",0) 
-var_w = wgt_areaave(var_in,gwobs,1.0,0)
+var_w = wgt_areaave_Wrap(var_in,gwobs,1.0,0)
 t1=(year1-1850)*12
 t2=(year2-1850)*12-1
 TSobsGlobal = var_w(t1:t2)
-; Normalize against 1989-1990
-t3=(1989-1850)*12
-t4=(1991-1850)*12+4
-TSnorm=avg(var_w(t3:t2))
+; Normalize against 1986-1990
+t3=(1986-1850)*12
+t4=(1990-1850)*12
+TSnorm=new(12,"float")
+do mon=0,11 
+  TSnorm(mon)=avg(var_w(t3+mon:t4+mon:12))
+end do
+do yr = 0,year2-1-year1
+  TSobsGlobal(yr*12:yr*12+11) = TSobsGlobal(yr*12:yr*12+11) - TSnorm(0:11)
+end do
 delete(var_w)
 
 pdffile="Tanomaly_Pinatubo"
@@ -156,9 +175,9 @@ do l = 0, nLevs - 1
 ;    printVarSummary(temp)
 ;    printVarSummary(TSobsGlobal)
 ;    printVarSummary(TSnorm)
-    temp(l, 0, :) = (/TSobsGlobal(:)/) - TSnorm
+    temp(l, 0, :) = (/TSobsGlobal(:)/)
   else
-    temp(l, 0, :) = (/tobsTropics(:,{levels(l)})/) - tobsNorm({levels(l)})
+    temp(l, 0, :) = (/tobsTropics(:,{levels(l)})/)
   end if
 ;  print("   Max obs:"+max(temp(l, nRuns, :)))
 ;  print("   Min obs:"+min(temp(l, nRuns, :)))
@@ -197,9 +216,9 @@ do l = 0, nLevs - 1
 ;  print("   Min all runs:"+min(temp(l, :, :)))
   res@gsnLeftString = " "
   if (levels(l).eq.1013.25) then
-    res@gsnCenterString = "Surface temperature, global average"
+    res@gsnCenterString = "Surface, seasonally adjusted global average"
   else
-    res@gsnCenterString = levels(l)+" hPa, tropical average"
+    res@gsnCenterString = levels(l)+" hPa, seasonally adjusted tropical average"
   end if
   res@gsnRightString = " "
   res@tiXAxisString = "Year"
