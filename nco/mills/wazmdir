@@ -16,7 +16,8 @@ if  [ -n "$caseid" ] ; then
   if [ ! -n "$rootpath" ] ; then
 
     if [[ $machine =~ 'yslogin' ]];then
-      rootpath='/glade/p/cesm/wawg/mmills/run'
+#      rootpath='/glade/p/cesm/wawg/mmills/run'
+      rootpath='/glade/scratch/mmills/archive'
     fi
 
     if [[ $machine =~ 'geyser' ]];then
@@ -63,7 +64,8 @@ if  [ -n "$caseid" ] ; then
   fi
 
   if [ ! -n "$wadir" ] ; then
-    wadir=$rootpath'/'$caseid'/'$runname'/atm/hist/'
+#    wadir=$rootpath'/'$caseid'/'$runname'/atm/hist/'
+    wadir=$rootpath'/'$caseid'/'$runname'/atm/proc/h0mam/'
   fi
   
   if [ ! -n "$outdir" ] ; then

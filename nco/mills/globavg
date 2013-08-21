@@ -17,7 +17,8 @@ if  [ -n "$caseid" ] ; then
   if [ ! -n "$rootpath" ] ; then
 
     if [[ $machine =~ 'yslogin' ]];then
-      rootpath='/glade/p/cesm/wawg/waccm'
+#      rootpath='/glade/p/cesm/wawg/waccm'
+      rootpath='/glade/scratch/mmills/archive'
     fi
 
     if [[ $machine =~ 'geyser' ]];then
