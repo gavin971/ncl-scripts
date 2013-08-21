@@ -198,12 +198,12 @@ begin
   res@gsnRightString  = " "
   res@tiYAxisString = "Mass burden (Tg S)"
   res@tiXAxisString = "Year"
-  res@xyLineColors    = (/"black","blue","green4","red",\
-                          "black","blue","green4","red",\
-                          "black","blue","green4","red"/)
+  res@xyLineColors    = (/"orange","red","green4","blue","black",\
+                          "orange","red","green4","blue","black",\
+                          "orange","red","green4","blue","black"/)
   res@xyMonoLineColor = False
   res@xyMonoDashPattern = False
-  res@xyDashPatterns = (/0,0,0,0,1,1,1,1,2,2,2,2/)
+  res@xyDashPatterns = (/0,0,0,0,0,1,1,1,1,1,2,2,2,2,2/)
   res@trXMinF = 1991.0
   res@trXMaxF = 1993.0
   res@tmXBMinorOn = False
@@ -230,9 +230,10 @@ begin
 
 ;  res@trXMinF = 0
 ;  res@xyLineColors    = (/"black","blue","red"/)
-  res@xyLineColors    = (/"blue","green4","red"/)
-  res@xyMonoLineColor = False
-  res@xyMonoDashPattern = True
+  res@xyLineColor    = "black"
+  res@xyMonoLineColor = True
+  res@xyMonoDashPattern = False
+  res@xyDashPatterns = (/0,1,2/)
   res@trXMinF = 1991.0
   res@trXMaxF = 1993.0
   res@xyLineThicknessF = 4.0
@@ -258,12 +259,12 @@ begin
 end
 
 
-;rootpath="/glade/scratch/mmills/archive/"
-rootpath="/glade/p/cesm/wawg/mmills/run/"
+rootpath="/glade/scratch/mmills/archive/"
+;rootpath="/glade/p/cesm/wawg/mmills/run/"
 ;caseid = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh400nm.noqbo.001" /)
-caseid = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh400nm.noqbo.001", \
-            "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh1um.noqbo.001" , \
-            "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh10um.noqbo.001" /)
+;caseid = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh400nm.noqbo.001", \
+;            "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh1um.noqbo.001" , \
+;            "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh10um.noqbo.001" /)
 ;caseid="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001"
 ;caseid = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001", \
 ;            "b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001" , \
@@ -271,8 +272,10 @@ caseid = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh400nm.noqbo.001", \
 ;         "b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnh1um.qboon.001" /);, \
 ;         "b.e11.B55TRW5CN.f19_g16.MJMtest.013", \
 ;         "b.e11.B55TRW5CN.f19_g16.MJMtest.010" /)
-tracers=(/"SO2","H2SO4","so4_a2","so4_a1"/);,"so4_a3"/)
-tracers@molwts=(/ 115.108999, 115.108999, 64.063799, 115.108999/);, 98.078479 /)
+caseid = (/ "b.e12.B55TRW5CN.f19_g16.course.001", \
+            "b.e12.B55TRW5CN.f19_g16.CoursePin.002" /)
+tracers=(/"SO2","H2SO4","so4_a2","so4_a1","so4_a3"/)
+tracers@molwts=(/ 115.108999, 115.108999, 64.063799, 115.108999, 98.078479 /)
 opt=False
 opt@overwritemass=False
 ;opt@lev1=100.0
