@@ -8,8 +8,10 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ;runNames = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh400nm.noqbo.001", \
 ;              "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh1um.noqbo.001" , \
 ;              "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh10um.noqbo.001" /)
-runNames = (/"b.e12.B55TRW5CN.f19_g16.course.001", \
-             "b.e12.B55TRW5CN.f19_g16.CoursePin.002" /)
+;runNames = (/"b.e12.B55TRW5CN.f19_g16.course.001", \
+;             "b.e12.B55TRW5CN.f19_g16.CoursePin.002" /)
+runNames = (/"b.e12.B55TRW5CN.f19_g16.CoursePin16-18.001", \
+             "b.e12.B55TRW5CN.f19_g16.CoursePin16-18.002" /)
 nRuns = dimsizes(runNames)
 
 ;cntlRun  =    "b.e11.B55TRW5CN.f19_g16.MJMtest.013"          

@@ -272,8 +272,10 @@ rootpath="/glade/scratch/mmills/archive/"
 ;         "b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnh1um.qboon.001" /);, \
 ;         "b.e11.B55TRW5CN.f19_g16.MJMtest.013", \
 ;         "b.e11.B55TRW5CN.f19_g16.MJMtest.010" /)
-caseid = (/ "b.e12.B55TRW5CN.f19_g16.course.001", \
-            "b.e12.B55TRW5CN.f19_g16.CoursePin.002" /)
+;caseid = (/ "b.e12.B55TRW5CN.f19_g16.course.001", \
+;            "b.e12.B55TRW5CN.f19_g16.CoursePin.002" /)
+caseid = (/ "b.e12.B55TRW5CN.f19_g16.CoursePin16-18.001", \
+            "b.e12.B55TRW5CN.f19_g16.CoursePin16-18.002" /)
 tracers=(/"SO2","H2SO4","so4_a2","so4_a1","so4_a3"/)
 tracers@molwts=(/ 115.108999, 115.108999, 64.063799, 115.108999, 98.078479 /)
 opt=False
