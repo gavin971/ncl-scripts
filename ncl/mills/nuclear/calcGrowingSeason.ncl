@@ -119,22 +119,22 @@ begin
 end
 
 caseid="b40.rcp4_5.2deg.wcm.carma.bc0tg.006"
-;calcGrowingSeason(caseid)
+calcGrowingSeason(caseid)
 
 caseid="b40.rcp4_5.2deg.wcm.carma.bc0tg.007"
-;calcGrowingSeason(caseid)
+calcGrowingSeason(caseid)
 
 caseid="b40.rcp4_5.2deg.wcm.carma.bc0tg.008"
-;calcGrowingSeason(caseid)
+calcGrowingSeason(caseid)
 
 caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003"
-;calcGrowingSeason(caseid)
+calcGrowingSeason(caseid)
 
 caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.006"
-;calcGrowingSeason(caseid)
+calcGrowingSeason(caseid)
 
 caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.007"
-;calcGrowingSeason(caseid)
+calcGrowingSeason(caseid)
 
 path="$MODEL_PATH/"
 
