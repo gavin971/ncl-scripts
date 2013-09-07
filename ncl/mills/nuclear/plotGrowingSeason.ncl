@@ -3,23 +3,30 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
-path="$MODEL_PATH/ccsm/case/"
+path="$MODEL_PATH/ccsm/runs/cesm1_0/"
 
 cntlCase="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
 
 
-;cntlFilepath=path+cntlCase+"/proc/"+cntlCase+".cam.growseas.2014-2018avg.nc"
-;exptFilepath=path+exptCase+"/proc/"+exptCase+".cam.growseas.2014-2018avg.nc"
+cntlFilepath=path+cntlCase+"/proc/"+cntlCase+".cam.growseas.2014-2018avg.nc"
+exptFilepath=path+exptCase+"/proc/"+exptCase+".cam.growseas.2014-2018avg.nc"
 
-cntlFilepath=path+cntlCase+"/proc/"+cntlCase+".cam.growseas.2014-2021avg.nc"
-exptFilepath=path+exptCase+"/proc/"+exptCase+".cam.growseas.2014-2021avg.nc"
+;cntlFilepath=path+cntlCase+"/proc/"+cntlCase+".cam.growseas.2014-2021avg.nc"
+;exptFilepath=path+exptCase+"/proc/"+exptCase+".cam.growseas.2014-2021avg.nc"
+
+;cntlFilepath=path+cntlCase+"/proc/"+cntlCase+".cam.growseas.2014-2021avg.nc"
+;cntlFilepath=path+cntlCase+"/proc/"+cntlCase+".cam.growseas.2018.nc"
+;exptFilepath=path+exptCase+"/proc/"+exptCase+".cam.growseas.2018.nc"
 
 cntlFile=addfile(cntlFilepath,"r")
 exptFile=addfile(exptFilepath,"r")
 
 cGS=cntlFile->GROWSEAS
+;printVarSummary(cGS)
 eGS=exptFile->GROWSEAS
+;printVarSummary(eGS)
+
 dims=dimsizes(dimsizes(eGS))
 if (dims.eq.3) then
   dGS=eGS(0,:,:) ; get metadata
@@ -33,7 +40,7 @@ end if
 ; create plot
 ;************************************************
 ;wks = gsn_open_wks("eps", "$IMG_PATH/nuclearGrowingSeason")                ; open an eps file
-wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearGrowingSeason")                ; open a pdf file
+wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearGrowingSeason2014-2018v3")                ; open a pdf file
 
 nPanel=2
 plot = new(2, graphic)
@@ -46,9 +53,16 @@ res@gsnFrame  = False
 
 res@cnFillOn              = True     ; turn on color fill
 res@cnLinesOn             = True    ; turn of contour lines
+res@cnLineLabelsOn        = True     ; turn on contour line labels
+res@cnLineLabelFontHeightF=0.004
+res@cnLineLabelPlacementMode= "Computed"
+res@cnLineLabelDensityF = 3
 res@cnLevelSelectionMode  = "ExplicitLevels"
+res@cnLineLabelBackgroundColor = "orange"
 ;res@cnLevels = (/-40,-30,-20,-10,-5,-2, 2,5,10,20,30,40/)
-res@cnLevels = (/-60,-50,-40,-30,-20, -10, 10,20/)
+;res@cnLevels = (/-60,-50,-40,-30,-20, -10, 10,20/)
+;res@cnLevels = (/-55,-45,-35,-25,-15, -5, 5,15/)
+res@cnLevels = (/-40,-30,-20,-15, -10, -5, 5 /)
 
 res@gsnSpreadColors       = True     ; use full range of color map
 
@@ -71,7 +85,7 @@ res@mpMaxLatF            = 77
 ; Change color map using named colors
   colors = (/"white","black","darkorchid","blue","dodgerblue3", \
              "dodgerblue1","cyan3","cyan","white", \
-             "yellow","orange"/)
+             "yellow"/);,"orange"/)
 
   gsn_define_colormap(wks,colors)                  ; change colormap 
 
