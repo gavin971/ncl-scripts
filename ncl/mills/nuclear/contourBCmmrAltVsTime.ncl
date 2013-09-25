@@ -1,9 +1,25 @@
+; This script creates Figure 1 for 2013 paper "Multi-decadal global cooling 
+; and unprecedented ozone loss following a regional nuclear conflict" by 
+; Mills, Toon, Lee-Taylor, and Robock. 
+
+; Figure 1 caption: The time evolution of BC mass mixing ratio (kg BC/109 
+; kg air) is shown for the average of the 5 Tg BC ensemble. The horizontal 
+; axis shows time in years since the BC emission on January 1.
+
+; Script written by Mike Mills
+; Modified September 24, 2013
+
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
-path="$MODEL_PATH/"
+ostype = systemfunc("echo $OSTYPE")
+if (ostype.eq."darwin") then
+  path="$MODEL_PATH/cesm/runs/cesm1_0/"
+else
+  path="$MODEL_PATH/"
+end if
 
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
 exptFilepath=path+exptCase+"/h0gm/"+exptCase+".cam2.h0.globavg.nc"
@@ -24,8 +40,8 @@ BCmmr@units="ppbm"
 ;************************************************
 ; create plot
 ;************************************************
-;wks = gsn_open_wks("eps", "$IMG_PATH/nuclearBCmmrAltVsTime")                ; open an eps file
-wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearBCmmrAltVsTime")                ; open a pdf file
+wks = gsn_open_wks("eps", "$IMG_PATH/nuclear/Fig01nuclearBCmmrAltVsTime")                ; open an eps file
+;wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearBCmmrAltVsTime")                ; open a pdf file
 
 ; Change color map using named colors
 colors = (/"white","black","white","cadetblue1","deepskyblue1","deepskyblue3","green4","greenyellow", \
@@ -65,13 +81,24 @@ res@tmXBMinorOn = False
 res@gsnLeftString=" "
 res@gsnRightString=" "
 res@tiXAxisString       = ""
-;res@tiXAxisString = "Time (years)"
+res@tiXAxisString = "Time (years since BC injection)"
+res@tiYAxisString = "Pressure (hPa)"
+res@tiXAxisFontHeightF = 0.022
+res@tiYAxisFontHeightF = 0.022
+res@tiXAxisOffsetYF = 0.14
+res@tiYAxisOffsetXF = 0.02
 res@lbLabelBarOn         = True
+;res@lbOrientation        = "Vertical"
 res@lbOrientation        = "Horizontal"
-;res@lbTopMarginF         =  0.0
-;res@lbBottomMarginF      =  0.0
-;res@lbRightMarginF       = -0.1
-;res@lbLeftMarginF        = 0.3
+res@lbTopMarginF         =  -3.8
+res@lbBottomMarginF      =  3.9
+res@lbRightMarginF       = -0.2
+res@lbLeftMarginF        = 2.0
+res@lbTitleOn = True
+res@lbTitlePosition = "Bottom"
+res@lbTitleString = "(kg BC/10~S~9~N~ kg air)"
+res@lbTitleFontHeightF = 0.022
+res@lbTitleOffsetF = -0.2
 plot = gsn_csm_pres_hgt(wks,BCmmr(press|:, time|:),res)      ; contour the variable
 
 delete(wks)  

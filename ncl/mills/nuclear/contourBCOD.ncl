@@ -1,8 +1,24 @@
+; This script creates Figure 2 for 2013 paper "Multi-decadal global cooling 
+; and unprecedented ozone loss following a regional nuclear conflict" by 
+; Mills, Toon, Lee-Taylor, and Robock. 
+
+; Figure 2 caption: The time evolution of zonal mean BC optical depth is shown 
+; for the 5 Tg BC ensemble average. The vertical axis shows latitude. The 
+; horizontal average shows time in years.
+
+; Script written by Mike Mills
+; Modified September 24, 2013
+
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-path="$MODEL_PATH/"
+ostype = systemfunc("echo $OSTYPE")
+if (ostype.eq."darwin") then
+  path="$MODEL_PATH/cesm/runs/cesm1_0/"
+else
+  path="$MODEL_PATH/"
+end if
 
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
 exptFilepath=path+exptCase+"/proc/"+exptCase+".h0zm.ODV_SOOT01.nc"
@@ -13,9 +29,9 @@ BCOD&time=BCOD&time/365.
 BCOD&time@units="Years"
   
   
-  pdffile = "$IMAGE_PATH/ContourBCOD."+exptCase
-;  wks = gsn_open_wks("eps", pdffile)
-  wks = gsn_open_wks("pdf", pdffile)
+  pdffile = "$IMAGE_PATH/nuclear/Fig02ContourBCOD."+exptCase
+  wks = gsn_open_wks("eps", pdffile)
+;  wks = gsn_open_wks("pdf", pdffile)
   
 ;  gsn_define_colormap(wks,"posneg_1")
 ;gsn_define_colormap(wks,"BlWhRe")                  ; change colormap 
@@ -38,8 +54,11 @@ BCOD&time@units="Years"
   res@vpHeightF           = 0.55
 ;  res@gsnLeftStringFontHeightF = 24
 ;  res@gsnRightStringFontHeightF = 24
-  res@tiXAxisString       = ""
-  res@tiYAxisString       = ""
+  res@tiXAxisString       = "Time (years since BC injection)"
+;  res@tiXAxisOffsetYF = 0.12
+  res@tiYAxisString       = "Latitude"
+  res@tiXAxisFontHeightF = 0.025
+  res@tiYAxisFontHeightF = 0.025
   res@cnLineLabelPlacementMode= "Computed"
   res@cnLineLabelDensityF = 5
   res@tmXBLabelFontHeightF =0.025
@@ -65,7 +84,7 @@ res@tmXBMinorOn = False
   res@cnMinLevelValF=120
   res@cnMaxLevelValF=510
   res@cnLevelSpacingF     = 30.
-  res@lbLabelAngleF       = 60
+;  res@lbLabelAngleF       = 60
   res@gsnLeftString       = "Control run"
 ;  plot = gsn_csm_lat_time(wks,O3_col_c(lat|:, time|:),res)      ; contour the variable
   res@gsnLeftString       = "Soot run"
@@ -81,6 +100,11 @@ res@tmXBMinorOn = False
   res@gsnCenterString      = "BC Optical Depth"
   res@gsnCenterStringFontHeightF   = 0.025
   res@lbLabelFontHeightF   = 0.025
+  res@lbOrientation        = "Vertical"
+  res@lbTopMarginF         =  -0.2
+  res@lbBottomMarginF      =  -0.6
+  res@lbRightMarginF       = 0.6
+  res@lbLeftMarginF        = -0.05
   res@tmYLLabels=(/"90~S~o~N~S","60~S~o~N~S","30~S~o~N~S","0","30~S~o~N~N",\
     "60~S~o~N~N","90~S~o~N~N"/)
   plot = gsn_csm_lat_time(wks,BCOD(lat|:, time|:),res)      ; contour the variable

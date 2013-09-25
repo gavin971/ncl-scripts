@@ -30,9 +30,9 @@ begin
   O3_col_dpct&time = time
   
   
-  pdffile = "$IMAGE_PATH/ContourO3dep."+historyRun
-;  wks = gsn_open_wks("eps", pdffile)
-  wks = gsn_open_wks("pdf", pdffile)
+  pdffile = "$IMAGE_PATH/nuclear/Fig06_ContourO3dep."+historyRun
+  wks = gsn_open_wks("eps", pdffile)
+;  wks = gsn_open_wks("pdf", pdffile)
   
 ;  gsn_define_colormap(wks,"posneg_1")
 ;gsn_define_colormap(wks,"BlWhRe")                  ; change colormap 
@@ -56,8 +56,10 @@ begin
   res@vpHeightF           = 0.55
 ;  res@gsnLeftStringFontHeightF = 24
 ;  res@gsnRightStringFontHeightF = 24
-  res@tiXAxisString       = ""
-  res@tiYAxisString       = ""
+  res@tiXAxisString       = "Time (years since BC injection)"
+  res@tiYAxisString       = "Latitude"
+  res@tiXAxisFontHeightF = 0.025
+  res@tiYAxisFontHeightF = 0.025
   res@cnLineLabelPlacementMode= "Computed"
   res@cnLineLabelDensityF = 5
   res@tmXBLabelFontHeightF =0.025
@@ -76,7 +78,7 @@ begin
   res@cnMaxLevelValF=510
   res@cnLevelSpacingF     = 30.
   res@gsnRightString      = "O~B~3~N~ Column (DU)"
-  res@lbLabelAngleF       = 60
+;  res@lbLabelAngleF       = 60
   res@gsnLeftString       = "Control run"
 ;  plot = gsn_csm_lat_time(wks,O3_col_c(lat|:, time|:),res)      ; contour the variable
   res@gsnLeftString       = "Soot run"
@@ -104,6 +106,11 @@ begin
   res@gsnCenterString      = "O~B~3~N~ Column Change (%)"
   res@gsnCenterStringFontHeightF   = 0.025
   res@lbLabelFontHeightF   = 0.025
+  res@lbOrientation        = "Vertical"
+  res@lbTopMarginF         =  -0.2
+  res@lbBottomMarginF      =  -0.5
+  res@lbRightMarginF       = 0.6
+  res@lbLeftMarginF        = -0.05
   res@tmYLLabels=(/"90~S~o~N~S","60~S~o~N~S","30~S~o~N~S","0","30~S~o~N~N",\
     "60~S~o~N~N","90~S~o~N~N"/)
   plot = gsn_csm_lat_time(wks,O3_col_dpct(lat|:, time|:),res)      ; contour the variable
@@ -111,7 +118,7 @@ begin
   
   ostype = systemfunc("echo $OSTYPE")
   if (ostype.eq."darwin") then
-    opencmd="open "+pdffile+".pdf"
+    opencmd="open "+pdffile+".eps"
     print(opencmd)
     open=systemfunc(opencmd)
     print(open)
@@ -157,7 +164,7 @@ host   = systemfunc("hostname")
 if (host.eq."modeling1") then
   rootPath="/data4/mmills/"
 else
-  rootPath="$MODEL_PATH/ccsm/case/"
+  rootPath="$MODEL_PATH/cesm/runs/cesm1_0/"
 end if
 
 historyRun="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"

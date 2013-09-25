@@ -1,9 +1,18 @@
+; This script creates Figure 5 for 2013 paper "Multi-decadal global cooling 
+; and unprecedented ozone loss following a regional nuclear conflict" by 
+; Mills, Toon, Lee-Taylor, and Robock. 
+
+; Figure 5 caption:  
+
+; Script written by Mike Mills
+; Modified September 24, 2013
+
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
-path="$MODEL_PATH/"
+path="$MODEL_PATH/cesm/runs/cesm1_0/"
 
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
 cntlCase="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
@@ -31,7 +40,8 @@ Tdiff&time@units="Years"
 ;************************************************
 ; create plot
 ;************************************************
-wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearTdiffAltVsTime")                ; open a pdf file
+wks = gsn_open_wks("eps", "$IMG_PATH/nuclear/Fig05_contourTdiffAltVsTime") ; open a pdf file
+;wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearTdiffAltVsTime")             ; open a pdf file
 
 colors = (/"white","black","lightblue","white","yellow1", \
            "yellow3","orange1","orange2","orangered","red1","red2","red4"/)
@@ -64,15 +74,19 @@ res@gsnLeftString=" "
 res@gsnRightString=" "
 res@tiXAxisString       = ""
 res@lbLabelBarOn         = True
-res@lbOrientation        = "Horizontal"
-;res@lbTopMarginF         =  0.0
-;res@lbBottomMarginF      = -3.0
-;res@lbRightMarginF       = -0.1
-;res@lbLeftMarginF        = 0.3
+res@lbOrientation        = "Vertical"
+res@lbTopMarginF         = -0.2
+res@lbBottomMarginF      = -0.5
+res@lbRightMarginF       = 0.3
+res@lbLeftMarginF        = 0.1
 
 ;res@lbTopMarginF         = 5
 ;res@lbBottomMarginF      = -7
-;res@tiXAxisString       = "Time (years)"
+res@tiXAxisString       = "Time (years since BC injection)"
+res@tiYAxisString       = "Pressure (hPa)"
+res@tiXAxisFontHeightF = 0.022
+res@tiYAxisFontHeightF = 0.022
+res@tiYAxisOffsetXF = 0.02
 plot = gsn_csm_pres_hgt(wks,Tdiff(press|:, time|:),res)      ; contour the variable
 
 delete(wks)

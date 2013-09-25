@@ -1,3 +1,24 @@
+; This script creates Figure 3 for 2013 paper "Multi-decadal global cooling 
+; and unprecedented ozone loss following a regional nuclear conflict" by 
+; Mills, Toon, Lee-Taylor, and Robock. 
+
+; Figure 3 caption: The monthly global mean time evolution is shown for 
+; (a) the mass burden of black carbon (Tg), (b) the shortwave net flux 
+; anomaly at the surface (W m-2), (c) the surface temperature (K), and 
+; (d) the precipitation anomaly (mm/day). The dark blue line and light 
+; blue shading shows the ensemble average and range for this study. 
+; The dark red line and pink shading shows the ensemble average and 
+; range for Robock et al. [2007] (data courtesy L. Oman). The grey and 
+; green lines show results from two 5 Tg BC simulations from Stenke et 
+; al. [2013] (data courtesy A. Stenke), with assumed aerosol radii of 
+; 50 nm and 100 nm, respectively. Ensemble anomalies are calculated with 
+; respect to the mean of the respective control simulation ensembles. 
+; Time 0 corresponds to the date of the BC injection (January 1 in this 
+; study, May 15 in the other studies).
+
+; Script written by Mike Mills
+; Modified September 24, 2013
+
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
@@ -7,17 +28,22 @@ ostype = systemfunc("echo $OSTYPE")
 MODEL_PATH=getenv("MODEL_PATH")
 IMAGE_PATH=getenv("IMG_PATH")
 
-if (host.eq."modeling1") then
-  path="/data4/mmills/"
-  stenkepath=""
-else if (isStrSubset(host,"caldera").or.isStrSubset(host,"geyser").or.isStrSubset(host,"yslogin")) then
-    path=MODEL_PATH+"/"
-    stenkepath="/glade/p/cesm/wawg/mmills/stenke/monthly/"
-  else
-    path=MODEL_PATH+"/cesm/case/"  
+if (ostype.eq."darwin") then
+  path="$MODEL_PATH/cesm/runs/cesm1_0/"
+  stenkepath="$DATA_PATH/stenke/monthly/"
+else if (host.eq."modeling1") then
+    path="/data4/mmills/"
     stenkepath=""
+  else if (isStrSubset(host,"caldera").or.isStrSubset(host,"geyser").or.isStrSubset(host,"yslogin")) then
+      path=MODEL_PATH+"/"
+      stenkepath="/glade/p/cesm/wawg/mmills/stenke/monthly/"
+    else
+      path=MODEL_PATH+"/cesm/case/"  
+      stenkepath=""
+    end if
   end if
 end if
+
 ;path="~/csm/"
 print("path="+path)
 print("stenkepath="+stenkepath)
@@ -320,7 +346,7 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   TS_range(1,0:120) = Oman(0:120,0)+Oman(0:120,2) ; min
   TS_range(6,0:120) = (/Oman(0:120,0)/)           ; avg
 
-  pdffile="5TgGaveRobockStenkeFigure."+test1+"-"+cntl1
+  pdffile="Fig03_5TgGaveRobockStenkeFigure."+test1+"-"+cntl1
   PRECT_range(0,0:120) = Oman(0:120,3)+Oman(0:120,4) ; max
   PRECT_range(1,0:120) = Oman(0:120,3)+Oman(0:120,5) ; min
   PRECT_range(6,0:120) = (/Oman(0:120,3)/)           ; avg
@@ -328,7 +354,8 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
 ;  print("PRECT_range(4:7,0:36):")
 ;  print(PRECT_range(4,0:36)+" "+PRECT_range(5,0:36)+" "+PRECT_range(6,0:36)+" "+PRECT_range(7,0:36))
 
-  wks   = gsn_open_wks ("pdf",IMAGE_PATH+"/"+pdffile) ; open workstation
+  wks   = gsn_open_wks ("eps",IMAGE_PATH+"/nuclear/"+pdffile) ; open workstation
+;  wks   = gsn_open_wks ("pdf",IMAGE_PATH+"/"+pdffile) ; open workstation
 
   nl = integertochar(10)  ; newline character
 
@@ -368,7 +395,7 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   res@trXMaxF = max(time)
   res@trYMinF = 0.0
   res@trYMaxF = 5.0
-  res@tiXAxisString = "Year"
+  res@tiXAxisString = "Time (years since BC injection)"
 ;  res@tmXTLabelsOn = True
 ;  res@tmYRLabelsOn = True
 

@@ -1,9 +1,12 @@
+; Script written by Mike Mills
+; Modified September 24, 2013
+
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
-path="$MODEL_PATH/ccsm/case/"
+path="$MODEL_PATH/cesm/runs/cesm1_0/"
 
 cntlCase="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
@@ -34,7 +37,7 @@ dTSJJA=dTSJJA-cTSJJA
 ;************************************************
 ; create plot
 ;************************************************
-;wks = gsn_open_wks("eps", "$IMG_PATH/nuclearTSdiff")                ; open an eps file
+;wks = gsn_open_wks("eps", "$IMG_PATH/nuclearTSdiff")    ; open an eps file
 wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearTSdiff")                ; open a pdf file
 
 nPanel=2
