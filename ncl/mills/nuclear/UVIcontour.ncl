@@ -3,7 +3,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
-path="$MODEL_PATH/ccsm/case/"
+;path="$MODEL_PATH/ccsm/case/"
+path="$MODEL_PATH/cesm/runs/cesm1_0/"
 
 cntlCase="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
@@ -29,8 +30,11 @@ maxLatList=(/80.,30./)
 ;************************************************
 ; create plot
 ;************************************************
-;wks = gsn_open_wks("eps", "$IMG_PATH/UVIcontour")                ; open a ps file
-wks = gsn_open_wks("pdf", "$IMG_PATH/UVIcontour")                ; open a ps file
+wks_type = "eps"
+wks_type@wkPaperWidthF  = 11.0  ; in inches
+wks_type@wkPaperHeightF = 14.0  ; in inches
+wks = gsn_open_wks(wks_type, "$IMG_PATH/nuclear/Fig07_UVIcontour")                ; open a ps file
+;wks = gsn_open_wks("pdf", "$IMG_PATH/UVIcontour")                ; open a ps file
 
 nPanel=3
 plot = new(6, graphic)
@@ -40,10 +44,10 @@ do i = 0, dimsizes(dateList)-1
   ct=ind(cntlDate.eq.dateList(i))
   et=ind(exptDate.eq.dateList(i))
   res                       = True     ; plot mods desired
-  res@gsnDraw   = False
+  res@gsnDraw   = True
   res@gsnFrame  = False
-  res@vpWidthF  = 1.0		; set width of plot 
-  res@vpHeightF = 1.0		; set height of plot
+;  res@vpWidthF  = 1.0		; set width of plot 
+;  res@vpHeightF = 1.0		; set height of plot
 
   res@tmXBMajorLengthF     = 0.0
   res@cnFillOn              = True     ; turn on color fill
@@ -82,55 +86,86 @@ do i = 0, dimsizes(dateList)-1
 ;             "orange","red", \
 ;             "purple","tan1", \
 ;             "tan3","tan4","black","white"/)
+
+  res@lbLabelBarOn=False
+  res@tiXAxisOffsetYF = 0.005
+  if (i.eq.0) then 
+    res@lbLabelBarOn=True
+    res@tiXAxisOffsetYF = 0.02
+  end if
+  res@lbOrientation        = "Horizontal"
+  res@lbTopMarginF=0.5
+  res@lbBottomMarginF=-0.5
+  res@lbLeftMarginF=6.0
+  res@lbRightMarginF=-7.0
+  res@lbLabelFontHeightF   = 0.01
+  res@tmXBLabelFontHeightF   = 0.01
+  res@tmYLLabelFontHeightF   = 0.01
+  res@gsnLeftString=" "
+  res@gsnRightString=" "
+;  res@gsnCenterString="UVI "+monthList(i)+", Control"
+  res@gsnCenterString=" "
+  res@gsnCenterStringFontHeightF = 0.02
+  res@tiXAxisFontHeightF = 0.01
+  res@tiXAxisString = "Longitude"
+  res@tiYAxisFontHeightF = 0.01
+  res@tiYAxisString = "Latitude"
+  res@tmXBLabelFontHeightF = 0.01
+  res@tmYRLabelFontHeightF = 0.01
+  
+  res@vpHeightF = 0.3 
+  res@vpWidthF = 0.39 
+  res@vpXF = 0.1+i*0.47
+  res@vpYF = 0.99 
+  ct=ind(cntlDate.eq.dateList(i))
+  et=ind(exptDate.eq.dateList(i))
+  
+; Change color map using named colors
   colors = (/"white","black","blue","green","yellow", \
              "orange","red","red4", \
              "sienna4","purple","black","white"/)
 
   gsn_define_colormap(wks,colors)                  ; change colormap 
 
-  res@lbLabelBarOn=False
-  if (i.eq.0) then 
-    res@lbLabelBarOn=True
-  end if
-;  res@lbTopMarginF=0.4
-  res@lbBottomMarginF=-1.7
-;  res@lbLeftMarginF=1
-;  res@lbRightMarginF=50
-  res@lbLabelFontHeightF   = 0.018
-  res@tmXBLabelFontHeightF   = 0.018
-  res@tmYLLabelFontHeightF   = 0.018
-  res@gsnLeftString=" "
-  res@gsnRightString=" "
-;  res@gsnCenterString="UVI "+monthList(i)+", Control"
-  res@gsnCenterString=" "
-  res@gsnCenterStringFontHeightF = 0.02
   plot(i) = gsn_csm_contour_map_ce(wks,cntlUVI(ct,:,:), res)
+;  if (i.eq.0) then
+;    drawNDCGrid(wks)
+;  end if
   
 ;  res@gsnCenterString="UVI "+monthList(i)+", Year 3"
-  res@gsnCenterString=" "
-  res@tmXBLabelsOn         = True
-  res@lbLabelBarOn=False
-  plot(i+2) = gsn_csm_contour_map_ce(wks,exptUVI(et,:,:), res)
+  res2=res
+  res2@tiXAxisOffsetYF = 0.005
+  res2@tmXBLabelsOn         = True
+  res2@lbLabelBarOn=False
+  res2@vpYF = 0.8 
+  plot(i+2) = gsn_csm_contour_map_ce(wks,exptUVI(et,:,:), res2)
   
-;  gsn_define_colormap(wks,"WhiteYellowOrangeRed")                  ; change colormap 
-;  res@gsnSpreadColors       = True     ; use full range of color map
+  colors2 = (/"white","black","lightblue","white", \
+             "pink","salmon","red1","red3","red4","black","white"/)
+  
+  gsn_define_colormap(wks,colors2)                  ; change colormap 
+  res@gsnSpreadColors       = False     ; use full range of color map
   diffUVI=exptUVI(et,:,:)
   diffUVI=diffUVI-cntlUVI(ct,:,:)
   delete(res@cnLevels)
-;  res@cnLevelSelectionMode  = "ExplicitLevels"
-;  res@cnLevels = (/-0.5,1,2,3,4,4.5,5,5.5,6/)
-  res@cnLevelSelectionMode  = "ManualLevels"
-  res@cnLevelSpacingF = 1
-  res@cnMinLevelValF  = -1
-  res@cnMaxLevelValF  = 6
+  res3=res2
+  res3@cnLevelSelectionMode  = "ExplicitLevels"
+  res3@cnLevels = (/-0.5,0.5,1.5,2.5,3.5,4.5,5.5/)
+;  res3@cnLevelSelectionMode  = "ManualLevels"
+;  res3@cnLevelSpacingF = 1.0
+;  res3@cnMinLevelValF  = -0.5
+;  res3@cnMaxLevelValF  = 5.5
 ;  res@gsnCenterString="UVI "+monthList(i)+", Year 3 - Control"
-  res@gsnCenterString=" "
-  res@lbBottomMarginF= 0.0
-  res@tmXBLabelsOn         = False
+  res3@gsnCenterString=" "
+;  res3@lbBottomMarginF= 0.0
+;  res3@tmXBLabelsOn         = False
+  res3@tiXAxisOffsetYF = 0.005
   if (i.eq.0) then 
-    res@lbLabelBarOn=True
+    res3@lbLabelBarOn=True
+    res3@tiXAxisOffsetYF = 0.02
   end if
-  plot(i+4) = gsn_csm_contour_map_ce(wks,diffUVI(:,:), res)
+  res3@vpYF = 0.62 
+  plot(i+4) = gsn_csm_contour_map_ce(wks,diffUVI(:,:), res3)
   delete(res@cnLevels)
     
 end do
@@ -145,8 +180,8 @@ end do
 ;nboxes=8
 ;gsn_labelbar_ndc(wks,nboxes,lblabels,0.5,0.2,lbres)
 
-pres                        = True
-pres@gsnMaximize            = True
-pres@gsnPaperOrientation    = "landscape"
-gsn_panel(wks, plot, (/ 3, 2 /), pres)
-;frame(wks)
+;pres                        = True
+;pres@gsnMaximize            = True
+;pres@gsnPaperOrientation    = "landscape"
+;gsn_panel(wks, plot, (/ 3, 2 /), pres)
+frame(wks)

@@ -3,8 +3,14 @@ z2=20 ; upper bound of SO2 emission (km), must be less than 31 km
 PinFac = 1.0 ; emission relative to Pinatubo
 TgSO2 = 20.*PinFac ; Tg of SO2
 
-oldfile = "/glade/p/cesm/cseg//inputdata/atm/cam/chem/trop_mozart_aero/emis/ar5_mam3_so2_elev_1850-2005_c090804.nc"
-newfile = "/glade/p/cesm/wawg/mmills/inputdata/ar5_mam3_so2_stratvolc_1850-2100_pin"+z1+"-"+z2+"_c130524.nc"
+;oldpath = "/glade/p/cesm/cseg//inputdata/atm/cam/chem/trop_mozart_aero/emis/"
+;newpath = "/glade/p/cesm/wawg/mmills/inputdata/"
+
+oldpath = "/Volumes/Data/Models/cesm/inputdata/atm/cam/chem/trop_mozart_aero/emis/"
+newpath = oldpath
+
+oldfile = oldpath+"ar5_mam3_so2_elev_1850-2005_c090804.nc"
+newfile = newpath+"ar5_mam3_so2_stratvolc_1850-2100_pin"+z1+"-"+z2+"_c131001.nc"
 
 oldfileh = addfile(oldfile,"r")
 lat = oldfileh->lat
@@ -84,8 +90,8 @@ filedimdef(newfileh,"time",-1,True)
 newfileh->date = date
 newfileh->lat = lat
 newfileh->lon = lon
-newfileh->altitude = altitude
-newfileh->altitude_int = altitude_int
+newfileh->altitude = (/ altitude /)
+newfileh->altitude_int = (/ altitude_int /)
 newfileh->stratvolc = stratvolc
 
 
