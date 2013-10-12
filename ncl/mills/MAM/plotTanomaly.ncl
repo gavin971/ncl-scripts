@@ -10,21 +10,26 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ;              "b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh10um.noqbo.001" /)
 ;runNames = (/"b.e12.B55TRW5CN.f19_g16.course.001", \
 ;             "b.e12.B55TRW5CN.f19_g16.CoursePin.002" /)
-runNames = (/"b.e12.B55TRW5CN.f19_g16.CoursePin16-18.001", \
-             "b.e12.B55TRW5CN.f19_g16.CoursePin16-18.002" /)
+;runNames = (/"b.e12.B55TRW5CN.f19_g16.CoursePin16-18.001", \
+;             "b.e12.B55TRW5CN.f19_g16.CoursePin16-18.002" /)
+runNames = (/ "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.001", \
+            "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.002" /)
 nRuns = dimsizes(runNames)
 
 ;cntlRun  =    "b.e11.B55TRW5CN.f19_g16.MJMtest.013"          
 ;cntlRunNames  =   (/"b.e11.B55TRW5CN.f19_g16.novolc.dgnh400nm.noqbo.001" , \
 ;              "b.e11.B55TRW5CN.f19_g16.MJMtest.013c" , \
 ;              "b.e11.B55TRW5CN.f19_g16.novolc.dgnh10um.noqbo.001" /)         
-cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.001" , \
-                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.002" /)
+;cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.001" , \
+;                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.002" /)
+cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.001" , \
+                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.002" /)
 rootpath =    "/glade/scratch/mmills/archive/"
 ;rootpath="/glade/p/cesm/wawg/mmills/run/"
 
 year1=1991
-year2=1994
+;year2=1994
+year2=1993
 date1=year1*10000+0201
 date2=year2*10000+0101
 
@@ -118,7 +123,9 @@ end do
 delete(var_w)
 
 pdffile="Tanomaly_Pinatubo"
-wks = gsn_open_wks("pdf", "$IMAGE_PATH/"+pdffile)
+pdfpath="$IMAGE_PATH/runNames(0)/"
+mkdir=systemfunc("mkdir -p "+pdfpath)
+wks = gsn_open_wks("pdf", pdfpath+pdffile)
 
 do l = 0, nLevs - 1
   print("")

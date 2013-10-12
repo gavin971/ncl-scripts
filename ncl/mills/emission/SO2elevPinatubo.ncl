@@ -1,17 +1,32 @@
+; Script written by Mike Mills
+; Modified October 11, 2013
+
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
+
 z1=16 ; lower bound of SO2 emission (km)
 z2=20 ; upper bound of SO2 emission (km), must be less than 31 km
-PinFac = 1.0 ; emission relative to Pinatubo
+PinFac = 0.5 ; emission relative to Pinatubo
 TgSO2 = 20.*PinFac ; Tg of SO2
 
-;oldpath = "/glade/p/cesm/cseg//inputdata/atm/cam/chem/trop_mozart_aero/emis/"
-;newpath = "/glade/p/cesm/wawg/mmills/inputdata/"
+host   = systemfunc("hostname")
+ostype = systemfunc("echo $OSTYPE")
+datestr = systemfunc("date +%y%m%d")
 
-oldpath = "/Volumes/Data/Models/cesm/inputdata/atm/cam/chem/trop_mozart_aero/emis/"
-newpath = oldpath
+if (isStrSubset(host,"caldera").or.isStrSubset(host,"geyser").or.isStrSubset(host,"yslogin")) then
+  oldpath = "/glade/p/cesm/cseg//inputdata/atm/cam/chem/trop_mozart_aero/emis/"
+  newpath = "/glade/p/cesm/wawg/mmills/inputdata/"
+else
+  oldpath = "/Volumes/Data/Models/cesm/inputdata/atm/cam/chem/trop_mozart_aero/emis/"
+  newpath = oldpath
+end if
 
 oldfile = oldpath+"ar5_mam3_so2_elev_1850-2005_c090804.nc"
-newfile = newpath+"ar5_mam3_so2_stratvolc_1850-2100_pin"+z1+"-"+z2+"_c131001.nc"
+newfile = newpath+"ar5_mam3_so2_stratvolc_1850-2100_"+floattointeger(TgSO2)+"Tg_"\
+                 +z1+"-"+z2+"_c"+datestr+".nc"
 
+print("reading "+oldfile)
 oldfileh = addfile(oldfile,"r")
 lat = oldfileh->lat
 lon = oldfileh->lon
