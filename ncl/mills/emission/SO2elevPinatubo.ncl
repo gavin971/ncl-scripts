@@ -105,8 +105,8 @@ filedimdef(newfileh,"time",-1,True)
 newfileh->date = date
 newfileh->lat = lat
 newfileh->lon = lon
-newfileh->altitude = (/ altitude /)
-newfileh->altitude_int = (/ altitude_int /)
+newfileh->altitude = altitude 
+newfileh->altitude_int = altitude_int
 newfileh->stratvolc = stratvolc
 
 

@@ -182,7 +182,9 @@ begin
   print("")
   print(" Plotting ...")
   pdffile="dmass_Pinatubo_"+historyPattern
-  wks = gsn_open_wks("pdf", "$IMAGE_PATH/"+pdffile)
+  pdfpath="$IMAGE_PATH/"+runNames(0)+"/"
+  mkdir=systemfunc("mkdir -p "+pdfpath)
+  wks = gsn_open_wks("pdf", pdfpath+pdffile)
 
   res = True
   res@gsnMaximize           = True
@@ -276,8 +278,9 @@ rootpath="/glade/scratch/mmills/archive/"
 ;            "b.e12.B55TRW5CN.f19_g16.CoursePin.002" /)
 ;caseid = (/ "b.e12.B55TRW5CN.f19_g16.CoursePin16-18.001", \
 ;            "b.e12.B55TRW5CN.f19_g16.CoursePin16-18.002" /)
-caseid = (/ "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.001", \
-            "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.002" /)
+;caseid = (/ "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.001", \
+;            "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.002" /)
+caseid = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.001" /)
 tracers=(/"SO2","H2SO4","so4_a2","so4_a1","so4_a3"/)
 tracers@molwts=(/ 115.108999, 115.108999, 64.063799, 115.108999, 98.078479 /)
 opt=False

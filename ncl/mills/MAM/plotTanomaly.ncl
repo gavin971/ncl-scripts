@@ -12,8 +12,10 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ;             "b.e12.B55TRW5CN.f19_g16.CoursePin.002" /)
 ;runNames = (/"b.e12.B55TRW5CN.f19_g16.CoursePin16-18.001", \
 ;             "b.e12.B55TRW5CN.f19_g16.CoursePin16-18.002" /)
-runNames = (/ "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.001", \
-            "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.002" /)
+;runNames = (/ "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.001", \
+;            "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.002" /)
+runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.001", \
+              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.002" /)
 nRuns = dimsizes(runNames)
 
 ;cntlRun  =    "b.e11.B55TRW5CN.f19_g16.MJMtest.013"          
@@ -28,10 +30,10 @@ rootpath =    "/glade/scratch/mmills/archive/"
 ;rootpath="/glade/p/cesm/wawg/mmills/run/"
 
 year1=1991
-;year2=1994
-year2=1993
+year2=1994
+;year2=1993
 date1=year1*10000+0201
-date2=year2*10000+0101
+date2=year2*10000+0701
 
 levels = (/ 30., 50., 70., 100., 1013.25 /)
 nLevs = dimsizes(levels)
@@ -71,6 +73,7 @@ obsfile="/glade/p/cesm/wawg/mmills/inputdata/rich_gridded_2009.nc"
 fileid=addfile(obsfile,"r")
 t1=floattoint(12*(year1-1958))
 t2=floattoint(12*(year2-1958)-1)
+t2=t2+6
 anomalies=fileid->anomalies ; ( time, pressure, lat, lon )
 anomalies@_FillValue = -1e+30
 latobs = anomalies&lat
@@ -109,6 +112,7 @@ gwobs = latRegWgt(latobs,"float",0)
 var_w = wgt_areaave_Wrap(var_in,gwobs,1.0,0)
 t1=(year1-1850)*12
 t2=(year2-1850)*12-1
+t2=t2+6
 TSobsGlobal = var_w(t1:t2)
 ; Normalize against 1986-1990
 t3=(1986-1850)*12
@@ -123,7 +127,7 @@ end do
 delete(var_w)
 
 pdffile="Tanomaly_Pinatubo"
-pdfpath="$IMAGE_PATH/runNames(0)/"
+pdfpath="$IMAGE_PATH/"+runNames(0)+"/"
 mkdir=systemfunc("mkdir -p "+pdfpath)
 wks = gsn_open_wks("pdf", pdfpath+pdffile)
 
@@ -177,6 +181,9 @@ do l = 0, nLevs - 1
     cd2=ind(cntldate.eq.date2)
     
     temp(l, i, :) = (/T(d1:d2)/) - (/Tcntl(cd1:cd2)/)
+    delete(T)
+    delete(Tcntl)
+    delete(cntldate)
     
     delete(date)
   end do
