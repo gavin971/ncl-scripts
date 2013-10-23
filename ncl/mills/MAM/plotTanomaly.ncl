@@ -14,8 +14,15 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ;             "b.e12.B55TRW5CN.f19_g16.CoursePin16-18.002" /)
 ;runNames = (/ "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.001", \
 ;            "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.002" /)
-runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.001", \
-              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.002" /)
+;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.001", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.002", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.003" /)
+;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.002", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.003" /)
+runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.001", \
+              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.002", \
+              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.003" /)
 nRuns = dimsizes(runNames)
 
 ;cntlRun  =    "b.e11.B55TRW5CN.f19_g16.MJMtest.013"          
@@ -25,17 +32,23 @@ nRuns = dimsizes(runNames)
 ;cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.001" , \
 ;                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.002" /)
 cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.001" , \
-                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.002" /)
+                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.002" , \
+                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.003" /)
 rootpath =    "/glade/scratch/mmills/archive/"
 ;rootpath="/glade/p/cesm/wawg/mmills/run/"
 
 year1=1991
-year2=1994
-;year2=1993
-date1=year1*10000+0201
-date2=year2*10000+0701
+;year2=1994
+year2=1993
 
-levels = (/ 30., 50., 70., 100., 1013.25 /)
+cntlyear1=1987
+cntlyear2=1990
+
+date1=year1*10000+0201
+date2=year2*10000+0101
+
+levels = (/ 30., 50., 70., 100., 1013.25, 1013.25 /)
+averaging = (/ "tropical", "tropical", "tropical" , "tropical", "tropical", "global"/)
 nLevs = dimsizes(levels)
 
 cntlRun = cntlRunNames(0)
@@ -73,7 +86,7 @@ obsfile="/glade/p/cesm/wawg/mmills/inputdata/rich_gridded_2009.nc"
 fileid=addfile(obsfile,"r")
 t1=floattoint(12*(year1-1958))
 t2=floattoint(12*(year2-1958)-1)
-t2=t2+6
+;t2=t2+6
 anomalies=fileid->anomalies ; ( time, pressure, lat, lon )
 anomalies@_FillValue = -1e+30
 latobs = anomalies&lat
@@ -83,8 +96,8 @@ tobsTropicsAll=wgt_areaave_Wrap(anomalies(:,:,{-25:25},:),gwobs({-25:25}),1.0,0)
 ;print("   Max obs:"+max(tobsTropics))
 ;print("   Min obs:"+min(tobsTropics))
 ; Normalize against 1986-1990
-t3=floattoint(12*(1986-1958))
-t4=floattoint(12*(1990-1958))
+t3=floattoint(12*(cntlyear1-1958))
+t4=floattoint(12*(cntlyear2-1958))
 tobsNorm=new((/12,12/),"float")
 printVarSummary(tobsTropicsAll)
 print("t3="+t3+", t4="+t4)
@@ -109,22 +122,30 @@ var_in = fileid->temp(:,0,:,:)
 delete(fileid)
 latobs = var_in&latitude
 gwobs = latRegWgt(latobs,"float",0) 
-var_w = wgt_areaave_Wrap(var_in,gwobs,1.0,0)
+gwobs&latitude=latobs
+TSglob = wgt_areaave_Wrap(var_in,gwobs,1.0,0)
+TStrop = wgt_areaave_Wrap(var_in(:,{-25:25},:),gwobs({-25:25}),1.0,0)
+
 t1=(year1-1850)*12
 t2=(year2-1850)*12-1
-t2=t2+6
-TSobsGlobal = var_w(t1:t2)
+;t2=t2+6
+TSobsGlobal = TSglob(t1:t2)
+TSobsTropic = TStrop(t1:t2)
 ; Normalize against 1986-1990
-t3=(1986-1850)*12
-t4=(1990-1850)*12
-TSnorm=new(12,"float")
+t3=(cntlyear1-1850)*12
+t4=(cntlyear2-1850)*12
+TSnormGlob=new(12,"float")
+TSnormTrop=new(12,"float")
 do mon=0,11 
-  TSnorm(mon)=avg(var_w(t3+mon:t4+mon:12))
+  TSnormGlob(mon)=avg(TSglob(t3+mon:t4+mon:12))
+  TSnormTrop(mon)=avg(TStrop(t3+mon:t4+mon:12))
 end do
 do yr = 0,year2-1-year1
-  TSobsGlobal(yr*12:yr*12+11) = TSobsGlobal(yr*12:yr*12+11) - TSnorm(0:11)
+  TSobsGlobal(yr*12:yr*12+11) = TSobsGlobal(yr*12:yr*12+11) - TSnormGlob(0:11)
+  TSobsTropic(yr*12:yr*12+11) = TSobsTropic(yr*12:yr*12+11) - TSnormTrop(0:11)
 end do
-delete(var_w)
+delete(TSglob)
+delete(TStrop)
 
 pdffile="Tanomaly_Pinatubo"
 pdfpath="$IMAGE_PATH/"+runNames(0)+"/"
@@ -139,37 +160,27 @@ do l = 0, nLevs - 1
     print("  Expt Run :  " + runNames(i-1))
     print("  Cntl Run :  " + cntlRunNames(i-1))
     
-    if (levels(l).eq.1013.25) then
-
+    if (averaging(l).eq."global") then
       filename=runNames(i-1)+".cam.h0.globavg.nc"
       filepath=rootpath+runNames(i-1)+"/atm/proc/h0gm/"
-      fileid=addfile(filepath+filename,"r")
-
       cntlFilename=cntlRunNames(i-1)+".cam.h0.globavg.nc"
       cntlFilepath=rootpath+cntlRunNames(i-1)+"/atm/proc/h0gm/"
-      cntlFileid=addfile(cntlFilepath+cntlFilename,"r")
-    
-      T      = fileid->TS
-      Tcntl = cntlFileid->TS
-      
-;      temp(l, i, :) = (/fileid->TS(d1:d2)/)
-;      TScntl   = cntlFileid->TS(d1:d2)
-;      temp(l, i, :) = temp(l, i, :) - (/TScntl(:)/)
     else
-
       filename=runNames(i-1)+".cam.h0.tropicsavg.nc"
       filepath=rootpath+runNames(i-1)+"/atm/proc/h0tm/"
-      fileid=addfile(filepath+filename,"r")
-
       cntlFilename=cntlRunNames(i-1)+".cam.h0.tropicsavg.nc"
       cntlFilepath=rootpath+cntlRunNames(i-1)+"/atm/proc/h0tm/"
-      cntlFileid=addfile(cntlFilepath+cntlFilename,"r")
-      
+    end if
+    
+    fileid=addfile(filepath+filename,"r")
+    cntlFileid=addfile(cntlFilepath+cntlFilename,"r")
+   
+    if (levels(l).eq.1013.25) then
+      T      = fileid->TS
+      Tcntl = cntlFileid->TS      
+    else
       T      = fileid->T(:,{levels(l)})
       Tcntl = cntlFileid->T(:,{levels(l)})
-;      temp(l, i, :) = (/fileid->T(d1:d2,{levels(l)})/)
-;      tempcntl = cntlFileid->T(d1:d2,{levels(l)})
-;      temp(l, i, :) = temp(l, i, :) - (/tempcntl(:)/)
     end if
     
     date=fileid->date
@@ -191,7 +202,11 @@ do l = 0, nLevs - 1
 ;    printVarSummary(temp)
 ;    printVarSummary(TSobsGlobal)
 ;    printVarSummary(TSnorm)
-    temp(l, 0, :) = (/TSobsGlobal(:)/)
+    if (averaging(l).eq."global") then
+      temp(l, 0, :) = (/TSobsGlobal(:)/)
+    else
+      temp(l, 0, :) = (/TSobsTropic(:)/)
+    end if
   else
     temp(l, 0, :) = (/tobsTropics(:,{levels(l)})/)
   end if
@@ -210,7 +225,7 @@ do l = 0, nLevs - 1
   res@trXMaxF = year2
   res@tmXBMinorOn = False
 ;  res@tmXBMinorPerMajor = 11
-  nticks=(year2-year1)*12+1
+  nticks=(year2-year1)*12
   res@tmXBMaxTicks = nticks
   res@tmXBMode= "Explicit"
   res@tmXBValues =fspan(year1,year2,nticks)
@@ -232,10 +247,13 @@ do l = 0, nLevs - 1
 ;  print("   Min all runs:"+min(temp(l, :, :)))
   res@gsnLeftString = " "
   if (levels(l).eq.1013.25) then
-    res@gsnCenterString = "Surface, seasonally adjusted global average"
+    res@gsnCenterString = "Surface, seasonally adjusted "+averaging(l)+ \
+     " average anomaly relative to "+cntlyear1+"-"+cntlyear2
   else
-    res@gsnCenterString = levels(l)+" hPa, seasonally adjusted tropical average"
+    res@gsnCenterString = levels(l)+" hPa, seasonally adjusted "+averaging(l)+\
+     " average anomaly relative to "+cntlyear1+"-"+cntlyear2
   end if
+  
   res@gsnRightString = " "
   res@tiXAxisString = "Year"
   res@tiYAxisString = "Temperature anomaly (K)"

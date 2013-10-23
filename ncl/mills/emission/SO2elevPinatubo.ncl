@@ -5,10 +5,9 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-z1=16 ; lower bound of SO2 emission (km)
-z2=20 ; upper bound of SO2 emission (km), must be less than 31 km
-PinFac = 0.5 ; emission relative to Pinatubo
-TgSO2 = 20.*PinFac ; Tg of SO2
+z1=18 ; lower bound of SO2 emission (km)
+z2=22 ; upper bound of SO2 emission (km), must be less than 31 km
+TgSO2 = 15.0 ; Tg of SO2
 
 host   = systemfunc("hostname")
 ostype = systemfunc("echo $OSTYPE")
@@ -33,7 +32,7 @@ lon = oldfileh->lon
 
 depth = (z2-z1)*1.0e5 ; emission depth in cm
 volume = 5.66e14 * depth ; cm3
-rate = PinFac * 1.88e35 / 86400. / volume ; molec/cm3/s
+rate = TgSO2 / 20.0 * 1.88e35 / 86400. / volume ; molec/cm3/s
 print("rate="+rate)
 
 date = (/ 18490115, 19910614, 19910615, 19910616, 21001215 /)
@@ -99,7 +98,7 @@ filedimdef(newfileh,"time",-1,True)
       "Created by SO2elevPinatubo.ncl"
   globalAtt@notes = nl+\
       "This file includes emissions for the following eruptions:"+nl+\ 
-      "  "+PinFac+" x Pinatubo (15.1417N, 120.35W): June 15, 1991, "+TgSO2+" Tg SO2, "+z1+"-"+z2+"km, "+rate+" molec/cm3/s"
+      "  Pinatubo (15.1417N, 120.35W): June 15, 1991, "+TgSO2+" Tg SO2, "+z1+"-"+z2+"km, "+rate+" molec/cm3/s"
   fileattdef( newfileh, globalAtt )
 
 newfileh->date = date
