@@ -14,6 +14,7 @@ lon1=96.5d0
 lon2=118.5d0
 
 molecSO2 = TgSO2 * 1.d12 / 64.d0 * 6.022d23 ; total molecules of SO2
+print("molecSO2="+molecSO2)
 
 host   = systemfunc("hostname")
 ostype = systemfunc("echo $OSTYPE")
@@ -28,10 +29,10 @@ else
 end if
 
 newfile  = newpath+"ar5_mam3_so2_stratvolc_1850-2100_"+doubletointeger(TgSO2)+"Tg_"\
-                 +doubletointeger(z1)+"-"+doubletointeger(z2)+"_"\
-                 +doubletointeger(lat1)+"-"+doubletointeger(lat2)+"_"\
+                 +doubletointeger(z1)+"-"+doubletointeger(z2)+"km_"\
+                 +doubletointeger(lat1)+"-"+doubletointeger(lat2)+"N_"\
                  +doubletointeger(lon1)+"-"+doubletointeger(lon2)\
-                 +"_c"+datestr+".nc"
+                 +"E_c"+datestr+".nc"
 gridfile = gridpath+"f19.grid.nc"
 
 print("reading "+gridfile)
@@ -61,16 +62,20 @@ varea({lat1:lat2},{lon1:lon2})=1.d0
 totarea=wgt_areasum2(tarea,weights,0)
 volcarea=wgt_areasum2(varea,weights,0)
 
-Rearth=6.37122d10 ; Earth radius in cm (CAM)
+Rearth=6.37122d8 ; Earth radius in cm (CAM)
 pi=asin(1.d0)*2.d0
 SAearth=4.d0*pi*Rearth*Rearth ; Earth surface area in cm2 (CAM)
+print("SAearth="+SAearth+" cm2")
 
 SAvolc=SAearth*volcarea/totarea
+print("SAvolc="+SAvolc+" cm2")
  
 depth = (z2-z1)*1.0d5 ; emission depth in cm
+print("depth="+depth+" cm")
 volume = SAvolc * depth ; cm3
+print("volume="+volume+" cm3")
 rate = molecSO2 / 86400. / volume ; molec/cm3/s
-print("rate="+rate)
+print("rate="+rate+" molec/cm3/s")
 
 date = (/ 18490115, 19910614, 19910615, 19910616, 21001215 /)
 date!0="time"
