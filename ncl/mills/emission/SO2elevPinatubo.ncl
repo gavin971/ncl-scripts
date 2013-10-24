@@ -5,34 +5,71 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-z1=18 ; lower bound of SO2 emission (km)
-z2=22 ; upper bound of SO2 emission (km), must be less than 31 km
-TgSO2 = 15.0 ; Tg of SO2
+z1=20.d0 ; lower bound of SO2 emission (km)
+z2=27.d0 ; upper bound of SO2 emission (km), must be less than 31 km
+TgSO2 = 15.d0 ; Tg of SO2
+lat1=0.5d0
+lat2=18.5d0
+lon1=96.5d0
+lon2=118.5d0
+
+molecSO2 = TgSO2 * 1.d12 / 64.d0 * 6.022d23 ; total molecules of SO2
 
 host   = systemfunc("hostname")
 ostype = systemfunc("echo $OSTYPE")
 datestr = systemfunc("date +%y%m%d")
 
 if (isStrSubset(host,"caldera").or.isStrSubset(host,"geyser").or.isStrSubset(host,"yslogin")) then
-  oldpath = "/glade/p/cesm/cseg//inputdata/atm/cam/chem/trop_mozart_aero/emis/"
-  newpath = "/glade/p/cesm/wawg/mmills/inputdata/"
+  newpath  = "/glade/p/cesm/wawg/mmills/inputdata/"
+  gridpath = newpath
 else
-  oldpath = "/Volumes/Data/Models/cesm/inputdata/atm/cam/chem/trop_mozart_aero/emis/"
-  newpath = oldpath
+  newpath  = "/Volumes/Data/Models/cesm/inputdata/atm/cam/chem/trop_mozart_aero/emis/"
+  gridpath = newpath
 end if
 
-oldfile = oldpath+"ar5_mam3_so2_elev_1850-2005_c090804.nc"
-newfile = newpath+"ar5_mam3_so2_stratvolc_1850-2100_"+floattointeger(TgSO2)+"Tg_"\
-                 +z1+"-"+z2+"_c"+datestr+".nc"
+newfile  = newpath+"ar5_mam3_so2_stratvolc_1850-2100_"+doubletointeger(TgSO2)+"Tg_"\
+                 +doubletointeger(z1)+"-"+doubletointeger(z2)+"_"\
+                 +doubletointeger(lat1)+"-"+doubletointeger(lat2)+"_"\
+                 +doubletointeger(lon1)+"-"+doubletointeger(lon2)\
+                 +"_c"+datestr+".nc"
+gridfile = gridpath+"f19.grid.nc"
 
-print("reading "+oldfile)
-oldfileh = addfile(oldfile,"r")
-lat = oldfileh->lat
-lon = oldfileh->lon
+print("reading "+gridfile)
+gridfileh = addfile(gridfile,"r")
+;slat = gridfileh->slat
+;slon = gridfileh->slon
+lat  = gridfileh->lat
+lon  = gridfileh->lon
+gw   = gridfileh->gw
+delete(gridfileh)
+nlats=dimsizes(lat)
+nlons=dimsizes(lon)
 
-depth = (z2-z1)*1.0e5 ; emission depth in cm
-volume = 5.66e14 * depth ; cm3
-rate = TgSO2 / 20.0 * 1.88e35 / 86400. / volume ; molec/cm3/s
+varea=new((/ nlats, nlons /), double)
+varea!0="lat"
+varea!1="lon"
+varea&lat=lat
+varea&lon=lon
+varea=0.d0
+
+tarea=varea
+tarea=1.d0
+
+weights=conform(varea,gw,0)
+
+varea({lat1:lat2},{lon1:lon2})=1.d0
+totarea=wgt_areasum2(tarea,weights,0)
+volcarea=wgt_areasum2(varea,weights,0)
+
+Rearth=6.37122d10 ; Earth radius in cm (CAM)
+pi=asin(1.d0)*2.d0
+SAearth=4.d0*pi*Rearth*Rearth ; Earth surface area in cm2 (CAM)
+
+SAvolc=SAearth*volcarea/totarea
+ 
+depth = (z2-z1)*1.0d5 ; emission depth in cm
+volume = SAvolc * depth ; cm3
+rate = molecSO2 / 86400. / volume ; molec/cm3/s
 print("rate="+rate)
 
 date = (/ 18490115, 19910614, 19910615, 19910616, 21001215 /)
@@ -49,8 +86,6 @@ altitude_int@units = "km"
 altitude_int!0="altitude_int"
 
 ntimes=dimsizes(date)
-nlats=dimsizes(lat)
-nlons=dimsizes(lon)
 nalts=dimsizes(altitude)
 
 stratvolc = new( (/ ntimes, nalts, nlats, nlons /), double)
@@ -65,7 +100,8 @@ stratvolc&lon=lon
 stratvolc@long_name = "SO2 elevated emissions from explosive volcanoes" 
 stratvolc@units = "molecules/cm3/s"
 
-stratvolc(2,1,{15.1417},{120.35})=rate
+;stratvolc(2,1,{15.1417},{120.35})=rate
+stratvolc(2,1,{lat1:lat2},{lon1:lon2})=rate
 
 print("rm "+newfile)
 a=systemfunc("rm "+newfile)
@@ -98,7 +134,10 @@ filedimdef(newfileh,"time",-1,True)
       "Created by SO2elevPinatubo.ncl"
   globalAtt@notes = nl+\
       "This file includes emissions for the following eruptions:"+nl+\ 
-      "  Pinatubo (15.1417N, 120.35W): June 15, 1991, "+TgSO2+" Tg SO2, "+z1+"-"+z2+"km, "+rate+" molec/cm3/s"
+      "  Pinatubo: June 15, 1991, "+TgSO2+" Tg SO2, "+rate+" molec/cm3/s"+nl+\
+      "    altitudes:  "+z1+" to "+z2+" km"+nl+\
+      "    latitudes:  "+lat1+" to "+lat2+" "+nl+\
+      "    longitudes: "+lon1+" to "+lon2
   fileattdef( newfileh, globalAtt )
 
 newfileh->date = date
