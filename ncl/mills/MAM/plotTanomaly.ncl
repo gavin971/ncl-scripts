@@ -17,23 +17,33 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.001", \
 ;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.002", \
 ;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.003" /)
-;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001", \
-;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.002", \
-;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.003" /)
-runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.001", \
-              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.002", \
-              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.003" /)
+;tag="10Tg.16-20km.1col"
+;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.001", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.002", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.003" /)
+;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.001", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.002", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.003" /)
+;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.002", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003" /)
+tag="10Tg.20-27km.100col"
+runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.001", \
+              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.003" /)
+
 nRuns = dimsizes(runNames)
 
 ;cntlRun  =    "b.e11.B55TRW5CN.f19_g16.MJMtest.013"          
 ;cntlRunNames  =   (/"b.e11.B55TRW5CN.f19_g16.novolc.dgnh400nm.noqbo.001" , \
 ;              "b.e11.B55TRW5CN.f19_g16.MJMtest.013c" , \
 ;              "b.e11.B55TRW5CN.f19_g16.novolc.dgnh10um.noqbo.001" /)         
+cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.001" , \
+                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.003" /)
 ;cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.001" , \
 ;                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.002" /)
-cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.001" , \
-                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.002" , \
-                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.003" /)
+;cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.001" , \
+;                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.002" , \
+;                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.003" /)
 rootpath =    "/glade/scratch/mmills/archive/"
 ;rootpath="/glade/p/cesm/wawg/mmills/run/"
 
@@ -41,7 +51,7 @@ year1=1991
 ;year2=1994
 year2=1993
 
-cntlyear1=1987
+cntlyear1=1990
 cntlyear2=1990
 
 date1=year1*10000+0201
@@ -77,10 +87,10 @@ temp!0 = "lev"
 temp&lev = levels
 temp!1 = "run"
 temp!2 = "time"
-temp&time=time-15      
+temp&time=time;-15      
 temp@units = "K"
 temp(:,:,:)=0.0e0
-print(temp&time)
+;print(temp&time)
 
 obsfile="/glade/p/cesm/wawg/mmills/inputdata/rich_gridded_2009.nc"
 fileid=addfile(obsfile,"r")
@@ -95,21 +105,25 @@ gwobs&lat=latobs
 tobsTropicsAll=wgt_areaave_Wrap(anomalies(:,:,{-25:25},:),gwobs({-25:25}),1.0,0)
 ;print("   Max obs:"+max(tobsTropics))
 ;print("   Min obs:"+min(tobsTropics))
-; Normalize against 1986-1990
-t3=floattoint(12*(cntlyear1-1958))
-t4=floattoint(12*(cntlyear2-1958))
-tobsNorm=new((/12,12/),"float")
-printVarSummary(tobsTropicsAll)
-print("t3="+t3+", t4="+t4)
-do mon=0,11 
-  do lev=0,11
-    tobsNorm(mon,lev)=avg(tobsTropicsAll(t3+mon:t4+mon:12,lev))
-  end do
-end do
+; Normalize against 1990 average
+t3=floattoint(12*(1990-1958))
+t4=t3+11
+tobsNorm=dim_avg_n_Wrap(tobsTropicsAll(t3:t4,:),0)
+;new((/12,12/),"float")
+;printVarSummary(tobsTropicsAll)
+;print("t3="+t3+", t4="+t4)
+;do mon=0,11 
+;  do lev=0,11
+;    tobsNorm(mon,lev)=avg(tobsTropicsAll(t3+mon:t4+mon:12,lev))
+;  end do
+;end do
 tobsTropics=tobsTropicsAll(t1:t2,:)
-do yr = 0,year2-1-year1
-  tobsTropics(yr*12:yr*12+11,:) = tobsTropics(yr*12:yr*12+11,:) - tobsNorm(:,:)
-end do
+;do t = t1,t2
+;  tobsTropics(t-t1,:)=tobsTropicsAll(t,:)-tobsNorm(:)
+;end do
+;do yr = 0,year2-1-year1
+;  tobsTropics(yr*12:yr*12+11,:) = tobsTropics(yr*12:yr*12+11,:) - tobsNorm(:,:)
+;end do
 delete(fileid)
 delete(latobs)
 delete(gwobs)
@@ -125,6 +139,7 @@ gwobs = latRegWgt(latobs,"float",0)
 gwobs&latitude=latobs
 TSglob = wgt_areaave_Wrap(var_in,gwobs,1.0,0)
 TStrop = wgt_areaave_Wrap(var_in(:,{-25:25},:),gwobs({-25:25}),1.0,0)
+;print("TStrop:"+TStrop)
 
 t1=(year1-1850)*12
 t2=(year2-1850)*12-1
@@ -132,24 +147,39 @@ t2=(year2-1850)*12-1
 TSobsGlobal = TSglob(t1:t2)
 TSobsTropic = TStrop(t1:t2)
 ; Normalize against 1986-1990
-t3=(cntlyear1-1850)*12
-t4=(cntlyear2-1850)*12
-TSnormGlob=new(12,"float")
-TSnormTrop=new(12,"float")
-do mon=0,11 
-  TSnormGlob(mon)=avg(TSglob(t3+mon:t4+mon:12))
-  TSnormTrop(mon)=avg(TStrop(t3+mon:t4+mon:12))
-end do
-do yr = 0,year2-1-year1
-  TSobsGlobal(yr*12:yr*12+11) = TSobsGlobal(yr*12:yr*12+11) - TSnormGlob(0:11)
-  TSobsTropic(yr*12:yr*12+11) = TSobsTropic(yr*12:yr*12+11) - TSnormTrop(0:11)
-end do
+t3=(1990-1850)*12
+t4=t3+11
+
+TSnormGlob=avg(TSglob(t3:t4))
+TSnormTrop=avg(TStrop(t3:t4))
+print("TSnormTrop:"+TSnormTrop)
+
+TSobsGlobal(:) = TSobsGlobal(:) - TSnormGlob
+TSobsTropic(:) = TSobsTropic(:) - TSnormTrop
+print("TSobsTropic:"+TSobsTropic)
+
+;t4=(cntlyear2-1850)*12
+;TSnormGlob=new(12,"float")
+;TSnormTrop=new(12,"float")
+;do mon=0,11 
+;  TSnormGlob(mon)=avg(TSglob(t3+mon:t4+mon:12))
+;  TSnormTrop(mon)=avg(TStrop(t3+mon:t4+mon:12))
+;end do
+;do yr = 0,year2-1-year1
+;  TSobsGlobal(yr*12:yr*12+11) = TSobsGlobal(yr*12:yr*12+11) - TSnormGlob(0:11)
+;  TSobsTropic(yr*12:yr*12+11) = TSobsTropic(yr*12:yr*12+11) - TSnormTrop(0:11)
+;end do
 delete(TSglob)
 delete(TStrop)
 
-pdffile="Tanomaly_Pinatubo"
+datestr = systemfunc("date +%y%m%d")
+datestr = datestr+"_"+systemfunc("date +%k%M")
+
+pdffile="Tanomaly_Pinatubo_"+tag+"_c"+datestr
 pdfpath="$IMAGE_PATH/"+runNames(0)+"/"
 mkdir=systemfunc("mkdir -p "+pdfpath)
+
+print("creating "+pdfpath+pdffile+".pdf")
 wks = gsn_open_wks("pdf", pdfpath+pdffile)
 
 do l = 0, nLevs - 1
@@ -221,14 +251,15 @@ do l = 0, nLevs - 1
   res@xyMonoDashPattern = True
   res@xyMonoLineThickness = False
   res@xyLineThicknesses = (/8.0, 4.0, 4.0, 4.0/)
-  res@trXMinF = year1
-  res@trXMaxF = year2
+  res@trXMinF = int2flt(year1)
+  res@trXMaxF = int2flt(year2)-31./365.
   res@tmXBMinorOn = False
 ;  res@tmXBMinorPerMajor = 11
   nticks=(year2-year1)*12
   res@tmXBMaxTicks = nticks
   res@tmXBMode= "Explicit"
-  res@tmXBValues =fspan(year1,year2,nticks)
+  ticks=int2flt(year1)+temp&time/365.
+  res@tmXBValues =ticks
   res@tmXBLabelFontHeightF = 0.015
 ;  XBLabels = new(nticks,"string")
   res@tmXBLabels = (/"91","F","M","A","M","J","J","A","S","O","N","D", \
@@ -247,20 +278,22 @@ do l = 0, nLevs - 1
 ;  print("   Min all runs:"+min(temp(l, :, :)))
   res@gsnLeftString = " "
   if (levels(l).eq.1013.25) then
-    res@gsnCenterString = "Surface, seasonally adjusted "+averaging(l)+ \
-     " average anomaly relative to "+cntlyear1+"-"+cntlyear2
+    res@gsnCenterString = "Surface, "+averaging(l)+ \
+     " average anomaly relative to 1990 annual average"
   else
-    res@gsnCenterString = levels(l)+" hPa, seasonally adjusted "+averaging(l)+\
-     " average anomaly relative to "+cntlyear1+"-"+cntlyear2
+    res@gsnCenterString = levels(l)+" hPa, "+averaging(l)+\
+     " average anomaly"
   end if
   
   res@gsnRightString = " "
   res@tiXAxisString = "Year"
   res@tiYAxisString = "Temperature anomaly (K)"
 ;  print(temp&time)
-  plot = gsn_csm_xy(wks, 1991+temp&time/365., temp(l, :, :), res)
+;  print(ticks)
+  plot = gsn_csm_xy(wks, ticks, temp(l, :, :), res)
   
 end do
+print("file: "+pdfpath+pdffile+".pdf")
 
 delete(wks)
 

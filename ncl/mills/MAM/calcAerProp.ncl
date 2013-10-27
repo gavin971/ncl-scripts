@@ -123,8 +123,15 @@ end
 ;caseid="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnh1um.qboon.001"
 caseid=getenv("caseid")
 print(caseid)
+casedir=getenv("casedir")
+print(casedir)
 rootpath="/glade/scratch/mmills/archive/"+caseid+"/atm/proc/h0mam/"
+
 copypattern="/glade/scratch/mmills/archive/"+caseid+"/atm/hist/*h0*"
+if (casedir.eq."run") then
+  copypattern="/glade/scratch/mmills/"+caseid+"/run/"+caseid+".cam.h0*"
+end if
+
 print("===========================================================")
 print("mkdir -p "+rootpath)
 mkdir=systemfunc("mkdir -p "+rootpath)
