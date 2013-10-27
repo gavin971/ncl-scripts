@@ -2,6 +2,16 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
+host   = systemfunc("hostname")
+ostype = systemfunc("echo $OSTYPE")
+
+if (isStrSubset(host,"caldera").or.isStrSubset(host,"geyser").or.isStrSubset(host,"yslogin")) then
+  rootpath =    "/glade/scratch/mmills/archive/"
+  ;rootpath="/glade/p/cesm/wawg/mmills/run/"
+else
+  rootpath =    "$MODEL_PATH/cesm/case/"
+end if
+
 ;runNames = (/ "b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001", \
 ;              "b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001" , \
 ;              "b.e11.B55TRW5CN.f19_g16.Pin17-25.dgnh1um.noqbo.001" /)
@@ -14,22 +24,28 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ;             "b.e12.B55TRW5CN.f19_g16.CoursePin16-18.002" /)
 ;runNames = (/ "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.001", \
 ;            "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.002" /)
-;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.001", \
-;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.002", \
-;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.003" /)
+
+tag="15Tg.16-20km.1col"
+runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001", \
+              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.002", \
+              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.003" /)
+
 ;tag="10Tg.16-20km.1col"
 ;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.001", \
 ;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.002", \
 ;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.003" /)
+
 ;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.001", \
 ;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.002", \
 ;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.003" /)
+
 ;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
 ;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.002", \
 ;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003" /)
-tag="10Tg.20-27km.100col"
-runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.001", \
-              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.003" /)
+
+;tag="10Tg.20-27km.100col"
+;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.001", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.003" /)
 
 nRuns = dimsizes(runNames)
 
@@ -44,8 +60,6 @@ cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.001" , \
 ;cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.001" , \
 ;                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.002" , \
 ;                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.003" /)
-rootpath =    "/glade/scratch/mmills/archive/"
-;rootpath="/glade/p/cesm/wawg/mmills/run/"
 
 year1=1991
 ;year2=1994
