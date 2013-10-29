@@ -100,45 +100,74 @@ GEOS5_min = (/ 0,0.04,0.141,0.182,0.196,0.196,0.178,0.153,0.13,0.114,0.104,0.096
 ;caseid = "f.e12.FSDW5.f19_f19.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001"
 ;caseid = "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.003"
 ;caseid = "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003"
-caseid = "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.avg"
-
+caseid = (/ \
+ "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.avg", \
+ "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.avg", \
+ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.avg", \
+; "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.avg", \
+ "b.e12.B55TRW5CN.f19_g16.Pin20Tg.16-18km.1col.QBOon.avg" \
+  /)
+  
 rootpath =    "/glade/scratch/mmills/archive/"
 
-h0zmpath=rootpath+caseid+"/atm/proc/h0zm/"
-h0gmpath=rootpath+caseid+"/atm/proc/h0gm/"
+nRuns = dimsizes(caseid)
 
-gmfile=addfile(h0gmpath+caseid+".cam.h0.globavg.nc","r")
-aod_gm=gmfile->AODvstrt
-print("AOD_gm:"+aod_gm)
+do i = 0,nRuns-1
+  print(i+": "+caseid(i))
+  h0zmpath=rootpath+caseid(i)+"/atm/proc/h0zm/"
+  h0gmpath=rootpath+caseid(i)+"/atm/proc/h0gm/"
 
-historyNames = systemfunc("ls " + h0zmpath + "*")
-history = addfiles(historyNames, "r")
-ListSetType(history, "cat")
-;  print(historyNames)
-print("historyNames:"+dimsizes(historyNames))
+  gmfile=addfile(h0gmpath+caseid(i)+".cam.h0.globavg.nc","r")
+  AODvstrt_gm=gmfile->AODvstrt
+  print("AODvstrt_gm:"+AODvstrt_gm)
 
-print ("reading time")
-time    = addfiles_GetVar(history, historyNames, "time")
-print ("reading date")
-date    = addfiles_GetVar(history, historyNames, "date")
-print(time+" "+date)
-print ("reading AODvstrt")
+  historyNames = systemfunc("ls " + h0zmpath + "*")
+  history = addfiles(historyNames, "r")
+  ListSetType(history, "cat")
+  ;  print(historyNames)
+  print("historyNames:"+dimsizes(historyNames))
 
-aod    = addfiles_GetVar(history, historyNames, "AODvstrt")
-printVarSummary(aod)
+  print ("reading time")
+  time    = addfiles_GetVar(history, historyNames, "time")
+  print ("reading date")
+  date    = addfiles_GetVar(history, historyNames, "date")
+  print(time+" "+date)
+  print ("reading AODvstrt")
 
-lat=aod&lat
-;print(lat)
+  AODvstrt    = addfiles_GetVar(history, historyNames, "AODvstrt")
+  printVarSummary(AODvstrt)
 
-day0=ind(date.eq.19910701)
-;print(day0+" "+time(day0))
+  day0=ind(date.eq.19910701)
+  day1=ind(date.eq.19930101)
+  ;print(day0+" "+time(day0))
+  
+  if (i.eq.0) then
+    lat=AODvstrt&lat
+    nLat=dimsizes(lat)
+    nmonths = day1-day0+1
+    day = time(day0:day1) - time(day0)
+    month = ispan(6-day0, nmonths-day0+5, 1)
+    aod=new( (/ nRuns, nmonths, nLat /), "double")
+    aod_gm=new( (/ nRuns, nmonths /), "double")
+    ;print(lat)
+  end if  
 
-day = time - time(day0)
+  aod(i,:,:)  = AODvstrt(day0:day1,:)
+  aod_gm(i,:) = AODvstrt_gm(day0:day1)
+  
+  delete(gmfile)
+  delete(historyNames)
+  delete(history)
+  delete(time)
+  delete(date)
+  delete(AODvstrt)
+  delete(AODvstrt_gm)
+  delete(h0zmpath)
+  delete(h0gmpath)
+  delete(day0)
+  delete(day1)
 
-nmonths=dimsizes(time)
-;print("nmonths="+nmonths)
-month = ispan(6-day0, nmonths-day0+5, 1)
-;fmonth = int2flt(month)
+end do
 
 ;print(month)
 ;print(time+" "+date+" "+month+" "+day+" "+aod(:,{10})+" "+aod(:,{15})+" "+aod(:,{19.5}))
@@ -155,7 +184,7 @@ month = ispan(6-day0, nmonths-day0+5, 1)
   res                   = True
   res@gsnDraw           = False
   res@gsnFrame          = False
-  res@xyLineThicknessF  = 2.0
+  res@xyLineThicknessF  = 4.0
   
   res@xyLineColor       = "red"
 ;  res@tiXaxisString     = "Months since Jan 1, 1991"
@@ -169,14 +198,17 @@ month = ispan(6-day0, nmonths-day0+5, 1)
 
 ;  res@xyLineColor       = "green"
 ;  overlay(plot, gsn_csm_xy(wks, month, aod(:,{14.2}), res))
-  res@xyLineColor       = "black"
+  res@xyMonoLineColor   = False
+  res@xyLineColors       = (/"black","black","black","green4"/)
+  res@xyDashPatterns = (/0,1,2,0/)
 ;  overlay(plot, gsn_csm_xy(wks, month, aod(:,{10.4}), res))
 ;  res@xyLineColor       = "darkgreen"
-  overlay(plot, gsn_csm_xy(wks, month, aod(:,{19.89}), res))
+  overlay(plot, gsn_csm_xy(wks, month, aod(:,:,{19.89}), res))
 
   draw(plot)
   frame(wks)
   
+  res@xyMonoLineColor   = True
   res@xyLineColor       = "red"
   res@tiMainString     = "5.0S"
   plot = gsn_csm_xy(wks, month_AVHRR5S, AVHRR5S, res)
@@ -184,8 +216,10 @@ month = ispan(6-day0, nmonths-day0+5, 1)
   res@xyLineColor       = "blue"
   overlay(plot, gsn_csm_xy(wks, month_SAGE5S, SAGE5S, res))
   
-  res@xyLineColor       = "black"
-  overlay(plot, gsn_csm_xy(wks, month, aod(:,{-4.7}), res))
+  res@xyMonoLineColor   = False
+  res@xyLineColors       = (/"black","black","black","green4"/)
+;  res@xyLineColor       = "black"
+  overlay(plot, gsn_csm_xy(wks, month, aod(:,:,{-4.7}), res))
 ;  res@xyLineColor       = "black"
 ;  overlay(plot, gsn_csm_xy(wks, month, aod(:,{-10.4}), res))
 ;  res@xyLineColor       = "orange"
@@ -197,8 +231,9 @@ month = ispan(6-day0, nmonths-day0+5, 1)
 ;  res@tiXaxisString     = "Days since eruption"
   res@tiMainString     = "50N"
   res@xyLineColor       = "black"
-  plot = gsn_csm_xy(wks, day, aod(:,{50.2}), res)
+  plot = gsn_csm_xy(wks, day, aod(:,:,{50.2}), res)
 
+  res@xyMonoLineColor   = True
   res@xyLineColor       = "green"
   overlay(plot, gsn_csm_xy(wks, day_SAGE_LIDAR50_55N, SAGE_LIDAR50_55N, res))
   
@@ -211,8 +246,8 @@ month = ispan(6-day0, nmonths-day0+5, 1)
   res@xyLineColor       = "purple"
   overlay(plot, gsn_csm_xy(wks, day_LIDAR50_55N, LIDARavg50_55N, res))
   
-  res@xyLineColor       = "black"
-  overlay(plot, gsn_csm_xy(wks, day, aod(:,{50.2}), res))
+;  res@xyLineColor       = "black"
+;  overlay(plot, gsn_csm_xy(wks, day, aod(:,:,{50.2}), res))
 ;  overlay(plot, gsn_csm_xy(wks, day, aod(:,{52.1}), res))
 ;  overlay(plot, gsn_csm_xy(wks, day, aod(:,{54}), res))
 ;  res@xyLineColor       = "brown"
@@ -236,8 +271,10 @@ month = ispan(6-day0, nmonths-day0+5, 1)
 ;  overlay(plot, gsn_csm_xy(wks, month_global, GEOS5_max, res))
 ;  overlay(plot, gsn_csm_xy(wks, month_global, GEOS5_min, res))
   
-  res@xyLineColor       = "black"
-  res@xyLineThicknessF  = 3.0
+;  res@xyLineColor       = "black"
+  res@xyMonoLineColor   = False
+  res@xyLineColors       = (/"black","black","black","green4"/)
+;  res@xyLineThicknessF  = 3.0
   overlay(plot, gsn_csm_xy(wks, month, aod_gm, res))
 
   draw(plot)
