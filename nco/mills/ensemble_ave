@@ -2,31 +2,47 @@
 
 export machine=`hostname`
 
-if [[ $machine = 'modeling1' ]];then
-  rootpath='/data4/mmills'
-fi
+if [ ! -n "$rootpath" ] ; then
 
-if [[ $machine = 'cmip5' ]];then
-  rootpath='/data/waccm'
-#  rootpath='/data/ccsm4'
-fi
-
-if [[ $OSTYPE = 'darwin' ]];then
-  rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
-fi
-
-if [ ! -n "$caseid" ] ; then
-  echo "caseid is not set, i.e.:"
-  echo " export caseid=bc5tgIP"
-  if  ! -n "$ensname" ] ; then
-    echo " ensname not set; exiting."
-    exit
+  if [[ $machine =~ 'yslogin' ]];then
+#      rootpath='/glade/p/cesm/wawg/mmills/run'
+    rootpath='/glade/scratch/mmills/archive'
   fi
-  if  ! -n "$avgname" ] ; then
-    echo " avgname not set; exiting."
-    exit
+
+  if [[ $machine = 'modeling1' ]];then
+    rootpath='/data4/mmills'
   fi
+
+  if [[ $machine = 'cmip5' ]];then
+    rootpath='/data/waccm'
+  #  rootpath='/data/ccsm4'
+  fi
+
+  if [[ $OSTYPE = 'darwin' ]];then
+    rootpath='/Volumes/Data/Models/waccm/run/carma-soot'
+  fi
+
 fi
+echo "rootpath = $rootpath"
+
+#if [ ! -n "$caseid" ] ; then
+#  echo "caseid is not set: $caseid, i.e.:"
+#  echo " export caseid=bc5tgIP"
+#  if  ! -n $ensname ] ; then
+#    echo " ensname not set; exiting: $ensname"
+#    exit
+#  fi
+#  if  ! -n "$avgname" ] ; then
+#    echo " avgname not set; exiting."
+#    exit
+#  fi
+#fi
+
+ensname=$ensemble'.00[123]'
+echo "ensname = $ensname"
+avgname=$ensemble'.avg'
+echo "avgname = $avgname"
+echo "hnum = $hnum"
 
 if [ $caseid = 'bc5tgIP' ] ; then
   ensname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.00[367]'
@@ -51,10 +67,10 @@ if [ $caseid = 'bc0tg' ] ; then
 fi
 
 if  ! -n "$year1" ] ; then
-  year1=2013
+  year1=1991
 fi
 if  ! -n "$year2" ] ; then
-  year2=2022
+  year2=1992
 fi
 
 #hno3_rename='b40.rcp2_6.2deg.wcm.002'
@@ -70,10 +86,10 @@ if [ ! -n "$hnum" ] ; then
   hnum='h0'
 fi
 
-wadir=$rootpath'/'$ensname'/'$hnum
+wadir=$rootpath'/'$ensname'/atm/proc/'$hnum
 #wadir2=$rootpath'/'$ensname2'/'$hnum
-avgdir=$outpath'/'$avgname'/'$hnum
-searchstr='cam2.'$hnum
+avgdir=$outpath'/'$avgname'/atm/proc/'$hnum
+searchstr='cam.'$hnum
 
 
 # script to average and standard deviation of waccm h0 files
