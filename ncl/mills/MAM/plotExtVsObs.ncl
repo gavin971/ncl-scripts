@@ -1,3 +1,4 @@
+
 load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
@@ -82,16 +83,33 @@ LIDARmax50_55N = (/ 0.048,0.043,0.145,0.134,0.11,0.181,0.206,0.234,0.283,0.206,0
 LIDARmin50_55N = (/ 0.048,0.043,0.031,0.088,0.11,0.092,0.141,0.154,0.18,0.122,0.095,0.094,0.103,0.09,0.113,0.123, \
    0.095,0.103,0.061,0.094,0.087,0.071,0.066,0.054,0.05,0.04,0.058,0.065,0.054 /)
 ;========================================================================================================
- 
+; Data from Aquila et al., JGR, 2012
+month_global = (/ 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33 /)
+AVHRR_global = (/ 0.013,0.017,0.097,0.167,0.181,0.16,0.164,0.16,0.144,0.128,0.138,0.132,0.127,0.126,\
+                 0.122,0.1,0.097,0.067,0.052,0.054,0.044,0.032,0.023,0.026,0.027,0.024,0.028,0.013,0 /)
+SAGE_global = (/ 0.007,0.012,0.046,0.092,0.107,0.12,0.133,0.134,0.139,0.145,0.134,0.126,0.125,0.112, \
+                 0.11,0.108,0.092,0.088,0.079,0.069,0.069,0.061,0.054,0.049,0.045,0.038,0.039,0.037,0.032 /)
+GEOS5_avg = (/ 0,0.04,0.151,0.19,0.202,0.199,0.188,0.171,0.156,0.143,0.136,0.128,0.118,0.109,0.099,0.089, \
+               0.081,0.074,0.07,0.064,0.058,0.052,0.045,0.038,0.034,0.029,0.024,0.021,0.015 /)
+GEOS5_max = (/ 0,0.04,0.162,0.2,0.205,0.203,0.193,0.184,0.174,0.168,0.164,0.155,0.146,0.136,0.126,0.116, \
+               0.107,0.1,0.095,0.088,0.082,0.073,0.064,0.057,0.048,0.041,0.034,0.028,0.024 /)
+GEOS5_min = (/ 0,0.04,0.141,0.182,0.196,0.196,0.178,0.153,0.13,0.114,0.104,0.096,0.082,0.07,0.058,0.052, \
+               0.046,0.041,0.039,0.035,0.031,0.027,0.022,0.019,0.017,0.015,0.012,0.011,0.008 /)
  
 ;caseid = "f.e12.FSDW5.f19_f19.Pin10Tg.18-22km.001"
 ;caseid = "f.e12.FSDW5.f19_f19.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001"
 ;caseid = "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.003"
-caseid = "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003"
+;caseid = "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003"
+caseid = "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.avg"
 
 rootpath =    "/glade/scratch/mmills/archive/"
 
 h0zmpath=rootpath+caseid+"/atm/proc/h0zm/"
+h0gmpath=rootpath+caseid+"/atm/proc/h0gm/"
+
+gmfile=addfile(h0gmpath+caseid+".cam.h0.globavg.nc","r")
+aod_gm=gmfile->AODvstrt
+print("AOD_gm:"+aod_gm)
 
 historyNames = systemfunc("ls " + h0zmpath + "*")
 history = addfiles(historyNames, "r")
@@ -110,7 +128,7 @@ aod    = addfiles_GetVar(history, historyNames, "AODvstrt")
 printVarSummary(aod)
 
 lat=aod&lat
-print(lat)
+;print(lat)
 
 day0=ind(date.eq.19910701)
 ;print(day0+" "+time(day0))
@@ -140,6 +158,9 @@ month = ispan(6-day0, nmonths-day0+5, 1)
   res@xyLineThicknessF  = 2.0
   
   res@xyLineColor       = "red"
+;  res@tiXaxisString     = "Months since Jan 1, 1991"
+;  res@tiYaxisString     = "Stratospheric AOD, visible"
+  res@tiMainString     = "19.5N"
   plot = gsn_csm_xy(wks, month_AVHRR195N, AVHRR195N, res)
 
   res@xyLineColor       = "blue"
@@ -149,31 +170,37 @@ month = ispan(6-day0, nmonths-day0+5, 1)
 ;  res@xyLineColor       = "green"
 ;  overlay(plot, gsn_csm_xy(wks, month, aod(:,{14.2}), res))
   res@xyLineColor       = "black"
-  overlay(plot, gsn_csm_xy(wks, month, aod(:,{10.4}), res))
-  res@xyLineColor       = "darkgreen"
+;  overlay(plot, gsn_csm_xy(wks, month, aod(:,{10.4}), res))
+;  res@xyLineColor       = "darkgreen"
   overlay(plot, gsn_csm_xy(wks, month, aod(:,{19.89}), res))
 
   draw(plot)
   frame(wks)
   
   res@xyLineColor       = "red"
+  res@tiMainString     = "5.0S"
   plot = gsn_csm_xy(wks, month_AVHRR5S, AVHRR5S, res)
 
   res@xyLineColor       = "blue"
   overlay(plot, gsn_csm_xy(wks, month_SAGE5S, SAGE5S, res))
   
-  res@xyLineColor       = "darkgreen"
-  overlay(plot, gsn_csm_xy(wks, month, aod(:,{-4.7}), res))
   res@xyLineColor       = "black"
+  overlay(plot, gsn_csm_xy(wks, month, aod(:,{-4.7}), res))
+;  res@xyLineColor       = "black"
 ;  overlay(plot, gsn_csm_xy(wks, month, aod(:,{-10.4}), res))
 ;  res@xyLineColor       = "orange"
-  overlay(plot, gsn_csm_xy(wks, month, aod(:,{-0.95}), res))
+;  overlay(plot, gsn_csm_xy(wks, month, aod(:,{-0.95}), res))
 
   draw(plot)
   frame(wks)
   
+;  res@tiXaxisString     = "Days since eruption"
+  res@tiMainString     = "50N"
+  res@xyLineColor       = "black"
+  plot = gsn_csm_xy(wks, day, aod(:,{50.2}), res)
+
   res@xyLineColor       = "green"
-  plot = gsn_csm_xy(wks, day_SAGE_LIDAR50_55N, SAGE_LIDAR50_55N, res)
+  overlay(plot, gsn_csm_xy(wks, day_SAGE_LIDAR50_55N, SAGE_LIDAR50_55N, res))
   
   res@xyLineColor       = "red"
   overlay(plot, gsn_csm_xy(wks, day_AVHRR50_55N, AVHRR50_55N, res))
@@ -188,8 +215,30 @@ month = ispan(6-day0, nmonths-day0+5, 1)
   overlay(plot, gsn_csm_xy(wks, day, aod(:,{50.2}), res))
 ;  overlay(plot, gsn_csm_xy(wks, day, aod(:,{52.1}), res))
 ;  overlay(plot, gsn_csm_xy(wks, day, aod(:,{54}), res))
-  res@xyLineColor       = "brown"
-  overlay(plot, gsn_csm_xy(wks, day, aod(:,{55.9}), res))
+;  res@xyLineColor       = "brown"
+;  overlay(plot, gsn_csm_xy(wks, day, aod(:,{55.9}), res))
+
+  draw(plot)
+  frame(wks)
+  
+  
+  res@xyLineColor       = "blue"
+;  res@tiXaxisString     = "Months since Jan 1, 1991"
+  res@tiMainString     = "Global Average"
+  plot = gsn_csm_xy(wks, month_global, AVHRR_global, res)
+
+  res@xyLineColor       = "red"
+  overlay(plot, gsn_csm_xy(wks, month_global, SAGE_global, res))
+  
+;  res@xyLineColor       = "green4"
+;  overlay(plot, gsn_csm_xy(wks, month_global, GEOS5_avg, res))
+;  res@xyLineThicknessF  = 1.0
+;  overlay(plot, gsn_csm_xy(wks, month_global, GEOS5_max, res))
+;  overlay(plot, gsn_csm_xy(wks, month_global, GEOS5_min, res))
+  
+  res@xyLineColor       = "black"
+  res@xyLineThicknessF  = 3.0
+  overlay(plot, gsn_csm_xy(wks, month, aod_gm, res))
 
   draw(plot)
   frame(wks)

@@ -25,10 +25,10 @@ end if
 ;runNames = (/ "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.001", \
 ;            "b.e12.B55TRW5CN.f19_g16.CoursePin17-25.QBOon.002" /)
 
-tag="15Tg.16-20km.1col"
-runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001", \
-              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.002", \
-              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.003" /)
+;tag="15Tg.16-20km.1col"
+;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.002", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.003" /)
 
 ;tag="10Tg.16-20km.1col"
 ;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.001", \
@@ -43,6 +43,42 @@ runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001", \
 ;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.002", \
 ;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003" /)
 
+tag="20Tg.20-27km.100col"
+;runNames = (/ \
+;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.001", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.002", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.003", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.002", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.001", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.002", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.003", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.001", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.002", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.003" \
+;               /)
+runNames = (/ \
+   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.avg", \
+   "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.avg", \
+   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.avg", \
+   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.avg", \
+   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.16-18km.1col.QBOon.avg" \
+               /)
+
+;tag="20Tg.20-27km.100col"
+;runNames = (/ \
+;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.001", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.002", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.003", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.002", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.001", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.002", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.003" \
+;               /)
+
 ;tag="10Tg.20-27km.100col"
 ;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.001", \
 ;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.003" /)
@@ -53,22 +89,36 @@ nRuns = dimsizes(runNames)
 ;cntlRunNames  =   (/"b.e11.B55TRW5CN.f19_g16.novolc.dgnh400nm.noqbo.001" , \
 ;              "b.e11.B55TRW5CN.f19_g16.MJMtest.013c" , \
 ;              "b.e11.B55TRW5CN.f19_g16.novolc.dgnh10um.noqbo.001" /)         
-cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.001" , \
-                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.003" /)
+;cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.001" , \
+;                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.003" /)
 ;cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.001" , \
 ;                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.002" /)
-;cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.001" , \
-;                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.002" , \
-;                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.003" /)
+cntlRunNames  =    (/ \
+   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
+   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
+   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
+   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
+   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg" \
+   /)
+;   , \
+;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.001", \
+;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.002", \
+;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.003", \
+;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.001", \
+;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.002", \
+;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.003", \
+;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.001", \
+;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.002", \
+;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.003" \
+;                       /)
+
+nCntl = dimsizes(cntlRunNames)
 
 year1=1991
 ;year2=1994
 year2=1993
 
-cntlyear1=1990
-cntlyear2=1990
-
-date1=year1*10000+0201
+date1=year1*10000+0701
 date2=year2*10000+0101
 
 levels = (/ 30., 50., 70., 100., 1013.25, 1013.25 /)
@@ -108,7 +158,7 @@ temp(:,:,:)=0.0e0
 
 obsfile="/glade/p/cesm/wawg/mmills/inputdata/rich_gridded_2009.nc"
 fileid=addfile(obsfile,"r")
-t1=floattoint(12*(year1-1958))
+t1=floattoint(12*(year1-1958))+5
 t2=floattoint(12*(year2-1958)-1)
 ;t2=t2+6
 anomalies=fileid->anomalies ; ( time, pressure, lat, lon )
@@ -119,8 +169,8 @@ gwobs&lat=latobs
 tobsTropicsAll=wgt_areaave_Wrap(anomalies(:,:,{-25:25},:),gwobs({-25:25}),1.0,0)
 ;print("   Max obs:"+max(tobsTropics))
 ;print("   Min obs:"+min(tobsTropics))
-; Normalize against 1990 average
-t3=floattoint(12*(1990-1958))
+; Normalize against June 1990 - May 1991
+t3=floattoint(12*(1990-1958))+5
 t4=t3+11
 tobsNorm=dim_avg_n_Wrap(tobsTropicsAll(t3:t4,:),0)
 ;new((/12,12/),"float")
@@ -155,13 +205,13 @@ TSglob = wgt_areaave_Wrap(var_in,gwobs,1.0,0)
 TStrop = wgt_areaave_Wrap(var_in(:,{-25:25},:),gwobs({-25:25}),1.0,0)
 ;print("TStrop:"+TStrop)
 
-t1=(year1-1850)*12
+t1=(year1-1850)*12+5
 t2=(year2-1850)*12-1
 ;t2=t2+6
 TSobsGlobal = TSglob(t1:t2)
 TSobsTropic = TStrop(t1:t2)
-; Normalize against 1986-1990
-t3=(1990-1850)*12
+; Normalize against June 1990-May 1991
+t3=(1990-1850)*12+5
 t4=t3+11
 
 TSnormGlob=avg(TSglob(t3:t4))
@@ -231,10 +281,11 @@ do l = 0, nLevs - 1
     d1=ind(date.eq.date1)
     d2=ind(date.eq.date2)
     
-    cntldate=fileid->date
+    cntldate=cntlFileid->date
     cd1=ind(cntldate.eq.date1)
     cd2=ind(cntldate.eq.date2)
     
+    print("d1="+d1+" d2="+d2+" cd1="+cd1+" cd2="+cd2)
     temp(l, i, :) = (/T(d1:d2)/) - (/Tcntl(cd1:cd2)/)
     delete(T)
     delete(Tcntl)
@@ -252,6 +303,8 @@ do l = 0, nLevs - 1
       temp(l, 0, :) = (/TSobsTropic(:)/)
     end if
   else
+;    printVarSummary(temp)
+;    printVarSummary(tobsTropics)
     temp(l, 0, :) = (/tobsTropics(:,{levels(l)})/)
   end if
 ;  print("   Max obs:"+max(temp(l, nRuns, :)))
@@ -260,23 +313,27 @@ do l = 0, nLevs - 1
   res@gsnMaximize           = True
   res@vpHeightF             = 0.5              ; change aspect ratio
   res@vpWidthF              = 1.0
-  res@xyLineColors    = (/"black","blue","green4","red"/)
+  res@xyLineColors    = (/"black","blue","green4","red","orange","purple"/)
   res@xyMonoLineColor = False
   res@xyMonoDashPattern = True
   res@xyMonoLineThickness = False
-  res@xyLineThicknesses = (/8.0, 4.0, 4.0, 4.0/)
-  res@trXMinF = int2flt(year1)
+  res@xyLineThicknesses = (/8.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0/)
+  res@trXMinF = int2flt(year1)+5./12.
   res@trXMaxF = int2flt(year2)-31./365.
   res@tmXBMinorOn = False
 ;  res@tmXBMinorPerMajor = 11
-  nticks=(year2-year1)*12
+  nticks=(year2-year1)*12-5
   res@tmXBMaxTicks = nticks
   res@tmXBMode= "Explicit"
   ticks=int2flt(year1)+temp&time/365.
   res@tmXBValues =ticks
   res@tmXBLabelFontHeightF = 0.015
 ;  XBLabels = new(nticks,"string")
-  res@tmXBLabels = (/"91","F","M","A","M","J","J","A","S","O","N","D", \
+;  res@tmXBLabels = (/"91","F","M","A","M","J","J","A","S","O","N","D", \
+;                     "92","F","M","A","M","J","J","A","S","O","N","D", \
+;                     "93","F","M","A","M","J","J","A","S","O","N","D", \
+;                     "94" /)
+  res@tmXBLabels = (/"J","J","A","S","O","N","D", \
                      "92","F","M","A","M","J","J","A","S","O","N","D", \
                      "93","F","M","A","M","J","J","A","S","O","N","D", \
                      "94" /)
@@ -293,7 +350,7 @@ do l = 0, nLevs - 1
   res@gsnLeftString = " "
   if (levels(l).eq.1013.25) then
     res@gsnCenterString = "Surface, "+averaging(l)+ \
-     " average anomaly relative to 1990 annual average"
+     " average anomaly relative to June 1990 - May 1991 average"
   else
     res@gsnCenterString = levels(l)+" hPa, "+averaging(l)+\
      " average anomaly"

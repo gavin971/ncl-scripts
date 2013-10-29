@@ -7,7 +7,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
 z1=20.d0 ; lower bound of SO2 emission (km)
 z2=27.d0 ; upper bound of SO2 emission (km), must be less than 31 km
-TgSO2 = 10.d0 ; Tg of SO2
+TgSO2 = 20.d0 ; Tg of SO2
 lat1=0.5d0
 lat2=18.5d0
 lon1=96.5d0

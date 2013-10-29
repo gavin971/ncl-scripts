@@ -56,6 +56,9 @@ begin
       t1=opt@timeoffset(i)
       t2=opt@timeoffset(i)+ntmin
       t3=opt@timeoffset2(i)
+;      t1=0
+;      t2=ntmin
+;      t3=0
       print("t1="+t1+" t2="+t2+" t3="+t3+" ntmin="+ntmin)
       do j = 0, nTracers - 1
         k=j+i*nTracers
@@ -106,6 +109,9 @@ begin
       t1=opt@timeoffset(i)
       t2=opt@timeoffset(i)+ntmin
       t3=opt@timeoffset2(i)
+;      t1=0
+;      t2=ntmin
+;      t3=0
       print("t1="+t1+" t2="+t2+" t3="+t3+" ntmin="+ntmin)
 
       print("rm "+massfilepath+massfile)
@@ -214,9 +220,10 @@ begin
   res@tmXBMode= "Explicit"
   res@tmXBValues =fspan(1991,1993,25)
   res@tmXBLabelFontHeightF = 0.015
-  res@tmXBLabels = (/"1991","F","M","A","M","J","J","A","S","O","N","D", \
+  tickLabels = (/"1991","F","M","A","M","J","J","A","S","O","N","D", \
                      "1992","F","M","A","M","J","J","A","S","O","N","D", \
                      "1993"/)
+  res@tmXBLabels = tickLabels
   plot = gsn_csm_xy(wks, 1991.+sulfur&time/365., sulfur(0:nTracers-1, :) /1e9, res)
   
   plot = gsn_csm_xy(wks, 1991.+sulfur&time/365., sulfur(:, :) /1e9, res)
@@ -251,9 +258,7 @@ begin
   res@tmXBMode= "Explicit"
   res@tmXBValues =fspan(1991,1993,25)
   res@tmXBLabelFontHeightF = 0.015
-  res@tmXBLabels = (/"1991","F","M","A","M","J","J","A","S","O","N","D", \
-                     "1992","F","M","A","M","J","J","A","S","O","N","D", \
-                     "1993"/)
+  res@tmXBLabels = tickLabels
   plot = gsn_csm_xy(wks, 1991.+dmass&time/365., dmass(:, :) /1e9, res)
 
   delete(wks)
@@ -283,13 +288,18 @@ rootpath="/glade/scratch/mmills/archive/"
 ;caseid = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.001", \
 ;            "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.002", \
 ;            "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.003"  /)
-caseid = (/ "f.e12.FSDW5.f19_f19.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
-            "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001", \
-            "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.002", \
-            "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.003", \
-            "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
-            "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.002", \
-             "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003" /)
+;caseid = (/ "f.e12.FSDW5.f19_f19.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
+;            "f.e12.FSDW5.f19_f19.Pin15Tg.18-22km.001", \
+;            "f.e12.FSDW5.f19_f19.Pin10Tg.18-22km.001" /)
+;caseid = (/ "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001", \
+;            "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.002", \
+;            "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.003" /)
+;caseid = (/ "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
+;            "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.002", \
+;            "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003" /)
+caseid = (/ "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.001", \
+            "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.002", \
+            "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.003" /)
                      
 tracers=(/"SO2","H2SO4","so4_a2","so4_a1","so4_a3"/)
 tracers@molwts=(/ 115.108999, 115.108999, 64.063799, 115.108999, 98.078479 /)
@@ -297,7 +307,8 @@ opt=False
 opt@overwritemass=False
 ;opt@lev1=100.0
 opt@lev1=1100.0
-opt@timeoffset=(/0,0,0/)
+;opt@timeoffset=(/0,0,0/)
+opt@timeoffset=(/5,5,5/)
 opt@timeoffset2=(/0,0,0/)
 ;opt@timeoffset=(/0,0,0,3*12,12/)
 ;opt@timeoffset2=(/0,15,0,3*12,12/)
