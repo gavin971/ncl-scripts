@@ -37,6 +37,10 @@ if  [ -n "$caseid" ] ; then
   #    rootpath='/data5/mmills/wa319/carma-soot'
     fi
 
+    if [[ $machine =~ 'lfe' ]];then
+      rootpath='/lou/s2m/mjmills2/csm'
+    fi
+
     if [[ $machine = 'cmip5' ]];then
       if [[ $caseid =~ 'wcm' ]]; then
         rootpath='/data/waccm'
@@ -64,8 +68,8 @@ if  [ -n "$caseid" ] ; then
   fi
 
   if [ ! -n "$wadir" ] ; then
-#    wadir=$rootpath'/'$caseid'/'$runname'/atm/hist/'
-    wadir=$rootpath'/'$caseid'/'$runname'/atm/proc/h0mam/'
+    wadir=$rootpath'/'$caseid'/'$runname'/atm/hist/'
+#    wadir=$rootpath'/'$caseid'/'$runname'/atm/proc/h0mam/'
   fi
   
   if [ ! -n "$outdir" ] ; then
