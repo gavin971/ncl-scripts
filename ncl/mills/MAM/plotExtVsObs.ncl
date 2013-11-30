@@ -110,9 +110,12 @@ GEOS5_min = (/ 0,0.04,0.141,0.182,0.196,0.196,0.178,0.153,0.13,0.114,0.104,0.096
 ;caseid = "b.e12.B55TRW5CN.f19_g16.Pin10Tg.18-22km.QBOon.003"
 ;caseid = "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003"
 caseid = (/ \
- "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.avg", \
- "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.avg", \
- "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.avg" \
+; "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.avg", \
+ "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.001" \
+; "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.002", \
+; "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.003" \
+; "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.avg", \
+; "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.avg" \
 ; "f.e12.FSDW5.f19_f19.Pin15Tg.18-22km.001", \
 ; "f.e12.FSDW5.f19_f19.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001" \
 ; "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.avg", \
@@ -124,7 +127,8 @@ rootpath =    "/glade/scratch/mmills/archive/"
 nRuns = dimsizes(caseid)
 
 do i = 0,nRuns-1
-  print(i+": "+caseid(i))
+  i1=i+1
+  print(i1+" of "+nRuns+": "+caseid(i))
   h0zmpath=rootpath+caseid(i)+"/atm/proc/h0zm/"
   h0gmpath=rootpath+caseid(i)+"/atm/proc/h0gm/"
 
@@ -132,8 +136,12 @@ do i = 0,nRuns-1
   AODvstrt_gm=gmfile->AODvstrt
   print("AODvstrt_gm:"+AODvstrt_gm)
 
+  print("historyNames = systemfunc(ls "+ h0zmpath + "*))")
   historyNames = systemfunc("ls " + h0zmpath + "*")
+  print(historyNames)
+  print("history = addfiles(historyNames, r)")
   history = addfiles(historyNames, "r")
+  print("ListSetType(history, cat)")
   ListSetType(history, "cat")
   ;  print(historyNames)
   print("historyNames:"+dimsizes(historyNames))
@@ -218,8 +226,8 @@ aod@long_name="Stratospheric AOD in visible"
 ;  res@xyLineColor       = "green"
 ;  overlay(plot, gsn_csm_xy(wks, month, aod(:,{14.2}), res))
   res@xyMonoLineColor   = False
-  res@xyLineColors       = (/"black","black","black","green4","brown"/)
-  res@xyDashPatterns = (/0,1,2,1,1/)
+  res@xyLineColors       = (/"black","black","black","black","green4","brown"/)
+  res@xyDashPatterns = (/0,1,2,3,1,1/)
 ;  overlay(plot, gsn_csm_xy(wks, month, aod(:,{10.4}), res))
 ;  res@xyLineColor       = "darkgreen"
   overlay(plot, gsn_csm_xy(wks, month, aod(:,:,{19.89}), res))
@@ -236,7 +244,7 @@ aod@long_name="Stratospheric AOD in visible"
   overlay(plot, gsn_csm_xy(wks, month_SAGE5S, SAGE5S, res))
   
   res@xyMonoLineColor   = False
-  res@xyLineColors       = (/"black","black","black","green4","brown"/)
+  res@xyLineColors       = (/"black","black","black","black","green4","brown"/)
 ;  res@xyLineColor       = "black"
   overlay(plot, gsn_csm_xy(wks, month, aod(:,:,{-4.7}), res))
 ;  res@xyLineColor       = "black"
@@ -292,7 +300,7 @@ aod@long_name="Stratospheric AOD in visible"
   
 ;  res@xyLineColor       = "black"
   res@xyMonoLineColor   = False
-  res@xyLineColors       = (/"black","black","black","green4","brown"/)
+  res@xyLineColors       = (/"black","black","black","black","green4","brown"/)
 ;  res@xyLineThicknessF  = 3.0
   overlay(plot, gsn_csm_xy(wks, month, aod_gm, res))
 

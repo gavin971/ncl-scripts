@@ -58,26 +58,27 @@ tag="20Tg.20-27km.100col"
 ;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.002", \
 ;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.003" \
 ;               /)
-runNames = (/ \
-   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.avg", \
-   "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.avg", \
-   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.avg", \
-   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.avg", \
-   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.16-18km.1col.QBOon.avg" \
-               /)
+;runNames = (/ \
+;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.avg", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.avg", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.avg", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.16-20km.QBOon.avg", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.16-18km.1col.QBOon.avg" \
+;               /)
 
 ;tag="20Tg.20-27km.100col"
-;runNames = (/ \
-;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.001", \
+runNames = (/ \
+;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.avg", \
+   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.001" \
 ;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.002", \
-;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.003", \
+;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.003" \
 ;   "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
 ;   "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.002", \
 ;   "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003", \
 ;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.001", \
 ;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.002", \
 ;   "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.003" \
-;               /)
+               /)
 
 ;tag="10Tg.20-27km.100col"
 ;runNames = (/ "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-27km.0-18N.96-118E.QBOon.001", \
@@ -94,10 +95,9 @@ nRuns = dimsizes(runNames)
 ;cntlRunNames  =    (/ "b.e12.B55TRW5CN.f19_g16.CourseBkgd.001" , \
 ;                      "b.e12.B55TRW5CN.f19_g16.CourseBkgd.002" /)
 cntlRunNames  =    (/ \
-   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
-   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
-   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
-   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
+;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
+;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
+;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
    "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg" \
    /)
 ;   , \
