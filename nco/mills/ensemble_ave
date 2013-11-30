@@ -47,10 +47,10 @@ echo "hnum = $hnum"
 if [ $caseid = 'bc5tgIP' ] ; then
   ensname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.00[367]'
   avgname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg'
-  if  ! -n "$year1" ] ; then
+  if [ ! -n "$year1" ] ; then
     year1=2013
   fi
-  if  ! -n "$year2" ] ; then
+  if [ ! -n "$year2" ] ; then
     year2=2022
   fi
 fi
@@ -58,20 +58,25 @@ fi
 if [ $caseid = 'bc0tg' ] ; then
   ensname='b40.rcp4_5.2deg.wcm.carma.bc0tg.00[678]'
   avgname='b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678'
-  if  ! -n "$year1" ] ; then
+  if [ ! -n "$year1" ] ; then
     year1=2013
   fi
-  if  ! -n "$year2" ] ; then
+  if [ ! -n "$year2" ] ; then
     year2=2022
   fi
 fi
 
-if  ! -n "$year1" ] ; then
+if [ ! -n "$year1" ] ; then
   year1=1991
 fi
-if  ! -n "$year2" ] ; then
+if [ ! -n "$year2" ] ; then
   year2=1992
 fi
+echo month1 $month1
+if [ ! -n "$month1" ] ; then
+  month1=1
+fi
+echo month1 $month1
 
 #hno3_rename='b40.rcp2_6.2deg.wcm.002'
 #ensname2='b40.rcp2_6.2deg.wcm.00[34]'
@@ -97,6 +102,9 @@ searchstr='cam.'$hnum
 mkdir -p $avgdir
 
 year=$year1
+month=$month1
+echo month $month
+
 while [[ $year -le $year2 ]];do
 
   if [[ year -lt 10 ]]
@@ -111,9 +119,7 @@ while [[ $year -le $year2 ]];do
     else
       yearstr=$year
     fi
-    
-  month=1
-  
+      
   while [[ $month -le 12 ]];do
   
     if [[ month -lt 10 ]]
@@ -157,6 +163,7 @@ while [[ $year -le $year2 ]];do
   done
    
   (( year+=1 ))
+  month=1
      
 done
 
