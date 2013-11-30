@@ -173,13 +173,15 @@ end
 
 ;rootpath="$MODEL_PATH/cesm/case/"
 ;rootpath="$MODEL_PATH/"
-rootpath="/glade/scratch/mmills/archive/"
-;caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.009"
-caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.100nm.001"
+;rootpath="/glade/scratch/mmills/archive/"
+rootpath="/lou/s2m/mjmills2/csm/"
+caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.008"
+;caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.100nm.001"
 ;caseid=getenv("caseid")
 opt=True
 ;opt@icfile=rootpath+"/b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg/ic/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.001.cam2.i.2013-01-01-00000.nc"
-opt@icfile="/glade/u/home/mmills/inputdata/atm/waccm/ic/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.003.cam2.i.2013-01-01-00000.nc"
+;opt@icfile="/glade/u/home/mmills/inputdata/atm/waccm/ic/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.003.cam2.i.2013-01-01-00000.nc"
+opt@icfile="/lou/s2m/mjmills2/inputdata/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.002.cam2.i.2013-01-01-00000.nc"
 opt@overwritemass=True
 opt@doplot=True
 plotMass( rootpath, "h0zm", caseid, "SOOT01", opt )
