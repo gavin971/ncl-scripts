@@ -3,6 +3,7 @@
 ; Create some tracer distributions for use with WACCM/CARMA.
 
 host   = systemfunc("hostname")
+print("hostname:"+host)
 WACCM_RES = getenv("WACCM_RES")
 MODEL_PATH = getenv("MODEL_PATH")
 
@@ -12,11 +13,22 @@ if (ismissing(WACCM_RES)) then
 end if
 print("Using " + WACCM_RES + " resolution ...")
 
-if (hostname.eq.""lou") then
-  PATH="~/csm/b40.rcp4_5.2deg.wcm.carma.bc0tg.001/rest/2013-01-01-00000/"
+;caseid = "b40.rcp4_5.2deg.wcm.carma.bc0tg.001"
+;year = 2013
+;newcase="b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.001"
+
+caseid = "b40.rcp4_5.2deg.wcm.carma.bc0tg.006"
+year = 2023
+newcase="b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.006"
+
+if (isStrSubset(host,"lfe") then
+  ; lou
+  PATH="~/csm/"+caseid+"/rest/"+year+"-01-01-00000/"
 else
   PATH=MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic"
 end if
+
+print("PATH="+PATH)
 
 ;load "soot.ncl"
 load "ic-BC-IndPak.ncl"
@@ -70,8 +82,8 @@ if (WACCM_RES .eq. "2x2.5") then
 
 ; 2/23/2011       
   newicBCIndPak(PATH, \
-       "b40.rcp4_5.2deg.wcm.carma.bc0tg.001.cam2.i.2013-01-01-00000.nc", \
-       "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.001.cam2.i.2013-01-01-00000.nc", \
+       caseid+".cam2.i."+year+"-01-01-00000.nc", \
+       newcase+".cam2.i."+year+"-01-01-00000.nc", \
        5.0d0)
 
 
