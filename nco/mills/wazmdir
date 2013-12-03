@@ -68,8 +68,10 @@ if  [ -n "$caseid" ] ; then
   fi
 
   if [ ! -n "$wadir" ] ; then
-    wadir=$rootpath'/'$caseid'/'$runname'/atm/hist/'
-#    wadir=$rootpath'/'$caseid'/'$runname'/atm/proc/h0mam/'
+    wadir=$rootpath'/'$caseid'/'$runname'/atm/proc/h0mam/'
+    if [[ ! -e $wadir ]];then
+      wadir=$rootpath'/'$caseid'/'$runname'/atm/hist/'
+    fi
   fi
   
   if [ ! -n "$outdir" ] ; then
