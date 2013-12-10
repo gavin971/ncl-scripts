@@ -1,7 +1,7 @@
 load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
-load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
+;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 ; Constants
 ;
@@ -150,11 +150,11 @@ end
 
 ;  icPath=MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic/"+\
 ;         "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.cam2.i.2012-05-15-00000.nc"
-icPath="/u/mjmills2/csm/b40.rcp4_5.2deg.wcm.carma.bc0tg.002/rest/2012-05-15-00000/"+\
-       "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.002.cam2.i.2012-05-15-00000.nc"
+;icPath="/u/mjmills2/csm/b40.rcp4_5.2deg.wcm.carma.bc0tg.002/rest/2012-05-15-00000/"+\
+;       "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.002.cam2.i.2012-05-15-00000.nc"
 
-totalMass=0.d0
-bin=0
-binName = "SOOT" + sprinti("%2.2i", bin+1)
+;totalMass=0.d0
+;bin=0
+;binName = "SOOT" + sprinti("%2.2i", bin+1)
 
-calculateMass(icPath, binName, totalMass)
+;calculateMass(icPath, binName, totalMass)

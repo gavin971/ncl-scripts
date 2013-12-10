@@ -1,3 +1,4 @@
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ; Soot Tests
 ;
 ; Create some tracer distributions for use with WACCM/CARMA.
@@ -21,11 +22,12 @@ caseid = "b40.rcp4_5.2deg.wcm.carma.bc0tg.006"
 year = 2023
 newcase="b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.006"
 
-if (isStrSubset(host,"lfe") then
+if (isStrSubset(host,"lfe")) then
   ; lou
   PATH="~/csm/"+caseid+"/rest/"+year+"-01-01-00000/"
 else
-  PATH=MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic"
+;  PATH=MODEL_PATH+"/ccsm/inputdata/atm/waccm/ic"
+  PATH="/glade/p/acd/mmills/run/"+caseid+"/rest/"+year+"-01-01-00000/"
 end if
 
 print("PATH="+PATH)

@@ -297,9 +297,12 @@ rootpath="/glade/scratch/mmills/archive/"
 ;caseid = (/ "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
 ;            "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.002", \
 ;            "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003" /)
-caseid = (/ "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.001", \
-            "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.002", \
-            "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.003" /)
+caseid = (/ \
+;       "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.001", \
+;       "b.e12.B55TRW5CN.f19_g16.Pin20Tg.20-27km.0-18N.96-118E.QBOon.002", \
+       "b.e12.B55TRW5CN.f19_g16.Pin20Tg.16-18km.1col.QBOon.001" \
+;       "b.e12.B55TRW5CN.f19_g16.Pin20Tg.16-18km.1col.QBOon.002" \
+       /)
                      
 tracers=(/"SO2","H2SO4","so4_a2","so4_a1","so4_a3"/)
 tracers@molwts=(/ 115.108999, 115.108999, 64.063799, 115.108999, 98.078479 /)
@@ -307,9 +310,9 @@ opt=False
 opt@overwritemass=False
 ;opt@lev1=100.0
 opt@lev1=1100.0
-;opt@timeoffset=(/0,0,0/)
-opt@timeoffset=(/5,5,5/)
-opt@timeoffset2=(/0,0,0/)
+opt@timeoffset=(/0,0,0,0/)
+;opt@timeoffset=(/5,5,5/)
+opt@timeoffset2=(/0,0,0,0/)
 ;opt@timeoffset=(/0,0,0,3*12,12/)
 ;opt@timeoffset2=(/0,15,0,3*12,12/)
 ;plotMass( rootpath, "h0zm", caseid, tracers, opt )
