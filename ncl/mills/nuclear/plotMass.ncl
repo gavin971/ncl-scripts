@@ -171,18 +171,28 @@ begin
   end if
 end
 
+host=systemfunc("hostname")
+caseid=getenv("caseid")
+print("hostname:"+host+"   caseid:"+caseid)
+
+opt=True
+ 
+if (isStrSubset(host,"lfe")) then
+  ; lou
+  rootpath="/lou/s2m/mjmills2/csm/"
+  opt@icfile="/lou/s2m/mjmills2/inputdata/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.002.cam2.i.2013-01-01-00000.nc"
+else
+  ; yellowstone
+  rootpath="/glade/p/acd/mmills/run/"
+  opt@icfile="/glade/u/home/mmills/inputdata/atm/waccm/ic/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.003.cam2.i.2013-01-01-00000.nc"
 ;rootpath="$MODEL_PATH/cesm/case/"
 ;rootpath="$MODEL_PATH/"
 ;rootpath="/glade/scratch/mmills/archive/"
-;rootpath="/lou/s2m/mjmills2/csm/"
-rootpath="/glade/p/acd/mmills/run/"
-caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP2023.001"
+end if
+ 
+;caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP2023.001"
 ;caseid="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.100nm.001"
-;caseid=getenv("caseid")
-opt=True
-;opt@icfile=rootpath+"/b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg/ic/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.001.cam2.i.2013-01-01-00000.nc"
-opt@icfile="/glade/u/home/mmills/inputdata/atm/waccm/ic/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.003.cam2.i.2013-01-01-00000.nc"
-;opt@icfile="/lou/s2m/mjmills2/inputdata/b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.002.cam2.i.2013-01-01-00000.nc"
+
 opt@overwritemass=True
 opt@doplot=True
 plotMass( rootpath, "h0zm", caseid, "SOOT01", opt )

@@ -79,16 +79,17 @@ dmass_range(1,0:nTimes-1) = mfileid->SOOT01(0:nTimes-1)
 delete(mfileid)
 
 ; New run starting 2023
-newcase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP2023.001"
+;newcase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP2023.001"
+newcase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.100nm.002"
 massfile="/glade/p/acd/mmills/run/"+ newcase +\
  "/proc/" + newcase + ".mass.nc"
 print("reading "+massfile)
 mfileid = addfile(massfile, "r")
 dmass2 = mfileid->SOOT01
-nTimes2 = dimsizes(dmass2)
-print("nTimes2="+nTimes2)
-nTimes2=132
-print("nTimes2="+nTimes2)
+;nTimes2 = dimsizes(dmass2)
+;print("nTimes2="+nTimes2)
+;nTimes2=132
+;print("nTimes2="+nTimes2)
 delete(mfileid)
       
 avgfile=path+root+test1+".avg/"+sub+"/"+test1+"-"+cntl1+".cam.h0.avg.nc"
@@ -105,6 +106,9 @@ avgfile2="/glade/p/acd/mmills/run/" + newcase +\
   "/atm/proc/h0gm/" + newcase + "-bc0tg.avg678.nc"
 print("adding avg file2: "+avgfile2)
 avgfileh2=addfile(avgfile2,"r")
+;printVarSummary(avgfileh2->FSNS)
+nTimes2 = dimsizes(avgfileh2->time)
+print("nTimes2="+nTimes2)
 
 massfile=stenkepath+"5Tg_100nm_soot_burden.nc"
 print("reading "+massfile)
@@ -137,10 +141,11 @@ print("reading FSNS_max")
 FSNS_range(2,0:nTimes-1) = maxfileh->FSNS(0:nTimes-1)
 print("reading FSNS_min")
 FSNS_range(3,0:nTimes-1) = minfileh->FSNS(0:nTimes-1)
-print("reading FSNS_diff")
-FSNS_range(7,0:nTimes-1) = avgfileh->FSNS(0:nTimes-1)
 print("reading FSNS_diff2")
-FSNS_range(8,0:nTimes2-1) = avgfileh2->FSNS(0:nTimes2-1)
+FSNS_range(7,0:nTimes2-1) = avgfileh2->FSNS(0:nTimes2-1)
+print("reading FSNS_diff")
+FSNS_range(8,0:nTimes-1) = avgfileh->FSNS(0:nTimes-1)
+
 stenkefileh=addfile(stenkepath+"5Tg_100nm_monthly_global_shortwave_radiation.nc","r")
 stenkefilec=addfile(stenkepath+"CTRL_monthly_global_shortwave_radiation.nc","r")
 delete(nTimes_stenke)
@@ -161,10 +166,10 @@ print("reading TS_max")
 TS_range(2,0:nTimes-1) = maxfileh->TS(0:nTimes-1)
 print("reading TS_min")
 TS_range(3,0:nTimes-1) = minfileh->TS(0:nTimes-1)
-print("reading TS_diff")
-TS_range(7,0:nTimes-1) = avgfileh->TS(0:nTimes-1)
 print("reading TS_diff2")
-TS_range(8,0:nTimes2-1) = avgfileh2->TS(0:nTimes2-1)
+TS_range(7,0:nTimes2-1) = avgfileh2->TS(0:nTimes2-1)
+print("reading TS_diff")
+TS_range(8,0:nTimes-1) = avgfileh->TS(0:nTimes-1)
 stenkefileh=addfile(stenkepath+"5Tg_100nm_monthly_global_surface_temperature.nc","r")
 stenkefilec=addfile(stenkepath+"CTRL_monthly_global_surface_temperature.nc","r")
 delete(nTimes_stenke)
@@ -185,10 +190,10 @@ print("reading PRECT_max")
 PRECT_range(2,0:nTimes-1) = maxfileh->PRECT(0:nTimes-1) * 24. * 3600. * 1000.; convert m/s to mm/day
 print("reading PRECT_min")
 PRECT_range(3,0:nTimes-1) = minfileh->PRECT(0:nTimes-1) * 24. * 3600. * 1000.; convert m/s to mm/day
-print("reading PRECT_diff")
-PRECT_range(7,0:nTimes-1) = avgfileh->PRECT(0:nTimes-1) * 24. * 3600. * 1000.; convert m/s to mm/day
 print("reading PRECT_diff2")
-PRECT_range(8,0:nTimes2-1) = avgfileh2->PRECT(0:nTimes2-1) * 24. * 3600. * 1000.; convert m/s to mm/day
+PRECT_range(7,0:nTimes2-1) = avgfileh2->PRECT(0:nTimes2-1) * 24. * 3600. * 1000.; convert m/s to mm/day
+print("reading PRECT_diff")
+PRECT_range(8,0:nTimes-1) = avgfileh->PRECT(0:nTimes-1) * 24. * 3600. * 1000.; convert m/s to mm/day
 stenkefileh=addfile(stenkepath+"5Tg_100nm_monthly_global_precipitation.nc","r")
 stenkefilec=addfile(stenkepath+"CTRL_monthly_global_precipitation.nc","r")
 delete(nTimes_stenke)
@@ -402,7 +407,8 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   res@vpHeightF           = 0.3
   res@gsnDraw = False
   res@gsnFrame     = False                        ; don't advance frame yet
-  res@xyLineThicknessF = 5.0
+  res@xyLineThicknessF = 3.0
+  res@xyDashPattern = 2
 ;  res@vpWidthF=0.85
 
   res@xyLineColor       = "red"          ; change line color
@@ -432,23 +438,26 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   res2=res
   res2@xyLineThicknessF = 0.5
   res2@xyMonoDashPattern = True
+  res2@xyDashPattern = 0
   res2@xyLineColor       = "lightblue"
   res2@gsnXYFillColors = (/"lightblue"/)
 
   res3=res
-  res3@xyLineThicknessF = 4.0
+  res3@xyDashPattern = 2
+  res3@xyLineThicknessF = 3.0
   res3@xyLineColor       = "midnightblue"
 
   res4=res
-  res4@xyLineThicknessF   = 4.0
+  res4@xyLineThicknessF   = 3.0
+  res4@xyDashPattern = 0
   res4@xyMonoLineColor    = False   ; different colors for different lines
   res4@xyMonoDashPattern  = True 
   res4@xyLineColors       = (/"green3","grey30"/)
   
   res5=res3
-;  res5@xyDashPattern = 1
+  res5@xyDashPattern = 0
   res5@xyLineColor       = "orange"
-  res5@xyLineThicknessF = 2.0
+  res5@xyLineThicknessF = 3.0
   
   baseplot = gsn_csm_xy (wks, dmass&time/365., dmass_range/1e9,res2) ; draw plot
   overlay(baseplot, gsn_csm_xy (wks, stenke_year, stenke_mass,res4)) ; draw  plot
@@ -467,14 +476,15 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   res2@tmYLMinorPerMajor = 4
   
   res2@xyMonoLineThickness = False
-  res2@xyLineThicknesses = (/0.5,0.5,0.5,0.5,3.0,3.0,3.0,3.0/)
-  res2@xyMonoDashPattern = True
+  res2@xyLineThicknesses = (/0.5,0.5,0.5,0.5,2.0,2.0,2.0,2.0,2./)
+  res2@xyMonoDashPattern = False
+  res2@xyDashPatterns = (/0,0,0,0,0,0,2,0,2/)
   res2@xyMonoLineColor   = False            ; different colors for different lines
   res2@xyLineColors       = (/"pink","pink","lightblue","lightblue","green3","grey30", \
-                              "red","midnightblue","orange"/)
+                              "red","orange","midnightblue"/)
   delete(res2@gsnXYFillColors)
   res2@gsnXYFillColors = (/"pink","transparent","lightblue","transparent","transparent", \
-                           "transparent","transparent","transparent"/)
+                           "transparent","transparent","transparent","transparent"/)
   
   plot(0) = gsn_csm_xy (wks,time,FSNS_range,res2) ; draw plot
   
@@ -502,13 +512,16 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   txres = True
   txres@txFontHeightF = 0.02
   txres@txFontColor="midnightblue"
-  gsn_text_ndc(wks,"CESM1(WACCM)",0.75,0.897,txres)
-  txres@txFontColor="red"
-  gsn_text_ndc(wks,"GISS ModelE",0.75,0.861,txres)
+  gsn_text_ndc(wks,"CESM1(WACCM), r=50 nm",0.45,0.897,txres)
+  txres@txFontColor="orange"
+  gsn_text_ndc(wks,"CESM1(WACCM), r=100 nm",0.45,0.861,txres)
+  
   txres@txFontColor="grey30"
-  gsn_text_ndc(wks,"SOCOL3, r=50 nm",0.75,0.822,txres)
+  gsn_text_ndc(wks,"SOCOL3, r=50 nm",0.8,0.897,txres)
   txres@txFontColor="green3"
-  gsn_text_ndc(wks,"SOCOL3, r=100 nm",0.75,0.783,txres)
+  gsn_text_ndc(wks,"SOCOL3, r=100 nm",0.8,0.861,txres)
+  txres@txFontColor="red"
+  gsn_text_ndc(wks,"GISS ModelE",0.8,0.822,txres)
     
   delete(wks)
   
