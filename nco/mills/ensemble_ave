@@ -91,10 +91,10 @@ if [ ! -n "$hnum" ] ; then
   hnum='h0'
 fi
 
-wadir=$rootpath'/'$ensname'/atm/proc/'$hnum
+wadir=$rootpath'/'$ensname'/'$hnum
 #wadir2=$rootpath'/'$ensname2'/'$hnum
-avgdir=$outpath'/'$avgname'/atm/proc/'$hnum
-searchstr='cam.'$hnum
+avgdir=$outpath'/'$avgname'/'$hnum
+searchstr='cam2.'$hnum
 
 
 # script to average and standard deviation of waccm h0 files
