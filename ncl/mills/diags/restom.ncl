@@ -277,7 +277,7 @@ else
   res3@vpXF              = 0.1    ; X,Y position of third plot
   res3@vpYF              = 0.45
   ;res3@trYMinF = 280.0
-  res3@trYMinF = 280.0
+  res3@trYMinF = 279.0
   res3@gsnYRefLine           = res3@trYMinF              ; reference line   
   ;res3@trYMaxF = 283
   res3@trYMaxF = 284.0  ;caf
@@ -301,10 +301,12 @@ else
 
   delete(wks)
 
-  print("gv "+pdffile+".pdf")
-  print("mutt mikejmills@mac.com -a "+pdffile+".pdf -s "+pdffile+" < /dev/null")
+  print("evince "+pdffile+".pdf")
+  evincer=systemfunc("evince " + pdffile + ".pdf &")
+  print(evincer)
+;  print("mutt mikejmills@mac.com -a "+pdffile+".pdf -s "+pdffile+" < /dev/null")
 
-  mutter=systemfunc("mutt mikejmills@mac.com -a " + pdffile + ".pdf -s "+pdffile+" < /dev/null")
-  print(mutter)
+;  mutter=systemfunc("mutt mikejmills@mac.com -a " + pdffile + ".pdf -s "+pdffile+" < /dev/null")
+;  print(mutter)
 end if
 

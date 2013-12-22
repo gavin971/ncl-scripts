@@ -375,7 +375,7 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   TS_range(1,0:120) = Oman(0:120,0)+Oman(0:120,2) ; min
   TS_range(6,0:120) = (/Oman(0:120,0)/)           ; avg
 
-  pdffile="Fig03_5TgGaveRobockStenkeFigV2."+test1+"-"+cntl1
+  pdffile="Fig03_5TgGaveRobockStenkeFigV3."+test1+"-"+cntl1
   PRECT_range(0,0:120) = Oman(0:120,3)+Oman(0:120,4) ; max
   PRECT_range(1,0:120) = Oman(0:120,3)+Oman(0:120,5) ; min
   PRECT_range(6,0:120) = (/Oman(0:120,3)/)           ; avg
@@ -456,7 +456,7 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   
   res5=res3
   res5@xyDashPattern = 0
-  res5@xyLineColor       = "orange"
+  res5@xyLineColor       = "darkorange3"
   res5@xyLineThicknessF = 3.0
   
   baseplot = gsn_csm_xy (wks, dmass&time/365., dmass_range/1e9,res2) ; draw plot
@@ -481,7 +481,7 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   res2@xyDashPatterns = (/0,0,0,0,0,0,2,0,2/)
   res2@xyMonoLineColor   = False            ; different colors for different lines
   res2@xyLineColors       = (/"pink","pink","lightblue","lightblue","green3","grey30", \
-                              "red","orange","midnightblue"/)
+                              "red","darkorange3","midnightblue"/)
   delete(res2@gsnXYFillColors)
   res2@gsnXYFillColors = (/"pink","transparent","lightblue","transparent","transparent", \
                            "transparent","transparent","transparent","transparent"/)
@@ -513,7 +513,7 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   txres@txFontHeightF = 0.02
   txres@txFontColor="midnightblue"
   gsn_text_ndc(wks,"CESM1(WACCM), r=50 nm",0.45,0.897,txres)
-  txres@txFontColor="orange"
+  txres@txFontColor="darkorange3"
   gsn_text_ndc(wks,"CESM1(WACCM), r=100 nm",0.45,0.861,txres)
   
   txres@txFontColor="grey30"
