@@ -170,7 +170,7 @@ res@lbRightMarginF       = -0.03
 res@lbLeftMarginF        = 0.33
 res@lbTopMarginF         = 0.0
 res@lbBottomMarginF      = -0.3
-res@tiXAxisString        = "Time (years)"
+res@tiXAxisString        = "Time (years since BC injection)"
 ;delete(res@tmXBMajorLengthF)
 ;res@vpYF                 = 0.4
 res@vpYF                 = 0.535

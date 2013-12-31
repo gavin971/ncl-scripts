@@ -6,7 +6,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
-path="$MODEL_PATH/cesm/runs/cesm1_0/"
+;path="$MODEL_PATH/cesm/runs/cesm1_0/"
+path="/glade/p/acd/mmills/run/"
 
 cntlCase="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
@@ -38,7 +39,7 @@ dTSJJA=dTSJJA-cTSJJA
 ; create plot
 ;************************************************
 ;wks = gsn_open_wks("eps", "$IMG_PATH/nuclearTSdiff")    ; open an eps file
-wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearTSdiff")                ; open a pdf file
+wks = gsn_open_wks("pdf", "$IMG_PATH/nuclear/Fig09_TSdiff")                ; open a pdf file
 
 nPanel=2
 plot = new(2, graphic)
@@ -71,9 +72,9 @@ res@pmTickMarkDisplayMode = "Always"; use NCL default lat/lon labels
 
 ;gsn_define_colormap(wks,"BlWhRe")                  ; change colormap 
 ; Change color map using named colors
-  colors = (/"white","black","darkorchid","orchid","blue","dodgerblue3", \
-             "dodgerblue2","dodgerblue1","cyan4","cyan3","cyan2","cyan1","white", \
-             "yellow","orange"/)
+  colors = (/"white","black","darkorchid","orchid","blue", \
+             "dodgerblue2","dodgerblue1","cyan4","cyan1","seagreen1", \
+             "greenyellow","lightgoldenrod1","white", "orange","red"/)
 
   gsn_define_colormap(wks,colors)                  ; change colormap 
 

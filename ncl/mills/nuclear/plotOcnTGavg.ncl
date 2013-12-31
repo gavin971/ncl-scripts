@@ -14,6 +14,7 @@ caseid = (/ \
    "b40.rcp4_5.2deg.wcm.carma.bc5tgIP.003", \
    "b40.rcp4_5.2deg.wcm.carma.bc5tgIP.006", \
    "b40.rcp4_5.2deg.wcm.carma.bc5tgIP.007" /)
+   
 rootpath = "/glade/p/acd/mmills/run/"
    
 nCases = dimsizes(caseid)
@@ -53,29 +54,42 @@ end do
 levels=(/5.,55.,105.,200.,300.,500.,1000./) ; levels in meters
 levels@units="meters"
 nLevels=dimsizes(levels)
+nl3=nLevels*3
 
-deltaTavg=new((/nLevels,nTimes/),"double")
-deltaTavg!1=temp!1
-deltaTavg!0="levels"
-deltaTavg&time=time
-deltaTavg&levels=levels
+deltaT=new((/nl3,nTimes/),"double")
+deltaT!1=temp!1
+deltaT!0="levels"
+deltaT&time=time
 
 do i = 0, nLevels-1
   lev=levels(i)*100.
-  deltaTavg(i,:)=dim_avg_n(temp(3:5,:,{lev}),0)
-  deltaTavg(i,:)=deltaTavg(i,:)-dim_avg_n(temp(0:2,:,{lev}),0)
+  cntlavg=dim_avg_n_Wrap(temp(0:2,:,{lev}),0)
+  j=nLevels*2+i
+  deltaT(j,:)   = dim_avg_n(temp(3:5,:,{lev}),0) - cntlavg
+  deltaT(2*i,:)   = dim_min_n(temp(3:5,:,{lev}),0) - cntlavg
+  deltaT(2*i+1,:) = dim_max_n(temp(3:5,:,{lev}),0) - cntlavg
 end do
 
 pdffile="OceanTempVsTime"
 wks   = gsn_open_wks ("pdf",IMAGE_PATH+"/nuclear/"+pdffile) ; open workstation
 
 res                   = True                      ; plot mods desired
-res@vpWidthF  = 0.8          ; set width of plot
+res@vpWidthF  = 0.7          ; set width of plot
 ;res@vpHeightF = 1.0          ; set height of plot
 res@xyMonoLineColor   = False   ; different colors for different lines
 res@xyMonoDashPattern = True 
-res@xyLineColors      = (/"black","purple","blue","darkgreen","orange","red","brown"/)
+res@xyLineColors      = (/ \
+    "grey","grey","plum","plum","lightblue","lightblue","darkolivegreen1","darkolivegreen1", \
+    "gold","gold","pink","pink","darkgoldenrod1","darkgoldenrod1",\
+    "black","purple4","blue","darkgreen","orange3","red","sienna4" /)
+res@gsnXYFillColors = (/\
+    "grey","transparent","plum","transparent","lightblue","transparent","darkolivegreen1","transparent", \
+    "gold","transparent","pink","transparent","darkgoldenrod1","transparent",\
+    "transparent","transparent","transparent","transparent","transparent","transparent" /)
 res@xyLineThicknessF = 3.0
+res@xyMonoLineThickness = False
+res@xyLineThicknesses = (/0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5, \
+    3.0,3.0,3.0,3.0,3.0,3.0,3.0/)
 res@trXMaxF=26.0
 res@trYMaxF=0.1
 res@trYMinF=-0.9
@@ -83,20 +97,24 @@ res@tiXAxisString="Time (years since BC injection)"
 res@tiYAxisString="Temperature (k)"
 res@gsnFrame  = False
 res@gsnPaperOrientation    = "landscape"
+res@tmXBMode="Manual"
+res@tmXBTickSpacingF=2
+res@tmXBAutoPrecision=False
+res@tmXBPrecision=2
 
 time=(time-time(0))/365
 
-plot = gsn_csm_xy (wks,time,deltaTavg,res) ; draw plot
+plot = gsn_csm_xy (wks,time,deltaT,res) ; draw plot
 
 txres = True
 txres@txFontHeightF = 0.03
 do i = 0, 3
-  txres@txFontColor=res@xyLineColors(i)
-  gsn_text_ndc(wks,floattoint(levels(i))+" m",0.7,0.25+.065*i,txres)
+  txres@txFontColor=res@xyLineColors(nLevels*2+i)
+  gsn_text_ndc(wks,floattoint(levels(i))+" m",0.8,0.25+.065*i,txres)
 end do
 do i = 4, 6
-  txres@txFontColor=res@xyLineColors(i)
-  gsn_text_ndc(wks,floattoint(levels(i))+" m",0.7,0.3+.075*i,txres)
+  txres@txFontColor=res@xyLineColors(nLevels*2+i)
+  gsn_text_ndc(wks,floattoint(levels(i))+" m",0.52,0.32+.072*i,txres)
 end do
 
 frame(wks)
