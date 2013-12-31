@@ -4,7 +4,8 @@
 ;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 load "../common.ncl"
 
-path="$MODEL_PATH/ccsm/case/"
+;path="$MODEL_PATH/ccsm/case/"
+path="$MODEL_PATH/"
 
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
 cntlCase="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
@@ -71,7 +72,7 @@ dWstar_ann = dWstar_ann-cWstar_ann
 ; create plot
 ;************************************************
 ;wks = gsn_open_wks("eps", "$IMG_PATH/WbarStarAltVsTime."+exptCase)                ; open an eps file
-wks = gsn_open_wks("pdf", "$IMG_PATH/WbarStarAltVsTime."+exptCase)                ; open a pdf file
+wks = gsn_open_wks("pdf", "$IMG_PATH/nuclear/Fig04_WbarStarAltVsTime."+exptCase)                ; open a pdf file
 ;gsn_define_colormap(wks,"BlAqGrYeOrReVi200")
 ;gsn_define_colormap(wks,"hotres")
 gsn_define_colormap(wks,"nrl_sirkes")

@@ -3,7 +3,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
-path="$MODEL_PATH/ccsm/runs/cesm1_0/"
+;path="$MODEL_PATH/ccsm/runs/cesm1_0/"
+path="$MODEL_PATH/"
 
 cntlCase="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
@@ -40,7 +41,7 @@ end if
 ; create plot
 ;************************************************
 ;wks = gsn_open_wks("eps", "$IMG_PATH/nuclearGrowingSeason")                ; open an eps file
-wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearGrowingSeason2014-2018v3")                ; open a pdf file
+wks = gsn_open_wks("pdf", "$IMG_PATH/nuclear/Fig12_GrowingSeason2014-2018v4")                ; open a pdf file
 
 nPanel=2
 plot = new(2, graphic)
@@ -53,12 +54,15 @@ res@gsnFrame  = False
 
 res@cnFillOn              = True     ; turn on color fill
 res@cnLinesOn             = True    ; turn of contour lines
-res@cnLineLabelsOn        = True     ; turn on contour line labels
-res@cnLineLabelFontHeightF=0.004
-res@cnLineLabelPlacementMode= "Computed"
-res@cnLineLabelDensityF = 3
+res@cnLineLabelsOn        = False     ; turn off contour line labels
+
+;res@cnLineLabelsOn        = True     ; turn on contour line labels
+;res@cnLineLabelFontHeightF=0.004
+;res@cnLineLabelPlacementMode= "Computed"
+;res@cnLineLabelDensityF = 3
+;res@cnLineLabelBackgroundColor = "orange"
+
 res@cnLevelSelectionMode  = "ExplicitLevels"
-res@cnLineLabelBackgroundColor = "orange"
 ;res@cnLevels = (/-40,-30,-20,-10,-5,-2, 2,5,10,20,30,40/)
 ;res@cnLevels = (/-60,-50,-40,-30,-20, -10, 10,20/)
 ;res@cnLevels = (/-55,-45,-35,-25,-15, -5, 5,15/)

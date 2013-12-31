@@ -523,6 +523,14 @@ Oman =(/ (/-0.543988,0.254766,-0.142107,-0.043993,0.021839,-0.013398,-6.918393,0
   txres@txFontColor="red"
   gsn_text_ndc(wks,"GISS ModelE",0.8,0.822,txres)
     
+  txres@txFontColor="black"
+  txres@txPerimOn=True
+  txres@txBackgroundFillColor="lightgoldenrod1"
+  gsn_text_ndc(wks,"a",0.17,0.77,txres)
+  gsn_text_ndc(wks,"b",0.17,0.683,txres)
+  gsn_text_ndc(wks,"c",0.17,0.502,txres)
+  gsn_text_ndc(wks,"d",0.17,0.315,txres)
+  
   delete(wks)
   
   if (host.eq."modeling1") then
