@@ -9,10 +9,10 @@ path="$MODEL_PATH/"
 cntlCase="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
 
-;yearstring="2014-2018"
+yearstring="2014-2018"
 ;yearstring="2017"
 ;yearstring="2018"
-yearstring="2014"
+;yearstring="2014"
 
 doDJF=False
 
@@ -52,8 +52,8 @@ dPRECTJJA=dPRECTJJA*1000.*24.*3600.
 ;************************************************
 ; create plot
 ;************************************************
-;wks = gsn_open_wks("eps", "$IMG_PATH/nuclearTSdiff")                ; open an eps file
-wks = gsn_open_wks("pdf", "$IMG_PATH/nuclearPRECTdiff"+yearstring)                ; open a pdf file
+;wks = gsn_open_wks("eps", "$IMG_PATH/nuclear/PRECTdiff"+yearstring)                ; open an eps file
+wks = gsn_open_wks("pdf", "$IMG_PATH/nuclear/Fig11_PRECTdiff"+yearstring)                ; open a pdf file
 
 nPanel=2
 plot = new(2, graphic)
@@ -90,13 +90,18 @@ res@pmTickMarkDisplayMode = "Always"; use NCL default lat/lon labels
 
 ;gsn_define_colormap(wks,"BlWhRe")                  ; change colormap 
 ; Change color map using named colors
-  colors = (/"white","black",\
-             "sienna4","darkgoldenrod4","darkgoldenrod3","darkgoldenrod1", \
-             "white", \
-             "chartreuse1","chartreuse2","chartreuse3","chartreuse4"/)
+;  colors = (/"white","black",\
+;             "sienna4","darkgoldenrod4","darkgoldenrod3","darkgoldenrod1", \
+;             "white", \
+;             "chartreuse1","chartreuse2","chartreuse3","chartreuse4"/)
 
-  gsn_define_colormap(wks,colors)                  ; change colormap 
+;  gsn_define_colormap(wks,colors)                  ; change colormap 
 
+ gsn_define_colormap(wks,"precip_diff_12lev")
+
+res@gsnSpreadColors = True
+;res@gsnSpreadColorStart = 1
+;res@gsnSpreadColorEnd = 12
 
 res@gsnLeftString        = " "
 res@gsnRightString       = " "
@@ -110,6 +115,15 @@ res@lbOrientation        = "Vertical"
 res@tmXBMajorLengthF     = 0.0
 plot(0) = gsn_csm_contour_map_ce(wks,dPRECTJJA(0,:,:), res)
 
+txres = True
+txres@txFontColor="black"
+txres@txPerimOn=True
+txres@txBackgroundFillColor="lightgoldenrod1"
+txres@txFontHeightF = 0.03                     ; font smaller. default big
+xpos=-160
+ypos=-55
+dum=gsn_add_text(wks,plot(0),"a",xpos,ypos,txres) 
+
 ;delete(res@cnLevels)
 res@cnLevels = (/-80, -60,-40,-20,20,40,60,80/)
 res@lbLabelBarOn         = True
@@ -117,6 +131,7 @@ res@lbLabelBarOn         = True
 ;res@lbBottomMarginF      = -2.8
 res@tmXBLabelsOn         = False
 plot(1) = gsn_csm_contour_map_ce(wks,dPRECTJJApct(0,:,:), res)
+dum=gsn_add_text(wks,plot(1),"b",xpos,ypos,txres) 
 
 pres                        = True
 pres@gsnMaximize            = True

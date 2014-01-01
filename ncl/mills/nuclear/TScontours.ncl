@@ -39,7 +39,7 @@ dTSJJA=dTSJJA-cTSJJA
 ; create plot
 ;************************************************
 ;wks = gsn_open_wks("eps", "$IMG_PATH/nuclearTSdiff")    ; open an eps file
-wks = gsn_open_wks("pdf", "$IMG_PATH/nuclear/Fig09_TSdiff")                ; open a pdf file
+wks = gsn_open_wks("pdf", "$IMG_PATH/nuclear/Fig10_TSdiff_testcmap")                ; open a pdf file
 
 nPanel=2
 plot = new(2, graphic)
@@ -72,13 +72,25 @@ res@pmTickMarkDisplayMode = "Always"; use NCL default lat/lon labels
 
 ;gsn_define_colormap(wks,"BlWhRe")                  ; change colormap 
 ; Change color map using named colors
-  colors = (/"white","black","darkorchid","orchid","blue", \
-             "dodgerblue2","dodgerblue1","cyan4","cyan1","seagreen1", \
-             "greenyellow","lightgoldenrod1","white", "orange","red"/)
+;  colors = (/"white","black","darkorchid","orchid","blue", \
+;             "dodgerblue1","cyan4","cyan1","seagreen1","green4", \
+;             "green","greenyellow","white", "lightgoldenrod","orange"/)
 
-  gsn_define_colormap(wks,colors)                  ; change colormap 
+;  colors = (/"blue4","blue","aquamarine","white","orange"/)
 
+;  rgb_array = span_named_colors(colors,False)
 
+;  gsn_define_colormap(wks,rgb_array)
+;  gsn_draw_colormap(wks)
+
+;---Using the color map to define a color map for the workstation
+ gsn_define_colormap(wks,"testcmap")
+; gsn_define_colormap(wks,"hotcold_18lev")
+; gsn_define_colormap(wks,"BlueDarkRed18") 
+ 
+res@gsnSpreadColors = True
+;res@gsnSpreadColorStart = 0
+res@gsnSpreadColorEnd = 120
 res@gsnLeftString        = " "
 res@gsnRightString       = " "
 res@gsnCenterString      = " "
@@ -90,6 +102,15 @@ res@lbBottomMarginF      = -2.8
 res@tmXBMajorLengthF     = 0.0
 plot(0) = gsn_csm_contour_map_ce(wks,dTSJJA(0,:,:), res)
 
+txres = True
+txres@txFontColor="black"
+txres@txPerimOn=True
+txres@txBackgroundFillColor="lightgoldenrod1"
+txres@txFontHeightF = 0.03                     ; font smaller. default big
+xpos=-160
+ypos=0
+dum=gsn_add_text(wks,plot(0),"a",xpos,ypos,txres) 
+
 res@tmXBLabelsOn         = False
 res@lbLabelBarOn         = True
 res@lbOrientation        = "Vertical"
@@ -98,6 +119,7 @@ res@lbBottomMarginF      = -7
 res@lbLabelFontHeightF   = 0.01
 ;delete(res@tmXBMajorLengthF)
 plot(1) = gsn_csm_contour_map_ce(wks,dTSDJF(0,:,:), res)
+dum=gsn_add_text(wks,plot(1),"b",xpos,ypos,txres) 
 
 pres                        = True
 pres@gsnMaximize            = True

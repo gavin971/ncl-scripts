@@ -137,10 +137,10 @@ dataRel=(dataRel-1.)*100.
   draw(plot1)
   
   delete(wks)
-  pdffile="Fig04iceExtentTimeSeriesPercentBC5Tg"
-  wks   = gsn_open_wks ("eps",IMAGE_PATH+"/nuclear/"+pdffile) ; open workstation  
+  pdffile="Fig05_iceExtentTimeSeriesPercentBC5Tg"
+  wks   = gsn_open_wks ("pdf",IMAGE_PATH+"/nuclear/"+pdffile) ; open workstation  
 
-  frame(wks)
+;  frame(wks)
   
   delete(res)
   res                   = True
@@ -155,7 +155,7 @@ dataRel=(dataRel-1.)*100.
   res@trXMaxF = max(time)
   res@trYMinF = -15
   res@trYMaxF = 85
-  res@tiXAxisString = "Time (years since BC injecion)"
+  res@tiXAxisString = "Time (years since BC injection)"
   res@tiYAxisString = "Ice Extent Change (%)"
   res@xyLineThicknesses = (/0.5,0.5,0.5,0.5,3.0,3.0/)
   res@xyMonoDashPattern = True

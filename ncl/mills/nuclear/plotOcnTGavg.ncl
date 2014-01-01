@@ -70,7 +70,7 @@ do i = 0, nLevels-1
   deltaT(2*i+1,:) = dim_max_n(temp(3:5,:,{lev}),0) - cntlavg
 end do
 
-pdffile="OceanTempVsTime"
+pdffile="Fig06_OceanTempVsTime"
 wks   = gsn_open_wks ("pdf",IMAGE_PATH+"/nuclear/"+pdffile) ; open workstation
 
 res                   = True                      ; plot mods desired
@@ -94,7 +94,7 @@ res@trXMaxF=26.0
 res@trYMaxF=0.1
 res@trYMinF=-0.9
 res@tiXAxisString="Time (years since BC injection)"
-res@tiYAxisString="Temperature (k)"
+res@tiYAxisString="Temperature (K)"
 res@gsnFrame  = False
 res@gsnPaperOrientation    = "landscape"
 res@tmXBMode="Manual"

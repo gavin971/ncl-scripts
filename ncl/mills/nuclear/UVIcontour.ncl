@@ -4,7 +4,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 ;path="$MODEL_PATH/ccsm/case/"
-path="$MODEL_PATH/cesm/runs/cesm1_0/"
+;path="$MODEL_PATH/cesm/runs/cesm1_0/"
+path="$MODEL_PATH/"
 
 cntlCase="b40.rcp4_5.2deg.wcm.carma.bc0tg.avg678"
 exptCase="b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg"
@@ -33,8 +34,8 @@ maxLatList=(/80.,30./)
 wks_type = "eps"
 wks_type@wkPaperWidthF  = 11.0  ; in inches
 wks_type@wkPaperHeightF = 14.0  ; in inches
-wks = gsn_open_wks(wks_type, "$IMG_PATH/nuclear/Fig07_UVIcontour")                ; open a ps file
-;wks = gsn_open_wks("pdf", "$IMG_PATH/UVIcontour")                ; open a ps file
+;wks = gsn_open_wks(wks_type, "$IMG_PATH/nuclear/Fig09_UVIcontour")                ; open a ps file
+wks = gsn_open_wks("pdf", "$IMG_PATH/nuclear/Fig09_UVIcontour")                ; open a ps file
 
 nPanel=3
 plot = new(6, graphic)
@@ -170,6 +171,22 @@ do i = 0, dimsizes(dateList)-1
     
 end do
 
+txres = True
+txres@txFontColor="black"
+txres@txPerimOn=True
+txres@txBackgroundFillColor="lightgoldenrod1"
+txres@txFontHeightF = 0.015                     ; font smaller. default big
+xpos=-160
+ypos=65
+xpos2=-160
+ypos2=15
+gsn_text(wks,plot(0),"a",xpos,ypos,txres) 
+gsn_text(wks,plot(1),"b",xpos2,ypos2,txres) 
+gsn_text(wks,plot(2),"c",xpos,ypos,txres) 
+gsn_text(wks,plot(3),"d",xpos2,ypos2,txres) 
+gsn_text(wks,plot(4),"e",xpos,ypos,txres) 
+gsn_text(wks,plot(5),"f",xpos2,ypos2,txres) 
+
 ;lbres                           = True
 ;lbres@lbAutoManage              = False         ; we control label bar
 ;lbres@lbFillColors              = fill_colors   ; use nice strided colors  
@@ -185,3 +202,5 @@ end do
 ;pres@gsnPaperOrientation    = "landscape"
 ;gsn_panel(wks, plot, (/ 3, 2 /), pres)
 frame(wks)
+;psres = True   
+;maximize_output(wks,psres) 

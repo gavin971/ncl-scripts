@@ -119,7 +119,7 @@ res@lbBottomMarginF      = -1.6
 res@lbRightMarginF       = 0.03
 res@lbLeftMarginF        = 0.30
 res@lbLabelFontHeightF   = 0.01
-res@tiYAxisString        = "Pressure (mb)"
+res@tiYAxisString        = "Pressure (hPa)"
 res@tiYAxisFontHeightF   = 0.014
 res@tiXAxisFontHeightF   = 0.014
 ;res@lbTitleOn            = True
@@ -142,6 +142,14 @@ res@tmXTOn       = True
 res@tmXTLabelsOn = True
 res@tiYAxisOn    = False
 plot(0) = gsn_csm_pres_hgt(wks,cWstar_ann(press|:, time|:),res)      ; contour the variable
+txres = True
+txres@txFontColor="black"
+txres@txPerimOn=True
+txres@txBackgroundFillColor="lightgoldenrod1"
+txres@txFontHeightF = 0.02                     ; font smaller. default big
+xpos=0.9
+ypos=6
+dum = gsn_add_text(wks,plot(0),"a",xpos,ypos,txres) 
 
 ;==================================================================================
 res@lbLabelBarOn         = True
@@ -158,6 +166,7 @@ res@tmXTOn       = True
 res@tmXTLabelsOn = False
 res@tiYAxisOn    = True
 plot(1) = gsn_csm_pres_hgt(wks,eWstar_ann(press|:, time|:),res)      ; contour the variable
+dum = gsn_add_text(wks,plot(1),"b",xpos,ypos,txres) 
 
 ;==================================================================================
 ;res@cnMinLevelValF = -0.4
@@ -181,6 +190,15 @@ res@tmXTOn       = True
 res@tmXTLabelsOn = False
 res@tiYAxisOn    = False
 plot(2) = gsn_csm_pres_hgt(wks,dWstar_ann(press|:, time|:),res)      ; contour the variable
+dum = gsn_add_text(wks,plot(2),"c",xpos,ypos,txres) 
+    
+;txres = True
+;txres@txFontColor="black"
+;txres@txPerimOn=True
+;txres@txBackgroundFillColor="lightgoldenrod1"
+;gsn_text_ndc(wks,"a",0.2,0.85,txres)
+;gsn_text_ndc(wks,"b",0.2,0.7,txres)
+;gsn_text_ndc(wks,"c",0.2,0.5,txres)
 
 ;==================================================================================
 ;frame(wks)

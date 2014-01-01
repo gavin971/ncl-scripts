@@ -102,6 +102,15 @@ res@lbLabelBarOn         = False
 res@tmXBMajorLengthF     = 0.0
 plot(0) = gsn_csm_contour_map_ce(wks,dGS, res)
 
+txres = True
+txres@txFontColor="black"
+txres@txPerimOn=True
+txres@txBackgroundFillColor="lightgoldenrod1"
+txres@txFontHeightF = 0.02                     ; font smaller. default big
+xpos=-150
+ypos=40
+dum=gsn_add_text(wks,plot(0),"a",xpos,ypos,txres) 
+
 res@mpMinLatF            = -77      ; range to zoom in on
 res@mpMaxLatF            = -10
 res@tmXBLabelsOn         = True
@@ -115,6 +124,8 @@ res@lbLabelFontHeightF   = 0.01
 ;res@lbPerimOn            = True
 ;delete(res@tmXBMajorLengthF)
 plot(1) = gsn_csm_contour_map_ce(wks,dGS, res)
+ypos=-40
+dum=gsn_add_text(wks,plot(1),"b",xpos,ypos,txres) 
 
 pres                        = True
 pres@gsnMaximize            = True
