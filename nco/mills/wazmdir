@@ -67,15 +67,20 @@ if  [ -n "$caseid" ] ; then
     htype=''
   fi
 
+  
+  if [ ! -n "$outdir" ] ; then
+    outdir=$rootpath'/'$caseid'/'$runname'/atm/proc/'$hnum'zm'$htype'/'
+  fi
+
   if [ ! -n "$wadir" ] ; then
     wadir=$rootpath'/'$caseid'/'$runname'/atm/proc/h0mam/'
     if [[ ! -e $wadir ]];then
       wadir=$rootpath'/'$caseid'/'$runname'/atm/hist/'
     fi
-  fi
-  
-  if [ ! -n "$outdir" ] ; then
-    outdir=$rootpath'/'$caseid'/'$runname'/atm/proc/'$hnum'zm'$htype'/'
+    if [[ ! -e $wadir ]];then
+      wadir=$rootpath'/'$caseid'/'$runname'/'$hnum'/'
+      outdir=$rootpath'/'$caseid'/'$runname'/'$hnum'zm'$htype'/'
+    fi
   fi
   
   echo " "

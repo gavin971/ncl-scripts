@@ -91,15 +91,23 @@ if [ ! -n "$hnum" ] ; then
   hnum='h0'
 fi
 
-wadir=$rootpath'/'$ensname'/'$hnum
+wadir=$rootpath'/'$ensname'/atm/proc/'$hnum
 #wadir2=$rootpath'/'$ensname2'/'$hnum
-avgdir=$outpath'/'$avgname'/'$hnum
+avgdir=$outpath'/'$avgname'/atm/proc/'$hnum
+if [[ ! -e $wadir ]];then
+  wadir=$rootpath'/'$ensname'/'$hnum
+  avgdir=$outpath'/'$avgname'/'$hnum
+fi
+
 searchstr='cam2.'$hnum
 
 
 # script to average and standard deviation of waccm h0 files
 
+echo " "
+echo "mkdir -p $avgdir"
 mkdir -p $avgdir
+echo " "
 
 year=$year1
 month=$month1
