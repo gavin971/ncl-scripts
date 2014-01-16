@@ -92,7 +92,7 @@ if  [ -n "$caseid" ] ; then
   echo "working directory:"
   pwd
 
-  for a in `ls -1 *$hnum*.nc`; do
+  for a in `ls -1 $caseid*.cam*.$hnum.*.nc`; do
     oldfile=$a
     ls -sh $oldfile
     newfile=`echo $oldfile | sed 's/'$hnum'/'$hnum'zm/g'`
