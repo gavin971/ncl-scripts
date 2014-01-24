@@ -1,0 +1,96 @@
+
+load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+
+rootpath="/glade/scratch/mmills/archive/"
+runs=(/"f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001",\
+       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001"/)
+       
+nRuns=dimsizes(runs)
+
+datadir="/glade/p/work/mmills/inputdata/"
+
+tropicsfile="CESM_1991_1995_sad_V2_sum_gw_SO2_TROPZ_tropicsavg.nc"
+NETfile="CESM_1991_1995_sad_V2_sum_gw_SO2_TROPZ_NETavg.nc"
+SETfile="CESM_1991_1995_sad_V2_sum_gw_SO2_TROPZ_SETavg.nc"
+
+a=addfile(datadir+tropicsfile,"r")
+test=a->aod532strat(5:)
+delete(a)
+nMonths=dimsizes(test)
+AODstr_trop=new((/nRuns+1,nMonths/),"float")
+AODstr_NET=AODstr_trop
+AODstr_SET=AODstr_trop
+AODstr_trop(0,:)=test
+delete(test)
+
+a=addfile(datadir+NETfile,"r")
+AODstr_NET(0,:)=a->aod532strat(5:)
+delete(a)
+
+a=addfile(datadir+SETfile,"r")
+AODstr_SET(0,:)=a->aod532strat(5:)
+delete(a)
+
+do i = 0,nRuns-1
+  n=i+1
+  print("run "+n)
+  tropicsfile=rootpath+runs(i)+"/atm/proc/h0tm/"+runs(i)+".cam.h0.tropicsavg.nc"
+  a=addfile(tropicsfile,"r")
+  test=a->AODVISst
+  nTimes=dimsizes(test)
+  AODstr_trop(n,0:nTimes-1)=test
+  delete(a)
+  delete(test)
+  
+  NETfile=rootpath+runs(i)+"/atm/proc/h0gm/"+runs(i)+".cam.h0.NETavg.nc"
+  a=addfile(NETfile,"r")
+  AODstr_NET(n,0:nTimes-1)=a->AODVISst  
+  delete(a)
+  
+  SETfile=rootpath+runs(i)+"/atm/proc/h0gm/"+runs(i)+".cam.h0.SETavg.nc"
+  a=addfile(SETfile,"r")
+  AODstr_SET(n,0:nTimes-1)=a->AODVISst
+  delete(a)
+end do
+
+month1=1991+6.5/12.
+month2=month1+(nMonths-1.)/12.
+time=fspan(month1,month2,nMonths)
+;  print(time)
+
+; Plot the data.
+pdfpath="$IMG_PATH/"
+a = systemfunc("mkdir -p "+pdfpath)
+pdffile=pdfpath+"ExtVsSAGEv7"
+print("Creating file "+pdffile+".pdf")
+wks  = gsn_open_wks("pdf", pdffile)    ; open a ncgm file
+
+
+res                   = True
+res@gsnPaperOrientation = "landscape"
+res@gsnMaximize         = True        ; must include w/ Paper Orientation
+res@vpHeightF             = 0.7              ; change aspect ratio
+res@vpWidthF              = 1.0
+res@xyLineThicknessF  = 4.0
+res@xyMonoDashPattern = True
+res@xyMonoLineColor   = False
+res@xyLineColors       = (/"black","blue","red"/)
+res@trXMinF = 1991.5
+res@trXMaxF = time(nMonths-1)
+res@tmXBMinorPerMajor = 11
+res@tmXTMinorPerMajor = 11
+res@tiXAxisString = "Year"
+res@tiYAxisString = "Stratospheric AOD, visible band"
+
+res@tiMainString     = "Tropics Average"
+plot = gsn_csm_xy(wks, time, AODstr_trop, res)
+
+res@tiMainString     = "Northern Extratropics Average"
+plot = gsn_csm_xy(wks, time, AODstr_NET, res)
+
+res@tiMainString     = "Southern Extratropics Average"
+plot = gsn_csm_xy(wks, time, AODstr_SET, res)
+
+delete(wks)

@@ -5,9 +5,16 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-z1=18.d0 ; lower bound of SO2 emission (km)
+z1=17.d0 ; lower bound of SO2 emission (km)
 z2=22.d0 ; upper bound of SO2 emission (km), must be less than 31 km
-TgSO2 = 20.d0 ; Tg of SO2
+
+TgSO2 = 10.d0 ; Tg of SO2
+
+; Zonal mean in tropics:
+lat1=-15.d0
+lat2=15.d0
+lon1=0.0d0
+lon2=357.5d0
 
 ; Spread over 10x10 columns:
 ;lat1=0.5d0
@@ -16,10 +23,28 @@ TgSO2 = 20.d0 ; Tg of SO2
 ;lon2=118.5d0
 
 ; Single column over Pinatubo:
-lat1=15.1417d0
-lat2=15.1417d0
-lon1=120.35d0
-lon2=120.35d0
+;lat1=15.1417d0
+;lat2=15.1417d0
+;lon1=120.35d0
+;lon2=120.35d0
+
+if (lat1.lt.0) then
+  latstr1=abs(doubletointeger(lat1))+"S"
+else
+  latstr1=doubletointeger(lat1)+"N"
+end if
+
+if (lat2.lt.0) then
+  latstr2=abs(doubletointeger(lat2))+"S"
+else
+  latstr2=doubletointeger(lat2)+"N"
+end if
+
+if ((lon1.le.2.5).and.(lon2.ge.357.5)) then
+  lonstr="zavg"
+else
+  lonstr=doubletointeger(lon1)+"-"+doubletointeger(lon2)+"E"
+end if
 
 molecSO2 = TgSO2 * 1.d12 / 64.d0 * 6.022d23 ; total molecules of SO2
 print("molecSO2="+molecSO2)
@@ -38,9 +63,7 @@ end if
 
 newfile  = newpath+"ar5_so2_stratvolc_1850-2100_"+doubletointeger(TgSO2)+"Tg_"\
                  +doubletointeger(z1)+"-"+doubletointeger(z2)+"km_"\
-                 +doubletointeger(lat1)+"-"+doubletointeger(lat2)+"N_"\
-                 +doubletointeger(lon1)+"-"+doubletointeger(lon2)\
-                 +"E_c"+datestr+".nc"
+                 +latstr1+"-"+latstr2+"_"+lonstr+"_c"+datestr+".nc"
 gridfile = gridpath+"f19.grid.nc"
 
 print("reading "+gridfile)
