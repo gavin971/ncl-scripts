@@ -53,7 +53,7 @@ do i = 0,nCases-1
   filepath=rootpath+cases(i)+"/"+"CESM_"+cases(i)+"_sad_V2_c"+datestr+".nc"
   
   cmd="ncrcat -O -v P0,lat,slat,lev,ilev,time,gw,PURSULAD,PURSULMD,PURSULND,PURSULRE,SULDEN,Z3,O3 "+\
-    rootpath+bkgdCase+"/h0zm/"+bkgdCase+".cam2.h0zm.2015-*.nc "+filepath
+    rootpath+cases(i)+"/h0zm/"+cases(i)+".cam2.h0zm.2015-*.nc "+filepath
   print(cmd)
   dum=systemfunc(cmd)
 
