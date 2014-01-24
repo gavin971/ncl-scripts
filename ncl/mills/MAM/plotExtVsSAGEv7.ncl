@@ -5,7 +5,8 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 rootpath="/glade/scratch/mmills/archive/"
 runs=(/"f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001",\
-       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001"/)
+       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001"/);,\
+;       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.17-22km.15S-15N.zavg.QBOon.001"/)
        
 nRuns=dimsizes(runs)
 
@@ -76,7 +77,7 @@ res@vpWidthF              = 1.0
 res@xyLineThicknessF  = 4.0
 res@xyMonoDashPattern = True
 res@xyMonoLineColor   = False
-res@xyLineColors       = (/"black","blue","red"/)
+res@xyLineColors       = (/"black","red","blue","green"/)
 res@trXMinF = 1991.5
 res@trXMaxF = time(nMonths-1)
 res@tmXBMinorPerMajor = 11
