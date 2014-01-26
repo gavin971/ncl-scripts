@@ -5,14 +5,14 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-z1=17.d0 ; lower bound of SO2 emission (km)
-z2=22.d0 ; upper bound of SO2 emission (km), must be less than 31 km
+z1=20.d0 ; lower bound of SO2 emission (km)
+z2=25.d0 ; upper bound of SO2 emission (km), must be less than 31 km
 
 TgSO2 = 10.d0 ; Tg of SO2
 
 ; Zonal mean in tropics:
-lat1=-15.d0
-lat2=15.d0
+lat1=-10.d0
+lat2=20.d0
 lon1=0.0d0
 lon2=357.5d0
 

@@ -43,6 +43,7 @@ rmode@long_name="sulfate mode radius"
 a->rmode=rmode
 delete(rmode)
 
+a->sad@units="um2/cm3"      ; change from um2/cm-3
 sad_bg=a->sad               ; (time, lev, lat)
 
 O3=a->O3
@@ -82,6 +83,7 @@ do i = 0,nCases-1
   b->rmode=rmode
   delete(rmode)  
   
+  b->sad@units="um2/cm3"      ; change from um2/cm-3
   sad=b->sad               ; (time, lev, lat)
   sad(:,{85:},:)=where(O3(:,{85:},:).lt.1.5e-9, \
        sad(:,{85:},:)-sad_bg(:,{85:},:), \
