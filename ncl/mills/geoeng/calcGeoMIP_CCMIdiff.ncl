@@ -1,19 +1,19 @@
-load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
 datestr = systemfunc("date +%y%m%d")
 
 rootpath="/glade/p/work/mmills/jenglish/"
-;outpath="/glade/p/work/mmills/inputdata/geoV2hy/"
-outpath="/glade/p/work/mmills/inputdata/geoV2/"
+outpath="/glade/p/work/mmills/inputdata/geoV3hy/"
+;outpath="/glade/p/work/mmills/inputdata/geoV3/"
 
 cmd="mkdir -p "+outpath
 print(cmd)
 dum=systemfunc(cmd)
 
-vars="P0,lat,slat,lev,ilev,time,gw,PURSULAD,PURSULMD,PURSULND,PURSULRE,SULDEN,Z3,O3"
-;vars=vars+",hyai,hybi,hyam,hybm,PS,PSL"
+vars="P0,lat,slat,lev,ilev,time,gw,PURSULAD,PURSULMD,PURSULND,PURSULRE,SULDEN,Z3,O3,WTPCT"
+vars=vars+",hyai,hybi,hyam,hybm,PS,PSL"
 
 bkgdCase="geo-0-bhn"
 bkgdFile="CESM_"+bkgdCase+"_sad_V2_c"+datestr+".nc"
@@ -44,19 +44,26 @@ md=a->PURSULMD
 H2SO4_mass_bg=md ; get metadata
 H2SO4_mass_bg=H2SO4_mass_bg*6.022e23/98.078479 ; g/cm3 ->molec-cm3
 H2SO4_mass_bg@long_name="sulfate mass density"
+H2SO4_mass_bg@units="molecules/cm3air"
 a->H2SO4_mass=H2SO4_mass_bg
 delete(md)
 ds=dimsizes(H2SO4_mass_bg)
 lev=H2SO4_mass_bg&lev
 
+wtpct=a->WTPCT
+sulden=a->SULDEN
+
 reff=a->reff
 rmode=reff ; get metadata
+rmode=rmode * (192.3/wtpct/sulden)^(1./3.) ; adjust for wet radius
 rmode=rmode*0.8829536147077603 ; rmode = reff * exp(-2.5 * (ln(sigma))**2), sigma=1.25
 rmode=rmode/1e6 ; um -> m
 rmode@units="meters"
 rmode@long_name="sulfate mode radius"
 a->rmode=rmode
 delete(rmode)
+delete(wtpct)
+delete(sulden)
 
 a->sad@units="um2/cm3"      ; change from um2/cm-3
 sad_bg=a->sad               ; (time, lev, lat)
@@ -89,16 +96,23 @@ do i = 0,nCases-1
   H2SO4_mass=md ; get metadata
   H2SO4_mass=H2SO4_mass*6.022e23/98.078479 ; g/cm3 ->molec-cm3
   H2SO4_mass@long_name="sulfate mass density"
+  H2SO4_mass@units="molecules/cm3air"
   delete(md)
+  
+  wtpct=b->WTPCT
+  sulden=b->SULDEN
 
-  reff=b->reff
+  reff=b->reff ; (time, lev, lat, lon)
   rmode=reff ; get metadata
+  rmode=rmode * (192.3/wtpct/sulden)^(1./3.) ; adjust for wet radius
   rmode=rmode*0.8829536147077603 ; rmode = reff * exp(-2.5 * (ln(sigma))**2), sigma=1.25
   rmode=rmode/1e6 ; um -> m
   rmode@units="meters"
   rmode@long_name="sulfate mode radius"
   b->rmode=rmode
   delete(rmode)  
+  delete(wtpct)
+  delete(sulden)
   
   b->sad@units="um2/cm3"      ; change from um2/cm-3
   sad=b->sad               ; (time, lev, lat)

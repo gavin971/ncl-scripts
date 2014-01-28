@@ -8,6 +8,10 @@ runs=(/"f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001",\
        "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001",\
        "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002",\
        "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003"/)
+
+
+;       "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.10S-20N.zavg.QBOon.001",\
+;       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.10S-20N.zavg.QBOon.001"/)
        
 nRuns=dimsizes(runs)
 
@@ -41,19 +45,19 @@ do i = 0,nRuns-1
   tropicsfile=rootpath+runs(i)+"/atm/proc/h0tm/"+runs(i)+".cam.h0.tropicsavg.nc"
   a=addfile(tropicsfile,"r")
   test=a->AODVISst
-  nTimes=dimsizes(test)
-  AODstr_trop(n,0:nTimes-1)=test
+  nTimes=min((/dimsizes(test),nMonths/))
+  AODstr_trop(n,0:nTimes-1)=test(0:nTimes-1)
   delete(a)
   delete(test)
   
   NETfile=rootpath+runs(i)+"/atm/proc/h0gm/"+runs(i)+".cam.h0.NETavg.nc"
   a=addfile(NETfile,"r")
-  AODstr_NET(n,0:nTimes-1)=a->AODVISst  
+  AODstr_NET(n,0:nTimes-1)=a->AODVISst(0:nTimes-1)
   delete(a)
   
   SETfile=rootpath+runs(i)+"/atm/proc/h0gm/"+runs(i)+".cam.h0.SETavg.nc"
   a=addfile(SETfile,"r")
-  AODstr_SET(n,0:nTimes-1)=a->AODVISst
+  AODstr_SET(n,0:nTimes-1)=a->AODVISst(0:nTimes-1)
   delete(a)
 end do
 
@@ -79,6 +83,7 @@ res@xyLineThicknessF  = 4.0
 res@xyMonoDashPattern = True
 res@xyMonoLineColor   = False
 res@xyLineColors       = (/"black","red","blue","blue","blue"/)
+;res@xyLineColors       = (/"black","red","blue","orange","green"/)
 res@trXMinF = 1991.5
 res@trXMaxF = time(nMonths-1)
 res@tmXBMinorPerMajor = 11
