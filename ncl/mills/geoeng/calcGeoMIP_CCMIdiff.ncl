@@ -5,15 +5,15 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 datestr = systemfunc("date +%y%m%d")
 
 rootpath="/glade/p/work/mmills/jenglish/"
-outpath="/glade/p/work/mmills/inputdata/geoV3hy/"
-;outpath="/glade/p/work/mmills/inputdata/geoV3/"
+;outpath="/glade/p/work/mmills/inputdata/geoV4hy/"
+outpath="/glade/p/work/mmills/inputdata/geoV4/"
 
 cmd="mkdir -p "+outpath
 print(cmd)
 dum=systemfunc(cmd)
 
 vars="P0,lat,slat,lev,ilev,time,gw,PURSULAD,PURSULMD,PURSULND,PURSULRE,SULDEN,Z3,O3,WTPCT"
-vars=vars+",hyai,hybi,hyam,hybm,PS,PSL"
+;vars=vars+",hyai,hybi,hyam,hybm,PS,PSL"
 
 bkgdCase="geo-0-bhn"
 bkgdFile="CESM_"+bkgdCase+"_sad_V2_c"+datestr+".nc"
@@ -45,7 +45,6 @@ H2SO4_mass_bg=md ; get metadata
 H2SO4_mass_bg=H2SO4_mass_bg*6.022e23/98.078479 ; g/cm3 ->molec-cm3
 H2SO4_mass_bg@long_name="sulfate mass density"
 H2SO4_mass_bg@units="molecules/cm3air"
-a->H2SO4_mass=H2SO4_mass_bg
 delete(md)
 ds=dimsizes(H2SO4_mass_bg)
 lev=H2SO4_mass_bg&lev
@@ -65,10 +64,20 @@ delete(rmode)
 delete(wtpct)
 delete(sulden)
 
-a->sad@units="um2/cm3"      ; change from um2/cm-3
 sad_bg=a->sad               ; (time, lev, lat)
+sad_bg@units="um2/cm3"      ; change from um2/cm-3
 
 O3=a->O3
+
+; Zero out mass and SAD below the tropopause
+H2SO4_mass_bg_strat=H2SO4_mass_bg ; get metadata
+H2SO4_mass_bg_strat(:,{85:},:)=where(O3(:,{85:},:).lt.1.5e-7, 0.0, H2SO4_mass_bg(:,{85:},:))
+sad_bg_strat=sad_bg ; get metadata
+sad_bg_strat(:,{85:},:)=where(O3(:,{85:},:).lt.1.5e-7, 0.0, sad_bg(:,{85:},:))
+
+a->H2SO4_mass=H2SO4_mass_bg_strat
+a->sad=sad_bg_strat
+
 delete(a)
 
 do i = 0,nCases-1
@@ -132,7 +141,6 @@ do i = 0,nCases-1
 ;       H2SO4_mass(:,{85:},:)-H2SO4_mass_bg(:,{85:},:), \
 ;       H2SO4_mass(:,{85:},:))
   do j=0,ds(0)-1
-;    print("month "+j)
     do k=0,ds(1)-1
       if (lev(k).gt.85.0) then
         do l=0,ds(2)-1
