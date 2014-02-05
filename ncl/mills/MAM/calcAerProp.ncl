@@ -101,9 +101,10 @@ begin
   end if
   
   if (isfilevar(history,"so4_nd")) then
-    print("  Reading so4_nd ...")
-    so4_nd = history->so4_nd
-    printVarSummary(so4_nd)    
+    print("  Found so4_nd ...")
+;    print("  Reading so4_nd ...")
+;    so4_nd = history->so4_nd
+;    printVarSummary(so4_nd)    
   else
     print("  Calculating sulfate molec/cm3 ...")
     so4_nd = so4 ; get metadata
@@ -115,6 +116,59 @@ begin
     history->so4_nd=so4_nd
   end if
 
+  if (isfilevar(history,"reff")) then
+    print("  Found reff ...")
+  else
+  
+    sigma1=1.6
+    sigma2=1.6
+    sigma3=1.8
+    
+    print("  Reading dgnumwet1 ...")
+    diam1=history->dgnumwet1
+    print("  Reading dgnumwet2 ...")
+    diam2=history->dgnumwet2
+    print("  Reading dgnumwet3 ...")
+    diam3=history->dgnumwet3
+    
+    exists=isvar((/"so4_a1","so4_a2","so4_a3"/))
+    if(.not.exists(0)) then
+      print("  Reading so4_a1 ...")
+      so4_a1= history->so4_a1        ; kg/kg air
+    end if
+    if(.not.exists(1)) then
+      print("  Reading so4_a2 ...")
+      so4_a2= history->so4_a2        ; kg/kg air
+    end if
+    if(.not.exists(2)) then
+      print("  Reading so4_a3 ...")
+      so4_a3= history->so4_a3        ; kg/kg air
+    end if
+        
+    print("  Calculating surf ...")
+    surf=     so4_a1*diam1^2.*exp(2.*log(sigma1)^2.)
+    surf=surf+so4_a2*diam2^2.*exp(2.*log(sigma2)^2.)
+    surf=surf+so4_a3*diam3^2.*exp(2.*log(sigma3)^2.)
+    surf@_FillValue=9.96921e+36
+    surf=where(surf.gt.0,surf,surf@_FillValue)
+;    surf=surf*arhomass*PI
+    
+    print("  Calculating vol ...")
+    vol =    so4_a1*diam1^3.*exp(4.5*log(sigma1)^2.)
+    vol =vol+so4_a2*diam1^3.*exp(4.5*log(sigma2)^2.)
+    vol =vol+so4_a3*diam1^3.*exp(4.5*log(sigma3)^2.)
+;    vol =vol*arhomass*PI/6
+
+    print("  Calculating radeff ...")
+    radeff=diam1 ; get metadata
+    radeff=vol/surf/2.0
+    radeff@long_name="Sulfate aerosol wet effective radius"
+    
+    print("  Saving radeff ...")
+    printVarSummary(radeff)    
+    history->radeff=radeff
+
+  end if
   
 end
 

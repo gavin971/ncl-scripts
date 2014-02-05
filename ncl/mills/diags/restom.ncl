@@ -14,6 +14,11 @@ else
 
   ostype=getenv("OSTYPE")
   host=getenv("HOSTNAME")
+  
+  subdir=getenv("subdir")
+  if (ismissing(subdir)) then
+    subdir="atm/hist"
+  end if
 
   rootpath=getenv("rootpath")
   if (ismissing(rootpath)) then
@@ -23,14 +28,13 @@ else
       if(isStrSubset(host,"cmip5"))
         rootpath="/data/waccm/"
       else
-        rootpath="/glade/p/cesm/wawg/runs/cesm1_2/"  
+        rootpath="/glade/scratch/mmills/archive/"
+        exists =isfilepresent(rootpath+run_name+"/"+subdir+"/")
+        if (.not.exists) then
+          rootpath="/glade/p/cesm/wawg/runs/cesm1_2/"
+        end if  
       end if
     end if
-  end if
-  
-  subdir=getenv("subdir")
-  if (ismissing(subdir)) then
-    subdir="atm/hist"
   end if
 
   in_dir =rootpath+run_name+"/"+subdir+"/"
