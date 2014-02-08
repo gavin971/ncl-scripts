@@ -32,6 +32,11 @@ else
         exists =isfilepresent(rootpath+run_name+"/"+subdir+"/")
         if (.not.exists) then
           rootpath="/glade/p/cesm/wawg/runs/cesm1_2/"
+          delete(exists)
+          exists =isfilepresent(rootpath+run_name+"/"+subdir+"/")
+          if (.not.exists) then
+            rootpath="/glade/p/cesm/wawg/runs/ccsm4_0/"
+          end if
         end if  
       end if
     end if

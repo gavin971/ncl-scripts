@@ -116,8 +116,8 @@ begin
     history->so4_nd=so4_nd
   end if
 
-  if (isfilevar(history,"reff")) then
-    print("  Found reff ...")
+  if (isfilevar(history,"radeff")) then
+    print("  Found radeff ...")
   else
   
     sigma1=1.6
@@ -206,4 +206,3 @@ do i = 0,nfiles-1
   calcAerProp(rootpath,historyNames(i))
   print("===========================================================")
 end do
-

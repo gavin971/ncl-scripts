@@ -66,9 +66,13 @@ end if
 ;   "b.e12.B55TRW5CN.f19_g16.Pin20Tg.16-18km.1col.QBOon.avg" \
 ;               /)
 
-tag="10Tg.20-25km.15S-15N"
+tag="10Tg.20-25km.15S-15N.ensemble"
 runNames = (/ \
-       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001" \
+       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001", \
+       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002", \
+       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003" \
+;       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.hetchem.001", \
+;       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.hetchem.002" \
                /)
 
 ;tag="10Tg.20-27km.100col"
@@ -88,7 +92,8 @@ nRuns = dimsizes(runNames)
 cntlRunNames  =    (/ \
 ;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
 ;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
-;   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
+   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
+   "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg", \
    "b.e12.B55TRW5CN.f19_g16.CourseBkgd.QBOon.avg" \
    /)
 
@@ -293,7 +298,7 @@ do l = 0, nLevs - 1
   res@gsnMaximize           = True
   res@vpHeightF             = 0.5              ; change aspect ratio
   res@vpWidthF              = 1.0
-  res@xyLineColors    = (/"black","blue","green4","red","orange","purple"/)
+  res@xyLineColors    = (/"black","blue","blue","blue","green4","red","orange","purple"/)
   res@xyMonoLineColor = False
   res@xyMonoDashPattern = True
   res@xyMonoLineThickness = False

@@ -32,8 +32,10 @@ begin
       nt=dimsizes(time)
       print("  nt="+nt+" units="+time@units)
       
+      t3=opt@timeoffset2(i)
+      
       if (i .eq. 0) then
-        nTimes=nt
+        nTimes=nt+t3
         print("nTimes="+nTimes)
 
         dmass = new((/ nRuns, nTimes /), "float")
@@ -42,20 +44,21 @@ begin
         dmass!1 = "time"
         dmass@units = "kg"
         dmass(:,:)=0.0e0
-        dmass&time=time
+        dmass&time=ispan(1,nTimes,1)
 
         sulfur=new((/nTracers*nRuns,nTimes/),float)
         sulfur!1 = "time"
         sulfur@units = "kg"
         sulfur(:,:)=0.0e0
-        sulfur&time=time
+        sulfur&time=dmass&time
         printVarSummary(sulfur)        
       end if
       
-      ntmin=min((/nt,nTimes/))-1
+      ntmin=min((/nt+t3,nTimes/))-1
       t1=opt@timeoffset(i)
-      t2=opt@timeoffset(i)+ntmin
-      t3=opt@timeoffset2(i)
+;      ntmin=ntmin-t1
+      t2=opt@timeoffset(i)+ntmin-t3
+
 ;      t1=0
 ;      t2=ntmin
 ;      t3=0
@@ -63,13 +66,13 @@ begin
       do j = 0, nTracers - 1
         k=j+i*nTracers
         tracer = mfileid->$tracerNames(j)$
-        sulfur(k, t3:ntmin+t3) = tracer(t1:t2)*32.064999/tracerNames@molwts(j)
+        sulfur(k, t3:ntmin) = tracer(t1:t2)*32.064999/tracerNames@molwts(j)
         if (j .ne. 0) then
           sulfur(k,:)=sulfur(k-1,:)+sulfur(k,:)
         end if
       end do
       so4_tot = mfileid->so4_tot
-      dmass(i, t3:ntmin+t3) = so4_tot(t1:t2)
+      dmass(i, t3:ntmin) = so4_tot(t1:t2)
       delete(mfileid)
       delete(tracer)
     else
@@ -107,7 +110,7 @@ begin
       print(" dimsizes(test):"+dimsizes(test))
       ntmin=min((/nt,nTimes/))-1
       t1=opt@timeoffset(i)
-      t2=opt@timeoffset(i)+ntmin
+      t2=ntmin
       t3=opt@timeoffset2(i)
 ;      t1=0
 ;      t2=ntmin
@@ -297,9 +300,13 @@ rootpath="/glade/scratch/mmills/archive/"
 ;caseid = (/ "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
 ;            "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.002", \
 ;            "b.e12.B55TRW5CN.f19_g16.Pin15Tg.20-27km.0-18N.96-118E.QBOon.003" /)
+;caseid = (/ \
+;       "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001", \
+;       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001" \
+;       /)
 caseid = (/ \
-       "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001", \
-       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001" \
+       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.hetchem.001", \
+       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.hetchem.002" \
        /)
                      
 tracers=(/"SO2","H2SO4","so4_a2","so4_a1","so4_a3"/)
@@ -308,9 +315,8 @@ opt=False
 opt@overwritemass=False
 ;opt@lev1=100.0
 opt@lev1=1100.0
-opt@timeoffset=(/0,0,0,0/)
-;opt@timeoffset=(/5,5,5/)
-opt@timeoffset2=(/0,0,0,0/)
+opt@timeoffset=(/0,0/)
+opt@timeoffset2=(/150,0/)
 ;opt@timeoffset=(/0,0,0,3*12,12/)
 ;opt@timeoffset2=(/0,15,0,3*12,12/)
 ;plotMass( rootpath, "h0zm", caseid, tracers, opt )

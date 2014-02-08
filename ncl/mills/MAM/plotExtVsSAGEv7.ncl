@@ -7,7 +7,8 @@ rootpath="/glade/scratch/mmills/archive/"
 runs=(/"f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001",\
        "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001",\
        "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002",\
-       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003"/)
+       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003",\
+       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.hetchem.002"/)
 
 
 ;       "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.10S-20N.zavg.QBOon.001",\
@@ -22,43 +23,49 @@ NETfile="CESM_1991_1995_sad_V2_sum_gw_SO2_TROPZ_NETavg.nc"
 SETfile="CESM_1991_1995_sad_V2_sum_gw_SO2_TROPZ_SETavg.nc"
 
 a=addfile(datadir+tropicsfile,"r")
-test=a->aod532strat(5:)
-delete(a)
-nMonths=dimsizes(test)
+date=a->date
+d1=ind(date.eq."19910615")
+print("d1="+d1)
+nMonths=dimsizes(date(d1:))
 AODstr_trop=new((/nRuns+1,nMonths/),"float")
 AODstr_NET=AODstr_trop
 AODstr_SET=AODstr_trop
-AODstr_trop(0,:)=test
-delete(test)
+AODstr_trop(0,:)=a->aod532strat(d1:)
+delete(a)
+delete(date)
 
 a=addfile(datadir+NETfile,"r")
-AODstr_NET(0,:)=a->aod532strat(5:)
+AODstr_NET(0,:)=a->aod532strat(d1:)
 delete(a)
 
 a=addfile(datadir+SETfile,"r")
-AODstr_SET(0,:)=a->aod532strat(5:)
+AODstr_SET(0,:)=a->aod532strat(d1:)
 delete(a)
+delete(d1)
 
 do i = 0,nRuns-1
   n=i+1
   print("run "+n)
   tropicsfile=rootpath+runs(i)+"/atm/proc/h0tm/"+runs(i)+".cam.h0.tropicsavg.nc"
   a=addfile(tropicsfile,"r")
-  test=a->AODVISst
-  nTimes=min((/dimsizes(test),nMonths/))
-  AODstr_trop(n,0:nTimes-1)=test(0:nTimes-1)
+  date=a->date
+  d1=ind(date.eq."19910701")
+  print("d1="+d1)
+  nTimes=min((/dimsizes(date(d1:)),nMonths/))
+  AODstr_trop(n,0:nTimes-1)=a->AODVISst(d1:d1+nTimes-1)
   delete(a)
-  delete(test)
+  delete(date)
   
   NETfile=rootpath+runs(i)+"/atm/proc/h0gm/"+runs(i)+".cam.h0.NETavg.nc"
   a=addfile(NETfile,"r")
-  AODstr_NET(n,0:nTimes-1)=a->AODVISst(0:nTimes-1)
+  AODstr_NET(n,0:nTimes-1)=a->AODVISst(d1:d1+nTimes-1)
   delete(a)
   
   SETfile=rootpath+runs(i)+"/atm/proc/h0gm/"+runs(i)+".cam.h0.SETavg.nc"
   a=addfile(SETfile,"r")
-  AODstr_SET(n,0:nTimes-1)=a->AODVISst(0:nTimes-1)
+  AODstr_SET(n,0:nTimes-1)=a->AODVISst(d1:d1+nTimes-1)
   delete(a)
+  delete(d1)
 end do
 
 month1=1991+6.5/12.
@@ -82,7 +89,7 @@ res@vpWidthF              = 1.0
 res@xyLineThicknessF  = 4.0
 res@xyMonoDashPattern = True
 res@xyMonoLineColor   = False
-res@xyLineColors       = (/"black","red","blue","blue","blue"/)
+res@xyLineColors       = (/"black","red","blue","blue","blue","green"/)
 ;res@xyLineColors       = (/"black","red","blue","orange","green"/)
 res@trXMinF = 1991.5
 res@trXMaxF = time(nMonths-1)
