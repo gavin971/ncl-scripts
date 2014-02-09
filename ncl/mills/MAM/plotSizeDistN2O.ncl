@@ -2,6 +2,9 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
+caseid = "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002"
+rootpath = "/glade/scratch/mmills/archive/"
+
 dlog10Dp = 0.056268 ; bin width of Wilson FCAS measurements
 
 ; Bin geometric mean diameters for Wilson FCAS measurements:
@@ -16,4 +19,34 @@ DpMean = (/ 0.064015516,0.072870752,0.082950928,0.094425491,0.107487324, \
 
 sigmag=(/1.6, 1.6, 1.8/) ; geometric standard deviations for 3 MAM3 modes
 
-rmode=
+historyPattern=rootpath+caseid+"/atm/hist/*.cam.h0.199[23]*"
+historyNames = systemfunc("ls " + historyPattern)
+history = addfiles(historyNames, "r")
+ListSetType(history, "cat")
+print("historyNames:"+dimsizes(historyNames))
+print("reading N2O")
+N2O = addfiles_GetVar(history, historyNames, "N2O")
+
+; dry diameter not saved, but wet should be the same as dry for these runs
+print("reading dgnumwet1")
+dgnum1 = addfiles_GetVar(history, historyNames, "dgnumwet1")
+print("reading dgnumwet2")
+dgnum2 = addfiles_GetVar(history, historyNames, "dgnumwet2")
+print("reading dgnumwet3")
+dgnum3 = addfiles_GetVar(history, historyNames, "dgnumwet3")
+print("reading num_a1")
+num_a1 = addfiles_GetVar(history, historyNames, "num_a1")
+print("reading num_a2")
+num_a2 = addfiles_GetVar(history, historyNames, "num_a2")
+print("reading num_a3")
+num_a3 = addfiles_GetVar(history, historyNames, "num_a3")
+
+printVarSummary(N2O)
+ds=dimsizes(N2O)
+
+N2O_1D = ndtooned(N2O)
+i250 = ind(N2O_1D.lt.300.e-9.and.N2O_1D.gt.250.e-9)
+
+printVarSummary(i250)
+
+
