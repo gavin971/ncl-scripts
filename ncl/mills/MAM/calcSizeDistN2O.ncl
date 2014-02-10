@@ -4,9 +4,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 undef("calcSizeDistN2O")
 procedure calcSizeDistN2O(caseid:string, dgVar:string, yearPattern:string,\
-                          yearString:string,N2Oppb[*]:integer, \
-                          DpMean[*]:float, dVdlog10Dp_avg[*,*]:float, \
-                          dVdlog10Dp_std[*,*]:float)
+                          yearString:string)
 
 ; input variables
 ;    caseid      : e.g "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003"  
@@ -26,7 +24,12 @@ begin
 
   rootpath = "/glade/scratch/mmills/archive/"
 
+  N2Oppb = (/ 300, 250, 200, 150, 100, 50 /)
+  N2Oppb@long_name="N2O boundaries"
+  N2Oppb@units="ppbv"
+  
   nBounds = dimsizes(N2Oppb)
+  nRanges = nBounds-1
   
   dlog10Dp = 0.056268 ; bin width of Wilson FCAS measurements
 
@@ -38,14 +41,27 @@ begin
               0.854368544,0.972552939,1.107085724,1.260228365,1.434555155, \
               1.632996487,1.858888114,2.116027222,2.40873626,2.741935601, \
               3.121226247 /)
+  DpMean@units="um"
+  
   nBins = dimsizes(DpMean)
   log10DpMean = log10(DpMean)
 
   sigmag=(/1.6, 1.6, 1.8/) ; geometric standard deviations for 3 MAM3 modes
   log10sigmag=log10(sigmag)
+    
+  N2Oppb2=N2Oppb(0:nRanges-1)
   
-  dVdlog10Dp_avg=new((/nBounds-1,nBins/),"float")
-  dVdlog10Dp_std=new((/nBounds-1,nBins/),"float")
+  dVdlog10Dp_avg=new((/nRanges,nBins/),"float")
+  dVdlog10Dp_avg!0="N2O"
+  dVdlog10Dp_avg&N2O=N2Oppb2
+  dVdlog10Dp_avg!1="diameter"
+  dVdlog10Dp_avg&diameter=DpMean
+  
+  dVdlog10Dp_std=dVdlog10Dp_avg
+  
+  outfilename=rootpath+caseid+"/atm/proc/SizeDistN2O_"+yearString+".nc"
+  dum=systemfunc("rm "+outfilename)
+  outfile=addfile(outfilename,"c")
 
   historyPattern=rootpath+caseid+"/atm/proc/h0zm/*.cam.h0zm."+yearPattern+"*"
   historyNames = systemfunc("ls " + historyPattern)
@@ -82,19 +98,25 @@ begin
 
   N2O_1D = ndtooned(N2O)
   N2Obounds=N2Oppb*1.e-9
+  N2Obounds@units=N2O@units
+  N2Obounds@long_name="N2O boundaries"
   
-  do n = 0, nBounds-1
-  
-    print(n+" of "+nBounds+": N20 range "+N2Oppb[n]+" to "+N2Oppb[n+1])
-    if (N2Oppb[n].le.N2Oppb[n+1]) then
+  do n = 0, nRanges-1
+    np1=n+1
+    print("    ")
+    print("=========================================================================")
+;    print(N2Oppb)
+;    print(n+" "+np1)
+    print(np1+" of "+nRanges+": N2O range "+N2Oppb(n)+" to "+N2Oppb(np1))
+    if (N2Oppb(n).le.N2Oppb(n+1)) then
       print("calcSizeDistN2O error: N2Oppb must be in descending order. Aborting.")
       print(N2Oppb)
       exit
     end if
     
-    iN2O = ind(N2O_1D.lt.N2Obounds[n].and.N2O_1D.gt.N2Obounds[n+1])
+    iN2O = ind(N2O_1D.lt.N2Obounds(n).and.N2O_1D.gt.N2Obounds(n+1))
 
-    printVarSummary(iN2O)
+;    printVarSummary(iN2O)
     nN2O = dimsizes(iN2O)
 
     log10dgvol=new((/3,nN2O/),"float")
@@ -140,9 +162,25 @@ begin
     delete(dVdlog10Dp)
     
   end do
-end
-
-undef("saveSizeDistN2O")
-procedure saveSizeDistN2O
+  
+  print("writing output")
+  outfile->N2Oppb=N2Oppb
+  outfile->N2Obounds=N2Obounds
+  outfile->dVdlog10Dp_avg=dVdlog10Dp_avg
+  outfile->dVdlog10Dp_std=dVdlog10Dp_std
   
 end
+
+;caseid = "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003"
+;yearPattern = "200[67]"
+;yearString = "2006-07"
+
+caseid = "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003"
+;yearPattern = "199[23]"
+;yearString = "1992-93"
+yearPattern = "199[67]"
+yearString = "1996-97"
+
+dgVar = "dgnumwet"
+calcSizeDistN2O(caseid, dgVar, yearPattern, yearString)
+
