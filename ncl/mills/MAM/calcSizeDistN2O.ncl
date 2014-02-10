@@ -175,11 +175,12 @@ end
 ;yearPattern = "200[67]"
 ;yearString = "2006-07"
 
-caseid = "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003"
-;yearPattern = "199[23]"
-;yearString = "1992-93"
-yearPattern = "199[67]"
-yearString = "1996-97"
+;caseid = "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003"
+caseid = "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001"
+yearPattern = "199[23]"
+yearString = "1992-93"
+;yearPattern = "199[67]"
+;yearString = "1996-97"
 
 dgVar = "dgnumwet"
 calcSizeDistN2O(caseid, dgVar, yearPattern, yearString)

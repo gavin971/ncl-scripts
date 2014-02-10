@@ -7,6 +7,7 @@ begin
   
   caseid = (/  \
               "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001", \
               "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003", \
               "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
   
@@ -36,26 +37,41 @@ begin
   pdffile="SizeDistN2O_multi"
   wks   = gsn_open_wks ("pdf", "$IMAGE_PATH/"+pdffile)                   ; open workstation
   res=True
+  res@vpHeightF             = 0.4              ; change aspect ratio
+  res@vpWidthF              = 0.7
   res@gsnFrame               = False                     ; don't draw yet
   res@gsnDraw                = False                     ; don't advance frame
   res@xyXStyle="Log"
   res@trXMinF=0.05
   res@trXMaxF=5.0
-  res@trYMinF=-0.1
-  res@trYMaxF=3.0
+  res@trYMinF=-0.2
+  res@trYMaxF=3.1
   res@xyMonoLineColor = False
-  res@xyLineColors    = (/"red","green","blue"/)
+  res@xyLineColors    = (/"red","green3","blue"/)
   res@xyMonoDashPattern = True
   res@xyLineThicknessF = 4.0
-  res@tiXAxisString = "Particle Diameter, Dp, um"
-  res@tiYAxisString = "dV/dLog10Dp (normalized)"
+  res@tiXAxisString = "Particle Diameter, Dp, ~F33~m~FR~m"
+  res@tiYAxisString = "dV/dLog~B~10~N~Dp, normalized"
+  res@tmXBMinorPerMajor = 8
+  res@tmXTMinorPerMajor = 8
+  res@tmXBMajorOutwardLengthF= -0.021
+  res@tmXBMajorLengthF= -0.021
+  res@tmXBMinorOutwardLengthF= -0.01
+  res@tmXBMinorLengthF= -0.01
+  res@tmYLMajorLengthF= 0.021
+  res@tmYLMajorOutwardLengthF= 0.021
+  res@tmYLMinorPerMajor = 3
+  res@tmYRMinorPerMajor = 3
+  res@tmYLMinorOn=True
+  res@tmYLMinorLengthF= 0.008
+  res@tmYLMinorOutwardLengthF= 0.008
   
   polyres                   = True                       ; marker resources
   polyres@gsMarkerIndex     = 1                          ; index for circle
   polyres@gsMarkerSizeF     = .02                        ; size 
   polyres@gsLineThicknessF  = 2
   
-  dfac =1.1
+  dfac =1.05
   
   do k = 1, nRanges
     j=nRanges-k
