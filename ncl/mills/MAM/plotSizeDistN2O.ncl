@@ -46,12 +46,20 @@ begin
   res@xyMonoLineColor = False
   res@xyLineColors    = (/"red","green","blue"/)
   res@xyMonoDashPattern = True
+  res@xyLineThicknessF = 4.0
+  res@tiXAxisString = "Particle Diameter, Dp, um"
+  res@tiYAxisString = "dV/dLog10Dp (normalized)"
   
   polyres                   = True                       ; marker resources
   polyres@gsMarkerIndex     = 1                          ; index for circle
   polyres@gsMarkerSizeF     = .02                        ; size 
+  polyres@gsLineThicknessF  = 2
   
-  do j = 0, nRanges-1
+  dfac =1.1
+  
+  do k = 1, nRanges
+    j=nRanges-k
+    res@tiMainString = N2Obounds(j+1)+" < N2O < "+N2Obounds(j)
   
     plot = gsn_csm_xy (wks, DpMean, dVdlog10Dp_avg(:,j,:), res)
 
@@ -59,14 +67,20 @@ begin
   ; add error bars
   ;************************************************ 
     error_bar = new(nCases*nBins,graphic)
+    error_bar_top = new(nCases*nBins,graphic)
+    error_bar_bot = new(nCases*nBins,graphic)
     do c = 0, nCases-1 
       polyres@gsLineColor = res@xyLineColors(c)
 
       do i = 0, nBins-1
+        top=dVdlog10Dp_avg(c,j,i)+dVdlog10Dp_std(c,j,i)
+        bottom=max((/dVdlog10Dp_avg(c,j,i)-dVdlog10Dp_std(c,j,i),0/))
         error_bar(c*nBins+i) = gsn_add_polyline(wks,plot,(/DpMean(i),DpMean(i)/),\
-          (/dVdlog10Dp_avg(c,j,i)+dVdlog10Dp_std(c,j,i),\
-          max((/dVdlog10Dp_avg(c,j,i)-dVdlog10Dp_std(c,j,i),0/))/),\
-          polyres)
+          (/top, bottom/), polyres)
+        error_bar_top(c*nBins+i) = gsn_add_polyline(wks,plot,(/DpMean(i)*dfac,DpMean(i)/dfac/),\
+          (/top,top/), polyres)
+        error_bar_bot(c*nBins+i) = gsn_add_polyline(wks,plot,(/DpMean(i)*dfac,DpMean(i)/dfac/),\
+          (/bottom,bottom/), polyres)
       end do
       
       delete(polyres@gsLineColor)
