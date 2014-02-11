@@ -5,13 +5,22 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 begin
   rootpath = "/glade/scratch/mmills/archive/"
   
+;  caseid = (/  \
+;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003", \
+;;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001", \
+;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003", \
+;              "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
+;  caseid = (/  \
+;              "f.e12.FSDW5.f19_f19.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
+;              "f.e12.FSDW5.f19_f19.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
+;              "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
   caseid = (/  \
-              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003", \
-;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001", \
-              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003", \
+              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002", \
+              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002", \
               "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
   
-  yearString = (/ "1992-93", "1996-97", "2006-07" /)
+;  yearString = (/ "1991_06-12", "1992", "2006-07" /)
+  yearString = (/ "1991_06-12", "1992_01-08", "2006-07" /)
   
   nCases = dimsizes(caseid)
   
@@ -34,7 +43,7 @@ begin
   
   end do
               
-  pdffile="SizeDistN2O_multi"
+  pdffile="SizeDistN2O_multi_"+caseid(0)
   wks   = gsn_open_wks ("pdf", "$IMAGE_PATH/"+pdffile)                   ; open workstation
   res=True
   res@vpHeightF             = 0.4              ; change aspect ratio

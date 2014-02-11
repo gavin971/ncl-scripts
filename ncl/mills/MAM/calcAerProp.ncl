@@ -52,6 +52,21 @@ begin
     printVarSummary(so4)
     history->so4 = so4
   end if
+  if (isfilevar(history,"TMso4")) then
+    print("  Found TMso4 ...")
+  else
+    print("  Reading TMso4 variables ...")
+    TMso4_a1= history->TMso4_a1        ; kg/kg air
+    TMso4_a2= history->TMso4_a2        ; kg/kg air
+    TMso4_a3= history->TMso4_a3        ; kg/kg air
+    print("  Summing TMso4 variables ...")
+    TMso4 = TMso4_a1 ; get metadata
+    TMso4 = TMso4_a1 + TMso4_a2 + TMso4_a3 ; kg/kg air
+    TMso4@long_name="so4 column burden"
+    print("  Saving TMso4 ...")
+    printVarSummary(TMso4)
+    history->TMso4 = TMso4
+  end if
 ;  print("  Reading dgnd variables ...")
 ;  dgnd_a1= history->dgnd_a1      ; diameter (m)
 ;  dgnd_a2= history->dgnd_a2      ; diameter (m)
@@ -116,13 +131,14 @@ begin
     history->so4_nd=so4_nd
   end if
 
-  if (isfilevar(history,"radeff")) then
-    print("  Found radeff ...")
+  if (isfilevar(history,"radeffwet")) then
+    print("  Found radeffwet ...")
   else
   
     sigma1=1.6
     sigma2=1.6
-    sigma3=1.8
+;    sigma3=1.8
+    sigma3=1.4
     
     print("  Reading dgnumwet1 ...")
     diam1=history->dgnumwet1
@@ -159,14 +175,74 @@ begin
     vol =vol+so4_a3*diam1^3.*exp(4.5*log(sigma3)^2.)
 ;    vol =vol*arhomass*PI/6
 
-    print("  Calculating radeff ...")
-    radeff=diam1 ; get metadata
-    radeff=vol/surf/2.0
-    radeff@long_name="Sulfate aerosol wet effective radius"
+    print("  Calculating radeffwet ...")
+    radeffwet=diam1 ; get metadata
+    radeffwet=vol/surf/2.0
+    radeffwet@long_name="Sulfate aerosol wet effective radius"
     
-    print("  Saving radeff ...")
-    printVarSummary(radeff)    
-    history->radeff=radeff
+    print("  Saving radeffwet ...")
+    printVarSummary(radeffwet)    
+    history->radeffwet=radeffwet
+
+  end if
+
+  if (isfilevar(history,"radeffdry")) then
+    print("  Found radeffdry ...")
+  else
+  
+    sigma1=1.6
+    sigma2=1.6
+;    sigma3=1.8
+    sigma3=1.4
+    
+    delete(diam1)
+    delete(diam2)
+    delete(diam3)
+    print("  Reading dgnd_a01 ...")
+    diam1=history->dgnd_a01
+    print("  Reading dgnd_a02 ...")
+    diam2=history->dgnd_a02
+    print("  Reading dgnd_a03 ...")
+    diam3=history->dgnd_a03
+    
+    exists=isvar((/"so4_a1","so4_a2","so4_a3"/))
+    if(.not.exists(0)) then
+      print("  Reading so4_a1 ...")
+      so4_a1= history->so4_a1        ; kg/kg air
+    end if
+    if(.not.exists(1)) then
+      print("  Reading so4_a2 ...")
+      so4_a2= history->so4_a2        ; kg/kg air
+    end if
+    if(.not.exists(2)) then
+      print("  Reading so4_a3 ...")
+      so4_a3= history->so4_a3        ; kg/kg air
+    end if
+        
+    delete(surf)
+    print("  Calculating surf ...")
+    surf=     so4_a1*diam1^2.*exp(2.*log(sigma1)^2.)
+    surf=surf+so4_a2*diam2^2.*exp(2.*log(sigma2)^2.)
+    surf=surf+so4_a3*diam3^2.*exp(2.*log(sigma3)^2.)
+    surf@_FillValue=9.96921e+36
+    surf=where(surf.gt.0,surf,surf@_FillValue)
+;    surf=surf*arhomass*PI
+    
+    delete(vol)
+    print("  Calculating vol ...")
+    vol =    so4_a1*diam1^3.*exp(4.5*log(sigma1)^2.)
+    vol =vol+so4_a2*diam1^3.*exp(4.5*log(sigma2)^2.)
+    vol =vol+so4_a3*diam1^3.*exp(4.5*log(sigma3)^2.)
+;    vol =vol*arhomass*PI/6
+
+    print("  Calculating radeffwet ...")
+    radeffdry=diam1 ; get metadata
+    radeffdry=vol/surf/2.0
+    radeffdry@long_name="Sulfate aerosol dry effective radius"
+    
+    print("  Saving radeffdry ...")
+    printVarSummary(radeffdry)    
+    history->radeffdry=radeffdry
 
   end if
   
