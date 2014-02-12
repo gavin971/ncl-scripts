@@ -2,7 +2,6 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
-load "../nuclear/calculateMass.ncl"
 
 ; Constants
 ;
@@ -95,7 +94,6 @@ begin
     print("  Calculating air pressure ...")
     P = so4 ; get metadata
     P = pres_hybrid_ccm(PS(:,:,:), P0, hyam(:) ,hybm(:))
-    delete(PS)
     P@long_name="Pressure"
     P@units="Pa"   
     print("  Saving P ...")
