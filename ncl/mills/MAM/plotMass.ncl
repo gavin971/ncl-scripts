@@ -310,7 +310,7 @@ caseid = (/ \
        /)
                      
 tracers=(/"SO2","H2SO4","so4_a2","so4_a1","so4_a3"/)
-tracers@molwts=(/ 115.108999, 115.108999, 64.063799, 115.108999, 98.078479 /)
+tracers@molwts=(/ 64.063799, 98.078479, 115.108999, 115.108999, 115.108999 /)
 opt=False
 opt@overwritemass=False
 ;opt@lev1=100.0

@@ -5,10 +5,10 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
-z1=20.d0 ; lower bound of SO2 emission (km)
-z2=24.d0 ; upper bound of SO2 emission (km), must be less than 31 km
+z1=19.d0 ; lower bound of SO2 emission (km)
+z2=27.d0 ; upper bound of SO2 emission (km), must be less than 31 km
 
-TgSO2 = 10.d0 ; Tg of SO2
+TgSO2 = 20.d0 ; Tg of SO2
 
 ; Zonal mean in tropics:
 ;lat1=-10.d0
@@ -17,16 +17,22 @@ TgSO2 = 10.d0 ; Tg of SO2
 ;lon2=357.5d0
 
 ; Spread over 10x10 columns:
-lat1=0.5d0
-lat2=18.5d0
-lon1=96.5d0
-lon2=118.5d0
+;lat1=0.5d0
+;lat2=18.5d0
+;lon1=96.5d0
+;lon2=118.5d0
 
 ; Single column over Pinatubo:
 ;lat1=15.1417d0
 ;lat2=15.1417d0
 ;lon1=120.35d0
 ;lon2=120.35d0
+
+; Single column over Pinatubo:
+lat1=0.0d0
+lat2=20.0d0
+lon1=120.35d0
+lon2=120.35d0
 
 if (lat1.lt.0) then
   latstr1=abs(doubletointeger(lat1))+"S"

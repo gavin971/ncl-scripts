@@ -2,6 +2,7 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
+load "../nuclear/calculateMass.ncl"
 
 ; Constants
 ;
@@ -17,7 +18,8 @@ MWH2O   = 18.000                  ; molecular weight of water vapor
 PTOP    = 100.0                   ; pressure at the top of the model (non-zero) ~ Pa
 REARTH  = 6.37122e6               ; Earth's radius (m)
 DG2RAD  = PI / 180.0              ; rad deg^-1
-MWNH4HSO4 = 115.108999 
+MWNH4HSO4 = 115.108999            ; molecular weight for MAM so4 species (ammonium sulfate)
+MWH2SO4 = 98.078479               ; molecular weight of H2SO4 species
 
 procedure calcAerProp(rootpath:string,filename:string)
 
@@ -33,8 +35,11 @@ begin
   print("  Reading pressure variables ...")
   hyam 	= history->hyam
   hybm 	= history->hybm
+  hyai 	= history->hyai
+  hybi 	= history->hybi
   P0 	= history->P0
   PS 	= history->PS
+  
   if (isfilevar(history,"so4")) then
     print("  Reading so4 ...")
     so4 = history->so4
@@ -52,8 +57,10 @@ begin
     printVarSummary(so4)
     history->so4 = so4
   end if
+  
   if (isfilevar(history,"TMso4")) then
-    print("  Found TMso4 ...")
+    print("  Reading TMso4 ...")
+    TMso4=history->TMso4
   else
     print("  Reading TMso4 variables ...")
     TMso4_a1= history->TMso4_a1        ; kg/kg air
@@ -67,6 +74,7 @@ begin
     printVarSummary(TMso4)
     history->TMso4 = TMso4
   end if
+  
 ;  print("  Reading dgnd variables ...")
 ;  dgnd_a1= history->dgnd_a1      ; diameter (m)
 ;  dgnd_a2= history->dgnd_a2      ; diameter (m)
@@ -94,7 +102,42 @@ begin
     printVarSummary(P)
     history->P = P
   end if
-;  pdel = P(:, 1:nLevs, :, :) - P(:, 0:nLevs-1, :, :)
+  
+  if (isfilevar(history,"TMso4_strat")) then
+    print("  Found TMso4_strat ...")
+;    TMso4_strat = history->TMso4_strat
+;    TMso4_strat = TMso4_strat*MWH2SO4/MWNH4HSO4 ; scale molecular weight
+;    TMso4_strat@method="scaled by 98.078479/115.108999 to adjust mol wt NH4HSO4 to H2SO4"
+;    print("  Saving TMso4_strat ...")
+;    printVarSummary(TMso4_strat)
+;    history->TMso4_strat = TMso4_strat
+  else
+    TMso4_strat=TMso4 ; get metadata and array structure
+    print("  Reading TROP_P ...")
+    tropP= history->TROP_P        ; tropopause pressure
+    print("calculating pdel ...")
+    Pi = pres_hybrid_ccm(PS(:,:,:), P0, hyai(:) ,hybi(:))   
+    nLevs=dimsizes(so4&lev)
+    pdel = Pi(:, 1:nLevs, :, :) - Pi(:, 0:nLevs-1, :, :) ; (time, lev, lat, lon)    
+    cellMass = so4 ; get metadata
+    cellMass = (pdel / G) * so4 ; k/m2 per level
+    nLat=dimsizes(tropP&lat)
+    nLon=dimsizes(tropP&lon)
+    do j = 0,nLat-1
+      do m = 0,nLon-1
+        tp = tropP(0,j,m)
+        TMso4_strat(0,j,m) = dim_sum(cellMass(time|0, lat|j, lon|m, {lev|:tp}))
+      end do
+    end do    
+    delete(cellMass)
+    TMso4_strat=TMso4_strat*MWH2SO4/MWNH4HSO4
+
+    TMso4_strat@long_name="so4 stratospheric column burden"
+    TMso4_strat@method="scaled by 98.078479/115.108999 to adjust mol wt NH4HSO4 to H2SO4"
+    print("  Saving TMso4_strat ...")
+    printVarSummary(TMso4_strat)
+    history->TMso4_strat = TMso4_strat
+  end if
   
   ; Calculate the atmospheric density (g/cm3) assuming an ideal gas.
   if (isfilevar(history,"arhomass")) then
