@@ -1,0 +1,8 @@
+
+varnames = 'so4_a1,so4_a2,so4_a3,so4_nd,so4,P,arhomass,SO2,H2SO4'
+varadd = 'date,hyam,hybm,hyai,hybi,P0,PS,PSL,T'
+
+varlist = varnames + ',' + varadd
+
+ncrcat -v $varlist h0zm/* b.e11.B55TRW5CN.f19_g16.Pin16-20.dgnh10um.noqbo.001.h0zm.sulf.nc
+  
