@@ -3,30 +3,36 @@
 
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
-ascii_path=getenv ("MODEL_PATH")+"/ccsm/solar/daily/"
-cdfpath=getenv ("MODEL_PATH")+"/ccsm/inputdata/atm/cam/solar/"
+;ascii_path=getenv ("MODEL_PATH")+"/ccsm/solar/daily/"
+;cdfpath=getenv ("MODEL_PATH")+"/ccsm/inputdata/atm/cam/solar/"
+ascii_path="/glade/p/work/mmills/inputdata/solar/LeanASCII/"
+cdfpath="/glade/p/work/mmills/inputdata/solar/"
+inputdatapath="/glade/p/cesmdata/cseg/inputdata/atm/cam/solar/"
 
-file1=ascii_path+"spectra_1950_1999d_11yr_new.txt"
+;file1=ascii_path+"spectra_1950_1999d_11yr_new.txt"
 ;file2=ascii_path+"katja_spectra_2000_2011d_28Mar11.txt"
 ;file2=ascii_path+"katja_spectra_2000_2011d_13Apr12.txt"
-file2=ascii_path+"katja_spectra_2000_2012d_13Feb13.txt"
-outfile="spectral_irradiance_Lean_1950-2012_daily"
-creation_date="130227"
+;file2=ascii_path+"katja_spectra_2000_2012d_13Feb13.txt"
+file2=ascii_path+"katja_spectra_1978_2013d_22Aug13_G.txt"
+outfile="spectral_irradiance_Lean_1978-2013_daily_GOME-Mg"
+creation_date = systemfunc("date +%y%m%d")
 calcNoLeap = False
 
 num_ssi_samples = 5*756
 
-nyears1=1999-1950+1
-nleap1=12
+;nyears1=1977-1950+1
+;nleap1=7
+nyears1=0
+nleap1=0
 num_samples_time1 = nyears1*365+nleap1
 
-print ("---------------------------------------------------------") 
-print ("nyears1="+nyears1)
-print ("nleap1="+nleap1)
-print ("num_samples_time1="+num_samples_time1)
+;print ("---------------------------------------------------------") 
+;print ("nyears1="+nyears1)
+;print ("nleap1="+nleap1)
+;print ("num_samples_time1="+num_samples_time1)
 
-nyears2=2012-2000+1
-nleap2=3
+nyears2=2013-1978+1
+nleap2=9
 num_samples_time2 = nyears2*365+nleap2
 
 print ("---------------------------------------------------------") 
@@ -58,15 +64,18 @@ band_width=asciiread(ascii_path+"bandwidths.txt",num_ssi_samples,"double")
 ; First 4 entries for each time are year, month, day, and TSI.
 ; These are followed by SSI for each of num_ssi_samples wavelengths.
 
-solar_data1=asciiread(file1,\
-       (/num_samples_time1, num_ssi_samples +4/),"double")
+;solar_data1=asciiread(file1,\
+;       (/num_samples_time1, num_ssi_samples +4/),"double")
        
-solar_data2=asciiread(file2,\
+;solar_data2=asciiread(file2,\
+;       (/num_samples_time2, num_ssi_samples +4/),"double")
+       
+;solar_data3=new((/num_samples_time3,num_ssi_samples +4/),double)
+;solar_data3(0:num_samples_time1-1,:)=solar_data1
+;solar_data3(num_samples_time1:num_samples_time3-1,:)=solar_data2
+
+solar_data3=asciiread(file2,\
        (/num_samples_time2, num_ssi_samples +4/),"double")
-       
-solar_data3=new((/num_samples_time3,num_ssi_samples +4/),double)
-solar_data3(0:num_samples_time1-1,:)=solar_data1
-solar_data3(num_samples_time1:num_samples_time3-1,:)=solar_data2
 
 solar_data=new((/num_samples_time3,num_ssi_samples +4/),double)
 
@@ -87,8 +96,8 @@ do i = 0, num_samples_time3-1
   end if
 end do
 
-delete(solar_data1)
-delete(solar_data2)
+;delete(solar_data1)
+;delete(solar_data2)
 delete(solar_data3)
 
 print("j="+j+", num_samples_time3="+num_samples_time3)
@@ -144,10 +153,10 @@ ssi = solar_data(0:j-1,4:)
  print ("verify first ssi at first time: "+ssi(0,0))
  print ("verify last ssi at first time: "+ssi(0,num_ssi_samples-1))
  print ("---------------------------------------------------------")
- print ("verify last date, first file: "+date(nyears1*365-1))
- print ("verify last tsi, first file: "+sprintf("%11.6f",tsi(nyears1*365-1)))
- print ("verify last ssi, last date, first file: "+ssi(nyears1*365-1,num_ssi_samples-1))
- print ("---------------------------------------------------------") 
+; print ("verify last date, first file: "+date(nyears1*365-1))
+; print ("verify last tsi, first file: "+sprintf("%11.6f",tsi(nyears1*365-1)))
+; print ("verify last ssi, last date, first file: "+ssi(nyears1*365-1,num_ssi_samples-1))
+; print ("---------------------------------------------------------") 
  print ("verify first date, second file: "+date(nyears1*365))
  print ("verify first tsi, second file: "+sprintf("%11.6f",tsi(nyears1*365)))
  print ("verify first ssi at first time, second file: "+ssi(nyears1*365,0))
@@ -167,7 +176,7 @@ ssi = solar_data(0:j-1,4:)
  print("creating file "+filename)
  ncf = addfile(filename,"c")
 
- ncf_ann = addfile(cdfpath+"spectral_irradiance_Lean_1610-2140_ann_c100408.nc","r")
+ ncf_ann = addfile(inputdatapath+"spectral_irradiance_Lean_1610-2140_ann_c100408.nc","r")
  
 ; Create an UNLIMITED record dimension in the output netCDF file.  This is critical if 
 ;  the user plans to ever use NCO to concatenate the file along the time/record dimension.
@@ -208,7 +217,9 @@ ssi = solar_data(0:j-1,4:)
        "with more uncertainty in the spectral irradiance changes which are determined in 1 "+nl+\
        "nm bins.  Integrated SSI is therefore varies slightly from TSI."+nl+\
        "Reference spectral and total irradiances derived from average over years 1834-1867 (solar"+nl+\
-       "cycles 8-10) using annual average data (spectral_irradiance_Lean_1610-2140_ann_c100405.nc)"
+       "cycles 8-10) using annual average data (spectral_irradiance_Lean_1610-2140_ann_c100405.nc)"+nl+\
+       "Unlike previous Lean data, this uses GOME Mg index for the facular component, giving"+nl+\ 
+       "slightly different values during the past two solar minima."
 
   fileattdef( ncf, globalAtt )
  

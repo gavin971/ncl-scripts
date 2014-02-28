@@ -14,9 +14,13 @@ begin
 ;              "f.e12.FSDW5.f19_f19.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
 ;              "f.e12.FSDW5.f19_f19.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
 ;              "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
+;  caseid = (/  \
+;              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002", \
+;              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002", \
+;              "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
   caseid = (/  \
-              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002", \
-              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002", \
+              "f.e12.FSDW5.f19_f19.Pin20Tg.19-27km.0-20N.120E.QBOon.001", \
+              "f.e12.FSDW5.f19_f19.Pin20Tg.19-27km.0-20N.120E.QBOon.001", \
               "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
   
 ;  yearString = (/ "1991_06-12", "1992", "2006-07" /)
