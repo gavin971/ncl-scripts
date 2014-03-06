@@ -25,6 +25,11 @@ do year = year1, year2
     i=i+1
   end do 
 end do
+
+; Adjust first and last date to cover full range of model run:
+date(0) = year1*10000+101
+date(i-1) = (year2+1)*10000+102
+
 a->date=(/date/)
 delete(a)
   
