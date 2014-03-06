@@ -44,6 +44,8 @@ avgname=$ensemble'.avg'
 echo "avgname = $avgname"
 echo "hnum = $hnum"
 
+exclude = ""
+
 if [ $caseid = 'bc5tgIP' ] ; then
   ensname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.00[367]'
   avgname='b40.rcp4_5.2deg.wcm.carma.bc5tgIP.avg'
@@ -64,6 +66,18 @@ if [ $caseid = 'bc0tg' ] ; then
   if [ ! -n "$year2" ] ; then
     year2=2022
   fi
+fi
+
+if [ $caseid = 'rcp85' ] ; then
+  ensname='b40.rcp8_5.2deg.wcm.00[345]'
+  avgname='b40.rcp8_5.2deg.wcm.avg'
+  if [ ! -n "$year1" ] ; then
+    year1=2051
+  fi
+  if [ ! -n "$year2" ] ; then
+    year2=2055
+  fi
+  exclude=HNO3_CD1,HNO3_CD3,NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_ocar3,ODV_sulf
 fi
 
 if [ ! -n "$year1" ] ; then
@@ -91,13 +105,15 @@ if [ ! -n "$hnum" ] ; then
   hnum='h0'
 fi
 
-wadir=$rootpath'/'$ensname'/atm/proc/'$hnum
+wadir=$rootpath'/'$ensname'/atm/hist/'
+avgdir=$outpath'/'$avgname'/atm/hist/'
+#wadir=$rootpath'/'$ensname'/atm/proc/'$hnum
 #wadir2=$rootpath'/'$ensname2'/'$hnum
-avgdir=$outpath'/'$avgname'/atm/proc/'$hnum
-if [[ ! -e $wadir ]];then
-  wadir=$rootpath'/'$ensname'/'$hnum
-  avgdir=$outpath'/'$avgname'/'$hnum
-fi
+#avgdir=$outpath'/'$avgname'/atm/proc/'$hnum
+#if [[ ! -e $wadir ]];then
+#  wadir=$rootpath'/'$ensname'/'$hnum
+#  avgdir=$outpath'/'$avgname'/'$hnum
+#fi
 
 searchstr='cam2.'$hnum
 
@@ -156,8 +172,8 @@ while [[ $year -le $year2 ]];do
 #    ncks -O -x -v NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_sulf $ncfiles $ncfiles_tmp
 
    # create ensemble mean
-    echo ncea $ncfiles $avgfile
-    ncea -O $ncfiles $avgfile
+    echo ncea -x -v $exclude $ncfiles $avgfile
+    ncea -O -x -v $exclude $ncfiles $avgfile
 
 #    echo ncea $ncfiles_tmp $ncfiles2 $avgfile
 #    ncea -O $ncfiles_tmp $ncfiles2 $avgfile
