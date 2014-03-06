@@ -80,6 +80,18 @@ if [ $caseid = 'rcp85' ] ; then
   exclude=HNO3_CD1,HNO3_CD3,NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_ocar3,ODV_sulf
 fi
 
+if [ $caseid = 'rcp26' ] ; then
+  ensname='b40.rcp8_5.2deg.wcm.00[234]'
+  avgname='b40.rcp8_5.2deg.wcm.avg'
+  if [ ! -n "$year1" ] ; then
+    year1=2051
+  fi
+  if [ ! -n "$year2" ] ; then
+    year2=2055
+  fi
+  exclude=HNO3_CD1,HNO3_CD3,NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_ocar3,ODV_sulf
+fi
+
 if [ ! -n "$year1" ] ; then
   year1=1991
 fi

@@ -87,6 +87,8 @@ if  [ -n "$caseid" ] ; then
   echo "mkdir -p $outdir"
   mkdir -p $outdir
   
+  echo " "
+  echo "cd $wadir"
   cd $wadir
   echo " "
   echo "working directory:"
