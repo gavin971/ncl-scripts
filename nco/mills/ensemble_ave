@@ -92,6 +92,63 @@ if [ $caseid = 'rcp26' ] ; then
   exclude=HNO3_CD1,HNO3_CD3,NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_ocar3,ODV_sulf
 fi
 
+if [ $caseid = 'rcp45' ] ; then
+  ensname='b40.rcp4_5.2deg.wcm.001'
+  ensname2='b.e10.BRCP45WCN.f19_g16.00[34]'
+  avgname='b40.rcp4_5.2deg.wcm.avg'
+  rootpath='/glade/p/cesm/wawg/runs/ccsm4_0/'
+  rootpath2='/glade/p/cesm/wawg/runs/cesm1_0/'
+  hnum='h0zm'
+  wadir=$rootpath'/'$ensname'/atm/proc/'$hnum
+  wadir2=$rootpath2'/'$ensname2'/atm/proc/'$hnum
+  avgdir=$rootpath'/'$avgname'/atm/proc/'$hnum
+  if [ ! -n "$year1" ] ; then
+    year1=2066
+  fi
+  if [ ! -n "$year2" ] ; then
+    year2=2099
+  fi
+  exclude=HNO3_CD1,HNO3_CD3,NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_ocar3,ODV_sulf
+fi
+
+if [ $caseid = 'rcp85b' ] ; then
+  ensname='b40.rcp8_5.2deg.wcm.00[34]'
+  ensname2='b.e10.BRCP85WCN.f19_g16.005'
+  avgname='b40.rcp8_5.2deg.wcm.avg'
+  rootpath='/glade/p/cesm/wawg/runs/ccsm4_0/'
+  rootpath2='/glade/p/cesm/wawg/runs/cesm1_0/'
+  hnum='h0zm'
+  wadir=$rootpath'/'$ensname'/atm/proc/'$hnum
+  wadir2=$rootpath2'/'$ensname2'/atm/proc/'$hnum
+  avgdir=$rootpath'/'$avgname'/atm/proc/'$hnum
+  if [ ! -n "$year1" ] ; then
+    year1=2051
+  fi
+  if [ ! -n "$year2" ] ; then
+    year2=2055
+  fi
+  exclude=HNO3_CD1,HNO3_CD3,NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_ocar3,ODV_sulf
+fi
+
+if [ $caseid = 'rcp85c' ] ; then
+  ensname='b40.rcp8_5.2deg.wcm.003'
+  ensname2='b.e10.BRCP85WCN.f19_g16.00[45]'
+  avgname='b40.rcp8_5.2deg.wcm.avg'
+  rootpath='/glade/p/cesm/wawg/runs/ccsm4_0/'
+  rootpath2='/glade/p/cesm/wawg/runs/cesm1_0/'
+  hnum='h0zm'
+  wadir=$rootpath'/'$ensname'/atm/proc/'$hnum
+  wadir2=$rootpath2'/'$ensname2'/atm/proc/'$hnum
+  avgdir=$rootpath'/'$avgname'/atm/proc/'$hnum
+  if [ ! -n "$year1" ] ; then
+    year1=2056
+  fi
+  if [ ! -n "$year2" ] ; then
+    year2=2099
+  fi
+  exclude=HNO3_CD1,HNO3_CD3,NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_ocar3,ODV_sulf
+fi
+
 if [ ! -n "$year1" ] ; then
   year1=1991
 fi
@@ -117,8 +174,14 @@ if [ ! -n "$hnum" ] ; then
   hnum='h0'
 fi
 
-wadir=$rootpath'/'$ensname'/atm/hist/'
-avgdir=$outpath'/'$avgname'/atm/hist/'
+if [ ! -n "$wadir" ] ; then
+  wadir=$rootpath'/'$ensname'/atm/hist/'
+fi
+
+if [ ! -n "$avgdir" ] ; then
+  avgdir=$outpath'/'$avgname'/atm/hist/'
+fi
+
 #wadir=$rootpath'/'$ensname'/atm/proc/'$hnum
 #wadir2=$rootpath'/'$ensname2'/'$hnum
 #avgdir=$outpath'/'$avgname'/atm/proc/'$hnum
@@ -168,7 +231,9 @@ while [[ $year -le $year2 ]];do
     ncfiles=$wadir'/'$ensname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
 #    ncfiles_rename=$wadir'/'$hno3_rename'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
 #    ncfiles_tmp=$wadir'/'$ensname'.'$searchstr'.'$yearstr'-'$monthstr'_tmp.nc'
-#    ncfiles2=$wadir2'/'$ensname2'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
+    if [ -n "$wadir2" ] ; then
+      ncfiles2=$wadir2'/'$ensname2'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
+    fi
     avgfile=$avgdir'/'$avgname'.'$searchstr'.'$yearstr'-'$monthstr'.nc'
 
     # "delete" missing variable to temporary file
@@ -184,8 +249,13 @@ while [[ $year -le $year2 ]];do
 #    ncks -O -x -v NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_sulf $ncfiles $ncfiles_tmp
 
    # create ensemble mean
-    echo ncea -x -v $exclude $ncfiles $avgfile
-    ncea -O -x -v $exclude $ncfiles $avgfile
+    if [ -n "$wadir2" ] ; then
+      echo ncea -x -v $exclude $ncfiles $ncfiles2 $avgfile
+      ncea -O -x -v $exclude $ncfiles $ncfiles2 $avgfile
+    else
+      echo ncea -x -v $exclude $ncfiles $avgfile
+      ncea -O -x -v $exclude $ncfiles $avgfile
+    fi
 
 #    echo ncea $ncfiles_tmp $ncfiles2 $avgfile
 #    ncea -O $ncfiles_tmp $ncfiles2 $avgfile
