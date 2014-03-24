@@ -234,7 +234,8 @@ begin
     sigma1=1.6
     sigma2=1.6
 ;    sigma3=1.8
-    sigma3=1.4
+;    sigma3=1.4
+    sigma3=1.2
     
     delete(diam1)
     delete(diam2)

@@ -24,11 +24,13 @@ begin
 ;              "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
   caseid = (/  \
               "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001", \
+              "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001", \
               "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001", \
-              "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
+              "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001" \
+               /)
   
 ;  yearString = (/ "1991_06-12", "1992", "2006-07" /)
-  yearString = (/ "1991_06-12", "1992_01-08", "2006-07" /)
+  yearString = (/ "1992-93", "1992-93", "1996-97", "1996-97" /)
   
   nCases = dimsizes(caseid)
   
@@ -38,20 +40,26 @@ begin
     if (i.eq.0) then
       DpMean=a->diameter
       nBins=dimsizes(DpMean)
+      nB=nBins-1
       N2Obounds=a->N2Oppb
       nRanges=dimsizes(N2Obounds)-1
       dVdlog10Dp_avg=new((/nCases,nRanges,nBins/),"float")
       dVdlog10Dp_avg!2="diameter"
       dVdlog10Dp_avg&diameter=DpMean
       dVdlog10Dp_std=dVdlog10Dp_avg
+    else  
+      nB=dimsizes(a->diameter)
+      nB=nB-1
     end if
     
-    dVdlog10Dp_avg(i,:,:)=a->dVdlog10Dp_avg
-    dVdlog10Dp_std(i,:,:)=a->dVdlog10Dp_std
+    dVdlog10Dp_avg(i,:,:nB)=a->dVdlog10Dp_avg
+    dVdlog10Dp_std(i,:,:nB)=a->dVdlog10Dp_std
   
   end do
+  
+  datestr = systemfunc("date +%y%m%d_%H%M")
               
-  pdffile="SizeDistN2O_multi_"+caseid(0)
+  pdffile="SizeDistN2O_multi_"+caseid(0)+"_c"+datestr
   wks   = gsn_open_wks ("pdf", "$IMAGE_PATH/"+pdffile)                   ; open workstation
   res=True
   res@vpHeightF             = 0.4              ; change aspect ratio
@@ -64,8 +72,9 @@ begin
   res@trYMinF=-0.2
   res@trYMaxF=3.1
   res@xyMonoLineColor = False
-  res@xyLineColors    = (/"red","green3","blue"/)
-  res@xyMonoDashPattern = True
+  res@xyLineColors    = (/"red","red","green3","green3","blue"/)
+  res@xyMonoDashPattern = False
+  res@xyDashPatterns = (/1,0,1,0,0/)
   res@xyLineThicknessF = 4.0
   res@tiXAxisString = "Particle Diameter, Dp, ~F33~m~FR~m"
   res@tiYAxisString = "dV/dLog~B~10~N~Dp, normalized"

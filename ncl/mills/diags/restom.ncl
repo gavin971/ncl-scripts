@@ -64,6 +64,7 @@ else
   nyears=dimsizes(infiles)/12
   print("nyears="+nyears)
 
+  nyears_a=0
   if (isfilepresent(savefile)) then
 
     print("reading "+savefile)
@@ -74,12 +75,19 @@ else
     ts_land_ann_w_a=b->ts_land_ann_w
     sst_ann_w_a=b->sst_ann_w
 
-    nyears_a = dimsizes(year_a)
-  else
-    nyears_a=0
+    ; query if clearsky restom exists
+    if (isfilevar(b,"restom_ann_w_c")) then
+      print("found restom_ann_w_c")
+      restom_ann_w_c_a=b->restom_ann_w_c
+      flnt_ann_w_c_a=b->flnt_ann_w_c
+      flntc_ann_w_c_a=b->flntc_ann_w_c
+      fsnt_ann_w_c_a=b->fsnt_ann_w_c
+      fsntc_ann_w_c_a=b->fsntc_ann_w_c
+      nyears_a = dimsizes(year_a)
+    end if
   end if
 
-  if (nyears_a.ge.nyears) then ; use only savefile if it has all history years
+  if ((nyears_a.ge.nyears)) then ; use only savefile if it has all history years
 
     year=year_a
     restom_ann_w=restom_ann_w_a
@@ -95,6 +103,8 @@ else
   ;  print(fin->date)
     fsnt = fin->FSNT
     flnt = fin->FLNT
+    fsntc = fin->FSNTC
+    flntc = fin->FLNTC
     ts = fin->TS
     landfrac = fin->LANDFRAC
     year_in = fin->date ; get record coordinate
@@ -114,6 +124,16 @@ else
       temp=flnt
       delete(flnt)
       flnt = array_append_record(temp,fin->FLNT,0)
+      delete(temp)
+
+      temp=fsntc
+      delete(fsntc)
+      fsntc = array_append_record(temp,fin->FSNTC,0)
+      delete(temp)
+
+      temp=flntc
+      delete(flntc)
+      flntc = array_append_record(temp,fin->FLNTC,0)
       delete(temp)
 
       temp=ts
@@ -148,33 +168,66 @@ else
     inptr_gw = addfile(infiles(0),"r")
     gw1  = inptr_gw->gw
 
+    ; calculate restom
     restom = fsnt
     restom = (/fsnt-flnt/)
 
+    ; calculate clearsky restom
+    restom_c = fsntc
+    restom_c = (/fsntc-flntc/)
+
+    ; weighted global average
     restom_w = wgt_areaave(restom,gw1,1.0,0) 
+    restom_w_c = wgt_areaave(restom_c,gw1,1.0,0) 
+    flnt_w = wgt_areaave(flnt,gw1,1.0,0) 
+    flntc_w = wgt_areaave(flntc,gw1,1.0,0) 
+    fsnt_w = wgt_areaave(fsnt,gw1,1.0,0) 
+    fsntc_w = wgt_areaave(fsntc,gw1,1.0,0) 
+    ts_w = wgt_areaave(ts,gw1,1.0,0) 
+    sst_w = wgt_areaave(sst,gw1,1.0,0) 
+    ts_land_w = wgt_areaave(ts_land,gw1,1.0,0) 
+    
+    ; create annual average arrays
     restom_ann_w = new(nyears,typeof(restom_w))
     restom_ann_w = 0.
 
-    ts_w = wgt_areaave(ts,gw1,1.0,0) 
+    restom_ann_w_c = new(nyears,typeof(restom_w_c))
+    restom_ann_w_c = 0.
+
+    flnt_ann_w = new(nyears,typeof(flnt_w))
+    flnt_ann_w = 0.
+
+    fsnt_ann_w = new(nyears,typeof(fsnt_w))
+    fsnt_ann_w = 0.
+
+    flntc_ann_w = new(nyears,typeof(flntc_w))
+    flntc_ann_w = 0.
+
+    fsntc_ann_w = new(nyears,typeof(fsntc_w))
+    fsntc_ann_w = 0.
+
     ts_ann_w = new(nyears,typeof(ts_w))
     ts_ann_w = 0.
 
-    sst_w = wgt_areaave(sst,gw1,1.0,0) 
     sst_ann_w = new(nyears,typeof(sst_w))
     sst_ann_w = 0.
 
-    ts_land_w = wgt_areaave(ts_land,gw1,1.0,0) 
     ts_land_ann_w = new(nyears,typeof(ts_land_w))
     ts_land_ann_w = 0.
 
     year = new(nyears,integer)
 
     if (nyears_a.gt.0) then
-        restom_ann_w(0:nyears_a-1) = restom_ann_w_a
-        ts_ann_w(0:nyears_a-1) = ts_ann_w_a
-        sst_ann_w(0:nyears_a-1) = sst_ann_w_a
-        ts_land_ann_w(0:nyears_a-1) = ts_land_ann_w_a
-        year(0:nyears_a-1) = year_a
+      restom_ann_w(0:nyears_a-1) = restom_ann_w_a
+      restom_ann_w_c(0:nyears_a-1) = restom_ann_w_c_a
+      ts_ann_w(0:nyears_a-1) = ts_ann_w_a
+      sst_ann_w(0:nyears_a-1) = sst_ann_w_a
+      ts_land_ann_w(0:nyears_a-1) = ts_land_ann_w_a
+      year(0:nyears_a-1) = year_a
+      flnt_ann_w(0:nyears_a-1) = flnt_ann_w_a
+      flntc_ann_w(0:nyears_a-1) = flntc_ann_w_a
+      fsnt_ann_w(0:nyears_a-1) = fsnt_ann_w_a
+      fsntc_ann_w(0:nyears_a-1) = fsntc_ann_w_a
     end if
 
     do iyr=nyears_a,nyears-1
@@ -183,14 +236,22 @@ else
       year(iyr)=year_in(iyr2*12)
       do imonth=0,11
         restom_ann_w(iyr) = mon_wgt(imonth)*dim_avg(restom_w(iyr2*12+imonth))+restom_ann_w(iyr)
+        restom_ann_w_c(iyr) = mon_wgt(imonth)*dim_avg(restom_w_c(iyr2*12+imonth))+restom_ann_w_c(iyr)
         ts_ann_w(iyr) = mon_wgt(imonth)*dim_avg(ts_w(iyr2*12+imonth))+ts_ann_w(iyr)
         sst_ann_w(iyr) = mon_wgt(imonth)*dim_avg(sst_w(iyr2*12+imonth))+sst_ann_w(iyr)
         ts_land_ann_w(iyr) = mon_wgt(imonth)*dim_avg(ts_land_w(iyr2*12+imonth))+ts_land_ann_w(iyr)
+        flnt_ann_w(iyr) = mon_wgt(imonth)*dim_avg(flnt_w(iyr2*12+imonth))+flnt_ann_w(iyr)
+        flntc_ann_w(iyr) = mon_wgt(imonth)*dim_avg(flntc_w(iyr2*12+imonth))+flntc_ann_w(iyr)
+        fsnt_ann_w(iyr) = mon_wgt(imonth)*dim_avg(fsnt_w(iyr2*12+imonth))+fsnt_ann_w(iyr)
+        fsntc_ann_w(iyr) = mon_wgt(imonth)*dim_avg(fsntc_w(iyr2*12+imonth))+fsntc_ann_w(iyr)
       end do
     end do
 
     restom_ann_w!0="year"
     restom_ann_w&year=year
+
+    restom_ann_w_c!0="year"
+    restom_ann_w_c&year=year
 
     ts_ann_w!0="year"
     ts_ann_w&year=year
@@ -211,9 +272,14 @@ else
     b = addfile(savefile,"c")
     b->year=year
     b->restom_ann_w=restom_ann_w
+    b->restom_ann_w_c=restom_ann_w_c
     b->ts_ann_w=ts_ann_w
     b->ts_land_ann_w=ts_land_ann_w
     b->sst_ann_w=sst_ann_w
+    b->flnt_ann_w=flnt_ann_w
+    b->flntc_ann_w=flntc_ann_w
+    b->fsnt_ann_w=fsnt_ann_w
+    b->fsntc_ann_w=fsntc_ann_w
 
   end if
 

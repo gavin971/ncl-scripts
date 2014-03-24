@@ -40,13 +40,14 @@ begin
               0.446997661,0.508830634,0.579216934,0.659339737,0.750545889, \
               0.854368544,0.972552939,1.107085724,1.260228365,1.434555155, \
               1.632996487,1.858888114,2.116027222,2.40873626,2.741935601, \
-              3.121226247 /)
+              3.121226247,3.5, 4. , 4.5, 5. /)
   DpMean@units="um"
   
   nBins = dimsizes(DpMean)
   log10DpMean = log10(DpMean)
 
-  sigmag=(/1.6, 1.6, 1.8/) ; geometric standard deviations for 3 MAM3 modes
+;  sigmag=(/1.6, 1.6, 1.8/) ; geometric standard deviations for 3 MAM3 modes
+  sigmag=(/1.6, 1.6, 1.2/) ; geometric standard deviations for 3 MAM3 modes
   log10sigmag=log10(sigmag)
     
   N2Oppb2=N2Oppb(0:nRanges-1)
@@ -177,21 +178,17 @@ end
 
 ;caseid = "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003"
 ;caseid = "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001"
-;yearPattern = "199[23]"
-;yearString = "1992-93"
-;yearPattern = "199[67]"
-;yearString = "1996-97"
 
 ;caseid = "b.e12.B55TRW5CN.f19_g16.Pin20Tg.22-26km.1col.QBOon.001"
 ;caseid = "f.e12.FSDW5.f19_f19.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001"
 ;caseid = "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002"
 ;caseid = "f.e12.FSDW5.f19_f19.Pin20Tg.19-27km.0-20N.120E.QBOon.001"
-caseid = "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001"
-yearPattern = "1992"
-yearString = "1992_01-08"
-;yearString = "1992"
-;yearPattern = "1991"
-;yearString = "1991_06-12"
+;caseid = "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001"
+caseid = "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001"
+;yearPattern = "199[23]"
+;yearString = "1992-93"
+yearPattern = "199[67]"
+yearString = "1996-97"
 
 ;dgVar = "dgnumwet"
 dgVar = "dgnd_a0"

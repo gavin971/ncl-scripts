@@ -6,9 +6,9 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 rootpath="/glade/scratch/mmills/archive/"
 runs=(/"f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001",\
        "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001",\
-       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002",\
-       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003",\
-       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.hetchem.002"/)
+       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.hetchem.002",\
+       "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001", \
+       "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001"/)
 
 
 ;       "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.10S-20N.zavg.QBOon.001",\
@@ -16,7 +16,7 @@ runs=(/"f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001",\
        
 nRuns=dimsizes(runs)
 
-datadir="/glade/p/work/mmills/inputdata/"
+datadir="/glade/p/work/mmills/inputdata/sulf/"
 
 tropicsfile="CESM_1991_1995_sad_V2_sum_gw_SO2_TROPZ_tropicsavg.nc"
 NETfile="CESM_1991_1995_sad_V2_sum_gw_SO2_TROPZ_NETavg.nc"
@@ -76,7 +76,8 @@ time=fspan(month1,month2,nMonths)
 ; Plot the data.
 pdfpath="$IMG_PATH/"
 a = systemfunc("mkdir -p "+pdfpath)
-pdffile=pdfpath+"ExtVsSAGEv7"
+datestr = systemfunc("date +%y%m%d_%H%M")
+pdffile=pdfpath+"ExtVsSAGEv7_c"+datestr
 print("Creating file "+pdffile+".pdf")
 wks  = gsn_open_wks("pdf", pdffile)    ; open a ncgm file
 
@@ -89,8 +90,8 @@ res@vpWidthF              = 1.0
 res@xyLineThicknessF  = 4.0
 res@xyMonoDashPattern = True
 res@xyMonoLineColor   = False
-res@xyLineColors       = (/"black","red","blue","blue","blue","green"/)
-;res@xyLineColors       = (/"black","red","blue","orange","green"/)
+;res@xyLineColors       = (/"black","red","blue","blue","blue","green"/)
+res@xyLineColors       = (/"black","red","blue","orange","green","brown"/)
 res@trXMinF = 1991.5
 res@trXMaxF = time(nMonths-1)
 res@tmXBMinorPerMajor = 11
