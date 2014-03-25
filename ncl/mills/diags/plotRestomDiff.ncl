@@ -21,6 +21,7 @@ do i = 0, nCases-1
   if (i.eq.0) then
     year=a->year
     print(year)
+    nY=nYears
     restom=new((/nCases,nYears/),typeof(r1))
     restomc=restom
     flnt=restom
@@ -42,11 +43,6 @@ do i = 0, nCases-1
   end if
   delete(r1)
 end do
-
-print(restom)
-print(restomc)
-print(restom_diff)
-print(restomc_diff)
 
 image_path=getenv("IMAGE_PATH")
 pdffile=image_path+"/RESTOM_diff"
@@ -71,6 +67,15 @@ res@xyLineThicknessF = 3
 res@tiMainString = "RESTOM, expt-cntl"
 plot(0) = gsn_csm_xy (wks,year,restom_diff,res)
 
+txres = True
+txres@txFontHeightF = 0.04                     ; font smaller. default big
+txres@txFontColor="green"
+text1=gsn_add_text(wks,plot(0),"1 Tg/yr",2009,0.5,txres)
+txres@txFontColor="blue"
+text2=gsn_add_text(wks,plot(0),"2 Tg/yr",2009,0.2,txres)
+txres@txFontColor="red"
+text4=gsn_add_text(wks,plot(0),"4 Tg/yr",2009,-0.1,txres)
+
 res@tiMainString = "Clearsky RESTOM, expt-cntl"
 plot(3) = gsn_csm_xy (wks,year,restomc_diff,res)
 
@@ -84,8 +89,27 @@ plot(5) = gsn_csm_xy (wks,year,fsntc,res)
 
 res@tiMainString = "Longwave net, Top Of Model"
 plot(1) = gsn_csm_xy (wks,year,flnt,res)
+txres@txFontColor="black"
+text0=gsn_add_text(wks,plot(1),"control",2009,236.1,txres)
 
 res@tiMainString = "Shortwave net, TOM"
 plot(2) = gsn_csm_xy (wks,year,fsnt,res)
 
 gsn_panel(wks, plot, (/ 2, 3 /), resP)
+
+delete(wks)
+
+do i = 0,nCases-1
+  print("=====================================")
+  print((/caseid(i)/))
+  print("YEAR  RESTOMC  FLNTC    FSNTC    RESTOMC_diff")
+  if (i.eq.0) then
+    print(year(:)+"  "+restomc(i,:)+"  "+flntc(i,:)+"  "+fsntc(i,:))
+  else
+    print(year(:)+"  "+restomc(i,:)+"  "+flntc(i,:)+"  "+fsntc(i,:)+"  "+restomc_diff(i-1,:))
+  end if
+end do
+
+print("evince "+pdffile+".pdf")
+evincer=systemfunc("evince " + pdffile + ".pdf &")
+print(evincer)
