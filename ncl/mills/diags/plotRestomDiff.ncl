@@ -23,11 +23,19 @@ do i = 0, nCases-1
     print(year)
     restom=new((/nCases,nYears/),typeof(r1))
     restomc=restom
+    flnt=restom
+    fsnt=restom
+    flntc=restom
+    fsntc=restom
     restom_diff=new((/nCases-1,nYears/),typeof(r1))
     restomc_diff=restom_diff
   end if
   restom(i,0:nYears-1)=r1
   restomc(i,0:nYears-1)=a->restom_ann_w_c
+  flntc(i,0:nYears-1)=a->flntc_ann_w
+  fsntc(i,0:nYears-1)=a->fsntc_ann_w
+  flnt(i,0:nYears-1)=a->flnt_ann_w
+  fsnt(i,0:nYears-1)=a->fsnt_ann_w
   if (i.ne.0) then
     restom_diff(i-1,:)=restom(i,:)-restom(0,:)
     restomc_diff(i-1,:)=restomc(i,:)-restomc(0,:)
@@ -45,7 +53,7 @@ pdffile=image_path+"/RESTOM_diff"
 print("Creating PDF file "+pdffile+".pdf")
 wks   = gsn_open_wks ("pdf", pdffile)
   
-plot = new(2, graphic)
+plot = new(6, graphic)
 
 resP                       = True
 resP@gsnMaximize           = True            ; expand plot size to maximum
@@ -60,8 +68,24 @@ res@xyMonoLineColor = False
 res@xyLineColors = (/"green","blue","red"/)
 res@xyLineThicknessF = 3
 
+res@tiMainString = "RESTOM, expt-cntl"
 plot(0) = gsn_csm_xy (wks,year,restom_diff,res)
 
-plot(1) = gsn_csm_xy (wks,year,restomc_diff,res)
+res@tiMainString = "Clearsky RESTOM, expt-cntl"
+plot(3) = gsn_csm_xy (wks,year,restomc_diff,res)
 
-gsn_panel(wks, plot, (/ 1, 2 /), resP)
+delete(res@xyLineColors)
+res@xyLineColors = (/"black","green","blue","red"/)
+res@tiMainString = "Clearsky LW net, TOM"
+plot(4) = gsn_csm_xy (wks,year,flntc,res)
+
+res@tiMainString = "Clearsky SW net, TOM"
+plot(5) = gsn_csm_xy (wks,year,fsntc,res)
+
+res@tiMainString = "Longwave net, Top Of Model"
+plot(1) = gsn_csm_xy (wks,year,flnt,res)
+
+res@tiMainString = "Shortwave net, TOM"
+plot(2) = gsn_csm_xy (wks,year,fsnt,res)
+
+gsn_panel(wks, plot, (/ 2, 3 /), resP)

@@ -79,10 +79,10 @@ else
     if (isfilevar(b,"restom_ann_w_c")) then
       print("found restom_ann_w_c")
       restom_ann_w_c_a=b->restom_ann_w_c
-      flnt_ann_w_c_a=b->flnt_ann_w_c
-      flntc_ann_w_c_a=b->flntc_ann_w_c
-      fsnt_ann_w_c_a=b->fsnt_ann_w_c
-      fsntc_ann_w_c_a=b->fsntc_ann_w_c
+      flnt_ann_w_a=b->flnt_ann_w
+      flntc_ann_w_a=b->flntc_ann_w
+      fsnt_ann_w_a=b->fsnt_ann_w
+      fsntc_ann_w_a=b->fsntc_ann_w
       nyears_a = dimsizes(year_a)
     end if
   end if
