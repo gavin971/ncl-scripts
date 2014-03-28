@@ -8,7 +8,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 z1=22.d0 ; lower bound of SO2 emission (km)
 z2=23.d0 ; upper bound of SO2 emission (km), must be less than 31 km
 
-TgSO2 = 4.d0 ; Tg of SO2/year
+TgSO2 = 10.d0 ; Tg of SO2/year
 
 ; Single column over Pinatubo:
 lat1=0.9473648d0
@@ -106,7 +106,11 @@ print("volume="+volume+" cm3")
 rate = molecSO2 / 86400. / 365. / volume ; molec/cm3/s
 print("rate="+rate+" molec/cm3/s")
 
-date = (/ 18490115, 21001215 /)
+; include 12 month cycle for INTERP_MISSING_MONTHS structure
+date = (/ 18490115, 18490215, 18490315, 18490415, 18490515, 18490615, \
+          18490715, 18490815, 18490915, 18491015, 18491115, 18491215, \
+          21000115, 21000215, 21000315, 21000415, 21000515, 21000615, \
+          21000715, 21000815, 21000915, 21001015, 21001115, 21001215 /)
 date!0="time"
 
 altitude= (/ z1/2., z1+(z2-z1)/2.0, z2+(31.0-z2)/2.0 /)

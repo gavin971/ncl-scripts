@@ -8,7 +8,8 @@ rootpath="/glade/scratch/mmills/archive/"
 caseid = (/ "b.e12.BRCP45W5CN.f19_g16.hifreq.001", \
             "b.e12.BRCP45W5CN.f19_g16.geo01Tgpy.001", \
             "b.e12.BRCP45W5CN.f19_g16.geo02Tgpy.001", \
-            "b.e12.BRCP45W5CN.f19_g16.geo04Tgpy.001" /)
+            "b.e12.BRCP45W5CN.f19_g16.geo04Tgpy.001", \
+            "b.e12.BRCP45W5CN.f19_g16.geo10Tgpy.001" /)
 
 nCases = dimsizes(caseid)
 
@@ -61,26 +62,28 @@ res@gsnFrame           = False   ; Don't advance the frame
 
 res@xyMonoDashPattern = True
 res@xyMonoLineColor = False
-res@xyLineColors = (/"green","blue","red"/)
+res@xyLineColors = (/"green","blue","red","brown"/)
 res@xyLineThicknessF = 3
 
 res@tiMainString = "RESTOM, expt-cntl"
 plot(0) = gsn_csm_xy (wks,year,restom_diff,res)
 
 txres = True
-txres@txFontHeightF = 0.04                     ; font smaller. default big
+txres@txFontHeightF = 0.03                     ; font smaller. default big
 txres@txFontColor="green"
-text1=gsn_add_text(wks,plot(0),"1 Tg/yr",2009,0.5,txres)
+text1=gsn_add_text(wks,plot(0),"1 Tg/yr",2009,0.6,txres)
 txres@txFontColor="blue"
-text2=gsn_add_text(wks,plot(0),"2 Tg/yr",2009,0.2,txres)
+text2=gsn_add_text(wks,plot(0),"2 Tg/yr",2009,0.3,txres)
 txres@txFontColor="red"
-text4=gsn_add_text(wks,plot(0),"4 Tg/yr",2009,-0.1,txres)
+text4=gsn_add_text(wks,plot(0),"4 Tg/yr",2009,0.0,txres)
+txres@txFontColor="brown"
+text4=gsn_add_text(wks,plot(0),"10 Tg/yr",2009,-0.3,txres)
 
 res@tiMainString = "Clearsky RESTOM, expt-cntl"
 plot(3) = gsn_csm_xy (wks,year,restomc_diff,res)
 
 delete(res@xyLineColors)
-res@xyLineColors = (/"black","green","blue","red"/)
+res@xyLineColors = (/"black","green","blue","red","brown"/)
 res@tiMainString = "Clearsky LW net, TOM"
 plot(4) = gsn_csm_xy (wks,year,flntc,res)
 
