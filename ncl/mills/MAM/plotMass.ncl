@@ -87,7 +87,7 @@ begin
       nt=dimsizes(time)
       
       if (i .eq. 0) then
-        nTimes=nt
+        nTimes=nt-opt@timeoffset2(i)
         print("nTimes="+nTimes)
 
         dmass = new((/ nRuns, nTimes /), "float")
@@ -304,23 +304,31 @@ rootpath="/glade/scratch/mmills/archive/"
 ;       "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001", \
 ;       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001" \
 ;       /)
+;caseid = (/ \
+;       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.hetchem.001", \
+;       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.hetchem.002" \
+;       /)
 caseid = (/ \
-       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.hetchem.001", \
-       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.hetchem.002" \
+       "b.e12.BRCP45W5CN.f19_g16.control.002", \
+       "b.e12.BRCP45W5CN.f19_g16.geo01Tgpy2015TR.002", \
+       "b.e12.BRCP45W5CN.f19_g16.geo02Tgpy2015TR.002", \
+       "b.e12.BRCP45W5CN.f19_g16.geo04Tgpy2015TR.002", \
+       "b.e12.BRCP45W5CN.f19_g16.geo10Tgpy2015TR.002" \
        /)
                      
 tracers=(/"SO2","H2SO4","so4_a2","so4_a1","so4_a3"/)
 tracers@molwts=(/ 64.063799, 98.078479, 115.108999, 115.108999, 115.108999 /)
 opt=False
-opt@overwritemass=False
+opt@overwritemass=True
 ;opt@lev1=100.0
 opt@lev1=1100.0
-opt@timeoffset=(/0,0/)
-opt@timeoffset2=(/150,0/)
+opt@timeoffset=(/36,0,0,0,0/)
+opt@timeoffset2=(/0,0,0,0,0/)
 ;opt@timeoffset=(/0,0,0,3*12,12/)
 ;opt@timeoffset2=(/0,15,0,3*12,12/)
 ;plotMass( rootpath, "h0zm", caseid, tracers, opt )
-plotMass( rootpath, "h3", caseid, tracers, opt )
+;plotMass( rootpath, "h3", caseid, tracers, opt )
+plotMass( rootpath, "h0", caseid, tracers, opt )
 
 ;opt@overwritemass=True
 ;caseid="b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001"

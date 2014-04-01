@@ -123,6 +123,7 @@ begin
     time(0)=0.0
     print("time(1:)=histtime")
     time(1:)=histtime
+    time@units=histtime@units
     print("t1=1")
     t1=1
   else
