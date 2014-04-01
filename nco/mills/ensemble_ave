@@ -80,14 +80,55 @@ if [ $caseid = 'rcp85' ] ; then
   exclude=HNO3_CD1,HNO3_CD3,NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_ocar3,ODV_sulf
 fi
 
+if [ $caseid = 'tr55' ] ; then
+  ensname='b40.1955-2005.2deg.wcm.00[234]'
+  avgname='b40.1955-2005.2deg.wcm.avg'
+  rootpath='/glade/p/cesm/wawg/runs/ccsm4_0/'
+  hnum='h0zm'
+  avgdir=$rootpath'/'$avgname'234/atm/proc/'$hnum
+  if [ ! -n "$year1" ] ; then
+    year1=1955
+  fi
+  if [ ! -n "$year2" ] ; then
+    year2=1959
+  fi
+#  exclude=HNO3_CD1,HNO3_CD3,NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_ocar3,ODV_sulf
+fi
+
 if [ $caseid = 'rcp26' ] ; then
-  ensname='b40.rcp8_5.2deg.wcm.00[234]'
-  avgname='b40.rcp8_5.2deg.wcm.avg'
+  ensname='b40.rcp2_6.2deg.wcm.00[23]'
+  ensname2='b.e10.BRCP26WCN.f19_g16.004'
+  avgname='b40.rcp2_6.2deg.wcm.avg'
+  rootpath='/glade/p/cesm/wawg/runs/ccsm4_0/'
+  rootpath2='/glade/p/cesm/wawg/runs/cesm1_0/'
+  hnum='h0zm'
+  wadir=$rootpath'/'$ensname'/atm/proc/'$hnum
+  wadir2=$rootpath2'/'$ensname2'/atm/proc/'$hnum
+  avgdir=$rootpath'/'$avgname'/atm/proc/'$hnum
   if [ ! -n "$year1" ] ; then
     year1=2051
   fi
   if [ ! -n "$year2" ] ; then
-    year2=2055
+    year2=2054
+  fi
+  exclude=HNO3_CD1,HNO3_CD3,NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_ocar3,ODV_sulf
+fi
+
+if [ $caseid = 'rcp26b' ] ; then
+  ensname='b40.rcp2_6.2deg.wcm.002'
+  ensname2='b.e10.BRCP26WCN.f19_g16.00[34]'
+  avgname='b40.rcp2_6.2deg.wcm.avg'
+  rootpath='/glade/p/cesm/wawg/runs/ccsm4_0/'
+  rootpath2='/glade/p/cesm/wawg/runs/cesm1_0/'
+  hnum='h0zm'
+  wadir=$rootpath'/'$ensname'/atm/proc/'$hnum
+  wadir2=$rootpath2'/'$ensname2'/atm/proc/'$hnum
+  avgdir=$rootpath'/'$avgname'/atm/proc/'$hnum
+  if [ ! -n "$year1" ] ; then
+    year1=2055
+  fi
+  if [ ! -n "$year2" ] ; then
+    year2=2099
   fi
   exclude=HNO3_CD1,HNO3_CD3,NO2_CLXF,NO2_XFRC,ODV_H2SO4M,ODV_SSLTA,ODV_SSLTC,ODV_bcar1,ODV_bcar2,ODV_dust1,ODV_dust2,ODV_dust3,ODV_dust4,ODV_ocar1,ODV_ocar2,ODV_ocar3,ODV_sulf
 fi
@@ -253,8 +294,10 @@ while [[ $year -le $year2 ]];do
       echo ncea -x -v $exclude $ncfiles $ncfiles2 $avgfile
       ncea -O -x -v $exclude $ncfiles $ncfiles2 $avgfile
     else
-      echo ncea -x -v $exclude $ncfiles $avgfile
-      ncea -O -x -v $exclude $ncfiles $avgfile
+#      echo ncea -x -v $exclude $ncfiles $avgfile
+#      ncea -O -x -v $exclude $ncfiles $avgfile
+      echo ncea $ncfiles $avgfile
+      ncea -O $ncfiles $avgfile
     fi
 
 #    echo ncea $ncfiles_tmp $ncfiles2 $avgfile
