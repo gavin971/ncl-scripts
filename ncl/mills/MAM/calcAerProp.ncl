@@ -412,7 +412,7 @@ end
 ;caseid="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001"
 ;caseid="b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001"
 ;caseid="b.e12.BRCP45W5CN.f19_g16.control.002"
-caseid="b.e12.BRCP45W5CN.f19_g16.geo04Tgpy2015TR.002"
+caseid="b.e12.BRCP45W5CN.f19_g16.geo02Tgpy2015TR.002"
 ;caseid=getenv("caseid")
 print(caseid)
 casedir=getenv("casedir")
@@ -439,7 +439,6 @@ nfiles=dimsizes(historyNames)
 print("===========================================================")
 
 do i = 0,nfiles-1
-  i = 12
   i1=i+1
   print("===========================================================")
   print("File "+i1+" of "+nfiles+":"+historyNames(i))
