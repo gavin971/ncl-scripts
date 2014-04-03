@@ -20,7 +20,7 @@ DG2RAD  = PI / 180.0              ; rad deg^-1
 MWNH4HSO4 = 115.108999            ; molecular weight for MAM so4 species (ammonium sulfate)
 MWH2SO4 = 98.078479               ; molecular weight of H2SO4 species
 
-procedure calcAerProp(rootpath:string,filename:string)
+procedure calcAerProp(rootpath:string,filename:string,sigma[3]:float)
 
 begin
 
@@ -172,15 +172,10 @@ begin
     history->so4_nd=so4_nd
   end if
 
-  if (isfilevar(history,"radeffwet")) then
-    print("  Found radeffwet ...")
-  else
-  
-    sigma1=1.6
-    sigma2=1.6
-;    sigma3=1.8
-    sigma3=1.4
-    
+;  if (isfilevar(history,"radeffwet")) then
+;    print("  Found radeffwet ...")
+;  else
+      
     print("  Reading dgnumwet1 ...")
     diam1=history->dgnumwet1
     print("  Reading dgnumwet2 ...")
@@ -188,55 +183,114 @@ begin
     print("  Reading dgnumwet3 ...")
     diam3=history->dgnumwet3
     
-    exists=isvar((/"so4_a1","so4_a2","so4_a3"/))
+    exists=isvar((/"num_a1","num_a2","num_a3"/))
     if(.not.exists(0)) then
-      print("  Reading so4_a1 ...")
-      so4_a1= history->so4_a1        ; kg/kg air
+      print("  Reading num_a1 ...")
+      num_a1= history->num_a1        ; kg/kg air
     end if
     if(.not.exists(1)) then
-      print("  Reading so4_a2 ...")
-      so4_a2= history->so4_a2        ; kg/kg air
+      print("  Reading num_a2 ...")
+      num_a2= history->num_a2        ; kg/kg air
     end if
     if(.not.exists(2)) then
-      print("  Reading so4_a3 ...")
-      so4_a3= history->so4_a3        ; kg/kg air
+      print("  Reading num_a3 ...")
+      num_a3= history->num_a3        ; kg/kg air
     end if
         
-    print("  Calculating surf ...")
-    surf=     so4_a1*diam1^2.*exp(2.*log(sigma1)^2.)
-    surf=surf+so4_a2*diam2^2.*exp(2.*log(sigma2)^2.)
-    surf=surf+so4_a3*diam3^2.*exp(2.*log(sigma3)^2.)
+    print("  Calculating surfwet ...")
+    surf_a1=diam1 ; get metadata
+    surf_a1@units="um2/cm3"
+    surf_a2=surf_a1 ; get metadata
+    surf_a3=surf_a1 ; get metadata
+    surf_a1=num_a1*diam1^2.*exp(2.*log(sigma(0))^2.)
+    surf_a2=num_a2*diam2^2.*exp(2.*log(sigma(1))^2.)
+    surf_a3=num_a3*diam3^2.*exp(2.*log(sigma(2))^2.)
+    surf_a1=surf_a1*1e12*1e-3*arhomass*PI ; convert m2/kg air -> um2/cm3 air
+    surf_a2=surf_a2*1e12*1e-3*arhomass*PI ; convert m2/kg air -> um2/cm3 air
+    surf_a3=surf_a3*1e12*1e-3*arhomass*PI ; convert m2/kg air -> um2/cm3 air
+    surf = surf_a1  ; get metadata
+    surf = surf_a1  + surf_a2 + surf_a3
     surf@_FillValue=9.96921e+36
     surf=where(surf.gt.0,surf,surf@_FillValue)
-;    surf=surf*arhomass*PI
+    surf@long_name="Aerosol wet surface area"
+    surf_a1@_FillValue=9.96921e+36
+    surf_a1=where(surf_a1.gt.0,surf_a1,surf_a1@_FillValue)
+    surf_a1@long_name="Accumulation mode wet surface area"
+    surf_a2@_FillValue=9.96921e+36
+    surf_a2=where(surf_a2.gt.0,surf_a2,surf_a2@_FillValue)
+    surf_a2@long_name="Nucleation mode wet surface area"
+    surf_a3@_FillValue=9.96921e+36
+    surf_a3=where(surf_a3.gt.0,surf_a3,surf_a3@_FillValue)
+    surf_a3@long_name="Coarse mode wet surface area"
+   
+    print("  Saving surfwet ...")
+    printVarSummary(surf)    
+    history->surfwet=surf
+    print("  Saving surfwet_a1 ...")
+    printVarSummary(surf_a1)    
+    history->surfwet_a1=surf_a1
+    print("  Saving surfwet_a2 ...")
+    printVarSummary(surf_a2)    
+    history->surfwet_a2=surf_a2
+    print("  Saving surfwet_a3 ...")
+    printVarSummary(surf_a3)    
+    history->surfwet_a3=surf_a3
     
-    print("  Calculating vol ...")
-    vol =    so4_a1*diam1^3.*exp(4.5*log(sigma1)^2.)
-    vol =vol+so4_a2*diam1^3.*exp(4.5*log(sigma2)^2.)
-    vol =vol+so4_a3*diam1^3.*exp(4.5*log(sigma3)^2.)
-;    vol =vol*arhomass*PI/6
+    print("  Calculating volwet ...")
+    vol_a1=diam1 ; get metadata
+    vol_a1@units="um3/cm3"
+    vol_a2=vol_a1 ; get metadata
+    vol_a3=vol_a1 ; get metadata
+    vol_a1=num_a1*diam1^3.*exp(3.*log(sigma(0))^2.)
+    vol_a2=num_a2*diam2^3.*exp(3.*log(sigma(1))^2.)
+    vol_a3=num_a3*diam3^3.*exp(3.*log(sigma(2))^2.)
+    vol_a1=vol_a1*1e18*1e-3*arhomass*PI/6. ; convert m3/kg air -> um3/cm3 air
+    vol_a2=vol_a2*1e18*1e-3*arhomass*PI/6. ; convert m3/kg air -> um3/cm3 air
+    vol_a3=vol_a3*1e18*1e-3*arhomass*PI/6. ; convert m3/kg air -> um3/cm3 air
+    vol = vol_a1  ; get metadata
+    vol = vol_a1  + vol_a2 + vol_a3
+    vol@_FillValue=9.96921e+36
+    vol=where(vol.gt.0,vol,vol@_FillValue)
+    vol@long_name="Aerosol wet volume"
+    vol_a1@_FillValue=9.96921e+36
+    vol_a1=where(vol_a1.gt.0,vol_a1,vol_a1@_FillValue)
+    vol_a1@long_name="Accumulation mode wet volume"
+    vol_a2@_FillValue=9.96921e+36
+    vol_a2=where(vol_a2.gt.0,vol_a2,vol_a2@_FillValue)
+    vol_a2@long_name="Nucleation mode wet volume"
+    vol_a3@_FillValue=9.96921e+36
+    vol_a3=where(vol_a3.gt.0,vol_a3,vol_a3@_FillValue)
+    vol_a3@long_name="Coarse mode wet volume"
+   
+    print("  Saving volwet ...")
+    printVarSummary(vol)    
+    history->volwet=vol
+    print("  Saving volwet_a1 ...")
+    printVarSummary(vol_a1)    
+    history->volwet_a1=vol_a1
+    print("  Saving volwet_a2 ...")
+    printVarSummary(vol_a2)    
+    history->volwet_a2=vol_a2
+    print("  Saving volwet_a3 ...")
+    printVarSummary(vol_a3)    
+    history->volwet_a3=vol_a3
 
     print("  Calculating radeffwet ...")
     radeffwet=diam1 ; get metadata
-    radeffwet=vol/surf/2.0
-    radeffwet@long_name="Sulfate aerosol wet effective radius"
-    
+    radeffwet=3.0*vol/surf
+    radeffwet@long_name="Aerosol wet effective radius"
+    radeffwet@units="um"
+   
     print("  Saving radeffwet ...")
     printVarSummary(radeffwet)    
     history->radeffwet=radeffwet
 
-  end if
+;  end if
 
-  if (isfilevar(history,"radeffdry")) then
-    print("  Found radeffdry ...")
-  else
-  
-    sigma1=1.6
-    sigma2=1.6
-;    sigma3=1.8
-;    sigma3=1.4
-    sigma3=1.2
-    
+;  if (isfilevar(history,"radeffdry")) then
+;    print("  Found radeffdry ...")
+;  else
+      
     delete(diam1)
     delete(diam2)
     delete(diam3)
@@ -247,46 +301,111 @@ begin
     print("  Reading dgnd_a03 ...")
     diam3=history->dgnd_a03
     
-    exists=isvar((/"so4_a1","so4_a2","so4_a3"/))
+    exists=isvar((/"num_a1","num_a2","num_a3"/))
     if(.not.exists(0)) then
-      print("  Reading so4_a1 ...")
-      so4_a1= history->so4_a1        ; kg/kg air
+      print("  Reading num_a1 ...")
+      num_a1= history->num_a1        ; kg/kg air
     end if
     if(.not.exists(1)) then
-      print("  Reading so4_a2 ...")
-      so4_a2= history->so4_a2        ; kg/kg air
+      print("  Reading num_a2 ...")
+      num_a2= history->num_a2        ; kg/kg air
     end if
     if(.not.exists(2)) then
-      print("  Reading so4_a3 ...")
-      so4_a3= history->so4_a3        ; kg/kg air
+      print("  Reading num_a3 ...")
+      num_a3= history->num_a3        ; kg/kg air
     end if
         
     delete(surf)
-    print("  Calculating surf ...")
-    surf=     so4_a1*diam1^2.*exp(2.*log(sigma1)^2.)
-    surf=surf+so4_a2*diam2^2.*exp(2.*log(sigma2)^2.)
-    surf=surf+so4_a3*diam3^2.*exp(2.*log(sigma3)^2.)
+    print("  Calculating surfdry ...")
+    surf_a1=diam1 ; get metadata
+    surf_a1@units="um2/cm3"
+    surf_a2=surf_a1 ; get metadata
+    surf_a3=surf_a1 ; get metadata
+    surf_a1=num_a1*diam1^2.*exp(2.*log(sigma(0))^2.)
+    surf_a2=num_a2*diam2^2.*exp(2.*log(sigma(1))^2.)
+    surf_a3=num_a3*diam3^2.*exp(2.*log(sigma(2))^2.)
+    surf_a1=surf_a1*1e12*1e-3*arhomass*PI ; convert m2/kg air -> um2/cm3 air
+    surf_a2=surf_a2*1e12*1e-3*arhomass*PI ; convert m2/kg air -> um2/cm3 air
+    surf_a3=surf_a3*1e12*1e-3*arhomass*PI ; convert m2/kg air -> um2/cm3 air
+    surf = surf_a1  ; get metadata
+    surf = surf_a1  + surf_a2 + surf_a3
     surf@_FillValue=9.96921e+36
     surf=where(surf.gt.0,surf,surf@_FillValue)
-;    surf=surf*arhomass*PI
+    surf@long_name="Aerosol dry surface area"
+    surf_a1@_FillValue=9.96921e+36
+    surf_a1=where(surf_a1.gt.0,surf_a1,surf_a1@_FillValue)
+    surf_a1@long_name="Accumulation mode dry surface area"
+    surf_a2@_FillValue=9.96921e+36
+    surf_a2=where(surf_a2.gt.0,surf_a2,surf_a2@_FillValue)
+    surf_a2@long_name="Nucleation mode dry surface area"
+    surf_a3@_FillValue=9.96921e+36
+    surf_a3=where(surf_a3.gt.0,surf_a3,surf_a3@_FillValue)
+    surf_a3@long_name="Coarse mode dry surface area"
+   
+    print("  Saving surfdry ...")
+    printVarSummary(surf)    
+    history->surfdry=surf
+    print("  Saving surfdry_a1 ...")
+    printVarSummary(surf_a1)    
+    history->surfdry_a1=surf_a1
+    print("  Saving surfdry_a2 ...")
+    printVarSummary(surf_a2)    
+    history->surfdry_a2=surf_a2
+    print("  Saving surfdry_a3 ...")
+    printVarSummary(surf_a3)    
+    history->surfdry_a3=surf_a3
     
     delete(vol)
-    print("  Calculating vol ...")
-    vol =    so4_a1*diam1^3.*exp(4.5*log(sigma1)^2.)
-    vol =vol+so4_a2*diam1^3.*exp(4.5*log(sigma2)^2.)
-    vol =vol+so4_a3*diam1^3.*exp(4.5*log(sigma3)^2.)
-;    vol =vol*arhomass*PI/6
+    print("  Calculating voldry ...")
+    vol_a1=diam1 ; get metadata
+    vol_a1@units="um3/cm3"
+    vol_a2=vol_a1 ; get metadata
+    vol_a3=vol_a1 ; get metadata
+    vol_a1=num_a1*diam1^3.*exp(3.*log(sigma(0))^2.)
+    vol_a2=num_a2*diam2^3.*exp(3.*log(sigma(1))^2.)
+    vol_a3=num_a3*diam3^3.*exp(3.*log(sigma(2))^2.)
+    vol_a1=vol_a1*1e18*1e-3*arhomass*PI/6. ; convert m3/kg air -> um3/cm3 air
+    vol_a2=vol_a2*1e18*1e-3*arhomass*PI/6. ; convert m3/kg air -> um3/cm3 air
+    vol_a3=vol_a3*1e18*1e-3*arhomass*PI/6. ; convert m3/kg air -> um3/cm3 air
+    vol = vol_a1  ; get metadata
+    vol = vol_a1  + vol_a2 + vol_a3
+    vol@_FillValue=9.96921e+36
+    vol=where(vol.gt.0,vol,vol@_FillValue)
+    vol@long_name="Aerosol dry volume"
+    vol_a1@_FillValue=9.96921e+36
+    vol_a1=where(vol_a1.gt.0,vol_a1,vol_a1@_FillValue)
+    vol_a1@long_name="Accumulation mode dry volume"
+    vol_a2@_FillValue=9.96921e+36
+    vol_a2=where(vol_a2.gt.0,vol_a2,vol_a2@_FillValue)
+    vol_a2@long_name="Nucleation mode dry volume"
+    vol_a3@_FillValue=9.96921e+36
+    vol_a3=where(vol_a3.gt.0,vol_a3,vol_a3@_FillValue)
+    vol_a3@long_name="Coarse mode dry volume"
+   
+    print("  Saving voldry ...")
+    printVarSummary(vol)    
+    history->voldry=vol
+    print("  Saving voldry_a1 ...")
+    printVarSummary(vol_a1)    
+    history->voldry_a1=vol_a1
+    print("  Saving voldry_a2 ...")
+    printVarSummary(vol_a2)    
+    history->voldry_a2=vol_a2
+    print("  Saving voldry_a3 ...")
+    printVarSummary(vol_a3)    
+    history->voldry_a3=vol_a3
 
-    print("  Calculating radeffwet ...")
+    print("  Calculating radeffdry ...")
     radeffdry=diam1 ; get metadata
-    radeffdry=vol/surf/2.0
-    radeffdry@long_name="Sulfate aerosol dry effective radius"
+    radeffdry=3.0*vol/surf
+    radeffdry@long_name="Aerosol dry effective radius"
+    radeffdry@units="um"
     
     print("  Saving radeffdry ...")
     printVarSummary(radeffdry)    
     history->radeffdry=radeffdry
 
-  end if
+;  end if
   
 end
 
@@ -299,6 +418,7 @@ print(caseid)
 casedir=getenv("casedir")
 print(casedir)
 rootpath="/glade/scratch/mmills/archive/"+caseid+"/atm/proc/h0mam/"
+sigma=(/1.6, 1.6, 1.2/)
 
 copypattern="/glade/scratch/mmills/archive/"+caseid+"/atm/hist/*h0*"
 if (casedir.eq."run") then
@@ -319,9 +439,10 @@ nfiles=dimsizes(historyNames)
 print("===========================================================")
 
 do i = 0,nfiles-1
+  i = 12
   i1=i+1
   print("===========================================================")
   print("File "+i1+" of "+nfiles+":"+historyNames(i))
-  calcAerProp(rootpath,historyNames(i))
+  calcAerProp(rootpath,historyNames(i),sigma)
   print("===========================================================")
 end do
