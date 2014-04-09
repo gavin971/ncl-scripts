@@ -28,15 +28,19 @@ else
       if(isStrSubset(host,"cmip5"))
         rootpath="/data/waccm/"
       else
-        rootpath="/glade/scratch/mmills/archive/"
-        exists =isfilepresent(rootpath+run_name+"/"+subdir+"/")
-        if (.not.exists) then
-          rootpath="/glade/p/cesm/wawg/runs/cesm1_2/"
-          delete(exists)
+        if(isStrSubset(host,"pfe"))
+          rootpath="/nobackupp8/mjmills2/archive/"
+        else
+          rootpath="/glade/scratch/mmills/archive/"
           exists =isfilepresent(rootpath+run_name+"/"+subdir+"/")
           if (.not.exists) then
-            rootpath="/glade/p/cesm/wawg/runs/ccsm4_0/"
-          end if
+            rootpath="/glade/p/cesm/wawg/runs/cesm1_2/"
+            delete(exists)
+            exists =isfilepresent(rootpath+run_name+"/"+subdir+"/")
+            if (.not.exists) then
+              rootpath="/glade/p/cesm/wawg/runs/ccsm4_0/"
+            end if
+          end if  
         end if  
       end if
     end if
@@ -280,6 +284,7 @@ else
     b->flntc_ann_w=flntc_ann_w
     b->fsnt_ann_w=fsnt_ann_w
     b->fsntc_ann_w=fsntc_ann_w
+    delete(b)
 
   end if
 
@@ -331,7 +336,7 @@ else
   res1@vpYF              = 0.91
   print("year:"+dimsizes(year))
   print("restom_ann_w:"+dimsizes(restom_ann_w))
-  print(min(restom_ann_w)+" "+max(restom_ann_w))
+  print("RESTOM min:"+min(restom_ann_w)+" max:"+max(restom_ann_w))
   plot(0) = gsn_csm_xy (wks,year,restom_ann_w,res1)
 
   res2@tiMainString  = "TS" ; title
