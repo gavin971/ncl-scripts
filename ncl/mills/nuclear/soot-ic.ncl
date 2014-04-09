@@ -32,8 +32,8 @@ end if
 
 print("PATH="+PATH)
 
-;load "soot.ncl"
-load "ic-BC-IndPak.ncl"
+;load "soot.ncl" ; for 0Tg ICs (comment out otherwise)
+load "ic-BC-IndPak.ncl" ; for India-Pakistan ICs (comment out otherwise)
 
 print("Resolution: " + WACCM_RES)
 
@@ -82,7 +82,17 @@ if (WACCM_RES .eq. "2x2.5") then
 ;       "b40.rcp4_5.2deg.wcm.carma.bc0tg.003.cam2.i.2012-01-01-00000.nc", \
 ;       0.0)
 
+;  newic("/nobackup/mjmills2/ccsmdata/inputdata/ccsm4_init/b40.rcp4_5.2deg.wcm.001/2012-01-01", \
+;       "b40.rcp4_5.2deg.wcm.001.cam2.i.2012-01-01-00000.nc", \
+;       "b40.rcp4_5.2deg.wcm.carma.bc0tg.001.cam2.i.2012-01-01-00000.nc", \
+;       0.0)
+
 ; 2/23/2011       
+;  newicBCIndPak("/nobackup/mjmills2/ccsmdata/inputdata/ccsm4_init/b40.rcp4_5.2deg.wcm.carma.bc0tg.001/2013-01-01", \
+;       "b40.rcp4_5.2deg.wcm.carma.bc0tg.001.cam2.i.2013-01-01-00000.nc", \
+;       "b40.rcp4_5.2deg.wcm.carma.bc5tg.IndPak.001.cam2.i.2013-01-01-00000.nc", \
+;       5.0d0)
+
   newicBCIndPak(PATH, \
        caseid+".cam2.i."+year+"-01-01-00000.nc", \
        newcase+".cam2.i."+year+"-01-01-00000.nc", \
