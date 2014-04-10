@@ -10,7 +10,7 @@ if (ismissing(run_name)) then
 else
 
   year0 = 1
-;  nyears=10-year0+1
+;  nYears=10-year0+1
 
   ostype=getenv("OSTYPE")
   host=getenv("HOSTNAME")
@@ -65,11 +65,14 @@ else
               0.08493150770664215,0.08219178020954132,0.08493150770664215/)
 
   infiles = systemfunc("ls -1 "+in_dir+"*h0.*.nc")
-  nyears=dimsizes(infiles)/12
-  print("nyears="+nyears)
+  nYears=dimsizes(infiles)/12
+  print("nYears="+nYears)
 
-  nyears_a=0
-  if (isfilepresent(savefile)) then
+  nYears_a=0
+  overwrite=getenv("overwrite")
+  doTropFlux = False
+  
+  if (isfilepresent(savefile).and.ismissing(overwrite)) then
 
     print("reading "+savefile)
     b = addfile(savefile,"r")
@@ -87,11 +90,19 @@ else
       flntc_ann_w_a=b->flntc_ann_w
       fsnt_ann_w_a=b->fsnt_ann_w
       fsntc_ann_w_a=b->fsntc_ann_w
-      nyears_a = dimsizes(year_a)
+      nYears_a = dimsizes(year_a)
     end if
+    
+    if (isfilevar(b,"flnr_ann_w")) then
+      print("found flnr_ann_w")
+      flnr_ann_w_a=b->flnr_ann_w
+      fsnr_ann_w_a=b->fsnr_ann_w
+      doTropFlux = True
+    end if
+    
   end if
 
-  if ((nyears_a.ge.nyears)) then ; use only savefile if it has all history years
+  if ((nYears_a.ge.nYears)) then ; use only savefile if it has all history years
 
     year=year_a
     restom_ann_w=restom_ann_w_a
@@ -101,7 +112,7 @@ else
 
   else
 
-    i=nyears_a*12
+    i=nYears_a*12
     fin=addfile(infiles(i),"r")
     print((/infiles(i)/))
   ;  print(fin->date)
@@ -114,8 +125,13 @@ else
     year_in = fin->date ; get record coordinate
     year_in = year_in/10000
   ;  print(year_in)
+    if (isfilevar(fin,"FLNR")) then
+      fsnr = fin->FSNR
+      flnr = fin->FLNR
+      doTropFlux = True
+    end if
 
-    do i=nyears_a*12+1,dimsizes(infiles)-1,1
+    do i=nYears_a*12+1,dimsizes(infiles)-1,1
       print(i+" "+(/infiles(i)/))
       fin=addfile(infiles(i),"r")
   ;    print(fin->date)
@@ -155,6 +171,18 @@ else
   ;    print(i+" "+temp+" "+fin->date+" "+(fin->date)/10000)
       year_in = array_append_record(temp,(fin->date)/10000,0)
       delete(temp)
+      
+      if (doTropFlux) then
+        temp=fsnr
+        delete(fsnr)
+        fsnr = array_append_record(temp,fin->FSNR,0)
+        delete(temp)
+        
+        temp=flnr
+        delete(flnr)
+        flnr = array_append_record(temp,fin->FLNR,0)
+        delete(temp)
+      end if
 
     end do
     ;    fid=addfile(in_file,"r")
@@ -190,53 +218,69 @@ else
     ts_w = wgt_areaave(ts,gw1,1.0,0) 
     sst_w = wgt_areaave(sst,gw1,1.0,0) 
     ts_land_w = wgt_areaave(ts_land,gw1,1.0,0) 
+    if (doTropFlux) then
+      flnr_w = wgt_areaave(flnr,gw1,1.0,0) 
+      fsnr_w = wgt_areaave(fsnr,gw1,1.0,0) 
+    end if
     
     ; create annual average arrays
-    restom_ann_w = new(nyears,typeof(restom_w))
+    restom_ann_w = new(nYears,typeof(restom_w))
     restom_ann_w = 0.
 
-    restom_ann_w_c = new(nyears,typeof(restom_w_c))
+    restom_ann_w_c = new(nYears,typeof(restom_w_c))
     restom_ann_w_c = 0.
 
-    flnt_ann_w = new(nyears,typeof(flnt_w))
+    flnt_ann_w = new(nYears,typeof(flnt_w))
     flnt_ann_w = 0.
 
-    fsnt_ann_w = new(nyears,typeof(fsnt_w))
+    fsnt_ann_w = new(nYears,typeof(fsnt_w))
     fsnt_ann_w = 0.
 
-    flntc_ann_w = new(nyears,typeof(flntc_w))
+    flntc_ann_w = new(nYears,typeof(flntc_w))
     flntc_ann_w = 0.
 
-    fsntc_ann_w = new(nyears,typeof(fsntc_w))
+    fsntc_ann_w = new(nYears,typeof(fsntc_w))
     fsntc_ann_w = 0.
+    
+    if (doTropFlux) then
+      flnr_ann_w = new(nYears,typeof(flnr_w))
+      flnr_ann_w = 0.
 
-    ts_ann_w = new(nyears,typeof(ts_w))
-    ts_ann_w = 0.
-
-    sst_ann_w = new(nyears,typeof(sst_w))
-    sst_ann_w = 0.
-
-    ts_land_ann_w = new(nyears,typeof(ts_land_w))
-    ts_land_ann_w = 0.
-
-    year = new(nyears,integer)
-
-    if (nyears_a.gt.0) then
-      restom_ann_w(0:nyears_a-1) = restom_ann_w_a
-      restom_ann_w_c(0:nyears_a-1) = restom_ann_w_c_a
-      ts_ann_w(0:nyears_a-1) = ts_ann_w_a
-      sst_ann_w(0:nyears_a-1) = sst_ann_w_a
-      ts_land_ann_w(0:nyears_a-1) = ts_land_ann_w_a
-      year(0:nyears_a-1) = year_a
-      flnt_ann_w(0:nyears_a-1) = flnt_ann_w_a
-      flntc_ann_w(0:nyears_a-1) = flntc_ann_w_a
-      fsnt_ann_w(0:nyears_a-1) = fsnt_ann_w_a
-      fsntc_ann_w(0:nyears_a-1) = fsntc_ann_w_a
+      fsnr_ann_w = new(nYears,typeof(fsnr_w))
+      fsnr_ann_w = 0.    
     end if
 
-    do iyr=nyears_a,nyears-1
+    ts_ann_w = new(nYears,typeof(ts_w))
+    ts_ann_w = 0.
+
+    sst_ann_w = new(nYears,typeof(sst_w))
+    sst_ann_w = 0.
+
+    ts_land_ann_w = new(nYears,typeof(ts_land_w))
+    ts_land_ann_w = 0.
+
+    year = new(nYears,integer)
+
+    if (nYears_a.gt.0) then
+      restom_ann_w(0:nYears_a-1) = restom_ann_w_a
+      restom_ann_w_c(0:nYears_a-1) = restom_ann_w_c_a
+      ts_ann_w(0:nYears_a-1) = ts_ann_w_a
+      sst_ann_w(0:nYears_a-1) = sst_ann_w_a
+      ts_land_ann_w(0:nYears_a-1) = ts_land_ann_w_a
+      year(0:nYears_a-1) = year_a
+      flnt_ann_w(0:nYears_a-1) = flnt_ann_w_a
+      flntc_ann_w(0:nYears_a-1) = flntc_ann_w_a
+      fsnt_ann_w(0:nYears_a-1) = fsnt_ann_w_a
+      fsntc_ann_w(0:nYears_a-1) = fsntc_ann_w_a
+      if (doTropFlux) then
+        flnr_ann_w(0:nYears_a-1) = flnr_ann_w_a
+        fsnr_ann_w(0:nYears_a-1) = fsnr_ann_w_a
+      end if
+    end if
+
+    do iyr=nYears_a,nYears-1
       print((/iyr/))
-      iyr2=iyr-nyears_a
+      iyr2=iyr-nYears_a
       year(iyr)=year_in(iyr2*12)
       do imonth=0,11
         restom_ann_w(iyr) = mon_wgt(imonth)*dim_avg(restom_w(iyr2*12+imonth))+restom_ann_w(iyr)
@@ -248,6 +292,10 @@ else
         flntc_ann_w(iyr) = mon_wgt(imonth)*dim_avg(flntc_w(iyr2*12+imonth))+flntc_ann_w(iyr)
         fsnt_ann_w(iyr) = mon_wgt(imonth)*dim_avg(fsnt_w(iyr2*12+imonth))+fsnt_ann_w(iyr)
         fsntc_ann_w(iyr) = mon_wgt(imonth)*dim_avg(fsntc_w(iyr2*12+imonth))+fsntc_ann_w(iyr)
+        if (doTropFlux) then
+          flnr_ann_w(iyr) = mon_wgt(imonth)*dim_avg(flnr_w(iyr2*12+imonth))+flnr_ann_w(iyr)
+          fsnr_ann_w(iyr) = mon_wgt(imonth)*dim_avg(fsnr_w(iyr2*12+imonth))+fsnr_ann_w(iyr)
+        end if
       end do
     end do
 
@@ -266,7 +314,7 @@ else
     ts_land_ann_w!0="year"
     ts_land_ann_w&year=year
 
-  ;  year = ispan (year0,nyears+year0-1,1)  
+  ;  year = ispan (year0,nYears+year0-1,1)  
 
     ; Remove any preexisting file.
     print("  Deleting " + savefile)
@@ -284,6 +332,10 @@ else
     b->flntc_ann_w=flntc_ann_w
     b->fsnt_ann_w=fsnt_ann_w
     b->fsntc_ann_w=fsntc_ann_w
+    if (doTropFlux) then
+      b->flnr_ann_w=flnr_ann_w
+      b->fsnr_ann_w=fsnr_ann_w
+    end if
     delete(b)
 
   end if
@@ -295,24 +347,25 @@ else
 
   ; Averages for annual means.
 
+  if (nYears.gt.1) then ; begin plot section
     plot = new(4, graphic)
 
-  resP                       = True
-  resP@gsnMaximize           = True            ; expand plot size to maximum
-  resP@gsnPaperOrientation   = "landscape"
-  resP@txString   = run_name
+    resP                       = True
+    resP@gsnMaximize           = True            ; expand plot size to maximum
+    resP@gsnPaperOrientation   = "landscape"
+    resP@txString   = run_name
 
 
-  res = True
-  res@gsnDraw               = False
-  res@gsnFrame           = False   ; Don't advance the frame
+    res = True
+    res@gsnDraw               = False
+    res@gsnFrame           = False   ; Don't advance the frame
 
-  res@gsnYRefLine           = 0.              ; reference line   
-  res@gsnXYBarChart         = True            ; create bar chart
-  res@gsnAboveYRefLineColor = "red"           ; above ref line fill red
-  res@gsnBelowYRefLineColor = "blue"          ; below ref line fill blue
-  res@tiYAxisString = "RESTOM (W/m2)" ; y-axis label      
-  res@tiMainString  = run_name ; title
+    res@gsnYRefLine           = 0.              ; reference line   
+    res@gsnXYBarChart         = True            ; create bar chart
+    res@gsnAboveYRefLineColor = "red"           ; above ref line fill red
+    res@gsnBelowYRefLineColor = "blue"          ; below ref line fill blue
+    res@tiYAxisString = "RESTOM (W/m2)" ; y-axis label      
+    res@tiMainString  = run_name ; title
 
 
     res1 = True   ; These four lines are redundant.
@@ -326,67 +379,69 @@ else
     res4 = res
 
 
-  print(year+" "+restom_ann_w+" "+ts_ann_w+" "+ts_land_ann_w+" "+sst_ann_w)
+    print(year+" "+restom_ann_w+" "+ts_ann_w+" "+ts_land_ann_w+" "+sst_ann_w)
 
-  res1@tiMainString  = "RESTOM" ; title
-  res1@gsnYRefLine           = 0.              ; reference line   
-  res1@trYMinF = min((/-4,min(restom_ann_w)/))
-  res1@trYMaxF = max((/4,max(restom_ann_w)/))
-  res1@vpXF              = 0.1    ; X,Y position of first plot
-  res1@vpYF              = 0.91
-  print("year:"+dimsizes(year))
-  print("restom_ann_w:"+dimsizes(restom_ann_w))
-  print("RESTOM min:"+min(restom_ann_w)+" max:"+max(restom_ann_w))
-  plot(0) = gsn_csm_xy (wks,year,restom_ann_w,res1)
+    res1@tiMainString  = "RESTOM" ; title
+    res1@gsnYRefLine           = 0.              ; reference line   
+    res1@trYMinF = min((/-4,min(restom_ann_w)/))
+    res1@trYMaxF = max((/4,max(restom_ann_w)/))
+    res1@vpXF              = 0.1    ; X,Y position of first plot
+    res1@vpYF              = 0.91
+    print("year:"+dimsizes(year))
+    print("restom_ann_w:"+dimsizes(restom_ann_w))
+    print("RESTOM min:"+min(restom_ann_w)+" max:"+max(restom_ann_w))
+    plot(0) = gsn_csm_xy (wks,year,restom_ann_w,res1)
 
-  res2@tiMainString  = "TS" ; title
-  res2@tiYAxisString = "TS K" ; y-axis label      
-  res2@vpXF              = 0.6    ; X,Y position of second plot
-  res2@vpYF              = 0.91
-  ;res2@trYMinF = 286.0
-  res2@trYMinF = 286.0
-  res2@gsnYRefLine           =  res2@trYMinF             ; reference line   
-  ;res2@trYMaxF = 289
-  res2@trYMaxF = 290.0  ;caf
-  print("ts_ann_w:"+dimsizes(ts_ann_w))
-  print(min(ts_ann_w)+" "+max(ts_ann_w))
-  print(res2)
-  plot(1) = gsn_csm_xy (wks,year,ts_ann_w,res2)
+    res2@tiMainString  = "TS" ; title
+    res2@tiYAxisString = "TS K" ; y-axis label      
+    res2@vpXF              = 0.6    ; X,Y position of second plot
+    res2@vpYF              = 0.91
+    ;res2@trYMinF = 286.0
+    res2@trYMinF = 286.0
+    res2@gsnYRefLine           =  res2@trYMinF             ; reference line   
+    ;res2@trYMaxF = 289
+    res2@trYMaxF = 290.0  ;caf
+    print("ts_ann_w:"+dimsizes(ts_ann_w))
+    print(min(ts_ann_w)+" "+max(ts_ann_w))
+    print(res2)
+    plot(1) = gsn_csm_xy (wks,year,ts_ann_w,res2)
 
-  res3@tiMainString  = "TS_LAND" ; title
-  res3@vpXF              = 0.1    ; X,Y position of third plot
-  res3@vpYF              = 0.45
-  ;res3@trYMinF = 280.0
-  res3@trYMinF = 279.0
-  res3@gsnYRefLine           = res3@trYMinF              ; reference line   
-  ;res3@trYMaxF = 283
-  res3@trYMaxF = 284.0  ;caf
-  res3@tiYAxisString = "TS_LAND K" ; y-axis label      
-  print("ts_land_ann_w:"+dimsizes(ts_land_ann_w))
-  print(min(ts_land_ann_w)+" "+max(ts_land_ann_w))
-  plot(2) = gsn_csm_xy (wks,year,ts_land_ann_w,res3)
+    res3@tiMainString  = "TS_LAND" ; title
+    res3@vpXF              = 0.1    ; X,Y position of third plot
+    res3@vpYF              = 0.45
+    ;res3@trYMinF = 280.0
+    res3@trYMinF = 279.0
+    res3@gsnYRefLine           = res3@trYMinF              ; reference line   
+    ;res3@trYMaxF = 283
+    res3@trYMaxF = 284.0  ;caf
+    res3@tiYAxisString = "TS_LAND K" ; y-axis label      
+    print("ts_land_ann_w:"+dimsizes(ts_land_ann_w))
+    print(min(ts_land_ann_w)+" "+max(ts_land_ann_w))
+    plot(2) = gsn_csm_xy (wks,year,ts_land_ann_w,res3)
 
-  res4@tiMainString  = "SST" ; title
-  res4@vpXF              = 0.6    ; X,Y position of fourth plot
-  res4@vpYF              = 0.45
-  res4@tiYAxisString = "SST C" ; y-axis label      
-  res4@trYMinF = 16
-  res4@trYMaxF = 19
-  print("sst_ann_w:"+dimsizes(sst_ann_w))
-  print(min(sst_ann_w)+" "+max(sst_ann_w))
-  plot(3) = gsn_csm_xy (wks,year,sst_ann_w,res4)
+    res4@tiMainString  = "SST" ; title
+    res4@vpXF              = 0.6    ; X,Y position of fourth plot
+    res4@vpYF              = 0.45
+    res4@tiYAxisString = "SST C" ; y-axis label      
+    res4@trYMinF = 16
+    res4@trYMaxF = 19
+    print("sst_ann_w:"+dimsizes(sst_ann_w))
+    print(min(sst_ann_w)+" "+max(sst_ann_w))
+    plot(3) = gsn_csm_xy (wks,year,sst_ann_w,res4)
 
-  gsn_panel(wks, plot, (/ 2, 2 /), resP)
+    gsn_panel(wks, plot, (/ 2, 2 /), resP)
 
 
-  delete(wks)
+    delete(wks)
 
-  print("evince "+pdffile+".pdf")
-  evincer=systemfunc("evince " + pdffile + ".pdf &")
-  print(evincer)
+    print("evince "+pdffile+".pdf")
+    evincer=systemfunc("evince " + pdffile + ".pdf &")
+    print(evincer)
 ;  print("mutt mikejmills@mac.com -a "+pdffile+".pdf -s "+pdffile+" < /dev/null")
 
 ;  mutter=systemfunc("mutt mikejmills@mac.com -a " + pdffile + ".pdf -s "+pdffile+" < /dev/null")
 ;  print(mutter)
+
+  end if ; end plot section
 end if
 
