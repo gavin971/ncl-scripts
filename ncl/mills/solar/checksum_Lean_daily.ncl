@@ -4,14 +4,22 @@
 
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
-;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-inputdatapath="/glade/p/cesmdata/cseg/inputdata/atm/cam/solar/"
-;datapath="$MODEL_PATH/ccsm/inputdata/atm/cam/solar/"
-datapath="/glade/p/work/mmills/inputdata/solar/"
+host   = systemfunc("hostname")
+
+if (host.eq."modeling1") then
+  datapath="/data4/mmills/inputdata/solar/"
+  inputdatapath="/data4/mmills/inputdata/atm/cam/solar/"
+else
+  inputdatapath="/glade/p/cesmdata/cseg/inputdata/atm/cam/solar/"
+  ;datapath="$MODEL_PATH/ccsm/inputdata/atm/cam/solar/"
+  datapath="/glade/p/work/mmills/inputdata/solar/"
+end if
+
 imagepath="$IMAGE_PATH/solar/"
 dum=systemfunc("mkdir -p "+imagepath)
 
-ncf = addfile(datapath+"spectral_irradiance_Lean_1978-2013_daily_GOME-Mg_Leap_c140227.nc","r")
+;ncf = addfile(datapath+"spectral_irradiance_Lean_1978-2013_daily_GOME-Mg_Leap_c140227.nc","r")
+ncf = addfile(datapath+"spectral_irradiance_Lean_1978-2014_daily_GOME-Mg_Leap_c140412.nc","r")
 
 print("reading ncf->ssi")
 ssi=ncf->ssi
@@ -51,12 +59,12 @@ tsi_diff=tsi-tsi_sum
 print("calculating year")
 year = yyyymmdd_to_yyyyfrac(date, 0.)
 
-filename=imagepath+"ssi_checksum_1978-2013"
+filename=imagepath+"ssi_checksum_1978-2014"
 print("plotting to "+filename+".pdf")
 wks = gsn_open_wks("pdf", filename)
   res                   = True                      ; plot mods desired
   res@trXMinF = 1978.8d0
-  res@trXMaxF = 2014.d0
+  res@trXMaxF = 2014.3d0
 
   res@trYMinF = 1360.2
   res@trYMaxF = 1362.2

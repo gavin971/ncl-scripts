@@ -3,10 +3,17 @@
 
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
-;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-inputdatapath="/glade/p/cesmdata/cseg/inputdata/atm/cam/solar/"
-;datapath="$MODEL_PATH/ccsm/inputdata/atm/cam/solar/"
-datapath="/glade/p/work/mmills/inputdata/solar/"
+host   = systemfunc("hostname")
+
+if (host.eq."modeling1") then
+  datapath="/data4/mmills/inputdata/solar/"
+  inputdatapath="/data4/mmills/inputdata/atm/cam/solar/"
+else
+  inputdatapath="/glade/p/cesmdata/cseg/inputdata/atm/cam/solar/"
+  ;datapath="$MODEL_PATH/ccsm/inputdata/atm/cam/solar/"
+  datapath="/glade/p/work/mmills/inputdata/solar/"
+end if
+
 imagepath="$IMAGE_PATH/solar/"
 dum=systemfunc("mkdir -p "+imagepath)
 
@@ -16,7 +23,8 @@ dum=systemfunc("mkdir -p "+imagepath)
 ;ncf  = addfile(inputdatapath+"spectral_irradiance_Lean_1950-2011_daily_Leap_c120426.nc","r")
 ;ncf2 = addfile(inputdatapath+"spectral_irradiance_Lean_1950-2012_daily_Leap_c130227.nc","r")
 ncf  = addfile(inputdatapath+"spectral_irradiance_Lean_1950-2012_daily_Leap_c130227.nc","r")
-ncf2 = addfile(datapath+"spectral_irradiance_Lean_1978-2013_daily_GOME-Mg_Leap_c140227.nc","r")
+;ncf2 = addfile(datapath+"spectral_irradiance_Lean_1978-2013_daily_GOME-Mg_Leap_c140227.nc","r")
+ncf2 = addfile(datapath+"spectral_irradiance_Lean_1978-2014_daily_GOME-Mg_Leap_c140412.nc","r")
 
 print("reading ncf->ssi")
 ssi=ncf->ssi
@@ -128,7 +136,7 @@ nOverlap=ndate-d12
 ;delete(res)
   
 ;wks = gsn_open_wks("pdf", imagepath+"tsi_2007-2013")
-filename=imagepath+"tsi_1978-2013"
+filename=imagepath+"tsi_1978-2014"
 print("plotting to "+filename+".pdf")
 wks = gsn_open_wks("pdf", filename)
   res                   = True                      ; plot mods desired
@@ -138,7 +146,7 @@ wks = gsn_open_wks("pdf", filename)
 ;  res@vpWidthF              = 1.0
   res@trXMinF = 1978.8d0
 ;  res@trXMaxF = 2010.d0
-  res@trXMaxF = 2014.d0
+  res@trXMaxF = 2014.3d0
 
 
 ;  res@trXMinF = 1830.d0
@@ -202,7 +210,7 @@ wks = gsn_open_wks("pdf", filename)
   
 ;  res@trXMinF = 1950.d0
   res@trXMinF = 1978.8d0
-  res@trXMaxF = 2013.0d0
+  res@trXMaxF = 2014.3d0
   res@tiYAxisString="SSI ratio (new/old)"
   data3 = ssi2(0:d21,1492)/ssi(d12:,1492)
   plot3 = gsn_xy(wks, year(d12:), data2, res)

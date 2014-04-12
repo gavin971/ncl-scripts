@@ -2,19 +2,28 @@
 ; Source data covers 1950-2009, in 2 files
 
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+host   = systemfunc("hostname")
 
 ;ascii_path=getenv ("MODEL_PATH")+"/ccsm/solar/daily/"
 ;cdfpath=getenv ("MODEL_PATH")+"/ccsm/inputdata/atm/cam/solar/"
-ascii_path="/glade/p/work/mmills/inputdata/solar/LeanASCII/"
-cdfpath="/glade/p/work/mmills/inputdata/solar/"
-inputdatapath="/glade/p/cesmdata/cseg/inputdata/atm/cam/solar/"
+if (host.eq."modeling1") then
+  ascii_path="/data4/mmills/inputdata/solar/LeanASCII/"
+  cdfpath="/data4/mmills/inputdata/solar/"
+  inputdatapath="/data4/mmills/inputdata/atm/cam/solar/"
+else
+  ascii_path="/glade/p/work/mmills/inputdata/solar/LeanASCII/"
+  cdfpath="/glade/p/work/mmills/inputdata/solar/"
+  inputdatapath="/glade/p/cesmdata/cseg/inputdata/atm/cam/solar/"
+end if
 
 ;file1=ascii_path+"spectra_1950_1999d_11yr_new.txt"
 ;file2=ascii_path+"katja_spectra_2000_2011d_28Mar11.txt"
 ;file2=ascii_path+"katja_spectra_2000_2011d_13Apr12.txt"
 ;file2=ascii_path+"katja_spectra_2000_2012d_13Feb13.txt"
-file2=ascii_path+"katja_spectra_1978_2013d_22Aug13_G.txt"
-outfile="spectral_irradiance_Lean_1978-2013_daily_GOME-Mg"
+;file2=ascii_path+"katja_spectra_1978_2013d_22Aug13_G.txt"
+file2=ascii_path+"katja_spectra_1978_2014d_19Mar14_G.txt"
+;outfile="spectral_irradiance_Lean_1978-2013_daily_GOME-Mg"
+outfile="spectral_irradiance_Lean_1978-2014_daily_GOME-Mg"
 creation_date = systemfunc("date +%y%m%d")
 calcNoLeap = False
 
@@ -31,7 +40,7 @@ num_samples_time1 = nyears1*365+nleap1
 ;print ("nleap1="+nleap1)
 ;print ("num_samples_time1="+num_samples_time1)
 
-nyears2=2013-1978+1
+nyears2=2014-1978+1
 nleap2=9
 num_samples_time2 = nyears2*365+nleap2
 
