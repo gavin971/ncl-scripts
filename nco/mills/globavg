@@ -41,6 +41,10 @@ if  [ -n "$caseid" ] ; then
       rootpath='/lou/s2m/mjmills2/csm'
     fi
 
+    if [[ $machine =~ 'pfe' ]];then
+      rootpath='/nobackupp8/mjmills2/archive'
+    fi
+
     if [[ $machine = 'cmip5' ]];then
       rootpath='/data/waccm'
     #  rootpath='/data/ccsm4'
