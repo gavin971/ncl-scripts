@@ -85,6 +85,7 @@ if [ $caseid = 'tr55' ] ; then
   avgname='b40.1955-2005.2deg.wcm.avg'
   rootpath='/glade/p/cesm/wawg/runs/ccsm4_0/'
   hnum='h0zm'
+  wadir=$rootpath'/'$ensname'/atm/proc/'$hnum
   avgdir=$rootpath'/'$avgname'234/atm/proc/'$hnum
   if [ ! -n "$year1" ] ; then
     year1=1955
