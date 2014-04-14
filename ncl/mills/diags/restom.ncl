@@ -284,6 +284,7 @@ else
       year(iyr)=year_in(iyr2*12)
       do imonth=0,11
         restom_ann_w(iyr) = mon_wgt(imonth)*dim_avg(restom_w(iyr2*12+imonth))+restom_ann_w(iyr)
+        print(iyr+" "+imonth+" "+restom_ann_w(iyr)+": "+restom_w(iyr2*12+imonth))
         restom_ann_w_c(iyr) = mon_wgt(imonth)*dim_avg(restom_w_c(iyr2*12+imonth))+restom_ann_w_c(iyr)
         ts_ann_w(iyr) = mon_wgt(imonth)*dim_avg(ts_w(iyr2*12+imonth))+ts_ann_w(iyr)
         sst_ann_w(iyr) = mon_wgt(imonth)*dim_avg(sst_w(iyr2*12+imonth))+sst_ann_w(iyr)
@@ -320,6 +321,8 @@ else
     print("  Deleting " + savefile)
     system("/bin/rm " + savefile)
 
+    print(restom_ann_w)
+
     print("  Creating " + savefile)
     b = addfile(savefile,"c")
     b->year=year
@@ -336,6 +339,7 @@ else
       b->flnr_ann_w=flnr_ann_w
       b->fsnr_ann_w=fsnr_ann_w
     end if
+    print(b->restom_ann_w)
     delete(b)
 
   end if

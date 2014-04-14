@@ -23,6 +23,12 @@ caseid = (/ "f.e12.FSDW5.f19_f19.geo00.01", \
             "f.e12.FSDW5.f19_f19.geo04.01", \
             "f.e12.FSDW5.f19_f19.geo10.01" /)
 
+;caseid = (/ "p.e12.PSDW5.f19_f19.geo00s00.01", \
+;            "p.e12.PSDW5.f19_f19.geo00s01.01", \
+;            "p.e12.PSDW5.f19_f19.geo00s02.01", \
+;            "p.e12.PSDW5.f19_f19.geo00s04.01", \
+;            "p.e12.PSDW5.f19_f19.geo00s10.01" /)
+
 nCases = dimsizes(caseid)
 
 doTropFlux=False
