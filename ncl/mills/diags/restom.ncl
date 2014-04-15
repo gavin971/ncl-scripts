@@ -28,18 +28,22 @@ else
       if(isStrSubset(host,"cmip5"))
         rootpath="/data/waccm/"
       else
-        if(isStrSubset(host,"pfe"))
-          rootpath="/nobackupp8/mjmills2/archive/"
-        else
-          rootpath="/glade/scratch/mmills/archive/"
-          exists =isfilepresent(rootpath+run_name+"/"+subdir+"/")
-          if (.not.exists) then
-            rootpath="/glade/p/cesm/wawg/runs/cesm1_2/"
-            delete(exists)
+	if(isStrSubset(host,"lfe")) ; lou (NAS HECC)
+          rootpath="~/csm/"
+	else
+          if(isStrSubset(host,"pfe"))
+            rootpath="/nobackupp8/mjmills2/archive/"
+          else
+            rootpath="/glade/scratch/mmills/archive/"
             exists =isfilepresent(rootpath+run_name+"/"+subdir+"/")
             if (.not.exists) then
-              rootpath="/glade/p/cesm/wawg/runs/ccsm4_0/"
-            end if
+              rootpath="/glade/p/cesm/wawg/runs/cesm1_2/"
+              delete(exists)
+              exists =isfilepresent(rootpath+run_name+"/"+subdir+"/")
+              if (.not.exists) then
+        	rootpath="/glade/p/cesm/wawg/runs/ccsm4_0/"
+              end if
+            end if  
           end if  
         end if  
       end if
