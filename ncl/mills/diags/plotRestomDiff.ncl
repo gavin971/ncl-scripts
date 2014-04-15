@@ -17,17 +17,17 @@ end if
 ;            "b.e12.BRCP45W5CN.f19_g16.geo04Tgpy.001", \
 ;            "b.e12.BRCP45W5CN.f19_g16.geo10Tgpy.001" /)
 
-caseid = (/ "f.e12.FSDW5.f19_f19.geo00.01", \
-            "f.e12.FSDW5.f19_f19.geo01.01", \
-            "f.e12.FSDW5.f19_f19.geo02.01", \
-            "f.e12.FSDW5.f19_f19.geo04.01", \
-            "f.e12.FSDW5.f19_f19.geo10.01" /)
+;caseid = (/ "f.e12.FSDW5.f19_f19.geo00.01", \
+;            "f.e12.FSDW5.f19_f19.geo01.01", \
+;            "f.e12.FSDW5.f19_f19.geo02.01", \
+;            "f.e12.FSDW5.f19_f19.geo04.01", \
+;            "f.e12.FSDW5.f19_f19.geo10.01" /)
 
-;caseid = (/ "p.e12.PSDW5.f19_f19.geo00s00.01", \
-;            "p.e12.PSDW5.f19_f19.geo00s01.01", \
-;            "p.e12.PSDW5.f19_f19.geo00s02.01", \
-;            "p.e12.PSDW5.f19_f19.geo00s04.01", \
-;            "p.e12.PSDW5.f19_f19.geo00s10.01" /)
+caseid = (/ "p.e12.PSDW5.f19_f19.geo00s00.01", \
+            "p.e12.PSDW5.f19_f19.geo00s01.01", \
+            "p.e12.PSDW5.f19_f19.geo00s02.01", \
+            "p.e12.PSDW5.f19_f19.geo00s04.01", \
+            "p.e12.PSDW5.f19_f19.geo00s10.01" /)
 
 nCases = dimsizes(caseid)
 
