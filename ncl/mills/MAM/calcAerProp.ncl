@@ -412,7 +412,12 @@ end
 ;caseid="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001"
 ;caseid="b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001"
 ;caseid="b.e12.BRCP45W5CN.f19_g16.control.002"
-caseid="b.e12.BRCP45W5CN.f19_g16.geo02Tgpy2015TR.002"
+;caseid="b.e12.BRCP45W5CN.f19_g16.geo02Tgpy2015TR.002"
+;caseid="b.e12.BRCP45W5CN.f19_g16.hifreq.001"
+;caseid="b.e12.BRCP45W5CN.f19_g16.geo10Tgpy.001"
+;caseid="f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001"
+;caseid="f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001"
+caseid="f.e12.FSDW5.f19_f19.geo00.02"
 ;caseid=getenv("caseid")
 print(caseid)
 casedir=getenv("casedir")

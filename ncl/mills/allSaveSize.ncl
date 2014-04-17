@@ -411,9 +411,6 @@ begin
 ;      end if
       
       calcPurSulRad(writefile, wtpct, sulfDens, rmass, arho, pureRad, skipbin)
-      delete(wtpct)
-      delete(sulfDens)
-      delete(arho)
       
       if (.not.(isfilevar(writefile,"PURERAD"))) then
          print("saving PURERAD")
@@ -422,10 +419,35 @@ begin
       delete(pureRad)
       
     end if
+    
+    if (isfilevar(writefile,"PURSULRE") .and. (.not.(isfilevar(writefile,"PURSULREwet")))) then
+       ; Adjust effective radius for weight percent      
+       ; Rwet = Rdry * (100 / wtpct * rhopdry/rhopwet)^1/3
+       ; rhopdry = rho = 1.923 g/cm3
+       
+       PURSULREwet = writefile->PURSULRE ; get data and metadata
+       factor=100.0*rho/wtpct
+       factor=factor/sulfDens
+       PURSULREwet = PURSULREwet * factor^(1./3.)
+       print("saving PURSULREwet")
+       writefile->PURSULREwet=PURSULREwet        
+
+       ; Adjust surface area density for weight percent      
+       ; Awet = Adry * (100 / wtpct * rhopdry/rhopwet)^2/3
+       ; rhopdry = rho = 1.923 g/cm3
+       
+       PURSULADwet = writefile->PURSULAD ; get data and metadata
+       PURSULADwet = PURSULADwet * factor^(2./3.)
+       print("saving PURSULADwet")
+       writefile->PURSULADwet=PURSULADwet        
+    end if 
             
     if (.not.(sathist)) then
       delete(time)
     end if
+    delete(wtpct)
+    delete(sulfDens)
+    delete(arho)
   end do
 end
 
@@ -445,5 +467,8 @@ end
 ;saveSize("125tabaz22","125tabaz22.cam2",-1) 
 
 ;historyPath="/Volumes/Data/Models/cesm/case/f40.Nabro.2deg.wcm.sd.carma.sulf.009/hs/"
-historyPath="/glade/proj2/acd/waccm/mmills/runs/f40.Nabro.2deg.wcm.sd.carma.sulf.009c/hs/"
-saveSize(historyPath,"f40.Nabro.2deg.wcm.sd.carma.sulf.009.cam.hs.2011-06-12-00000.nc",-1,True)
+;historyPath="/glade/proj2/acd/waccm/mmills/runs/f40.Nabro.2deg.wcm.sd.carma.sulf.009c/hs/"
+;saveSize(historyPath,"f40.Nabro.2deg.wcm.sd.carma.sulf.009.cam.hs.2011-06-12-00000.nc",-1,True)
+
+historyPath="/glade/p/cesm/wawg/mmills/run/f40.2008-2011.2deg.wcm.sd.carma.sulf.002/atm/hist/"
+saveSize(historyPath,"f40.2008-2011.2deg.wcm.sd.carma.sulf.002.cam2.h0.",-1,False)
