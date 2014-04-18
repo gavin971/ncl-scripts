@@ -146,6 +146,8 @@ begin
     print("  Reading T ...")
     T = history->T
     printVarSummary(T)
+    print("min T="+min(T))
+;    print("RDAIR="+RDAIR)
     arhomass = T ; get metadata
     print("  Calculating air density ...")
     arhomass(:,:,:,:)  = P(:,:,:,:) / (RDAIR * T(:,:,:,:)) / 1.e3 ; kg/m3 -> g/cm3
@@ -417,25 +419,27 @@ end
 ;caseid="b.e12.BRCP45W5CN.f19_g16.geo10Tgpy.001"
 ;caseid="f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001"
 ;caseid="f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001"
-caseid="f.e12.FSDW5.f19_f19.geo00.02"
+caseid="f.e12.FSDW5.f19_f19.geo04.02"
 ;caseid=getenv("caseid")
 print(caseid)
-casedir=getenv("casedir")
-print(casedir)
+;casedir=getenv("casedir")
+;print(casedir)
 rootpath="/glade/scratch/mmills/archive/"+caseid+"/atm/proc/h0mam/"
 sigma=(/1.6, 1.6, 1.2/)
 
 copypattern="/glade/scratch/mmills/archive/"+caseid+"/atm/hist/*h0*"
-if (casedir.eq."run") then
-  copypattern="/glade/scratch/mmills/"+caseid+"/run/"+caseid+".cam.h0*"
-end if
+;if (casedir.eq."run") then
+;  copypattern="/glade/scratch/mmills/"+caseid+"/run/"+caseid+".cam.h0*"
+;end if
 
 print("===========================================================")
 print("mkdir -p "+rootpath)
 mkdir=systemfunc("mkdir -p "+rootpath)
 print("===========================================================")
-print("cp -n -v "+copypattern+" "+rootpath)
-cp=systemfunc("cp -n -v "+copypattern+" "+rootpath)
+cpcmd="cp -n -v "+copypattern+" "+rootpath ; don't overwrite
+;cpcmd="cp -v "+copypattern+" "+rootpath ; overwrite
+print(cpcmd)
+cp=systemfunc(cpcmd)
 print(cp)
 print("===========================================================")
 historyNames=systemfunc("ls "+rootpath)

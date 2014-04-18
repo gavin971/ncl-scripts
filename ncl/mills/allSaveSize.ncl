@@ -255,36 +255,129 @@ begin
       delete(dustndbin)
     end if
     
-    if (isfilevar(writefile,"PURSUL01") .and. (.not.(isfilevar(writefile,"PURSULNDBIN")))) then
-      print("Calculating the pure sulfate number density ...")
-      if (sathist) then
-        pursulndbin = new((/ ncol, nLevs, nBins /), float)
-        pursulndbin!0="ncol"
-        pursulndbin!1="lev"
-        pursulndbin&lev=lev
-        pursulndbin!2="bins"   
-        pursulndbin@long_name="pure sulfate number density per bin"
-        pursulndbin@units="/cm3"
+    if (isfilevar(writefile,"PURSUL01")) then
+      if (isfilevar(writefile,"PURSULNDBIN")) then
+        print("reading PURSULNDBIN...")
+        pursulndbin=writefile->PURSULNDBIN
       else
-        pursulndbin = new((/ nFTimes, nLevs, nLats, nLons, nBins /), float)
-        pursulndbin!0="time"
-        pursulndbin&time=time
-        pursulndbin!1="lev"
-        pursulndbin&lev=lev
-        pursulndbin!2="lat"
-        pursulndbin&lat=lat
-        pursulndbin!3="lon"
-        pursulndbin&lon=lon
-        pursulndbin!4="bins"   
-        pursulndbin@long_name="pure sulfate number density per bin"
-        pursulndbin@units="/cm3"
+        print("Calculating the pure sulfate number density ...")
+        if (sathist) then
+          pursulndbin = new((/ ncol, nLevs, nBins /), float)
+          pursulndbin!0="ncol"
+          pursulndbin!1="lev"
+          pursulndbin&lev=lev
+          pursulndbin!2="bins"   
+          pursulndbin@long_name="pure sulfate number density per bin"
+          pursulndbin@units="/cm3"
+        else
+          pursulndbin = new((/ nFTimes, nLevs, nLats, nLons, nBins /), float)
+          pursulndbin!0="time"
+          pursulndbin&time=time
+          pursulndbin!1="lev"
+          pursulndbin&lev=lev
+          pursulndbin!2="lat"
+          pursulndbin&lat=lat
+          pursulndbin!3="lon"
+          pursulndbin&lon=lon
+          pursulndbin!4="bins"   
+          pursulndbin@long_name="pure sulfate number density per bin"
+          pursulndbin@units="/cm3"
+        end if
+        getN(writefile, "PURSUL", rmass, arho, pursulndbin, skipbin)
+
+        print("Writing PURSULNDBIN...")
+        writefile->PURSULNDBIN=pursulndbin ; PURSULNDBIN(time, lev, lat, lon, bins)
       end if
-      getN(writefile, "PURSUL", rmass, arho, pursulndbin, skipbin)
       
-      print("Writing PURSULNDBIN...")
-      writefile->PURSULNDBIN=pursulndbin
+      if (isfilevar(writefile,"PURERAD")) then
+        print("reading PURERAD")
+        pureRad=writefile->PURERAD
+      else
+
+        print("Calculating PURERAD...")
+        if (sathist) then
+          pureRad = new((/ ncol, nLevs, nBins /), float)
+          pureRad!0="ncol"
+          pureRad!1="lev"
+          pureRad&lev=lev
+          pureRad!2="bins"
+        else
+          pureRad = new((/ nFTimes, nLevs, nLats, nLons, nBins /), float)
+          pureRad!0="time"
+          pureRad&time=time
+          pureRad!1="lev"
+          pureRad&lev=lev
+          pureRad!2="lat"
+          pureRad&lat=lat
+          pureRad!3="lon"
+          pureRad&lon=lon
+          pureRad!4="bins"
+        end if
+
+        pureRad@long_name="pure sulfate radius"
+        pureRad@units="cm"
+
+  ;      if (.not.(isvar(mixsulndbin))) then
+  ;        mixsulndbin = writefile->MIXSULNDBIN
+  ;      end if
+
+        calcPurSulRad(writefile, wtpct, sulfDens, rmass, arho, pureRad, skipbin)
+
+        print("saving PURERAD")
+        writefile->PURERAD=pureRad ; PURERAD(time, lev, lat, lon, bins)
+
+      end if
+      
+      recalcSurf=True
+      if (recalcSurf) then
+        print("calculating moments...")
+        moment2a=pursulndbin*pureRad*pureRad
+        moment3a=moment2a*pureRad ; cm2/cm3
+        moment2a=where(pureRad.ge.1e-6,moment2a,moment2a@_FillValue) ; include only r > 10 nm
+        moment3a=where(pureRad.ge.1e-6,moment3a,moment3a@_FillValue) ; include only r > 10 nm
+        moment2=dim_sum(moment2a)
+        moment2=where(moment2.gt.0,moment2,moment2@_FillValue)
+        delete(moment2a)
+        moment3=dim_sum(moment3a)
+        moment3=where(moment3.gt.0,moment3,moment3@_FillValue)
+        delete(moment3a)
+
+        print("calculating surfArea")
+        surfArea=moment2 ; get metadata
+        surfArea=surfArea*4.e8*PI ; surface area density = 4*pi*r2, 1e8 um2/cm2
+        surfArea@units = "um2/cm3"
+        surfArea@long_name="pure sulfate surface area density, r > 10 nm"
+        surfArea!0="time"
+        surfArea&time=time
+        surfArea!1="lev"
+        surfArea&lev=lev
+        surfArea!2="lat"
+        surfArea&lat=lat
+        surfArea!3="lon"
+        print("saving PURSULADw10")
+        writefile->PURSULADw10=surfArea
+        delete(surfArea)
+
+        print("calculating radiusEff")
+        radiusEff=moment3 ; get metadata
+        radiusEff=radiusEff/moment2
+        radiusEff=radiusEff*1e4 ; 1e4 um/cm
+        radiusEff@units = "um"
+        radiusEff@long_name="pure sulfate effective radius, r > 10 nm"
+        radiusEff!0="time"
+        radiusEff&time=time
+        radiusEff!1="lev"
+        radiusEff&lev=lev
+        radiusEff!2="lat"
+        radiusEff&lat=lat
+        radiusEff!3="lon"
+        print("saving PURSULREw10")
+        writefile->PURSULREw10=radiusEff
+        delete(radiusEff)
+      end if
       
       delete(pursulndbin)
+      delete(pureRad)
     end if
  
     if (isfilevar(writefile,"MIXSUL01") .and. (.not.(isfilevar(writefile,"MIXSULNDBIN")))) then
@@ -380,45 +473,6 @@ begin
       delete(coreRad)
       
     end if
-      
-    if (isfilevar(writefile,"PURSUL01") .and. (.not.(isfilevar(writefile,"PURERAD")))) then
-    
-      print("Calculating PURERAD...")
-      if (sathist) then
-        pureRad = new((/ ncol, nLevs, nBins /), float)
-        pureRad!0="ncol"
-        pureRad!1="lev"
-        pureRad&lev=lev
-        pureRad!2="bins"
-      else
-        pureRad = new((/ nFTimes, nLevs, nLats, nLons, nBins /), float)
-        pureRad!0="time"
-        pureRad&time=time
-        pureRad!1="lev"
-        pureRad&lev=lev
-        pureRad!2="lat"
-        pureRad&lat=lat
-        pureRad!3="lon"
-        pureRad&lon=lon
-        pureRad!4="bins"
-      end if
-      
-      pureRad@long_name="pure sulfate radius"
-      pureRad@units="cm"
-      
-;      if (.not.(isvar(mixsulndbin))) then
-;        mixsulndbin = writefile->MIXSULNDBIN
-;      end if
-      
-      calcPurSulRad(writefile, wtpct, sulfDens, rmass, arho, pureRad, skipbin)
-      
-      if (.not.(isfilevar(writefile,"PURERAD"))) then
-         print("saving PURERAD")
-        writefile->PURERAD=pureRad
-      end if
-      delete(pureRad)
-      
-    end if
     
     if (isfilevar(writefile,"PURSULRE") .and. (.not.(isfilevar(writefile,"PURSULREwet")))) then
        ; Adjust effective radius for weight percent      
@@ -441,6 +495,8 @@ begin
        print("saving PURSULADwet")
        writefile->PURSULADwet=PURSULADwet        
     end if 
+    
+    
             
     if (.not.(sathist)) then
       delete(time)
