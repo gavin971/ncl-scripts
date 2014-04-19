@@ -39,12 +39,10 @@ dTSJJA=dTSJJA-cTSJJA
 ; create plot
 ;************************************************
 ;wks = gsn_open_wks("eps", "$IMG_PATH/nuclearTSdiff")    ; open an eps file
-;wks = gsn_open_wks("pdf", "$IMG_PATH/nuclear/Fig10_TSdiff_hotcold")                ; open a pdf file
-wks = gsn_open_wks("png", "$IMG_PATH/nuclear/TSdiff_DJF")                ; open a pdf file
+wks = gsn_open_wks("pdf", "$IMG_PATH/nuclear/Fig10_TSdiff_testcmap")                ; open a pdf file
 
-;nPanel=2
-nPanel=1
-plot = new(nPanel, graphic)
+nPanel=2
+plot = new(2, graphic)
 
 res                       = True     ; plot mods desired
 res@gsnDraw   = False
@@ -86,13 +84,13 @@ res@pmTickMarkDisplayMode = "Always"; use NCL default lat/lon labels
 ;  gsn_draw_colormap(wks)
 
 ;---Using the color map to define a color map for the workstation
-; gsn_define_colormap(wks,"testcmap")
- gsn_define_colormap(wks,"hotcold_18lev")
+ gsn_define_colormap(wks,"testcmap")
+; gsn_define_colormap(wks,"hotcold_18lev")
 ; gsn_define_colormap(wks,"BlueDarkRed18") 
  
 res@gsnSpreadColors = True
 ;res@gsnSpreadColorStart = 0
-res@gsnSpreadColorEnd = 13
+res@gsnSpreadColorEnd = 120
 res@gsnLeftString        = " "
 res@gsnRightString       = " "
 res@gsnCenterString      = " "
@@ -102,7 +100,7 @@ res@lbTopMarginF         = 0.0
 res@lbBottomMarginF      = -2.8
 ;res@lbRightMarginF         = 0.3
 res@tmXBMajorLengthF     = 0.0
-;plot(0) = gsn_csm_contour_map_ce(wks,dTSJJA(0,:,:), res)
+plot(0) = gsn_csm_contour_map_ce(wks,dTSJJA(0,:,:), res)
 
 txres = True
 txres@txFontColor="black"
@@ -111,41 +109,21 @@ txres@txBackgroundFillColor="lightgoldenrod1"
 txres@txFontHeightF = 0.03                     ; font smaller. default big
 xpos=-160
 ypos=0
-;dum=gsn_add_text(wks,plot(0),"a",xpos,ypos,txres) 
+dum=gsn_add_text(wks,plot(0),"a",xpos,ypos,txres) 
 
-;res@tmXBLabelsOn         = False
-res@tmXBLabelsOn         = True
-;res@tmXTLabelsOn         = True
-;res@tmYRLabelsOn         = True
-;res@tmXTOn         = True
-;res@tmYROn         = True
-res@tmXTMajorLengthF     = 0.0
-res@tmYRMajorLengthF     = 0.0
-
+res@tmXBLabelsOn         = False
 res@lbLabelBarOn         = True
-;res@lbOrientation        = "Vertical"
-res@lbOrientation        = "Horizontal"
-;res@lbTopMarginF         = 5
-;res@lbBottomMarginF      = -7
-res@lbTopMarginF         = -0.1
-res@lbBottomMarginF      = 0.1
-res@lbLeftMarginF         = -0.7
-res@lbRightMarginF      = -0.7
-res@lbLabelFontHeightF   = 0.015
-
+res@lbOrientation        = "Vertical"
+res@lbTopMarginF         = 5
+res@lbBottomMarginF      = -7
+res@lbLabelFontHeightF   = 0.01
 ;delete(res@tmXBMajorLengthF)
-;plot(1) = gsn_csm_contour_map_ce(wks,dTSDJF(0,:,:), res)
-plot(0) = gsn_csm_contour_map_ce(wks,dTSDJF(0,:,:), res)
-;dum=gsn_add_text(wks,plot(1),"b",xpos,ypos,txres) 
-
-;draw(plot)
-;frame(wks)
-;delete(wks)
+plot(1) = gsn_csm_contour_map_ce(wks,dTSDJF(0,:,:), res)
+dum=gsn_add_text(wks,plot(1),"b",xpos,ypos,txres) 
 
 pres                        = True
 pres@gsnMaximize            = True
 pres@gsnPaperOrientation    = "landscape"
-;gsn_panel(wks, plot, (/ 2, 1 /), pres)
-gsn_panel(wks, plot, (/ 1, 1 /), pres)
+gsn_panel(wks, plot, (/ 2, 1 /), pres)
 
 
