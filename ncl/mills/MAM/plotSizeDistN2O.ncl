@@ -4,6 +4,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 begin
   rootpath = "/glade/scratch/mmills/archive/"
+  res=True
   
 ;  caseid = (/  \
 ;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003", \
@@ -22,15 +23,29 @@ begin
 ;              "f.e12.FSDW5.f19_f19.Pin20Tg.19-27km.0-20N.120E.QBOon.001", \
 ;              "f.e12.FSDW5.f19_f19.Pin20Tg.19-27km.0-20N.120E.QBOon.001", \
 ;              "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
-  caseid = (/  \
-              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001", \
-              "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001", \
-              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001", \
-              "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001" \
-               /)
-  
 ;  yearString = (/ "1991_06-12", "1992", "2006-07" /)
-  yearString = (/ "1992-93", "1992-93", "1996-97", "1996-97" /)
+
+;  caseid = (/  \
+;              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001", \
+;              "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001", \
+;              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001", \
+;              "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001" \
+;               /)
+;  yearString = (/ "1992-93", "1992-93", "1996-97", "1996-97" /)
+;  res@xyMonoLineColor = False
+;  res@xyLineColors    = (/"red","red","green3","green3","blue"/)
+;  res@xyMonoDashPattern = False
+;  res@xyDashPatterns = (/1,0,1,0,0/)
+
+  caseid = (/  \
+               "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001", \
+              "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001" \
+               /)  
+  yearString = (/ "1992-93", "1996-97" /)
+  res@xyMonoLineColor = False
+  res@xyLineColors    = (/"red","green3"/)
+  res@xyMonoDashPattern = False
+  res@xyDashPatterns = (/0,0/)
   
   nCases = dimsizes(caseid)
   
@@ -59,9 +74,8 @@ begin
   
   datestr = systemfunc("date +%y%m%d_%H%M")
               
-  pdffile="SizeDistN2O_multi_"+caseid(0)+"_c"+datestr
+  pdffile="SizeDistN2O_multi_"+caseid(0)+"_"+yearString(0)+"_c"+datestr
   wks   = gsn_open_wks ("pdf", "$IMAGE_PATH/"+pdffile)                   ; open workstation
-  res=True
   res@vpHeightF             = 0.4              ; change aspect ratio
   res@vpWidthF              = 0.7
   res@gsnFrame               = False                     ; don't draw yet
@@ -71,10 +85,6 @@ begin
   res@trXMaxF=5.0
   res@trYMinF=-0.2
   res@trYMaxF=3.1
-  res@xyMonoLineColor = False
-  res@xyLineColors    = (/"red","red","green3","green3","blue"/)
-  res@xyMonoDashPattern = False
-  res@xyDashPatterns = (/1,0,1,0,0/)
   res@xyLineThicknessF = 4.0
   res@tiXAxisString = "Particle Diameter, Dp, ~F33~m~FR~m"
   res@tiYAxisString = "dV/dLog~B~10~N~Dp, normalized"
