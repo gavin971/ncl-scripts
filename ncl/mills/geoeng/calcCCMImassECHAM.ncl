@@ -18,9 +18,12 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
-rootpath="/Users/mmills/Dropbox/Work/GeoMIP/"
+;rootpath="/Users/mmills/Dropbox/Work/GeoMIP/"
+;filename="background_2001_ccmval_ymon_zm_pl.nc"
+rootpath="/glade/p/work/mmills/inputdata/sulf/"
+filename="svc002_2001_ccmval_sad_ymon_zm_pl.nc"
 
-a=addfile(rootpath+"background_2001_ccmval_ymon_zm_pl.nc","w")
+a=addfile(rootpath+filename,"w")
 
 lev=a->lev ; pressure (Pa), 39 levels
 temp=a->st ; temperature (K), (time=12, lev=39, lat=64, lon=1)
@@ -28,18 +31,21 @@ so4=a->SO4_AS
 so4_cs=a->SO4_CS
 so4=so4+so4_cs ; kg S/kg air
 
-vol=a->vol_as ; um3/cm2
-vol=vol+a->vol_cs
+;vol=a->vol_as ; um3/cm2
+;vol=vol+a->vol_cs
+vol=a->VAD ; m3/m3 = cm3/cm3
+vol = where(vol .le. 0.0, vol@_FillValue, vol*1e6) ; cm3/cm3 -> um3/cm3
 vol@long_name="aerosol volume"
 vol@units="um3/cm3"
-vol = where(vol .le. 0.0, vol@_FillValue, vol*1e6)
+vol = where(vol .le. 0.0, vol@_FillValue, vol)
 print("saving volume_density")
 a->volume_density=vol
 
-sad=a->aer_surf_as ; um2/cm2
-sad=sad+a->aer_surf_cs
+;sad=a->aer_surf_as ; um2/cm2
+;sad=sad+a->aer_surf_cs
+sad=a->SAD ; m2/m3 = cm3/cm3
+sad = where(sad .le. 0.0, sad@_FillValue, sad*1e4) ; cm2/cm3 -> um2/cm3
 sad@units = "um2/cm3"
-sad = where(sad .le. 0.0, sad@_FillValue, sad)
 print("saving sad")
 a->sad=sad
 
@@ -71,7 +77,7 @@ arho@units="kg m-3"
 H2SO4_mass = temp ; get metadata
 H2SO4_mass = arho*so4 ; kg S m-3
 H2SO4_mass = H2SO4_mass*AVOGAD/MWS ; molec m-3
-H2SO4_mass = H2SO4_mass*1.e6 ; molec cm-3
+H2SO4_mass = H2SO4_mass*1.e-6 ; molec cm-3
 H2SO4_mass@long_name="sulfate aerosol mass"
 H2SO4_mass@units="molecules/cm3air"
 print("saving H2SO4_mass")
