@@ -1,3 +1,7 @@
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 undef("plotS")
 procedure plotS(rootpath, caseid, startTime, stopTime)
@@ -39,6 +43,8 @@ begin
 
   ; Make a zonal and time average.
   gts  = dim_avg_Wrap(totals(lev|:, time|startTime:stopTime))
+  gz   =dim_avg_Wrap(z(lev|:, time|startTime:stopTime))
+  
   gocs = dim_avg_Wrap(ocs(lev|:, time|startTime:stopTime))
   gocs = (/ gocs*1e12 /)
   gso2 = dim_avg_Wrap(so2(lev|:, time|startTime:stopTime))
@@ -145,18 +151,28 @@ begin
   
 end
 
-rootpath = "/glade/scratch/mmills/archive/"
+print("running sulfurMAMvertProf.ncl...")
+
+host   = systemfunc("hostname")
+print("host: "+host)
+
+if (host.eq."modeling1") then
+  rootpath="/data2/mmills/"
+else
+  rootpath = "/glade/scratch/mmills/archive/"
+end if
+print("Using rootpath: " + rootpath)
+  
 caseid = getenv("caseid")
 
 if (ismissing(caseid)) then
   print("set environment variable caseid before running")
-  quit
+else
+  print("Using caseid: " + caseid)
+  print("")
+
+  startTime=12*7
+  stopTime=12*8-1
+
+  plotS(rootpath, caseid, startTime, stopTime)
 end if
-
-print("Using caseid: " + caseid)
-print("")
-
-startTime=12*7
-stopTime=12*8-1
-
-plotS(roothpath, caseid, startTime, stopTime)
