@@ -43,8 +43,8 @@ a->volume_density=vol
 
 ;sad=a->aer_surf_as ; um2/cm2
 ;sad=sad+a->aer_surf_cs
-sad=a->SAD ; m2/m3 = cm3/cm3
-sad = where(sad .le. 0.0, sad@_FillValue, sad*1e4) ; cm2/cm3 -> um2/cm3
+sad=a->SAD ; m2/m3
+sad = where(sad .le. 0.0, sad@_FillValue, sad*1e6) ; m2/m3 -> um2/cm3
 sad@units = "um2/cm3"
 print("saving sad")
 a->sad=sad
