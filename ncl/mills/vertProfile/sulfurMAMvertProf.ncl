@@ -49,7 +49,7 @@ begin
   gocs = (/ gocs*1e12 /)
   gso2 = dim_avg_Wrap(so2(lev|:, time|startTime:stopTime))
   gso2 = (/ gso2*1e12 /)
-  gso3 = dim_avg_Wrap(so2(lev|:, time|startTime:stopTime))
+  gso3 = dim_avg_Wrap(so3(lev|:, time|startTime:stopTime))
   gso3 = (/ gso3*1e12 /)
   gh2so4 = dim_avg_Wrap(h2so4(lev|:, time|startTime:stopTime))
   gh2so4 = (/ gh2so4*1e12 /)
@@ -60,7 +60,7 @@ begin
    
   ; Open a workstation
   datestr = systemfunc("date +%y%m%d_%H%M")
-  wks = gsn_open_wks("pdf", "$IMAGE_PATH/sulfurMAMvertProf_vmr_" + caseid + "_c" + datestr)
+  wks = gsn_open_wks("pdf", "$IMAGE_PATH/sulfurMAMvertProf_vmr_" + caseid ); + "_c" + datestr)
 ;  gsn_define_colormap(wks,"BlWhRe")       
       
   resP                       = True
@@ -127,9 +127,6 @@ begin
   resxy@xyLineColors          = (/ "green" /)
   overlay(plot, gsn_csm_xy(wks, gocs, gz, resxy))
 
-  resxy@xyLineColors          = (/ "red" /)
-  overlay(plot, gsn_csm_xy(wks, gso2, gz, resxy))
-
   resxy@xyLineColors          = (/ "purple" /)
   overlay(plot, gsn_csm_xy(wks, gso3, gz, resxy))
 
@@ -144,6 +141,41 @@ begin
 
   resxy@xyLineColors          = (/ "orange" /)
   overlay(plot, gsn_csm_xy(wks, gso4, gz, resxy))
+
+  resxy@xyLineColors          = (/ "red" /)
+  overlay(plot, gsn_csm_xy(wks, gso2, gz, resxy))
+
+  xpos=1000
+  ypos=130
+  ydif=10
+  txres = True
+  txres@txFontColor="black"
+  txres@txFontHeightF = 0.03                     ; font smaller. default big
+  gsn_text(wks,plot,"Total S",xpos,ypos,txres)
+  
+  ypos=ypos-ydif
+  txres@txFontColor="green"
+  gsn_text(wks,plot,"OCS",xpos,ypos,txres)
+  
+  ypos=ypos-ydif
+  txres@txFontColor="yellow"
+  gsn_text(wks,plot,"DMS",xpos,ypos,txres)
+  
+  ypos=ypos-ydif
+  txres@txFontColor="red"
+  gsn_text(wks,plot,"SO2",xpos,ypos,txres)
+  
+  ypos=ypos-ydif
+  txres@txFontColor="purple"
+  gsn_text(wks,plot,"SO3",xpos,ypos,txres)
+  
+  ypos=ypos-ydif
+  txres@txFontColor="blue"
+  gsn_text(wks,plot,"H2SO4",xpos,ypos,txres)
+  
+  ypos=ypos-ydif
+  txres@txFontColor="orange"
+  gsn_text(wks,plot,"SO4",xpos,ypos,txres)
 
   draw(plot)
   frame(wks)
