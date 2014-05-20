@@ -74,6 +74,28 @@ begin
     history->TMso4 = TMso4
   end if
   
+  if (isfilevar(history,"soy")) then
+    print("  Found SOy, skipping")
+  else
+    print("  Reading sulfur gas variables ...")
+    ocs= history->OCS        ; molec/molec air
+    dms= history->DMS        ; molec/molec air
+    s= history->S            ; molec/molec air
+    so= history->SO          ; molec/molec air
+    so2= history->SO2        ; molec/molec air
+    so3= history->SO3        ; molec/molec air
+    hso3= history->HSO3      ; molec/molec air
+    h2so4= history->H2SO4    ; molec/molec air
+
+    print("  Summing sulfur species, SOy ...")
+    soy = ocs ; get metadata    
+    soy = (/ so4*MWDAIR/MWNH4HSO4 + ocs + dms + s + so + so2 + so3 + hso3 + h2so4 /)
+    soy@long_name="Total sulfur gas + aerosol vmr"
+    print("  Saving soy ...")
+    printVarSummary(soy)
+    history->soy = soy
+  end if
+  
 ;  print("  Reading dgnd variables ...")
 ;  dgnd_a1= history->dgnd_a1      ; diameter (m)
 ;  dgnd_a2= history->dgnd_a2      ; diameter (m)
@@ -419,38 +441,44 @@ end
 ;caseid="b.e12.BRCP45W5CN.f19_g16.geo10Tgpy.001"
 ;caseid="f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001"
 ;caseid="f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001"
-caseid="f.e12.FSDW5.f19_f19.geo04.02"
-;caseid=getenv("caseid")
+;caseid="f.e12.FSDW5.f19_f19.geo04.02"
+caseid=getenv("caseid")
 print(caseid)
-;casedir=getenv("casedir")
-;print(casedir)
-rootpath="/glade/scratch/mmills/archive/"+caseid+"/atm/proc/h0mam/"
-sigma=(/1.6, 1.6, 1.2/)
 
-copypattern="/glade/scratch/mmills/archive/"+caseid+"/atm/hist/*h0*"
-;if (casedir.eq."run") then
-;  copypattern="/glade/scratch/mmills/"+caseid+"/run/"+caseid+".cam.h0*"
-;end if
+if (ismissing(caseid)) then
+  print("missing environment variable caseid, quitting")
+else
+  print("caseid:"+caseid)
+  ;casedir=getenv("casedir")
+  ;print(casedir)
+  rootpath="/glade/scratch/mmills/archive/"+caseid+"/atm/proc/h0mam/"
+  sigma=(/1.6, 1.6, 1.2/)
 
-print("===========================================================")
-print("mkdir -p "+rootpath)
-mkdir=systemfunc("mkdir -p "+rootpath)
-print("===========================================================")
-cpcmd="cp -n -v "+copypattern+" "+rootpath ; don't overwrite
-;cpcmd="cp -v "+copypattern+" "+rootpath ; overwrite
-print(cpcmd)
-cp=systemfunc(cpcmd)
-print(cp)
-print("===========================================================")
-historyNames=systemfunc("ls "+rootpath)
-print(historyNames)
-nfiles=dimsizes(historyNames)
-print("===========================================================")
+  copypattern="/glade/scratch/mmills/archive/"+caseid+"/atm/hist/*h0*"
+  ;if (casedir.eq."run") then
+  ;  copypattern="/glade/scratch/mmills/"+caseid+"/run/"+caseid+".cam.h0*"
+  ;end if
 
-do i = 0,nfiles-1
-  i1=i+1
   print("===========================================================")
-  print("File "+i1+" of "+nfiles+":"+historyNames(i))
-  calcAerProp(rootpath,historyNames(i),sigma)
+  print("mkdir -p "+rootpath)
+  mkdir=systemfunc("mkdir -p "+rootpath)
   print("===========================================================")
-end do
+  cpcmd="cp -n -v "+copypattern+" "+rootpath ; don't overwrite
+  ;cpcmd="cp -v "+copypattern+" "+rootpath ; overwrite
+  print(cpcmd)
+  cp=systemfunc(cpcmd)
+  print(cp)
+  print("===========================================================")
+  historyNames=systemfunc("ls "+rootpath)
+  print(historyNames)
+  nfiles=dimsizes(historyNames)
+  print("===========================================================")
+
+  do i = 0,nfiles-1
+    i1=i+1
+    print("===========================================================")
+    print("File "+i1+" of "+nfiles+":"+historyNames(i))
+    calcAerProp(rootpath,historyNames(i),sigma)
+    print("===========================================================")
+  end do
+end if
