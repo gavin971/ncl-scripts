@@ -24,8 +24,16 @@ procedure calcAerProp(rootpath:string,filename:string,sigma[3]:float)
 
 begin
 
+  command="rm "+rootpath+"temp.nc"
+  print(command)
+  a=systemfunc(command)
+
+  print("creating temp.nc")
+  tempfile=addfile(rootpath+"temp.nc","c")
+  append=False
+  
   print("reading "+filename)
-  history=addfile(rootpath+filename,"w")
+  history=addfile(rootpath+filename,"r")
   
   ; Compute the air mass and density.
   ;
@@ -54,7 +62,8 @@ begin
     so4@long_name="so4 concentration"
     print("  Saving so4 ...")
     printVarSummary(so4)
-    history->so4 = so4
+    tempfile->so4 = so4
+    append=True
   end if
   
   if (isfilevar(history,"TMso4")) then
@@ -71,10 +80,11 @@ begin
     TMso4@long_name="so4 column burden"
     print("  Saving TMso4 ...")
     printVarSummary(TMso4)
-    history->TMso4 = TMso4
+    tempfile->TMso4 = TMso4
+    append=True
   end if
   
-  if (isfilevar(history,"soy")) then
+  if (isfilevar(history,"SOy")) then
     print("  Found SOy, skipping")
   else
     print("  Reading sulfur gas variables ...")
@@ -91,9 +101,10 @@ begin
     soy = ocs ; get metadata    
     soy = (/ so4*MWDAIR/MWNH4HSO4 + ocs + dms + s + so + so2 + so3 + hso3 + h2so4 /)
     soy@long_name="Total sulfur gas + aerosol vmr"
-    print("  Saving soy ...")
+    print("  Saving SOy ...")
     printVarSummary(soy)
-    history->soy = soy
+    tempfile->SOy = soy
+    append=True
   end if
   
 ;  print("  Reading dgnd variables ...")
@@ -110,8 +121,10 @@ begin
   if (isfilevar(history,"P")) then
     print("  Reading P ...")
     P = history->P
-    history->P@units="Pa"
-    P@units="Pa"
+    if (P@units.ne."Pa") then
+      history->P@units="Pa"
+      P@units="Pa"
+    end if  
   else
     print("  Calculating air pressure ...")
     P = so4 ; get metadata
@@ -120,7 +133,8 @@ begin
     P@units="Pa"   
     print("  Saving P ...")
     printVarSummary(P)
-    history->P = P
+    tempfile->P = P
+    append=True
   end if
   
   if (isfilevar(history,"TMso4_strat")) then
@@ -156,7 +170,8 @@ begin
     TMso4_strat@method="scaled by 98.078479/115.108999 to adjust mol wt NH4HSO4 to H2SO4"
     print("  Saving TMso4_strat ...")
     printVarSummary(TMso4_strat)
-    history->TMso4_strat = TMso4_strat
+    tempfile->TMso4_strat = TMso4_strat
+    append=True
   end if
   
   ; Calculate the atmospheric density (g/cm3) assuming an ideal gas.
@@ -177,7 +192,8 @@ begin
     arhomass@units = "g/cm3"
     print("  Saving arhomass ...")
     printVarSummary(arhomass)    
-    history->arhomass=arhomass
+    tempfile->arhomass=arhomass
+    append=True
   end if
   
   if (isfilevar(history,"so4_nd")) then
@@ -193,12 +209,13 @@ begin
     so4_nd@units = "molec/cm3"
     print("  Saving so4_nd ...")
     printVarSummary(so4_nd)    
-    history->so4_nd=so4_nd
+    tempfile->so4_nd=so4_nd
+    append=True
   end if
 
-;  if (isfilevar(history,"radeffwet")) then
-;    print("  Found radeffwet ...")
-;  else
+  if (isfilevar(history,"radeffwet")) then
+    print("  Found radeffwet ...")
+  else
       
     print("  Reading dgnumwet1 ...")
     diam1=history->dgnumwet1
@@ -249,16 +266,16 @@ begin
    
     print("  Saving surfwet ...")
     printVarSummary(surf)    
-    history->surfwet=surf
+    tempfile->surfwet=surf
     print("  Saving surfwet_a1 ...")
     printVarSummary(surf_a1)    
-    history->surfwet_a1=surf_a1
+    tempfile->surfwet_a1=surf_a1
     print("  Saving surfwet_a2 ...")
     printVarSummary(surf_a2)    
-    history->surfwet_a2=surf_a2
+    tempfile->surfwet_a2=surf_a2
     print("  Saving surfwet_a3 ...")
     printVarSummary(surf_a3)    
-    history->surfwet_a3=surf_a3
+    tempfile->surfwet_a3=surf_a3
     
     print("  Calculating volwet ...")
     vol_a1=diam1 ; get metadata
@@ -288,16 +305,16 @@ begin
    
     print("  Saving volwet ...")
     printVarSummary(vol)    
-    history->volwet=vol
+    tempfile->volwet=vol
     print("  Saving volwet_a1 ...")
     printVarSummary(vol_a1)    
-    history->volwet_a1=vol_a1
+    tempfile->volwet_a1=vol_a1
     print("  Saving volwet_a2 ...")
     printVarSummary(vol_a2)    
-    history->volwet_a2=vol_a2
+    tempfile->volwet_a2=vol_a2
     print("  Saving volwet_a3 ...")
     printVarSummary(vol_a3)    
-    history->volwet_a3=vol_a3
+    tempfile->volwet_a3=vol_a3
 
     print("  Calculating radeffwet ...")
     radeffwet=diam1 ; get metadata
@@ -307,13 +324,14 @@ begin
    
     print("  Saving radeffwet ...")
     printVarSummary(radeffwet)    
-    history->radeffwet=radeffwet
+    tempfile->radeffwet=radeffwet
+    append=True
 
-;  end if
+  end if
 
-;  if (isfilevar(history,"radeffdry")) then
-;    print("  Found radeffdry ...")
-;  else
+  if (isfilevar(history,"radeffdry")) then
+    print("  Found radeffdry ...")
+  else
       
     delete(diam1)
     delete(diam2)
@@ -368,16 +386,16 @@ begin
    
     print("  Saving surfdry ...")
     printVarSummary(surf)    
-    history->surfdry=surf
+    tempfile->surfdry=surf
     print("  Saving surfdry_a1 ...")
     printVarSummary(surf_a1)    
-    history->surfdry_a1=surf_a1
+    tempfile->surfdry_a1=surf_a1
     print("  Saving surfdry_a2 ...")
     printVarSummary(surf_a2)    
-    history->surfdry_a2=surf_a2
+    tempfile->surfdry_a2=surf_a2
     print("  Saving surfdry_a3 ...")
     printVarSummary(surf_a3)    
-    history->surfdry_a3=surf_a3
+    tempfile->surfdry_a3=surf_a3
     
     delete(vol)
     print("  Calculating voldry ...")
@@ -408,16 +426,16 @@ begin
    
     print("  Saving voldry ...")
     printVarSummary(vol)    
-    history->voldry=vol
+    tempfile->voldry=vol
     print("  Saving voldry_a1 ...")
     printVarSummary(vol_a1)    
-    history->voldry_a1=vol_a1
+    tempfile->voldry_a1=vol_a1
     print("  Saving voldry_a2 ...")
     printVarSummary(vol_a2)    
-    history->voldry_a2=vol_a2
+    tempfile->voldry_a2=vol_a2
     print("  Saving voldry_a3 ...")
     printVarSummary(vol_a3)    
-    history->voldry_a3=vol_a3
+    tempfile->voldry_a3=vol_a3
 
     print("  Calculating radeffdry ...")
     radeffdry=diam1 ; get metadata
@@ -427,21 +445,21 @@ begin
     
     print("  Saving radeffdry ...")
     printVarSummary(radeffdry)    
-    history->radeffdry=radeffdry
+    tempfile->radeffdry=radeffdry
+    append=True
 
-;  end if
+  end if
   
+  delete(tempfile)
+  delete(history)
+  
+  if (append) then
+    command="ncks -A "+rootpath+"temp.nc "+rootpath+filename
+    print(command)
+    a=systemfunc(command)
+  end if
 end
 
-;caseid="b.e11.B55TRW5CN.f19_g16.Pin16-18.dgnumhi1um.001"
-;caseid="b.e11.B55TRW5CN.f19_g16.Pin20-30.dgnh1um.noqbo.001"
-;caseid="b.e12.BRCP45W5CN.f19_g16.control.002"
-;caseid="b.e12.BRCP45W5CN.f19_g16.geo02Tgpy2015TR.002"
-;caseid="b.e12.BRCP45W5CN.f19_g16.hifreq.001"
-;caseid="b.e12.BRCP45W5CN.f19_g16.geo10Tgpy.001"
-;caseid="f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001"
-;caseid="f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001"
-;caseid="f.e12.FSDW5.f19_f19.geo04.02"
 caseid=getenv("caseid")
 print(caseid)
 
@@ -469,7 +487,7 @@ else
   cp=systemfunc(cpcmd)
   print(cp)
   print("===========================================================")
-  historyNames=systemfunc("ls "+rootpath)
+  historyNames=systemfunc("ls "+rootpath+" |grep "+caseid)
   print(historyNames)
   nfiles=dimsizes(historyNames)
   print("===========================================================")
@@ -481,4 +499,8 @@ else
     calcAerProp(rootpath,historyNames(i),sigma)
     print("===========================================================")
   end do
+    
+  command="rm "+rootpath+"temp.nc"
+  print(command)
+  a=systemfunc(command)
 end if
