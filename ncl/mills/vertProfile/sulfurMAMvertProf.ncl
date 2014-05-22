@@ -4,7 +4,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 undef("plotS")
-procedure plotS(rootpath, caseid, startTime, stopTime)
+procedure plotS(rootpath, caseid, year)
 
 begin
   MWDAIR  = 28.966                  ; molecular weight dry air ~ kg/kmole
@@ -15,6 +15,10 @@ begin
     
   z     = history->Z3
   z     = (/ z / 1000. /)
+  
+  date=history->date
+  startTime=ind(date.eq.year*10000+201)
+  stopTime=ind(date.eq.(year+1)*10000+101)
 
   ; Read in the gases (mol/mol)
   h2so4 = history->H2SO4
@@ -60,7 +64,7 @@ begin
    
   ; Open a workstation
   datestr = systemfunc("date +%y%m%d_%H%M")
-  wks = gsn_open_wks("pdf", "$IMAGE_PATH/sulfurMAMvertProf_vmr_" + caseid ); + "_c" + datestr)
+  wks = gsn_open_wks("pdf", "$IMAGE_PATH/sulfurMAMvertProf_vmr_" + caseid +"_"+year+"avg" ); + "_c" + datestr)
 ;  gsn_define_colormap(wks,"BlWhRe")       
       
   resP                       = True
@@ -188,10 +192,13 @@ print("running sulfurMAMvertProf.ncl...")
 host   = systemfunc("hostname")
 print("host: "+host)
 
-if (host.eq."modeling1") then
-  rootpath="/data2/mmills/"
-else
-  rootpath = "/glade/scratch/mmills/archive/"
+rootpath=getenv("rootpath")
+if (ismissing(rootpath)) then
+  if (host.eq."modeling1") then
+    rootpath="/data2/mmills/"
+  else
+    rootpath = "/glade/scratch/mmills/archive/"
+  end if
 end if
 print("Using rootpath: " + rootpath)
   
@@ -202,9 +209,12 @@ if (ismissing(caseid)) then
 else
   print("Using caseid: " + caseid)
   print("")
+  
+  year=stringtointeger(getenv("year"))
+  if (ismissing(year)) then
+    year=1993
+  end if
+  print(year)
 
-  startTime=12*7
-  stopTime=12*8-1
-
-  plotS(rootpath, caseid, startTime, stopTime)
+  plotS(rootpath, caseid, year)
 end if
