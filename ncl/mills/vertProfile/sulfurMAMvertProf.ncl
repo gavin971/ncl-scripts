@@ -33,6 +33,7 @@ begin
   so3   = history->SO3
   hso3  = history->HSO3
   dms   = history->DMS
+  T     = history->T ; temperature
   
   ; Read in the sulfate (kg/kg)
   so4   = history->so4
@@ -56,17 +57,38 @@ begin
   r_SO2_OH  = history->r_SO2_OH
   r_SO3_H2O = history->r_SO3_H2O
   DTWR_SO2  = history->DTWR_SO2 ; wet removal Neu scheme tendency (mol/mol/s)
-  R146      = history->R_146 ; rate constant 146: SO2 + OH + M ->  HSO3 + M 
+  R146      = history->R_146 ; rate constant 146: SO2 + OH + M ->  HSO3 + M (cm6/molec2/s)
+  jh2so4    = history->jh2so4 ; photolysis rate (/s)
+  
   arhomass  = history->arhomass ; air density (g/cm3)
   arho = arhomass*AVOGAD/MWDAIR  ; air density (molec/cm3)
   arho@units="molec/cm3"
   
-  r_jso3    = r_jso3/arho       ; reaction rate (molec/molec/s)
-  r_jso3@units="molec/molec/s"
-  r_SO2_OH    = r_SO2_OH/arho       ; reaction rate (molec/molec/s)
-  r_SO2_OH@units="molec/molec/s"
-  r_SO3_H2O    = r_SO3_H2O/arho       ; reaction rate (molec/molec/s)
-  r_SO3_H2O@units="molec/molec/s"
+  r_jso3          = r_jso3/arho       ; reaction rate (molec/molec/s)
+  r_jso3@units    = "molec/molec/s"
+  r_SO2_OH        = r_SO2_OH/arho       ; reaction rate (molec/molec/s)
+  r_SO2_OH@units  = "molec/molec/s"
+  r_SO3_H2O       = r_SO3_H2O/arho       ; reaction rate (molec/molec/s)
+  r_SO3_H2O@units = "molec/molec/s"
+
+  R146            = R146*arho ; rate constant 146: SO2 + OH + M ->  HSO3 + M (cm3/molec/s)
+  R146@units      = "cm3/molec/s"
+  
+  A1=T ; get metadata
+  A1=(/ arho*3.30E-31*(300./T)^4.30 /)
+  B1=T ; get metadata
+  B1=(/ A1/1.6e-12 /)
+  SO2_OH_v1=T ; get metadata
+  SO2_OH_v1=(/ (A1/(1+B1))*0.6^(1./(1+log(B1)^2.)) /)
+  print("SO2_OH_v1: min="+min(SO2_OH_v1)+" max="+max(SO2_OH_v1))
+  
+  A2=T ; get metadata
+  A2=(/ arho*3.0E-31*(300./T)^3.30 /)
+  B2=T ; get metadata
+  B2=(/ A2/1.5e-12 /)
+  SO2_OH_v2=T ; get metadata
+  SO2_OH_v2=(/ (A2/(1+B2))*0.6^(1./(1+log(B2)^2.)) /)
+  print("SO2_OH_v2: min="+min(SO2_OH_v2)+" max="+max(SO2_OH_v2))
   
   tau_SOx = sox ; get metadata
   tau_SOx@_FillValue = default_fillvalue(typeof(tau_SOx))
@@ -84,7 +106,6 @@ begin
   tau_SOx_wr = tau_SOx_wr/DTWR_SO2  ; SOx lifetime (s)
   tau_SOx_wr = tau_SOx_wr/3600./24   ; SOx lifetime (s->days)
   tau_SOx_wr@units="days"
-
 
   
   ; Make a zonal and time average.
@@ -109,6 +130,10 @@ begin
   r_SO3_H2O_tavg = dim_avg_Wrap(r_SO3_H2O(lev|:, time|startTime:stopTime))
   DTWR_SO2_tavg =dim_avg_Wrap(DTWR_SO2(lev|:, time|startTime:stopTime))
   R146_tavg =dim_avg_Wrap(R146(lev|:, time|startTime:stopTime))
+  SO2_OH_v1_tavg =dim_avg_Wrap(SO2_OH_v1(lev|:, time|startTime:stopTime))
+  SO2_OH_v2_tavg =dim_avg_Wrap(SO2_OH_v2(lev|:, time|startTime:stopTime))
+  jh2so4_tavg = dim_avg_Wrap(jh2so4(lev|:, time|startTime:stopTime))
+  T_tavg = dim_avg_Wrap(T(lev|:, time|startTime:stopTime))
   
   tau_SOx_tavg =dim_avg_Wrap(tau_SOx(lev|:, time|startTime:stopTime))
   tau_SOx_wr_tavg =dim_avg_Wrap(tau_SOx_wr(lev|:, time|startTime:stopTime))
@@ -140,7 +165,7 @@ begin
   resxy@tmXBMinorPerMajor     = 8
   resxy@tmXTMinorPerMajor     = 8
 
-  plot = new(4, graphic)
+  plot = new(6, graphic)
   
 ; PLOT GASES
   plot(0) = gsn_csm_xy(wks, gts, gz, resxy)
@@ -234,46 +259,78 @@ begin
   txres@txFontColor="blue"
   dum=gsn_add_text(wks,plot(1),"SO2 wet removal",xpos,ypos,txres)
 
+  resxy@tiXAxisString         = "T (K)"
+  delete(resxy@trXMinF)            
+  delete(resxy@trXMaxF)            
+  resxy@trXMaxF               = 290.
+  resxy@trXMinF               = 190.
+  resxy@xyLineThicknesses     = (/ 8.0 /)
+  resxy@xyLineColors          = (/ "black" /)
+  resxy@trXLog                = False
+  plot(2) = gsn_csm_xy(wks, T_tavg, gz, resxy)
 
   resxy@tiXAxisString         = "SOx Lifetime (days)"
   delete(resxy@trXMinF)            
   delete(resxy@trXMaxF)            
+  resxy@trYMaxF               = 85.
   resxy@trXMaxF               = 1.e6
+  resxy@trXLog                = True
   resxy@xyLineThicknesses     = (/ 8.0 /)
   resxy@xyLineColors          = (/ "black" /)
-  plot(2) = gsn_csm_xy(wks, tau_SOx_tavg, gz, resxy)
+  plot(3) = gsn_csm_xy(wks, tau_SOx_tavg, gz, resxy)
   resxy@xyLineThicknesses     = (/ 4.0 /)
   resxy@xyLineColors          = (/ "blue" /)
-  overlay(plot(2), gsn_csm_xy(wks, tau_SOx_wr_tavg, gz, resxy))
+  overlay(plot(3), gsn_csm_xy(wks, tau_SOx_wr_tavg, gz, resxy))
   
-  xpos=2000.
-  ypos=130.0
-  ydif=8.0
+  xpos=60.
+  ypos=65.0
+  ydif=5.0
   txres@txFontHeightF = 0.025                     ; font smaller. default big
   txres@txFontColor="black"
-  dum=gsn_add_text(wks,plot(2),"SO3 oxidation",xpos,ypos,txres)
+  dum=gsn_add_text(wks,plot(3),"SO3 oxidation",xpos,ypos,txres)
   ypos=ypos-ydif
   txres@txFontColor="blue"
-  dum=gsn_add_text(wks,plot(2),"SO2 wet removal",xpos,ypos,txres)
+  dum=gsn_add_text(wks,plot(3),"SO2 wet removal",xpos,ypos,txres)
 
   resxy@tiXAxisString         = "Rate constant ("+R146@units+")"
   delete(resxy@trXMinF)            
   delete(resxy@trXMaxF)            
-;  resxy@trXMaxF               = 1.e6
+  resxy@trXMaxF               = 2.e-12
+  resxy@trXMinF               = 2.e-16
   resxy@xyLineThicknesses     = (/ 8.0 /)
   resxy@xyLineColors          = (/ "black" /)
-  plot(3) = gsn_csm_xy(wks, R146_tavg, gz, resxy)
-  xpos=3.e-32
-  ypos=60.0
-  ydif=8.0
+  plot(4) = gsn_csm_xy(wks, R146_tavg, gz, resxy)
+  resxy@xyLineThicknesses     = (/ 4.0 /)
+  resxy@xyLineColors          = (/ "blue" /)
+  overlay(plot(4), gsn_csm_xy(wks, SO2_OH_v1_tavg, gz, resxy))
+  resxy@xyLineThicknesses     = (/ 4.0 /)
+  resxy@xyLineColors          = (/ "red" /)
+  overlay(plot(4), gsn_csm_xy(wks, SO2_OH_v2_tavg, gz, resxy))
+
+  xpos=1.e-13
+  ypos=75.0
+  ydif=5.0
   txres@txFontColor="black"
   txres@txFontHeightF = 0.025                     ; font smaller. default big
-  dum=gsn_add_text(wks,plot(3),"SO2+OH+M->HSO3+M",xpos,ypos,txres)
+  dum=gsn_add_text(wks,plot(4),"SO2+OH, model",xpos,ypos,txres)
+  ypos=ypos-ydif
+  txres@txFontColor="blue"
+  dum=gsn_add_text(wks,plot(4),"JPL11",xpos,ypos,txres)
+  ypos=ypos-ydif
+  txres@txFontColor="red"
+  dum=gsn_add_text(wks,plot(4),"MAM",xpos,ypos,txres)
+
+  resxy@tiXAxisString         = "jH2SO4"
+  delete(resxy@trXMinF)            
+  delete(resxy@trXMaxF)            
+  resxy@xyLineThicknesses     = (/ 8.0 /)
+  resxy@xyLineColors          = (/ "black" /)
+  plot(5) = gsn_csm_xy(wks, jh2so4_tavg, gz, resxy)
 
   resP                      = True
   resP@gsnMaximize          = True
-  resP@gsnPaperOrientation   = "portrait"
-  gsn_panel(wks, plot, (/ 2, 2 /), resP)
+  resP@gsnPaperOrientation   = "landscape"
+  gsn_panel(wks, plot, (/ 2, 3 /), resP)
 ;  draw(plot)
 ;  frame(wks)
   delete(wks)
