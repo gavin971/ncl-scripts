@@ -73,10 +73,10 @@ begin
     append=True
   end if
   
-;  if (isfilevar(history,"TMso4")) then
-;    print("  Reading TMso4 ...")
-;    TMso4=history->TMso4
-;  else
+  if (isfilevar(history,"TMso4")) then
+    print("  Reading TMso4 ...")
+    TMso4=history->TMso4
+  else
     if (isfilevar(history,"TMso4_a1")) then
       print("  Reading TMso4 variables ...")
       TMso4_a1= history->TMso4_a1        ; kg/m2
@@ -108,7 +108,7 @@ begin
 ;    printVarSummary(TMso4)
     tempfile->TMso4 = TMso4
     append=True
-;  end if
+  end if
       
   if (isfilevar(history,"SOy")) then
     print("  Found SOy, skipping")
@@ -594,10 +594,14 @@ else
   mamdir=rootpath+"/"+caseid+"/atm/proc/h0mam/"
   sigma=(/1.6, 1.6, 1.2/)
 
-  copypattern=rootpath+caseid+"/atm/hist/*h0*"
-  ;if (casedir.eq."run") then
-  ;  copypattern="/glade/scratch/mmills/"+caseid+"/run/"+caseid+".cam.h0*"
-  ;end if
+  rundir=getenv("rundir") ; use output from run directory or archive?
+  if (ismissing(rundir)) then ; use output from archive
+    copypattern=rootpath+caseid+"/atm/hist/*h0*"
+    print("copying from archive:"+copypattern)
+  else ; use output from run directory
+    copypattern="/glade/scratch/mmills/"+caseid+"/run/"+caseid+".cam.h0*"
+    print("copying from run dir:"+copypattern)
+  end if
 
   print("===========================================================")
   print("mkdir -p "+mamdir)
