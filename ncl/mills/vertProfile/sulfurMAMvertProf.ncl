@@ -272,8 +272,10 @@ begin
   resxy@tiXAxisString         = "SOx Lifetime (days)"
   delete(resxy@trXMinF)            
   delete(resxy@trXMaxF)            
-  resxy@trYMaxF               = 85.
-  resxy@trXMaxF               = 1.e6
+;  resxy@trYMaxF               = 85.
+  resxy@trYMaxF               = 40.
+;  resxy@trXMaxF               = 1.e6
+  resxy@trXMaxF               = 1.e2
   resxy@trXLog                = True
   resxy@xyLineThicknesses     = (/ 8.0 /)
   resxy@xyLineColors          = (/ "black" /)
@@ -287,14 +289,16 @@ begin
   ydif=5.0
   txres@txFontHeightF = 0.025                     ; font smaller. default big
   txres@txFontColor="black"
-  dum=gsn_add_text(wks,plot(3),"SO3 oxidation",xpos,ypos,txres)
+;  dum=gsn_add_text(wks,plot(3),"SO3 oxidation",xpos,ypos,txres)
   ypos=ypos-ydif
   txres@txFontColor="blue"
-  dum=gsn_add_text(wks,plot(3),"SO2 wet removal",xpos,ypos,txres)
+;  dum=gsn_add_text(wks,plot(3),"SO2 wet removal",xpos,ypos,txres)
 
   resxy@tiXAxisString         = "Rate constant ("+R146@units+")"
   delete(resxy@trXMinF)            
   delete(resxy@trXMaxF)            
+  resxy@trYMaxF               = 85.
+  resxy@trYMaxF               = 40.
   resxy@trXMaxF               = 2.e-12
   resxy@trXMinF               = 2.e-16
   resxy@xyLineThicknesses     = (/ 8.0 /)
