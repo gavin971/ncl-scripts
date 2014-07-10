@@ -10,7 +10,7 @@ z2=23.d0 ; upper bound of SO2 emission (km), must be less than 31 km
 
 TgSO2 = 10.d0 ; Tg of SO2/year
 
-; Single column over Pinatubo:
+; Single column on equator, Pinatubo longitude:
 lat1=0.9473648d0
 lat2=0.9473648d0
 lon1=120.d0
