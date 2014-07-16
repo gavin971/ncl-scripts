@@ -82,6 +82,8 @@ if  [ -n "$caseid" ] ; then
   mkdir -p $gmdir
   mkdir -p $tmdir
 
+#==========================================================================
+
   avgfile=$gmdir'/'$caseid'.cam.'$hnum'.globavg.nc'
   tmpfile=$gmdir'/zmtmp.nc'
 
@@ -96,6 +98,8 @@ if  [ -n "$caseid" ] ; then
   echo "ncwa -O -I -a lat -w gw -x -v nlon,wnummax $tmpfile $avgfile"
   ncwa -O -I -a lat -w gw -x -v nlon,wnummax $tmpfile $avgfile
     
+#==========================================================================
+
   avgfile=$tmdir'/'$caseid'.cam.'$hnum'.tropicsavg.nc'
   echo " "
   echo "avgfile= $avgfile"
@@ -104,6 +108,18 @@ if  [ -n "$caseid" ] ; then
   echo "ncwa -O -I -a lat -w gw -d lat,-23.4378,23.4378 -x -v nlon,wnummax $tmpfile $avgfile"
   ncwa -O -I -a lat -w gw -d lat,-23.4378,23.4378 -x -v nlon,wnummax $tmpfile $avgfile
     
+#==========================================================================
+
+  avgfile=$tmdir'/'$caseid'.cam.'$hnum'.0-20N.nc'
+  echo " "
+  echo "avgfile= $avgfile"
+    
+  echo " "
+  echo "ncwa -O -I -a lat -w gw -d lat,0.0,20.0 -x -v nlon,wnummax $tmpfile $avgfile"
+  ncwa -O -I -a lat -w gw -d lat,0.0,20.0 -x -v nlon,wnummax $tmpfile $avgfile
+    
+#==========================================================================
+
   avgfile=$gmdir'/'$caseid'.cam.'$hnum'.NHavg.nc'
   echo " "
   echo "avgfile= $avgfile"
@@ -112,6 +128,8 @@ if  [ -n "$caseid" ] ; then
   echo "ncwa -O -I -a lat -w gw -d lat,0.0,90.0 -x -v nlon,wnummax $tmpfile $avgfile"
   ncwa -O -I -a lat -w gw -d lat,0.0,90.0 -x -v nlon,wnummax $tmpfile $avgfile
     
+#==========================================================================
+
   avgfile=$gmdir'/'$caseid'.cam.'$hnum'.SHavg.nc'
   echo " "
   echo "avgfile= $avgfile"
@@ -120,6 +138,8 @@ if  [ -n "$caseid" ] ; then
   echo "ncwa -O -I -a lat -w gw -d lat,-90.0,0.0 -x -v nlon,wnummax $tmpfile $avgfile"
   ncwa -O -I -a lat -w gw -d lat,-90.0,0.0 -x -v nlon,wnummax $tmpfile $avgfile
     
+#==========================================================================
+
   avgfile=$gmdir'/'$caseid'.cam.'$hnum'.NETavg.nc'
   echo " "
   echo "avgfile= $avgfile"
@@ -128,6 +148,8 @@ if  [ -n "$caseid" ] ; then
   echo "ncwa -O -I -a lat -w gw -d lat,23.4378,90.0 -x -v nlon,wnummax $tmpfile $avgfile"
   ncwa -O -I -a lat -w gw -d lat,23.4378,90.0 -x -v nlon,wnummax $tmpfile $avgfile
     
+#==========================================================================
+
   avgfile=$gmdir'/'$caseid'.cam.'$hnum'.SETavg.nc'
   echo " "
   echo "avgfile= $avgfile"
@@ -136,6 +158,8 @@ if  [ -n "$caseid" ] ; then
   echo "ncwa -O -I -a lat -w gw -d lat,-90.0,-23.4378 -x -v nlon,wnummax $tmpfile $avgfile"
   ncwa -O -I -a lat -w gw -d lat,-90.0,-23.4378 -x -v nlon,wnummax $tmpfile $avgfile
     
+#==========================================================================
+
   echo " "
   echo "rm $tmpfile"
   rm $tmpfile
