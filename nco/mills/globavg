@@ -120,6 +120,16 @@ if  [ -n "$caseid" ] ; then
     
 #==========================================================================
 
+  avgfile=$tmdir'/'$caseid'.cam.'$hnum'.10N-10S.nc'
+  echo " "
+  echo "avgfile= $avgfile"
+    
+  echo " "
+  echo "ncwa -O -I -a lat -w gw -d lat,-10.0,10.0 -x -v nlon,wnummax $tmpfile $avgfile"
+  ncwa -O -I -a lat -w gw -d lat,-10.0,10.0 -x -v nlon,wnummax $tmpfile $avgfile
+    
+#==========================================================================
+
   avgfile=$gmdir'/'$caseid'.cam.'$hnum'.NHavg.nc'
   echo " "
   echo "avgfile= $avgfile"
