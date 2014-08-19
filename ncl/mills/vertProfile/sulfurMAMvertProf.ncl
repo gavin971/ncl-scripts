@@ -125,14 +125,21 @@ begin
   
   ; Open the histories
 ;  history = addfile(rootpath+caseid+"/atm/proc/h0gm/"+caseid+".cam.h0.globavg.nc","r")
-  history = addfile(rootpath+caseid+"/atm/proc/h0gm/"+caseid+".cam.h0.0-20N.nc","r")
+  history = addfile(rootpath+caseid(0)+"/atm/proc/h0gm/"+caseid(0)+".cam.h0.0-20N.nc","r")
+  history1 = addfile(rootpath+caseid(1)+"/atm/proc/h0gm/"+caseid(1)+".cam.h0.0-20N.nc","r")
+  history2 = addfile(rootpath+caseid(2)+"/atm/proc/h0gm/"+caseid(2)+".cam.h0.0-20N.nc","r")
     
   z     = history->Z3
   z     = (/ z / 1000. /)
   
   date=history->date
-  startTime=ind(date.eq.year*10000+201)
-  stopTime=ind(date.eq.(year+1)*10000+101)
+  startTime=ind(date.eq.year(0)*10000+201)
+  stopTime=ind(date.eq.(year(0)+1)*10000+101)
+  
+  date1=history1->date
+  startTime1=ind(date1.eq.year(1)*10000+201)
+  date2=history2->date
+  startTime2=ind(date2.eq.year(2)*10000+201)
 
 ; GASES
   ; Read in the gases (mol/mol)
@@ -141,6 +148,8 @@ begin
   s     = history->S
   so    = history->SO
   so2   = history->SO2
+  so2_1 = history1->SO2
+  so2_2 = history2->SO2
   so3   = history->SO3
   dms   = history->DMS
   T     = history->T ; temperature
@@ -229,6 +238,18 @@ begin
   gso2_mam = dim_avg_Wrap(so2(lev|:, time|startTime+2:startTime+4))
   gso2_jja = dim_avg_Wrap(so2(lev|:, time|startTime+5:startTime+7))
   gso2_son = dim_avg_Wrap(so2(lev|:, time|startTime+8:startTime+10))
+
+  so2_1 = (/ so2_1*1e12 /)
+  gso2_djf1 = dim_avg_Wrap(so2_1(lev|:, time|startTime1-1:startTime1+1))
+  gso2_mam1 = dim_avg_Wrap(so2_1(lev|:, time|startTime1+2:startTime1+4))
+  gso2_jja1 = dim_avg_Wrap(so2_1(lev|:, time|startTime1+5:startTime1+7))
+  gso2_son1 = dim_avg_Wrap(so2_1(lev|:, time|startTime1+8:startTime1+10))
+
+  so2_2 = (/ so2_2*1e12 /)
+  gso2_djf2 = dim_avg_Wrap(so2_2(lev|:, time|startTime2-1:startTime2+1))
+  gso2_mam2 = dim_avg_Wrap(so2_2(lev|:, time|startTime2+2:startTime2+4))
+  gso2_jja2 = dim_avg_Wrap(so2_2(lev|:, time|startTime2+5:startTime2+7))
+  gso2_son2 = dim_avg_Wrap(so2_2(lev|:, time|startTime2+8:startTime2+10))
   
   gsox = dim_avg_Wrap(sox(lev|:, time|startTime:stopTime))
   gsox = (/ gsox*1e12 /)
@@ -254,7 +275,8 @@ begin
   
   ; Open a workstation
   datestr = systemfunc("date +%y%m%d_%H%M")
-  wks = gsn_open_wks("pdf", "$IMAGE_PATH/sulfurMAMvertProf_vmr_" + caseid +"_"+year+"avg" ); + "_c" + datestr)
+;  wks = gsn_open_wks("pdf", "$IMAGE_PATH/sulfurMAMvertProf_vmr_" + caseid +"_"+year+"avg" ); + "_c" + datestr)
+  wks = gsn_open_wks("pdf", "$IMAGE_PATH/sulfurMAMvertProf_vmr_0-20N" ); + "_c" + datestr)
 
   minP = 0.
   maxP = 1000.  
@@ -487,7 +509,7 @@ begin
   resxy@xyDashPatterns        = (/ 0 /)
   resxy@xyLineThicknesses     = (/ 3.0 /)
   resxy@xyLineColors          = (/ "purple" /)
-  overlay(plot(0), gsn_csm_xy(wks, UKCA_SO2_DJF, UKCA_alt, resxy))
+;  overlay(plot(0), gsn_csm_xy(wks, UKCA_SO2_DJF, UKCA_alt, resxy))
 
   resxy@xyLineThicknesses     = (/ 5.0 /)
   resxy@xyLineColors          = (/ "red" /)
@@ -497,23 +519,37 @@ begin
   resxy@xyLineColors          = (/ "black" /)
   overlay(plot(0), gsn_csm_xy(wks, gso2_djf, gz, resxy))
 
-  xpos=9.0
+  resxy@xyLineThicknesses     = (/ 3.0 /)
+  resxy@xyLineColors          = (/ "blue" /)
+;  overlay(plot(0), gsn_csm_xy(wks, gso2_djf1, gz, resxy))
+  resxy@xyLineColors          = (/ "green" /)
+;  overlay(plot(0), gsn_csm_xy(wks, gso2_djf2, gz, resxy))
+
+  xpos=10.0
   ypos=42.0
   ydif=4.0
   txres = True
   txres@txFontColor="black"
   txres@txFontHeightF = 0.025                     ; font smaller. default big
   dum=gsn_add_text(wks,plot(0),"WACCM",xpos,ypos,txres)
+  xpos=30.0
+  ypos=40.0
+  txres@txFontColor="blue"
+;  dum=gsn_add_text(wks,plot(0),"QY=1",xpos,ypos,txres)
+  txres@txFontColor="green"
+  xpos=2.0
+  ypos=41.0
+;  dum=gsn_add_text(wks,plot(0),"old JH2SO4",xpos,ypos,txres)
   
   xpos=60.0
   ypos=20.0
   txres@txFontColor="red"
   dum=gsn_add_text(wks,plot(0),"MIPAS",xpos,ypos,txres)
   
-  xpos=3.0
-  ypos=30.0
+  xpos=1.0
+  ypos=35.0
   txres@txFontColor="purple"
-  dum=gsn_add_text(wks,plot(0),"UKCA",xpos,ypos,txres)
+;  dum=gsn_add_text(wks,plot(0),"UKCA",xpos,ypos,txres)
 
 ; PLOT SO2 MAM
   resxy@tiMainString         = "MAM, 0-20N"
@@ -530,8 +566,14 @@ begin
   overlay(plot(1), gsn_csm_xy(wks, gso2_mam, gz, resxy))
 
   resxy@xyLineThicknesses     = (/ 3.0 /)
+  resxy@xyLineColors          = (/ "blue" /)
+;  overlay(plot(1), gsn_csm_xy(wks, gso2_mam1, gz, resxy))
+  resxy@xyLineColors          = (/ "green" /)
+;  overlay(plot(1), gsn_csm_xy(wks, gso2_mam2, gz, resxy))
+
+  resxy@xyLineThicknesses     = (/ 3.0 /)
   resxy@xyLineColors          = (/ "purple" /)
-  overlay(plot(1), gsn_csm_xy(wks, UKCA_SO2_MAM, UKCA_alt, resxy))
+;  overlay(plot(1), gsn_csm_xy(wks, UKCA_SO2_MAM, UKCA_alt, resxy))
 
   resxy@xyLineThicknesses     = (/ 5.0 /)
   resxy@xyLineColors          = (/ "red" /)
@@ -552,8 +594,14 @@ begin
   overlay(plot(2), gsn_csm_xy(wks, gso2_jja, gz, resxy))
 
   resxy@xyLineThicknesses     = (/ 3.0 /)
+  resxy@xyLineColors          = (/ "blue" /)
+;  overlay(plot(2), gsn_csm_xy(wks, gso2_jja1, gz, resxy))
+  resxy@xyLineColors          = (/ "green" /)
+;  overlay(plot(2), gsn_csm_xy(wks, gso2_jja2, gz, resxy))
+
+  resxy@xyLineThicknesses     = (/ 3.0 /)
   resxy@xyLineColors          = (/ "purple" /)
-  overlay(plot(2), gsn_csm_xy(wks, UKCA_SO2_JJA, UKCA_alt, resxy))
+;  overlay(plot(2), gsn_csm_xy(wks, UKCA_SO2_JJA, UKCA_alt, resxy))
 
   resxy@xyLineThicknesses     = (/ 5.0 /)
   resxy@xyLineColors          = (/ "red" /)
@@ -574,8 +622,14 @@ begin
   overlay(plot(3), gsn_csm_xy(wks, gso2_son, gz, resxy))
 
   resxy@xyLineThicknesses     = (/ 3.0 /)
+  resxy@xyLineColors          = (/ "blue" /)
+;  overlay(plot(3), gsn_csm_xy(wks, gso2_son1, gz, resxy))
+  resxy@xyLineColors          = (/ "green" /)
+;  overlay(plot(3), gsn_csm_xy(wks, gso2_son2, gz, resxy))
+
+  resxy@xyLineThicknesses     = (/ 3.0 /)
   resxy@xyLineColors          = (/ "purple" /)
-  overlay(plot(3), gsn_csm_xy(wks, UKCA_SO2_SON, UKCA_alt, resxy))
+;  overlay(plot(3), gsn_csm_xy(wks, UKCA_SO2_SON, UKCA_alt, resxy))
 
   resxy@xyLineThicknesses     = (/ 5.0 /)
   resxy@xyLineColors          = (/ "red" /)
@@ -602,19 +656,23 @@ if (ismissing(rootpath)) then
 end if
 print("Using rootpath: " + rootpath)
   
-caseid = getenv("caseid")
+;caseid = getenv("caseid")
+caseid=(/"b.e12.B55TRW5CN.f19_g16.1989Tr.QBOon.NeuSO2.LyA.expJH2SO4.bkgd.2", \
+         "b.e12.B55TRW5CN.f19_g16.1989Tr.QBOon.NeuSO2.LyA.expJH2SO4.QY1.bkgd.1", \
+         "b.e12.B55TRW5CN.f19_g16.1989Tr.QBOon.NeuSO2.LyA.bkgd.1"/)
+year=(/1992,1992,1990/)
 
-if (ismissing(caseid)) then
-  print("set environment variable caseid before running")
-else
-  print("Using caseid: " + caseid)
+;if (ismissing(caseid)) then
+;  print("set environment variable caseid before running")
+;else
+  print("Using caseid: " + caseid + " year "+year)
   print("")
   
-  year=stringtointeger(getenv("year"))
-  if (ismissing(year)) then
-    year=1990
-  end if
-  print("Averaging year: "+year)
+;  year=stringtointeger(getenv("year"))
+;  if (ismissing(year)) then
+;    year=1990
+;  end if
+;  print("Averaging year: "+year)
 
   plotS(rootpath, caseid, year)
-end if
+;end if

@@ -397,7 +397,7 @@ else
     res1@vpYF              = 0.91
     print("year:"+dimsizes(year))
     print("restom_ann_w:"+dimsizes(restom_ann_w))
-    print("RESTOM min:"+min(restom_ann_w)+" max:"+max(restom_ann_w))
+    print("RESTOM avg(10y):"+avg(restom_ann_w(0:9))+" min:"+min(restom_ann_w)+" max:"+max(restom_ann_w))
     plot(0) = gsn_csm_xy (wks,year,restom_ann_w,res1)
 
     res2@tiMainString  = "TS" ; title
@@ -410,7 +410,7 @@ else
     ;res2@trYMaxF = 289
     res2@trYMaxF = 290.0  ;caf
     print("ts_ann_w:"+dimsizes(ts_ann_w))
-    print(min(ts_ann_w)+" "+max(ts_ann_w))
+    print("TS avg(10y):"+avg(ts_ann_w(0:9))+" min:"+min(ts_ann_w)+" max:"+max(ts_ann_w))
     print(res2)
     plot(1) = gsn_csm_xy (wks,year,ts_ann_w,res2)
 
