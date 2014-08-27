@@ -13,7 +13,7 @@ PI      = 4.0 * atan(1.0)         ; pi
 
 SAearth=4.e0*PI*Rearth*Rearth ; Earth surface area in m2 (CAM)
 ;print("SAearth="+SAearth+" m2")
-cfac = SAearth/1.e6 ; (kgS/m2 -> TgS)
+cfac = SAearth/1.e6 ; (kgS/m2 -> GgS)
 ;print(cfac)
 
 
@@ -26,6 +26,7 @@ else
   end if
   gmdir=rootpath+"/"+caseid+"/atm/proc/h0gm/"
   filename=caseid+".cam.h0.globavg.nc"
+  print("opening "+gmdir+filename)
   a=addfile(gmdir+filename,"r")
   TMso4_strat   = a->TMso4_strat
   printVarSummary(TMso4_strat)
@@ -33,6 +34,7 @@ else
   year1=(time(0)-31)/365
   nMonths=dimsizes(TMso4_strat)
   nYears=nMonths/12
+  print("nYears="+nYears)
   TMso4_strat   = (/ TMso4_strat * cfac /)
   if (isfilevar(a,"TMso4_trop")) then
     TMso4_trop    = a->TMso4_trop
@@ -57,7 +59,8 @@ else
 
     print((/caseid/))
     print("time(0)="+time(0)+" "+TMso4_strat&time@units)
-    print("Stratospheric burdens (Tg S):")
+    print("=====================================")
+    print("Annual Stratospheric burdens (Gg S):")
 ;    print("OCS   DMS      SO2  H2SO4 sulfate")
 ;    print(sprintf("%5.1f",TMOCS_strat)+" "+sprintf("%5.1e",TMDMS_strat)+" "+sprintf("%5.2f",TMSO2_strat)+" "+\
 ;  	  sprintf("%5.3f",TMH2SO4_strat)+" "+sprintf("%5.1f",TMso4_strat))
@@ -71,12 +74,13 @@ else
   	    sprintf("%5.3f",avg(TMH2SO4_strat(t1:t2)))+" "+sprintf("%5.1f",avg(TMso4_strat(t1:t2))))
     end do
     
-    print("Tropospheric burdens (Tg S):")
+    print("=====================================")
+    print("Annual Tropospheric burdens (Gg S):")
 ;    print("OCS    DMS    SO2  H2SO4 sulfate")
 ;    print(sprintf("%5.1f",TMOCS_trop)+" "+sprintf("%5.1f",TMDMS_trop)+" "+sprintf("%5.2f",TMSO2_trop)+" "+\
 ;  	  sprintf("%5.3f",TMH2SO4_trop)+" "+sprintf("%5.1f",TMso4_trop))
     print("Year OCS   DMS      SO2  H2SO4 sulfate")
-    do i = 0,3
+    do i = 0,nYears-1
       t1=12*i
       t2=t1+11
       year = i+1
@@ -84,11 +88,20 @@ else
             sprintf("%5.1f",avg(TMDMS_trop(t1:t2)))+" "+sprintf("%5.2f",avg(TMSO2_trop(t1:t2)))+" "+\
   	    sprintf("%5.3f",avg(TMH2SO4_trop(t1:t2)))+" "+sprintf("%5.1f",avg(TMso4_trop(t1:t2))))
     end do
+    
+    print("=====================================")
+    print("Monthly Stratospheric burdens (Gg S):")
+    print("Month OCS   DMS      SO2  H2SO4 sulfate")
+    do i = 0,nMonths-1
+      print(" "+i +"   " + sprintf("%5.1f",TMOCS_strat(i))+" "+\
+            sprintf("%5.1e",TMDMS_strat(i))+" "+sprintf("%5.2f",TMSO2_strat(i))+" "+\
+  	    sprintf("%5.3f",TMH2SO4_strat(i))+" "+sprintf("%5.1f",TMso4_strat(i)))
+    end do
   else
     TMso4_strat=TMso4_strat*MWS/MWH2SO4
     print((/caseid/))
     print("time(0)="+time(0)+" "+TMso4_strat&time@units)
-    print( "Stratospheric sulfate burdens (Tg S):" )
+    print( "Stratospheric sulfate burdens (Gg S):" )
 ;    print( sprintf("%5.1f",TMso4_strat) )
 
     print("Year sulfate")

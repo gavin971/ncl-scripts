@@ -35,6 +35,7 @@ begin
   print(command)
   a=systemfunc(command)
 
+  setfileoption("nc","Format","LargeFile") ; needed to write large variables (>2GB) to a NetCDF file
   print("creating temp.nc")
   tempfile=addfile(mamdir+"temp.nc","c")
   append=False
@@ -113,24 +114,28 @@ begin
   if (isfilevar(history,"SOy")) then
     print("  Found SOy, skipping")
   else
-    print("  Reading sulfur gas variables ...")
-    ocs= history->OCS        ; molec/molec air
-    dms= history->DMS        ; molec/molec air
-    s= history->S            ; molec/molec air
-    so= history->SO          ; molec/molec air
-    so2= history->SO2        ; molec/molec air
-    so3= history->SO3        ; molec/molec air
-;    hso3= history->HSO3      ; molec/molec air
-    h2so4= history->H2SO4    ; molec/molec air
+    if (isfilevar(history,"OCS")) then
+      print("  Reading sulfur gas variables ...")
+      ocs= history->OCS        ; molec/molec air
+      dms= history->DMS        ; molec/molec air
+      s= history->S            ; molec/molec air
+      so= history->SO          ; molec/molec air
+      so2= history->SO2        ; molec/molec air
+      so3= history->SO3        ; molec/molec air
+  ;    hso3= history->HSO3      ; molec/molec air
+      h2so4= history->H2SO4    ; molec/molec air
 
-    print("  Summing sulfur species, SOy ...")
-    soy = ocs ; get metadata    
-    soy = (/ so4*MWDAIR/MWNH4HSO4 + ocs + dms + s + so + so2 + so3 + h2so4 /)
-    soy@long_name="Total sulfur gas + aerosol vmr"
-    print("  Saving SOy ...")
-;    printVarSummary(soy)
-    tempfile->SOy = soy
-    append=True
+      print("  Summing sulfur species, SOy ...")
+      soy = ocs ; get metadata    
+      soy = (/ so4*MWDAIR/MWNH4HSO4 + ocs + dms + s + so + so2 + so3 + h2so4 /)
+      soy@long_name="Total sulfur gas + aerosol vmr"
+      print("  Saving SOy ...")
+  ;    printVarSummary(soy)
+      tempfile->SOy = soy
+      append=True
+    else
+      print("  OCS missing, skipping SOy calculation")
+    end if
   end if
   
 ;  print("  Reading dgnd variables ...")
@@ -205,11 +210,11 @@ begin
           tp = (/ tp/100.0 /)
           tp@units="hPa"
         end if
-        TMso4_strat(0,j,m)   = dim_sum(cellMass_so4 (time|:, lat|j, lon|m, {lev|:tp}))
-        TMSO2_strat(0,j,m)   = dim_sum(cellMass_so2 (time|:, lat|j, lon|m, {lev|:tp}))
-        TMOCS_strat(0,j,m)   = dim_sum(cellMass_ocs (time|:, lat|j, lon|m, {lev|:tp}))
-        TMDMS_strat(0,j,m)   = dim_sum(cellMass_dms (time|:, lat|j, lon|m, {lev|:tp}))
-        TMH2SO4_strat(0,j,m) = dim_sum(cellMass_h2so4 (time|:, lat|j, lon|m, {lev|:tp}))
+        TMso4_strat(:,j,m)   = dim_sum(cellMass_so4 (time|:, lat|j, lon|m, {lev|:tp}))
+        TMSO2_strat(:,j,m)   = dim_sum(cellMass_so2 (time|:, lat|j, lon|m, {lev|:tp}))
+        TMOCS_strat(:,j,m)   = dim_sum(cellMass_ocs (time|:, lat|j, lon|m, {lev|:tp}))
+        TMDMS_strat(:,j,m)   = dim_sum(cellMass_dms (time|:, lat|j, lon|m, {lev|:tp}))
+        TMH2SO4_strat(:,j,m) = dim_sum(cellMass_h2so4 (time|:, lat|j, lon|m, {lev|:tp}))
      end do
     end do    
     delete(cellMass_so4)
@@ -591,15 +596,20 @@ else
   if (ismissing(rootpath)) then
     rootpath="/glade/scratch/mmills/archive/"
   end if
-  mamdir=rootpath+"/"+caseid+"/atm/proc/h0mam/"
+  
+  hnum=getenv("hnum")
+  if (ismissing(hnum)) then
+    hnum="h0"
+  end if
+  mamdir=rootpath+"/"+caseid+"/atm/proc/"+hnum+"mam/"
   sigma=(/1.6, 1.6, 1.2/)
 
   rundir=getenv("rundir") ; use output from run directory or archive?
   if (ismissing(rundir)) then ; use output from archive
-    copypattern=rootpath+caseid+"/atm/hist/*h0*"
+    copypattern=rootpath+caseid+"/atm/hist/*"+hnum+"*"
     print("copying from archive:"+copypattern)
   else ; use output from run directory
-    copypattern="/glade/scratch/mmills/"+caseid+"/run/"+caseid+".cam.h0*"
+    copypattern="/glade/scratch/mmills/"+caseid+"/run/"+caseid+".cam."+hnum+"*"
     print("copying from run dir:"+copypattern)
   end if
 

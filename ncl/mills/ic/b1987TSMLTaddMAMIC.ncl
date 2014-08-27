@@ -12,13 +12,19 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 
 icpath1="/glade/p/work/mmills/inputdata/init/"
-icpath2="/glade/p/cesm/wawg/mmills/run/b.e11.B55TRW5CN.f19_g16.MJMtest.013/rest/1989-01-01-00000/"
+srcIcWaccm = icpath1+"f_1950-2010_2deg_refc1_wa4_tsmlt.002.cam.i.1987-01-01-00000.nc"
+
+;icpath2="/glade/p/cesm/wawg/mmills/run/b.e11.B55TRW5CN.f19_g16.MJMtest.013/rest/1989-01-01-00000/"
+;srcIcWACCM5   = icpath2+"b.e11.B55TRW5CN.f19_g16.MJMtest.013.cam.i.1989-01-01-00000.nc"
+
+icpath2="/glade/p/cesm/wawg/mmills/run/b.e12.B55TRW5CN.f19_g16.1989Tr.QBOon.NeuSO2.LyA.expJH2SO4.bkgd.2/rest/1999-01-01-00000/"
+srcIcWACCM5   = icpath2+"b.e12.B55TRW5CN.f19_g16.1989Tr.QBOon.NeuSO2.LyA.expJH2SO4.bkgd.2.cam.i.1999-01-01-00000.nc"
+
 icpath3="~/inputdata/atm/waccm/ic/"
+tmpIcWaccm = icpath3+"tmp.nc"
+
 templatefile="/glade/p/work/mmills/inputdata/init/coords_1.9x2.5_L70.nc"
 
-srcIcWaccm = icpath1+"f_1950-2010_2deg_refc1_wa4_tsmlt.002.cam.i.1987-01-01-00000.nc"
-srcIcWACCM5   = icpath2+"b.e11.B55TRW5CN.f19_g16.MJMtest.013.cam.i.1989-01-01-00000.nc"
-tmpIcWaccm = icpath3+"tmp.nc"
 datestr = systemfunc("date +%y%m%d")
 outIcWaccm = icpath3+"b.waccm-tsmlt-mam3_1.9x2.5_L70.cam.i.1987-01-01.c"+datestr+".nc"
 
@@ -60,6 +66,40 @@ do i = 0, nFields - 1
   print("copying "+fields(i))
   WACCMicFile->$fields(i)$ = WACCM5icFile->$fields(i)$
 end do  
+
+print("creating VOLCEMIS field")
+VOLCEMIS=WACCM5icFile->OCS ; get metadata and array structure
+VOLCEMIS=1.d-36
+VOLCEMIS@long_name="Volcanic SO2 emissions"
+WACCMicFile->VOLCEMIS=VOLCEMIS
+
+;
+; For a nicer looking netCDF, create a "new line" character.
+; This is not necessary.
+;
+  nl = integertochar(10)  ; newline character
+;
+; Define global attributes.
+;
+; globalAtt can be of any type. Here logical is used by convention.
+;
+
+  globalAtt             = True
+
+  globalAtt@creation_date     = nl+\
+      systemfunc("date")
+      
+  globalAtt@creator = nl+\
+      "Mike Mills, mmills@ucar.edu"
+  globalAtt@history = nl+\
+        "Created with program b1987TSMLTaddMAMIC.ncl"+nl+\
+        "TSMLT species interpolated from WACCM4 IC file: "+nl+\
+        "    "+srcIcWaccm+nl+\
+        "MAM3 and sulfur species from WACCM5 IC file: "+nl+\
+        "    "+srcIcWACCM5+nl+\
+        "VOLCEMIS set to small number (1e-36 kg/kg)" 
+        
+  fileattdef( WACCMicFile, globalAtt )
   
 print("  IC Done.")
 
