@@ -77,8 +77,9 @@ if  [ -n "$caseid" ] ; then
   fi
 
   if [ ! -n "$wadir" ] ; then
-    wadir=$rootpath'/'$caseid'/'$runname'/atm/proc/h0mam/'
+    wadir=$rootpath'/'$caseid'/'$runname'/atm/proc/'$hnum'mam/'
     if [[ ! -e $wadir ]];then
+      echo "path not found: $wadir"
       wadir=$rootpath'/'$caseid'/'$runname'/atm/hist/'
     fi
     if [[ ! -e $wadir ]];then
