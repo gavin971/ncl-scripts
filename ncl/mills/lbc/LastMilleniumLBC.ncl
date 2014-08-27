@@ -75,7 +75,8 @@ date&time=time
 
 do y=0,nYears-1
   year=850+y
-  time(y*12:y*12+11)=365.*y+timeY1
+  offset=365.d0*y
+  time(y*12:y*12+11)=doubletofloat(offset)+timeY1
   date(y*12:y*12+11)=year*10000+dateY1
 ;  print(y+" "+year+" "+time(y*12:y*12+11)+" "+date(y*12:y*12+11))
 end do
@@ -85,7 +86,7 @@ print(time(0:23))
 filedimdef(outFile,"time",-1,True)
  
 outFile->lat=lat
-outFile->time=time
+;outFile->time=time
 outFile->date=date
 
 vars2Da = (/ "CFCL3_LBC", "CF2CL2_LBC", "CH4_LBC", "N2O_LBC", "CO2_LBC" /)
@@ -150,20 +151,22 @@ do i=0,dimsizes(vars1D)-1
   delete(tmp3)
 end do
 
+outFile->time=(/time/)
+
 cmd="cp "+rootpath+WACCM_monthly_Filename+" "+rootpath+"tmp.nc"
 print(cmd)
 cp=systemfunc(cmd)
 print("addfile tmp.nc")
 ncf_id=addfile(rootpath+"tmp.nc","w")
-adjfac=(1765.0-850.0)*365.0
-ncf_id->time=ncf_id->time+adjfac
+adjfac=(1765.d0-850.d0)*365.d0
+ncf_id->time=ncf_id->time+doubletofloat(adjfac)
 ncf_id->time@units="days since 850-01-01 00:00:00"
 
-;cmd="ncrcat "+rootpath+outFilename+" "+rootpath+"tmp.nc LBC_850-2005_1.9x2.5_CMIP5_za_c"+creation_date+".nc"
-;print(cmd)
-;ncrcat=systemfunc(cmd)
+cmd="ncrcat "+rootpath+outFilename+" "+rootpath+"tmp.nc  "+rootpath+"LBC_850-2005_1.9x2.5_CMIP5_za_c"+creation_date+".nc"
+print(cmd)
+ncrcat=systemfunc(cmd)
 
-;cmd="rm "+rootpath+"tmp.nc"
-;print(cmd)
-;rm=systemfunc(cmd)
+cmd="rm "+rootpath+"tmp.nc"
+print(cmd)
+rm=systemfunc(cmd)
 
