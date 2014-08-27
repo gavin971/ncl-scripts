@@ -594,14 +594,15 @@ else
   print("caseid:"+caseid)
   rootpath=getenv("rootpath")
   if (ismissing(rootpath)) then
-    rootpath="/glade/scratch/mmills/archive/"
+    rootpath="/glade/scratch/mmills/archive.locked/"
+    outpath="/glade/scratch/mmills/archive/"
   end if
   
   hnum=getenv("hnum")
   if (ismissing(hnum)) then
     hnum="h0"
   end if
-  mamdir=rootpath+"/"+caseid+"/atm/proc/"+hnum+"mam/"
+  mamdir=outpath+"/"+caseid+"/atm/proc/"+hnum+"mam/"
   sigma=(/1.6, 1.6, 1.2/)
 
   rundir=getenv("rundir") ; use output from run directory or archive?

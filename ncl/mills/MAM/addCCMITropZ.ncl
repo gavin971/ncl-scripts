@@ -89,7 +89,7 @@ PI      = 4.0 * atan(1.0)         ; pi
   
   do i = 0,nTimes-1
     i1=i+1
-    print("month "+i1+" of "+nTimes+": "+date2(i)+" "+mon(i))
+;    print("month "+i1+" of "+nTimes+": "+date2(i)+" "+mon(i))
     monind=floattoint(mon(i)-1)
     do l = 0,nLats-1
       tz=tropz2(monind,l)
@@ -116,7 +116,7 @@ PI      = 4.0 * atan(1.0)         ; pi
   so4_strat_tot=dim_avg_wgt_Wrap(so4_strat,gw,0)
   so4_strat_tot=so4_strat_tot*cfac
   so4_strat_tot@long_name="Global stratospheric sulfate mass"
-  so4_strat@units="Tg-S"
+  so4_strat_tot@units="Tg-S"
   a->so4_strat_tot=so4_strat_tot
   
   ; For a nicer looking netCDF, create a "new line" character.

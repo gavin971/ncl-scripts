@@ -4,15 +4,17 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 rootpath="/glade/scratch/mmills/archive/"
-runs=(/"f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001",\
-       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001",\
-       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.hetchem.002",\
-       "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001", \
-       "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001"/)
+;runs=(/"f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001",\
+;       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.001",\
+;       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.hetchem.002",\
+;       "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001", \
+;       "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001"/)
 
 
 ;       "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.10S-20N.zavg.QBOon.001",\
 ;       "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.10S-20N.zavg.QBOon.001"/)
+runs=(/"b.e13.BW5TREFC2R60.f19_g16.TSMLT.1990Tr.volc.001",\
+       "b.e13.BW5TREFC2R60.f19_g16.TSMLT.1987Tr.007" /)
        
 nRuns=dimsizes(runs)
 
@@ -46,7 +48,7 @@ delete(d1)
 do i = 0,nRuns-1
   n=i+1
   print("run "+n)
-  tropicsfile=rootpath+runs(i)+"/atm/proc/h0tm/"+runs(i)+".cam.h0.tropicsavg.nc"
+  tropicsfile=rootpath+runs(i)+"/atm/proc/h0gm/"+runs(i)+".cam.h0.tropicsavg.nc"
   a=addfile(tropicsfile,"r")
   date=a->date
   d1=ind(date.eq."19910701")

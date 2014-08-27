@@ -28,6 +28,9 @@ else
   filename=caseid+".cam.h0.globavg.nc"
   print("opening "+gmdir+filename)
   a=addfile(gmdir+filename,"r")
+  date=a->date
+  date=date/100
+  date=where(mod(date,100).eq.1,date-89,date-1)
   TMso4_strat   = a->TMso4_strat
   printVarSummary(TMso4_strat)
   time=TMso4_strat&time
@@ -64,14 +67,14 @@ else
 ;    print("OCS   DMS      SO2  H2SO4 sulfate")
 ;    print(sprintf("%5.1f",TMOCS_strat)+" "+sprintf("%5.1e",TMDMS_strat)+" "+sprintf("%5.2f",TMSO2_strat)+" "+\
 ;  	  sprintf("%5.3f",TMH2SO4_strat)+" "+sprintf("%5.1f",TMso4_strat))
-    print("Year OCS   DMS      SO2  H2SO4 sulfate")
+    print(" Year   OCS   DMS      SO2   H2SO4 sulfate")
     do i = 0,nYears-1
       t1=12*i
       t2=t1+11
-      year = i+1
+      year = date(t1)/100
       print(" "+year +"   " + sprintf("%5.1f",avg(TMOCS_strat(t1:t2)))+" "+\
-            sprintf("%5.1e",avg(TMDMS_strat(t1:t2)))+" "+sprintf("%5.2f",avg(TMSO2_strat(t1:t2)))+" "+\
-  	    sprintf("%5.3f",avg(TMH2SO4_strat(t1:t2)))+" "+sprintf("%5.1f",avg(TMso4_strat(t1:t2))))
+            sprintf("%5.1e",avg(TMDMS_strat(t1:t2)))+" "+sprintf("%6.2f",avg(TMSO2_strat(t1:t2)))+" "+\
+  	    sprintf("%5.3f",avg(TMH2SO4_strat(t1:t2)))+" "+sprintf("%6.1f",avg(TMso4_strat(t1:t2))))
     end do
     
     print("=====================================")
@@ -79,23 +82,31 @@ else
 ;    print("OCS    DMS    SO2  H2SO4 sulfate")
 ;    print(sprintf("%5.1f",TMOCS_trop)+" "+sprintf("%5.1f",TMDMS_trop)+" "+sprintf("%5.2f",TMSO2_trop)+" "+\
 ;  	  sprintf("%5.3f",TMH2SO4_trop)+" "+sprintf("%5.1f",TMso4_trop))
-    print("Year OCS   DMS      SO2  H2SO4 sulfate")
+    print(" Year   OCS     DMS   SO2    H2SO4  sulfate")
     do i = 0,nYears-1
       t1=12*i
       t2=t1+11
-      year = i+1
-      print(" "+year +"   " + sprintf("%5.1f",avg(TMOCS_trop(t1:t2)))+" "+\
-            sprintf("%5.1f",avg(TMDMS_trop(t1:t2)))+" "+sprintf("%5.2f",avg(TMSO2_trop(t1:t2)))+" "+\
-  	    sprintf("%5.3f",avg(TMH2SO4_trop(t1:t2)))+" "+sprintf("%5.1f",avg(TMso4_trop(t1:t2))))
+      year = date(t1)/100
+      print(" "+year +"   " + sprintf("%6.1f",avg(TMOCS_trop(t1:t2)))+" "+\
+            sprintf("%5.1f",avg(TMDMS_trop(t1:t2)))+" "+sprintf("%7.2f",avg(TMSO2_trop(t1:t2)))+" "+\
+  	    sprintf("%6.3f",avg(TMH2SO4_trop(t1:t2)))+" "+sprintf("%6.1f",avg(TMso4_trop(t1:t2))))
     end do
+    
+    b=addfile("/glade/p/work/mmills/inputdata/sulf/CESM_1949_2100_sad_V2_gw_TROPZ_so4strat.nc","r")
+    dateb=b->date
+    dateb=dateb/100
+    indb=ind(dateb.eq.date(0))
+;    print("indb="+indb+" date="+dateb(indb))
+    CCMI_so4_strat_tot=b->so4_strat_tot
     
     print("=====================================")
     print("Monthly Stratospheric burdens (Gg S):")
-    print("Month OCS   DMS      SO2  H2SO4 sulfate")
+    print(" Month    OCS   DMS      SO2     H2SO4  SO4    CCMI")
     do i = 0,nMonths-1
-      print(" "+i +"   " + sprintf("%5.1f",TMOCS_strat(i))+" "+\
-            sprintf("%5.1e",TMDMS_strat(i))+" "+sprintf("%5.2f",TMSO2_strat(i))+" "+\
-  	    sprintf("%5.3f",TMH2SO4_strat(i))+" "+sprintf("%5.1f",TMso4_strat(i)))
+      print(" "+date(i) +"   " + sprintf("%5.1f",TMOCS_strat(i))+" "+\
+            sprintf("%5.1e",TMDMS_strat(i))+" "+sprintf("%7.2f",TMSO2_strat(i))+" "+\
+  	    sprintf("%6.3f",TMH2SO4_strat(i))+" "+sprintf("%6.1f",TMso4_strat(i))+" "+\
+            sprintf("%6.1f",CCMI_so4_strat_tot(indb+i)))
     end do
   else
     TMso4_strat=TMso4_strat*MWS/MWH2SO4
