@@ -6,6 +6,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 MWH2SO4 = 98.0784                 ; molecular weight of H2SO4 species (g/mol)
 MWS     = 32.066                  ; molecular weight of atomic sulfur (g/mol)
 
+
 ; Global H2SO4 burden (Tg) data from Baran and Foot, JGR, 1994, Figure 3:
 BaranMonth = (/ 199105,199106,199107,199108,199109,199110,199111,199112, \
    199201,199202,199203,199204,199205,199206,199207,199208,199209,199210,199211,199212, \
@@ -109,18 +110,12 @@ else
     
     print("=====================================")
     print("Monthly Stratospheric burdens (Gg S):")
-    print(" Month    OCS   DMS      SO2     H2SO4  SO4    CCMI   Baran")
+    print(" Month    OCS   DMS      SO2     H2SO4  SO4    CCMI")
     do i = 0,nMonths-1
-      BaranInd=ind(BaranMonth.eq.date(i))
-      if (ismissing(BaranInd)) then
-        Baran=-1.0
-      else
-        Baran=H2SO4_Tg(BaranInd)*1000.0*32.064999/98.078479
-      end if
       print(" "+date(i) +"   " + sprintf("%5.1f",TMOCS_strat(i))+" "+\
             sprintf("%5.1e",TMDMS_strat(i))+" "+sprintf("%7.2f",TMSO2_strat(i))+" "+\
   	    sprintf("%6.3f",TMH2SO4_strat(i))+" "+sprintf("%6.1f",TMso4_strat(i))+" "+\
-            sprintf("%6.1f",CCMI_so4_strat_tot(indb+i))+" "+sprintf("%6.1f",Baran))
+            sprintf("%6.1f",CCMI_so4_strat_tot(indb+i)))
     end do
   else
     TMso4_strat=TMso4_strat*MWS/MWH2SO4
