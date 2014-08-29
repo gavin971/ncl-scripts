@@ -109,18 +109,21 @@ else
     
     print("=====================================")
     print("Monthly Stratospheric burdens (Gg S):")
-    print(" Month    OCS   DMS      SO2     H2SO4  SO4    CCMI   Baran")
+    print(" Month    OCS   DMS      SO2     H2SO4  SO4    CCMI Baran/3 Baran/4")
     do i = 0,nMonths-1
       BaranInd=ind(BaranMonth.eq.date(i))
       if (ismissing(BaranInd)) then
         Baran=-1.0
+        Baran4=-1.0
       else
         Baran=H2SO4_Tg(BaranInd)*1000.0*32.064999/98.078479
+        Baran4=H2SO4_Tg(BaranInd)*1000.0*.75*32.064999/98.078479
       end if
       print(" "+date(i) +"   " + sprintf("%5.1f",TMOCS_strat(i))+" "+\
             sprintf("%5.1e",TMDMS_strat(i))+" "+sprintf("%7.2f",TMSO2_strat(i))+" "+\
   	    sprintf("%6.3f",TMH2SO4_strat(i))+" "+sprintf("%6.1f",TMso4_strat(i))+" "+\
-            sprintf("%6.1f",CCMI_so4_strat_tot(indb+i))+" "+sprintf("%6.1f",Baran))
+            sprintf("%6.1f",CCMI_so4_strat_tot(indb+i))+" "+sprintf("%6.1f",Baran)+" "+\
+            sprintf("%6.1f",Baran4))
     end do
   else
     TMso4_strat=TMso4_strat*MWS/MWH2SO4
