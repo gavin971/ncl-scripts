@@ -593,9 +593,15 @@ if (ismissing(caseid)) then
 else
   print("caseid:"+caseid)
   rootpath=getenv("rootpath")
+  host   = systemfunc("hostname")
   if (ismissing(rootpath)) then
-    rootpath="/glade/scratch/mmills/archive.locked/"
-    outpath="/glade/scratch/mmills/archive/"
+    if (isStrSubset(host,"lfe")) then
+      rootpath = "/lou/s2m/mjmills2/csm/"
+      outpath = "/lou/s2m/mjmills2/csm/"
+    else    
+      rootpath="/glade/scratch/mmills/archive.locked/"
+      outpath="/glade/scratch/mmills/archive/"
+    end if
   end if
   
   hnum=getenv("hnum")
