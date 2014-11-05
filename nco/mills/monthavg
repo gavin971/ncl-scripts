@@ -1,0 +1,44 @@
+#!/bin/ksh
+
+###.......creates monthly means from all available years.......
+
+#echo zmavg
+
+if  [ -n "$caseid" ] ; then
+  rootpath='/glade/scratch/mmills/archive/'
+
+  wadir=$rootpath'/'$caseid'/atm/proc/h0zm'
+
+  outdir=$rootpath'/'$caseid'/atm/proc/h0zm.monthavg'
+  
+  echo "mkdir -p $outdir"
+  mkdir -p $outdir
+
+  set -A months 01 02 03 04 05 06 07 08 09 10 11 12
+
+  echo ${months[*]}
+
+  for month in ${months[*]}
+
+  do
+
+    echo "month: $month"
+
+    # script to average and standard deviation of waccm h0 files
+
+    ncfiles=$wadir'/'$caseid'.cam2.h0zm.*-'$month'.nc'
+
+    avgfile=$outdir'/'$caseid'.cam2.h0zm.'$month'.nc'
+
+    echo $ncfiles
+    echo $avgfile
+
+    echo "ncea -O $ncfiles $avgfile"
+    ncea -O $ncfiles $avgfile
+
+  done
+
+  echo "Successfully completed script monthavg."
+else
+  echo "caseid is not set"
+fi
