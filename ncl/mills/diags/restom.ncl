@@ -443,8 +443,8 @@ else
     delete(wks)
 
     print("evince "+pdffile+".pdf")
-    evincer=systemfunc("evince " + pdffile + ".pdf &")
-    print(evincer)
+    ; evincer=systemfunc("evince " + pdffile + ".pdf &")
+    ; print(evincer)
 ;  print("mutt mikejmills@mac.com -a "+pdffile+".pdf -s "+pdffile+" < /dev/null")
 
 ;  mutter=systemfunc("mutt mikejmills@mac.com -a " + pdffile + ".pdf -s "+pdffile+" < /dev/null")
