@@ -26,9 +26,9 @@ if  [ -n "$caseid" ] ; then
 
     # script to average and standard deviation of waccm h0 files
 
-    ncfiles=$wadir'/'$caseid'.cam2.h0zm.*-'$month'.nc'
+    ncfiles=$wadir'/'$caseid'.cam.h0zm.*-'$month'.nc'
 
-    avgfile=$outdir'/'$caseid'.cam2.h0zm.'$month'.nc'
+    avgfile=$outdir'/'$caseid'.cam.h0zm.'$month'.nc'
 
     echo $ncfiles
     echo $avgfile
