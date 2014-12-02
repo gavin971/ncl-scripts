@@ -1,15 +1,23 @@
 
-rootpath=(/ "/glade/scratch/mmills/archive/", \
-            "/glade/scratch/mmills/archive/", \
+;rootpath=(/ "/glade/scratch/mmills/archive/", \
+;            "/glade/scratch/mmills/archive/", \
+;            "/glade/p/cesm/wawg/runs/cesm1_2/" /)
+
+;caseid = (/ "b.e12.B1850C5CN.f19_g16.W5ocn.003", \
+;            "b.e12.B1850C5CN.f19_g16.W5ocn.L32.005", \
+;            "b.e12.B1850W5CN.f19_g16.002" /)
+
+rootpath=(/ "/glade/p/cesm/wawg/runs/cam5/", \
             "/glade/p/cesm/wawg/runs/cesm1_2/" /)
 
-caseid = (/ "b.e12.B1850C5CN.f19_g16.W5ocn.003", \
-            "b.e12.B1850C5CN.f19_g16.W5ocn.L32.005", \
+caseid = (/ "b.e12.B1850C5CN.f19_g16.W5ocn.L32.006.CH4oxidation", \
             "b.e12.B1850W5CN.f19_g16.002" /)
+
+firstYear = (/9,0/) ; set number of years to skip for spinup in each case
             
 nCases = dimsizes(caseid)
 
-wks = gsn_open_wks ("pdf","~/images/H2OtapeRecorder")
+wks = gsn_open_wks ("pdf","~/images/H2OtapeRecorder_CAM5wCH4oxidation")
 
 do i = 0, nCases-1
 ;  filename=rootpath(i)+caseid(i)+"/atm/proc/h0gm/"+caseid(i)+".cam.h0.10N-10S.nc"
@@ -24,7 +32,9 @@ do i = 0, nCases-1
   nlev=dimsizes(lev)
   nYears=nTimes/12
   h2o_4d=reshape(h2o_a,(/nYears,12,nlev/))
-  h2o_1y=dim_avg_n(h2o_4d,0)
+  printVarSummary(h2o_4d)
+  h2o_1y=dim_avg_n(h2o_4d(firstYear(i):,:,:),0)
+  printVarSummary(h2o_1y)
   h2o_1y!0="time"
   h2o_1y!1="lev"
   h2o_2y=new((/nlev,24/), typeof(h2o_1y))
@@ -38,8 +48,12 @@ do i = 0, nCases-1
   
   gsn_define_colormap(wks,"rainbow")                ; choose colormap
   res                      = True                  ; plot mods desired
+  res@gsnMaximize = True
+  res@vpHeightF = 1.0
+  res@vpWidthF = 0.7
   res@cnFillOn             = True                  ; turn on color
-  res@trYMinF           = 20.0
+;  res@trYMinF           = 20
+  res@trYMinF           = 3.6
   res@trYMaxF           = 100.0
   res@cnLevelSelectionMode = "ManualLevels"       ; set manual contour levels
   res@cnMinLevelValF       = 2.0                  ; set min contour level
