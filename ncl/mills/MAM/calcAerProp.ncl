@@ -624,11 +624,35 @@ else
   print("mkdir -p "+mamdir)
   mkdir=systemfunc("mkdir -p "+mamdir)
   print("===========================================================")
-  cpcmd="cp -n -v "+copypattern+" "+mamdir ; don't overwrite
-  ;cpcmd="cp -v "+copypattern+" "+mamdir ; overwrite
-  print(cpcmd)
-  cp=systemfunc(cpcmd)
-  print(cp)
+  StartYearMonth=getenv("startym")
+  print("StartYearMonth="+StartYearMonth)
+  if (ismissing(StartYearMonth)) then
+    cpcmd="cp -n -v "+copypattern+" "+mamdir ; don't overwrite
+    ;cpcmd="cp -v "+copypattern+" "+mamdir ; overwrite
+    print(cpcmd)
+    cp=systemfunc(cpcmd)
+    print(cp)
+  else
+    filelist=systemfunc("ls "+copypattern)
+;    print(filelist)
+    ds=dimsizes(filelist)
+    filelistind=0
+    do i=0,ds-1
+      if(isStrSubset(filelist(i),StartYearMonth)) then
+        filelistind=i
+        break
+      end if
+    end do
+    print("filelistind="+filelistind)
+    print("ds="+ds)
+;    print(filelist(filelistind:))
+    do i=filelistind,ds-1
+      cpcmd="cp -n -v "+filelist(i)+" "+mamdir ; don't overwrite
+      print(cpcmd)
+      cp=systemfunc(cpcmd)
+      print(cp)    
+    end do
+  end if
   print("===========================================================")
   historyNames=systemfunc("ls "+mamdir+" |grep "+caseid)
   print(historyNames)

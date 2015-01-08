@@ -10,7 +10,6 @@ if (ismissing(run_name)) then
 else
 
   year0 = 1
-;  nYears=10-year0+1
 
   ostype=getenv("OSTYPE")
   host=getenv("HOSTNAME")
@@ -69,56 +68,83 @@ else
               0.08493150770664215,0.08219178020954132,0.08493150770664215/)
 
   infiles = systemfunc("ls -1 "+in_dir+"*h0.*.nc")
-  nYears=dimsizes(infiles)/12
-  print("nYears="+nYears)
+;  print("infiles:")
+;  print(infiles)
+  nH0files=dimsizes(infiles)
+  print("nH0files="+nH0files)
 
   nYears_a=0
-  overwrite=getenv("overwrite")
+  overwrite_str=getenv("overwrite")
+  overwrite=(.not.ismissing(overwrite_str).or..not.isfilepresent(savefile))
+;  print(overwrite)
   doTropFlux = False
   
-  if (isfilepresent(savefile).and.ismissing(overwrite)) then
+  if (.not.(overwrite)) then
 
     print("reading "+savefile)
     b = addfile(savefile,"r")
-    year_a=b->year
-    restom_ann_w_a=b->restom_ann_w
-    ts_ann_w_a=b->ts_ann_w
-    ts_land_ann_w_a=b->ts_land_ann_w
-    sst_ann_w_a=b->sst_ann_w
 
     ; query if clearsky restom exists
     if (isfilevar(b,"restom_ann_w_c")) then
       print("found restom_ann_w_c")
+      overwrite = False
+
+      year_a=b->year
+      restom_ann_w_a=b->restom_ann_w
+      ts_ann_w_a=b->ts_ann_w
+      ts_land_ann_w_a=b->ts_land_ann_w
+      sst_ann_w_a=b->sst_ann_w
+
       restom_ann_w_c_a=b->restom_ann_w_c
       flnt_ann_w_a=b->flnt_ann_w
       flntc_ann_w_a=b->flntc_ann_w
       fsnt_ann_w_a=b->fsnt_ann_w
       fsntc_ann_w_a=b->fsntc_ann_w
+
       nYears_a = dimsizes(year_a)
+      LastYear=year_a(nYears_a-1)
+      print("Last year in save file:"+LastYear)
+
+      if (isfilevar(b,"flnr_ann_w")) then
+        print("found flnr_ann_w")
+        flnr_ann_w_a=b->flnr_ann_w
+        fsnr_ann_w_a=b->fsnr_ann_w
+        doTropFlux = True
+      end if
+
+    else
+      overwrite = True
     end if
-    
-    if (isfilevar(b,"flnr_ann_w")) then
-      print("found flnr_ann_w")
-      flnr_ann_w_a=b->flnr_ann_w
-      fsnr_ann_w_a=b->fsnr_ann_w
-      doTropFlux = True
-    end if
-    
   end if
 
-  if ((nYears_a.ge.nYears)) then ; use only savefile if it has all history years
+;  print(overwrite)
+  
+  if (overwrite) then
+    ifile1=0
+  else
+    FirstYear=LastYear+1
+    searchstr="ls -1 "+in_dir+"*h0."+sprinti("%0.4i", FirstYear)+"-01.nc"
+;    print(searchstr)
+    infiles1 = systemfunc(searchstr)
+;    print(infiles1)
+    ifile1=ind(infiles.eq.infiles1)
+  end if
+  print("Index of first h0 file to read:"+ifile1)
 
+  if (ismissing(ifile1)) then ; use only savefile if it has all history years
+  
+    print("using savefile only")
     year=year_a
     restom_ann_w=restom_ann_w_a
     ts_ann_w=ts_ann_w_a
     ts_land_ann_w=ts_land_ann_w_a
     sst_ann_w=sst_ann_w_a  
+    nYears=nYears_a
 
   else
-
-    i=nYears_a*12
-    fin=addfile(infiles(i),"r")
-    print((/infiles(i)/))
+    
+    fin=addfile(infiles(ifile1),"r")
+    print((/infiles(ifile1)/))
   ;  print(fin->date)
     fsnt = fin->FSNT
     flnt = fin->FLNT
@@ -135,7 +161,10 @@ else
       doTropFlux = True
     end if
 
-    do i=nYears_a*12+1,dimsizes(infiles)-1,1
+    print("nH0files:"+nH0files)
+    print("ifile1:"+ifile1)
+    
+    do i=ifile1,nH0files-1,1
       print(i+" "+(/infiles(i)/))
       fin=addfile(infiles(i),"r")
   ;    print(fin->date)
@@ -189,6 +218,14 @@ else
       end if
 
     end do
+    
+    nYears=nYears_a+(nH0files-ifile1)/12
+    print("nYears:"+nYears+"=nYears_a+(nH0files-ifile1)/12")
+    print("nYears_a:"+nYears_a)
+    print("(nH0files-ifile1)/12="+(nH0files-ifile1)/12)
+    print("nH0files:"+nH0files)
+    print("ifile1:"+ifile1)
+    
     ;    fid=addfile(in_file,"r")
     ;    data = fid->$variable$
     ;inptr = addfiles(infiles,"r")
