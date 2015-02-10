@@ -6,14 +6,18 @@
 
 if  [ -n "$caseid" ] ; then
   rootpath='/glade/scratch/mmills/archive/'
+  
+  if [[ $OSTYPE = 'darwin' ]];then
+    rootpath='/Volumes/Data/Models/cesm/runs/cesm1_0/'
+  fi
 
 #  hnum='h0zm'
 #  wadir=$rootpath'/'$caseid'/atm/proc/h0zm'
 #  outdir=$rootpath'/'$caseid'/atm/proc/h0zm.monthavg'
 
   hnum='h0'  
-  wadir=$rootpath'/'$caseid'/atm/proc/h0mam'
-  outdir=$rootpath'/'$caseid'/atm/proc/h0mam.monthavg'
+  wadir=$rootpath'/'$caseid'/h0'
+  outdir=$rootpath'/'$caseid'/h0.monthavg'
   
   echo "mkdir -p $outdir"
   mkdir -p $outdir
@@ -30,15 +34,18 @@ if  [ -n "$caseid" ] ; then
 
     # script to average and standard deviation of waccm h0 files
 
-    ncfiles=$wadir'/'$caseid'.cam.'$hnum'.*-'$month'.nc'
+    ncfiles=$wadir'/'$caseid'.cam*.'$hnum'.*-'$month'.nc'
 
     avgfile=$outdir'/'$caseid'.cam.'$hnum'.'$month'.nc'
 
     echo $ncfiles
     echo $avgfile
 
-    echo "ncea -O -v lev,hyam,hybm,P0,ilev,hyai,hybi,date,lat,gw,CH4_CHML,OCS_CHML $ncfiles $avgfile"
-    ncea -O -v lev,hyam,hybm,P0,ilev,hyai,hybi,date,lat,gw,CH4_CHML,OCS_CHML $ncfiles $avgfile
+#    echo "ncea -O -v lev,hyam,hybm,P0,ilev,hyai,hybi,date,lat,gw,CH4_CHML,OCS_CHML $ncfiles $avgfile"
+#    ncea -O -v lev,hyam,hybm,P0,ilev,hyai,hybi,date,lat,gw,CH4_CHML,OCS_CHML $ncfiles $avgfile
+
+    echo "ncea -O -v lev,hyam,hybm,P0,ilev,hyai,hybi,date,lat,gw,Z3 $ncfiles $avgfile"
+    ncea -O -v lev,hyam,hybm,P0,ilev,hyai,hybi,date,lat,gw,Z3 $ncfiles $avgfile
 
   done
 
