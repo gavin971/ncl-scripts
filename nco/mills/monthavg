@@ -44,8 +44,8 @@ if  [ -n "$caseid" ] ; then
 #    echo "ncea -O -v lev,hyam,hybm,P0,ilev,hyai,hybi,date,lat,gw,CH4_CHML,OCS_CHML $ncfiles $avgfile"
 #    ncea -O -v lev,hyam,hybm,P0,ilev,hyai,hybi,date,lat,gw,CH4_CHML,OCS_CHML $ncfiles $avgfile
 
-    echo "ncea -O -v lev,hyam,hybm,P0,ilev,hyai,hybi,date,lat,gw,Z3 $ncfiles $avgfile"
-    ncea -O -v lev,hyam,hybm,P0,ilev,hyai,hybi,date,lat,gw,Z3 $ncfiles $avgfile
+    echo "ncea -O -v lev,hyam,hybm,P0,ilev,hyai,hybi,date,lat,gw,PS,Z3 $ncfiles $avgfile"
+    ncea -O -v lev,hyam,hybm,P0,ilev,hyai,hybi,date,lat,gw,PS,Z3 $ncfiles $avgfile
 
   done
 
