@@ -21,7 +21,7 @@ ewrite = "Y"
 ipth="/datalocal/haystack/andrew/aero_recent/trop_mozart_aero/emis/"
 
 
-filedate="20141216"
+filedate = systemfunc("date +%Y%m%d")
 etxt="Holuhraun35"
 ;cleanup...daily files and ALT files...
 
