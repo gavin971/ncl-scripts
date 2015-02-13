@@ -4,7 +4,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 undef("readSAGE1020OD")
-procedure readSAGE1020OD(od[*][*]:float)
+function readSAGE1020OD ()
 
 begin
   ostype=getenv("OSTYPE")
@@ -41,7 +41,9 @@ begin
   od&time=date
   od!1="lat"
   od&lat=lat
+  
+  printVarSummary(od)
 
-return
-;tmin=yyyymmdd_to_yyyyfrac(19910601,0)
+  return(od)
+end
 
