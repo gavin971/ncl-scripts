@@ -12,20 +12,26 @@ infiles=systemfunc("ls "+rootpath+caseid+subdir+"*.nc")
 history=addfiles(infiles,"r")
 ListSetType(history, "cat")
 
-od=addfiles_GetVar(history,infiles,"AODNIRst")
 date=addfiles_GetVar(history,infiles,"date")
-
-printVarSummary(od)
 print(date)
 
+time=yyyymmdd_to_yyyyfrac(date,0)
+
+AODNIRst=addfiles_GetVar(history,infiles,"AODNIRst")
+AODNIRst&time=time
+printVarSummary(AODNIRst)
+AODVISst=addfiles_GetVar(history,infiles,"AODVISst")
+AODVISst&time=time
+printVarSummary(AODVISst)
+AODUVst=addfiles_GetVar(history,infiles,"AODUVst")
+AODUVst&time=time
+printVarSummary(AODUVst)
+
 a = systemfunc("mkdir -p $IMAGE_PATH/sage")
-pdffile = "$IMAGE_PATH/sage/WACCM1020OD"
+pdffile = "$IMAGE_PATH/sage/WACCM_OD"
 wks = gsn_open_wks("pdf", pdffile)
 
 ;gsn_define_colormap(wks,"rainbow")
-
-time=yyyymmdd_to_yyyyfrac(date,0)
-od&time=time
 
 res                     = True          ; plot mods desired
 ;res@trXMinF=tmin
@@ -40,4 +46,12 @@ res@gsnMaximize         = True          ; expand plot size to maximum
 res@cnLevelSelectionMode = "ExplicitLevels" 
 res@cnLevels = 10.^fspan(-.5,-3.,11)
 
-plot = gsn_csm_lat_time(wks,od(lat|:, time|:),res)
+plot = gsn_csm_lat_time(wks,AODNIRst(lat|:, time|:),res)
+delete(plot)
+
+plot = gsn_csm_lat_time(wks,AODVISst(lat|:, time|:),res)
+delete(plot)
+
+plot = gsn_csm_lat_time(wks,AODUVst(lat|:, time|:),res)
+delete(plot)
+
