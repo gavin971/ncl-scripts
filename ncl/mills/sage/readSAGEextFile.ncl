@@ -35,9 +35,14 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
   ext1020!2="lat"
   ext1020&lat=lat
   ext1020@_FillValue=-1.0
+  ext1020@long_name="Extinction at 1020 nm"
+  ext1020@units="km-1"
   ext525=ext1020
+  ext525@long_name="Extinction at 525 nm"
   ext452=ext1020
+  ext452@long_name="Extinction at 452 nm"
   ext386=ext1020
+  ext386@long_name="Extinction at 386 nm"
   
   date=new(ntimes,"float")
   
@@ -57,7 +62,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 ;    print("numRows="+numRows)
 
     do l=0,nlat-1
-;      print("   "+l+" "+lat(l))
+      print("      "+l+" "+lat(l))
 
       data = readAsciiTable(sagedir+filename, ncol, "float", (/nhead+l*ntot,numRows-(l+1)*ntot/))
       if (l.eq.0) then
@@ -79,6 +84,10 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
     end do
     
   end do
+  ext1020&time=date
+  ext525&time=date
+  ext452&time=date
+  ext386&time=date
   
   a=systemfunc("mkdir "+rootpath+"netCDF")
   b=addfile(rootpath+"netCDF/CCMI_Filled_Data_V2.nc","c")
