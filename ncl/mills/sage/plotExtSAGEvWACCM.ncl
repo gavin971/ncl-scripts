@@ -32,7 +32,7 @@ nAlt=dimsizes(sageAlt)
 
 sagedate=ext1020s&time
 sage1991=ind(floattoint(sagedate).eq.1991)
-sageD1=sage1991(0)
+sageD1=sage1991(4)
 print(sageD1+" "+sagedate(sageD1))
 
 rootpath="/glade/scratch/mmills/archive/"
@@ -43,7 +43,7 @@ history=addfiles(infiles,"r")
 ListSetType(history, "cat")
 
 waccmdate=addfiles_GetVar(history,infiles,"date")
-waccmD1=ind(waccmdate.eq.19910201)
+waccmD1=ind(waccmdate.eq.19910601)
 print(waccmD1+" "+waccmdate(waccmD1))
 
 ext550w=addfiles_GetVar(history,infiles,"EXTINCT")
@@ -57,8 +57,9 @@ ext1020w@units="km-1"
 ext1020w&lev@long_name="Pressure"
 ext550w&lev@long_name="Pressure"
 
-nYears=4
-nMonths=nYears*12
+;nYears=4
+;nMonths=nYears*12
+nMonths=8
 date=sagedate(sageD1:sageD1+nMonths-1)
 
 a = systemfunc("mkdir -p $IMAGE_PATH/sage")
@@ -100,7 +101,7 @@ months=(/"January", "February", "March", "April", "May", "June", "July", \
 plot = new(4, graphic)
 do year=1991,1991
   do month=5,12
-    d=(year-1991)*12+month-1
+    d=(year-1991)*12+month-5
     wd=waccmD1+d
     sd=sageD1+d
     print(d+" "+wd+" "+sd)
