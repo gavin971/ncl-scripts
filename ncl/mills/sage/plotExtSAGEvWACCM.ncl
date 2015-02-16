@@ -3,6 +3,12 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
+caseid=getenv("caseid")
+if (ismissing(caseid)) then
+  caseid="f.e13.FSDW5.f19_f19.1990-2011.ASv1.P17Tg.16-18km.wCH.01"
+  print("missing environment variable caseid, using default")
+end if
+print("caseid="+caseid)
   
 ostype=getenv("OSTYPE")
 host=getenv("HOSTNAME")
@@ -28,8 +34,6 @@ sagedate=ext1020s&time
 sage1991=ind(floattoint(sagedate).eq.1991)
 sageD1=sage1991(0)
 print(sageD1+" "+sagedate(sageD1))
-
-caseid="f.e13.FSDW5.f19_f19.1990-2011.ASv1.P17Tg.16-18km.wCH.01"
 
 rootpath="/glade/scratch/mmills/archive/"
 subdir="/atm/proc/h0zm/"
@@ -58,7 +62,7 @@ nMonths=nYears*12
 date=sagedate(sageD1:sageD1+nMonths-1)
 
 a = systemfunc("mkdir -p $IMAGE_PATH/sage")
-pdffile = "$IMAGE_PATH/sage/ExtSAGEvWACCM"
+pdffile = "$IMAGE_PATH/sage/ExtSAGEvWACCM."+caseid
 wks = gsn_open_wks("pdf", pdffile)
 
 resP=True

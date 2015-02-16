@@ -3,7 +3,12 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
-caseid="f.e13.FSDW5.f19_f19.1990-2011.ASv1.P17Tg.16-18km.wCH.01"
+caseid=getenv("caseid")
+if (ismissing(caseid)) then
+  caseid="f.e13.FSDW5.f19_f19.1990-2011.ASv1.P17Tg.16-18km.wCH.01"
+  print("missing environment variable caseid, using default")
+end if
+print("caseid="+caseid)
 
 rootpath="/glade/scratch/mmills/archive/"
 subdir="/atm/proc/h0zm/"
@@ -28,7 +33,7 @@ AODUVst&time=time
 printVarSummary(AODUVst)
 
 a = systemfunc("mkdir -p $IMAGE_PATH/sage")
-pdffile = "$IMAGE_PATH/sage/WACCM_OD"
+pdffile = "$IMAGE_PATH/sage/WACCM_OD."+caseid
 wks = gsn_open_wks("pdf", pdffile)
 
 ;gsn_define_colormap(wks,"rainbow")
