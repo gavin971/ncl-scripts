@@ -37,9 +37,13 @@ begin
 ;  res@xyMonoDashPattern = False
 ;  res@xyDashPatterns = (/1,0,1,0,0/)
 
+;  caseid = (/  \
+;               "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001", \
+;              "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001" \
+;               /)  
   caseid = (/  \
-               "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001", \
-              "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001" \
+               "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.005.18-20km", \
+              "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.004.expfix" \
                /)  
   yearString = (/ "1992-93", "1996-97" /)
   res@xyMonoLineColor = False

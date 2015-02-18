@@ -276,7 +276,8 @@ begin
   ; Open a workstation
   datestr = systemfunc("date +%y%m%d_%H%M")
 ;  wks = gsn_open_wks("pdf", "$IMAGE_PATH/sulfurMAMvertProf_vmr_" + caseid +"_"+year+"avg" ); + "_c" + datestr)
-  wks = gsn_open_wks("pdf", "$IMAGE_PATH/sulfurMAMvertProf_vmr_0-20N" ); + "_c" + datestr)
+  pdffile="$IMAGE_PATH/sulfurMAMvertProf_vmr_0-20N_"+year(0)+"_"+ caseid(0) +"_c" + datestr
+  wks = gsn_open_wks("pdf", pdffile)
 
   minP = 0.
   maxP = 1000.  
@@ -521,9 +522,9 @@ begin
 
   resxy@xyLineThicknesses     = (/ 3.0 /)
   resxy@xyLineColors          = (/ "blue" /)
-;  overlay(plot(0), gsn_csm_xy(wks, gso2_djf1, gz, resxy))
+  overlay(plot(0), gsn_csm_xy(wks, gso2_djf1, gz, resxy))
   resxy@xyLineColors          = (/ "green" /)
-;  overlay(plot(0), gsn_csm_xy(wks, gso2_djf2, gz, resxy))
+  overlay(plot(0), gsn_csm_xy(wks, gso2_djf2, gz, resxy))
 
   xpos=10.0
   ypos=42.0
@@ -567,9 +568,9 @@ begin
 
   resxy@xyLineThicknesses     = (/ 3.0 /)
   resxy@xyLineColors          = (/ "blue" /)
-;  overlay(plot(1), gsn_csm_xy(wks, gso2_mam1, gz, resxy))
+  overlay(plot(1), gsn_csm_xy(wks, gso2_mam1, gz, resxy))
   resxy@xyLineColors          = (/ "green" /)
-;  overlay(plot(1), gsn_csm_xy(wks, gso2_mam2, gz, resxy))
+  overlay(plot(1), gsn_csm_xy(wks, gso2_mam2, gz, resxy))
 
   resxy@xyLineThicknesses     = (/ 3.0 /)
   resxy@xyLineColors          = (/ "purple" /)
@@ -595,9 +596,9 @@ begin
 
   resxy@xyLineThicknesses     = (/ 3.0 /)
   resxy@xyLineColors          = (/ "blue" /)
-;  overlay(plot(2), gsn_csm_xy(wks, gso2_jja1, gz, resxy))
+  overlay(plot(2), gsn_csm_xy(wks, gso2_jja1, gz, resxy))
   resxy@xyLineColors          = (/ "green" /)
-;  overlay(plot(2), gsn_csm_xy(wks, gso2_jja2, gz, resxy))
+  overlay(plot(2), gsn_csm_xy(wks, gso2_jja2, gz, resxy))
 
   resxy@xyLineThicknesses     = (/ 3.0 /)
   resxy@xyLineColors          = (/ "purple" /)
@@ -623,9 +624,9 @@ begin
 
   resxy@xyLineThicknesses     = (/ 3.0 /)
   resxy@xyLineColors          = (/ "blue" /)
-;  overlay(plot(3), gsn_csm_xy(wks, gso2_son1, gz, resxy))
+  overlay(plot(3), gsn_csm_xy(wks, gso2_son1, gz, resxy))
   resxy@xyLineColors          = (/ "green" /)
-;  overlay(plot(3), gsn_csm_xy(wks, gso2_son2, gz, resxy))
+  overlay(plot(3), gsn_csm_xy(wks, gso2_son2, gz, resxy))
 
   resxy@xyLineThicknesses     = (/ 3.0 /)
   resxy@xyLineColors          = (/ "purple" /)
@@ -638,6 +639,7 @@ begin
   gsn_panel(wks, plot, (/ 2, 2 /), resP)
   
   delete(wks)
+  print(pdffile+".pdf")
   
 end
 
@@ -657,10 +659,17 @@ end if
 print("Using rootpath: " + rootpath)
   
 ;caseid = getenv("caseid")
-caseid=(/"b.e12.B55TRW5CN.f19_g16.1989Tr.QBOon.NeuSO2.LyA.expJH2SO4.bkgd.2", \
-         "b.e12.B55TRW5CN.f19_g16.1989Tr.QBOon.NeuSO2.LyA.expJH2SO4.QY1.bkgd.1", \
-         "b.e12.B55TRW5CN.f19_g16.1989Tr.QBOon.NeuSO2.LyA.bkgd.1"/)
-year=(/1992,1992,1990/)
+;caseid=(/"b.e12.B55TRW5CN.f19_g16.1989Tr.QBOon.NeuSO2.LyA.expJH2SO4.bkgd.2", \
+;         "b.e12.B55TRW5CN.f19_g16.1989Tr.QBOon.NeuSO2.LyA.expJH2SO4.QY1.bkgd.1", \
+;         "b.e12.B55TRW5CN.f19_g16.1989Tr.QBOon.NeuSO2.LyA.bkgd.1"/)
+;year=(/1992,1992,1990/)
+;caseid=(/"b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.004.expfix", \
+;         "b.e12.B55TRW5CN.f19_g16.1989Tr.QBOon.NeuSO2.LyA.expJH2SO4.bkgd.2"/)
+;year=(/1989,1992/)
+caseid=(/"b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.004.expfix", \
+         "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.004.expfix", \
+         "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.004.expfix"/)
+year=(/1988,1989,1990/)
 
 ;if (ismissing(caseid)) then
 ;  print("set environment variable caseid before running")

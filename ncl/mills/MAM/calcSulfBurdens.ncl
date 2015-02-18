@@ -38,7 +38,7 @@ else
   a=addfile(gmdir+filename,"r")
   date=a->date
   date=date/100
-  date=where(mod(date,100).eq.1,date-89,date-1)
+  date=where(mod(date,100).eq.1,date-89,date-1) ; adjust h0 dates (199001->198912, etc)
   TMso4_strat   = a->TMso4_strat
   printVarSummary(TMso4_strat)
   time=TMso4_strat&time
