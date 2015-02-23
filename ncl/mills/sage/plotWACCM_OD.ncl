@@ -13,14 +13,27 @@ print("caseid="+caseid)
 rootpath="/glade/scratch/mmills/archive/"
 subdir="/atm/proc/h0zm/"
 
-infiles=systemfunc("ls "+rootpath+caseid+subdir+"*.nc")
+filelist=systemfunc("ls "+rootpath+caseid+subdir+"*.nc")
+ds=dimsizes(filelist)
+filelistind=0
+do i=0,ds-1
+  if(isStrSubset(filelist(i),"1991-01")) then
+    filelistind=i
+    break
+  end if
+end do
+print("filelistind="+filelistind)
+print("ds="+ds)
+infiles=filelist(filelistind:)
+
 history=addfiles(infiles,"r")
 ListSetType(history, "cat")
 
 date=addfiles_GetVar(history,infiles,"date")
-print(date)
 
 time=yyyymmdd_to_yyyyfrac(date,0)
+time=time-15./365.
+print(date+" "+time);+" "+infiles)
 
 AODNIRst=addfiles_GetVar(history,infiles,"AODNIRst")
 AODNIRst&time=time
@@ -40,7 +53,7 @@ wks = gsn_open_wks("pdf", pdffile)
 
 res                     = True          ; plot mods desired
 ;res@trXMinF=tmin
-res@trXMinF=1991.0
+res@trXMinF=time(0)
 res@trXMaxF=1995.0
 res@gsnPaperOrientation = "landscape"
 res@vpWidthF            = 1.2           ; change aspect ratio of plot
@@ -51,12 +64,15 @@ res@gsnMaximize         = True          ; expand plot size to maximum
 res@cnLevelSelectionMode = "ExplicitLevels" 
 res@cnLevels = 10.^fspan(-.5,-3.,11)
 
+;print(AODNIRst&time)
 plot = gsn_csm_lat_time(wks,AODNIRst(lat|:, time|:),res)
 delete(plot)
 
+;print(AODVISst&time)
 plot = gsn_csm_lat_time(wks,AODVISst(lat|:, time|:),res)
 delete(plot)
 
+;print(AODUVst&time)
 plot = gsn_csm_lat_time(wks,AODUVst(lat|:, time|:),res)
 delete(plot)
 
