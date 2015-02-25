@@ -1,0 +1,54 @@
+#!/bin/ksh
+# Script replaces h0 history files with hard links to post-processed files in h0mam directory
+# Define environment variables, i.e.:
+#   setenv caseid b40.rcp4_5.2deg.wcm.carma.bc5tgIP.007
+
+echo " "
+echo lnh0mam
+
+if  [ -n "$caseid" ] ; then
+  export machine=`hostname`
+  
+  if [ ! -n "$rootpath" ] ; then
+
+    if [[ $machine =~ 'yslogin' || $machine =~ 'geyser' || $machine =~ 'caldera' ]];then
+#      rootpath='/glade/p/cesm/wawg/mmills/run'
+      rootpath='/glade/scratch/mmills/archive'
+    fi
+    
+  fi
+
+  mamdir=$rootpath'/'$caseid'/'$runname'/atm/proc/h0mam/'
+  h0dir1=$rootpath'/'$caseid'/'$runname'/atm/hist/'
+  h0dir2=$rootpath'.locked/'$caseid'/'$runname'/atm/hist/'
+  
+  echo " "
+  echo "cd $mamdir"
+  cd $mamdir
+  echo " "
+  echo "working directory:"
+  pwd
+
+  for a in `ls -1 $caseid*.cam*.h0.*.nc`; do
+    echo " "
+    ls -ski $a
+    ls -ski $h0dir1$a
+#    echo "rm $h0dir1/$a"
+    rm $h0dir1/$a
+#    echo "ln $a $h0dir1"
+    ln $a $h0dir1
+  
+    ls -ski $h0dir1$a
+
+#    ls -li $h0dir2$a
+#    echo "rm $h0dir2/$a"
+    rm $h0dir2/$a
+#    echo "ln $a $h0dir2"
+    ln $a $h0dir2
+  
+#    ls -li $h0dir2$a
+  done
+    
+else
+  echo "caseid is not set"
+fi
