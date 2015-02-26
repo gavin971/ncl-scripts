@@ -594,6 +594,7 @@ else
   print("caseid:"+caseid)
   rootpath=getenv("rootpath")
   host   = systemfunc("hostname")
+  print("host="+host)
   if (ismissing(rootpath)) then
     if (isStrSubset(host,"lfe")) then
       rootpath = "/lou/s2m/mjmills2/csm/"
@@ -670,5 +671,13 @@ else
   command="rm "+mamdir+"temp.nc"
   print(command)
   a=systemfunc(command)
+  
+  delete(command)
+  delete(a)
+  if (isStrSubset(host,"geyser")) then
+    command="bsub -n 1 -q geyser -W 24:00 -P P93300007 /glade/u/home/mmills/scripts/nco/wazmdir"
+    print(command)
+    a=systemfunc(command)
+  end if
     
 end if

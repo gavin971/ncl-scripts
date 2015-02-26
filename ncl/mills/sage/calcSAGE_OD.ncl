@@ -28,7 +28,8 @@ sage1991=ind(floattoint(sagedate).eq.1991)
 sageD1=sage1991(0)
 print(sageD1+" "+sagedate(sageD1))
 
-caseid="f.e13.FSDW5.f19_f19.1990-2011.ASv1.P17Tg.16-18km.wCH.01"
+;caseid="f.e13.FSDW5.f19_f19.1990-2011.ASv1.P17Tg.16-18km.wCH.01"
+caseid="b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.006.0-15N"
 
 rootpath="/glade/scratch/mmills/archive/"
 subdir="/atm/proc/h0zm/"
@@ -44,7 +45,7 @@ print(waccmD1+" "+waccmdate(waccmD1))
 TROP_Z=addfiles_GetVar(history,infiles,"TROP_Z")
 waccmLat=TROP_Z&lat
 
-nYears=4
+nYears=13
 nMonths=nYears*12
 date=sagedate(sageD1:sageD1+nMonths-1)
 ODst1020=new((/nMonths,nLat/),"float")

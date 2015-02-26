@@ -41,15 +41,20 @@ begin
 ;               "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001", \
 ;              "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001" \
 ;               /)  
+;  caseid = (/  \
+;               "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.005.18-20km", \
+;              "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.004.expfix" \
+;               /)  
   caseid = (/  \
-               "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.005.18-20km", \
-              "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.004.expfix" \
+             "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.006.0-15N", \
+             "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.006.0-15N", \
+             "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.006.0-15N" \
                /)  
-  yearString = (/ "1992-93", "1996-97" /)
+  yearString = (/ "1992-1993", "1996-1997", "2002-2003" /)
   res@xyMonoLineColor = False
-  res@xyLineColors    = (/"red","green3"/)
+  res@xyLineColors    = (/"red","green3", "black"/)
   res@xyMonoDashPattern = False
-  res@xyDashPatterns = (/0,0/)
+  res@xyDashPatterns = (/0,0,0,0/)
   
   nCases = dimsizes(caseid)
   

@@ -17,7 +17,7 @@ filelist=systemfunc("ls "+rootpath+caseid+subdir+"*.nc")
 ds=dimsizes(filelist)
 filelistind=0
 do i=0,ds-1
-  if(isStrSubset(filelist(i),"1991-01")) then
+  if(isStrSubset(filelist(i),"1990-12")) then
     filelistind=i
     break
   end if
@@ -53,8 +53,9 @@ wks = gsn_open_wks("pdf", pdffile)
 
 res                     = True          ; plot mods desired
 ;res@trXMinF=tmin
-res@trXMinF=time(0)
-res@trXMaxF=1995.0
+;res@trXMinF=time(0)
+res@trXMinF=1991.0
+res@trXMaxF=2000.0
 res@gsnPaperOrientation = "landscape"
 res@vpWidthF            = 1.2           ; change aspect ratio of plot
 res@vpHeightF           = 0.55
