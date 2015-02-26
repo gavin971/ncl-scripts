@@ -30,15 +30,15 @@ if  [ -n "$caseid" ] ; then
   pwd
 
   for a in `ls -1 $caseid*.cam*.h0.*.nc`; do
-    echo " "
+#    echo " "
     ls -ski $a
-    ls -ski $h0dir1$a
+#    ls -ski $h0dir1$a
 #    echo "rm $h0dir1/$a"
     rm $h0dir1/$a
 #    echo "ln $a $h0dir1"
     ln $a $h0dir1
   
-    ls -ski $h0dir1$a
+#    ls -ski $h0dir1$a
 
 #    ls -li $h0dir2$a
 #    echo "rm $h0dir2/$a"
