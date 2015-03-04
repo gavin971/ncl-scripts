@@ -224,9 +224,11 @@ begin
     end do    
     delete(cellMass_so4)
     delete(cellMass_so2)
-    delete(cellMass_ocs)
     delete(cellMass_dms)
     delete(cellMass_h2so4)
+    if (isvar("cellMass_ocs")) then
+      delete(cellMass_ocs)
+    end if
 
     TMso4_strat=TMso4_strat*MWS/MWNH4HSO4
     TMso4@units = "kgS/m2"
@@ -251,18 +253,20 @@ begin
     TMSO2_trop= (/ TMSO2*MWS/MWSO2-TMSO2_strat/)
     print("  Saving TMSO2_trop ...")
     tempfile->TMSO2_trop = TMSO2_trop    
-
-    TMOCS_strat=TMOCS_strat*MWS/MWOCS
-    TMOCS@units = "kgS/m2"
-    TMOCS_strat@long_name="OCS stratospheric column burden"
-    TMOCS_strat@method="scaled to mol wt S"
-    print("  Saving TMOCS_strat ...")
-;    printVarSummary(TMOCS_strat)
-    tempfile->TMOCS_strat = TMOCS_strat
-    TMOCS_trop=TMOCS ; get metadata
-    TMOCS_trop= (/ TMOCS*MWS/MWOCS-TMOCS_strat/)
-    print("  Saving TMOCS_OCS ...")
-    tempfile->TMOCS_trop = TMOCS_trop 
+    
+    if (isvar("TMOCS_strat")) then
+      TMOCS_strat=TMOCS_strat*MWS/MWOCS
+      TMOCS@units = "kgS/m2"
+      TMOCS_strat@long_name="OCS stratospheric column burden"
+      TMOCS_strat@method="scaled to mol wt S"
+      print("  Saving TMOCS_strat ...")
+  ;    printVarSummary(TMOCS_strat)
+      tempfile->TMOCS_strat = TMOCS_strat
+      TMOCS_trop=TMOCS ; get metadata
+      TMOCS_trop= (/ TMOCS*MWS/MWOCS-TMOCS_strat/)
+      print("  Saving TMOCS_OCS ...")
+      tempfile->TMOCS_trop = TMOCS_trop 
+    end if
 
     TMDMS_strat=TMDMS_strat*MWS/MWDMS
     TMDMS@units = "kgS/m2"
