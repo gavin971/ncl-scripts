@@ -171,119 +171,121 @@ begin
   if (isfilevar(history,"TMso4_strat")) then
     print("  Found TMso4_strat ...")
   else
-    TMSO2=history->TMSO2
-    TMOCS=history->TMOCS
-    TMDMS=history->TMDMS
-    TMH2SO4=history->TMH2SO4
-    TMso4_strat=TMso4 ; get metadata and array structure
-    TMSO2_strat=TMSO2 ; get metadata and array structure
-    TMOCS_strat=TMOCS ; get metadata and array structure
-    TMDMS_strat=TMDMS ; get metadata and array structure
-    TMH2SO4_strat=TMH2SO4 ; get metadata and array structure
-    print("  Reading TROP_P ...")
-    tropP= history->TROP_P        ; tropopause pressure
-    if (.not.(cmcalc)) then
-      print("calculating pdel ...")
-      Pi = pres_hybrid_ccm(PS(:,:,:), P0, hyai(:) ,hybi(:))   
-      nLevs=dimsizes(so4&lev)
-      pdel = Pi(:, 1:nLevs, :, :) - Pi(:, 0:nLevs-1, :, :) ; (time, lev, lat, lon)    
-      print("calculating cellMass ...")
-      cellMass_so4 = so4 ; get metadata
-      cellMass_so4 = (pdel / G) * so4 ; k/m2 per level
-      cellMass_so2 = so2 ; get metadata
-      cellMass_so2 = (pdel / G) * so2 ; k/m2 per level
-      cellMass_ocs = ocs ; get metadata
-      cellMass_ocs = (pdel / G) * ocs ; k/m2 per level
-      cellMass_dms = dms ; get metadata
-      cellMass_dms = (pdel / G) * dms ; k/m2 per level
-      cellMass_h2so4 = h2so4 ; get metadata
-      cellMass_h2so4 = (pdel / G) * h2so4 ; k/m2 per level
+    if (isfilevar(history,"TMSO2")) then
+      TMSO2=history->TMSO2
+      TMOCS=history->TMOCS
+      TMDMS=history->TMDMS
+      TMH2SO4=history->TMH2SO4
+      TMso4_strat=TMso4 ; get metadata and array structure
+      TMSO2_strat=TMSO2 ; get metadata and array structure
+      TMOCS_strat=TMOCS ; get metadata and array structure
+      TMDMS_strat=TMDMS ; get metadata and array structure
+      TMH2SO4_strat=TMH2SO4 ; get metadata and array structure
+      print("  Reading TROP_P ...")
+      tropP= history->TROP_P        ; tropopause pressure
+      if (.not.(cmcalc)) then
+        print("calculating pdel ...")
+        Pi = pres_hybrid_ccm(PS(:,:,:), P0, hyai(:) ,hybi(:))   
+        nLevs=dimsizes(so4&lev)
+        pdel = Pi(:, 1:nLevs, :, :) - Pi(:, 0:nLevs-1, :, :) ; (time, lev, lat, lon)    
+        print("calculating cellMass ...")
+        cellMass_so4 = so4 ; get metadata
+        cellMass_so4 = (pdel / G) * so4 ; k/m2 per level
+        cellMass_so2 = so2 ; get metadata
+        cellMass_so2 = (pdel / G) * so2 ; k/m2 per level
+        cellMass_ocs = ocs ; get metadata
+        cellMass_ocs = (pdel / G) * ocs ; k/m2 per level
+        cellMass_dms = dms ; get metadata
+        cellMass_dms = (pdel / G) * dms ; k/m2 per level
+        cellMass_h2so4 = h2so4 ; get metadata
+        cellMass_h2so4 = (pdel / G) * h2so4 ; k/m2 per level
+      end if
+      nLat=dimsizes(tropP&lat)
+      nLon=dimsizes(tropP&lon)
+  ;    printVarSummary(cellMass)
+      print("calculating TMso4_strat ...")
+      do j = 0,nLat-1
+        do m = 0,nLon-1
+          tp = tropP(0,j,m)
+          if (tropP@units.eq."Pa") then 
+            tp = (/ tp/100.0 /)
+            tp@units="hPa"
+          end if
+          TMso4_strat(:,j,m)   = dim_sum(cellMass_so4 (time|:, lat|j, lon|m, {lev|:tp}))
+          TMSO2_strat(:,j,m)   = dim_sum(cellMass_so2 (time|:, lat|j, lon|m, {lev|:tp}))
+          TMOCS_strat(:,j,m)   = dim_sum(cellMass_ocs (time|:, lat|j, lon|m, {lev|:tp}))
+          TMDMS_strat(:,j,m)   = dim_sum(cellMass_dms (time|:, lat|j, lon|m, {lev|:tp}))
+          TMH2SO4_strat(:,j,m) = dim_sum(cellMass_h2so4 (time|:, lat|j, lon|m, {lev|:tp}))
+       end do
+      end do    
+      delete(cellMass_so4)
+      delete(cellMass_so2)
+      delete(cellMass_ocs)
+      delete(cellMass_dms)
+      delete(cellMass_h2so4)
+
+      TMso4_strat=TMso4_strat*MWS/MWNH4HSO4
+      TMso4@units = "kgS/m2"
+      TMso4_strat@long_name="SO4 stratospheric column burden"
+      TMso4_strat@method="scaled by 32.065/115.108999 to adjust mol wt NH4HSO4 to H2SO4"
+      print("  Saving TMso4_strat ...")
+  ;    printVarSummary(TMso4_strat)
+      tempfile->TMso4_strat = TMso4_strat
+      TMso4_trop=TMso4 ; get metadata
+      TMso4_trop= (/ TMso4-TMso4_strat/)
+      print("  Saving TMso4_trop ...")
+      tempfile->TMso4_trop = TMso4_trop 
+
+      TMSO2_strat=TMSO2_strat*MWS/MWSO2
+      TMSO2@units = "kgS/m2"
+      TMSO2_strat@long_name="SO2 stratospheric column burden"
+      TMSO2_strat@method="scaled to mol wt S"
+      print("  Saving TMSO2_strat ...")
+  ;    printVarSummary(TMSO2_strat)
+      tempfile->TMSO2_strat = TMSO2_strat
+      TMSO2_trop=TMSO2 ; get metadata
+      TMSO2_trop= (/ TMSO2*MWS/MWSO2-TMSO2_strat/)
+      print("  Saving TMSO2_trop ...")
+      tempfile->TMSO2_trop = TMSO2_trop    
+
+      TMOCS_strat=TMOCS_strat*MWS/MWOCS
+      TMOCS@units = "kgS/m2"
+      TMOCS_strat@long_name="OCS stratospheric column burden"
+      TMOCS_strat@method="scaled to mol wt S"
+      print("  Saving TMOCS_strat ...")
+  ;    printVarSummary(TMOCS_strat)
+      tempfile->TMOCS_strat = TMOCS_strat
+      TMOCS_trop=TMOCS ; get metadata
+      TMOCS_trop= (/ TMOCS*MWS/MWOCS-TMOCS_strat/)
+      print("  Saving TMOCS_OCS ...")
+      tempfile->TMOCS_trop = TMOCS_trop 
+
+      TMDMS_strat=TMDMS_strat*MWS/MWDMS
+      TMDMS@units = "kgS/m2"
+      TMDMS_strat@long_name="DMS stratospheric column burden"
+      TMDMS_strat@method="scaled to mol wt S"
+      print("  Saving TMDMS_strat ...")
+  ;    printVarSummary(TMDMS_strat)
+      tempfile->TMDMS_strat = TMDMS_strat
+      TMDMS_trop=TMDMS ; get metadata
+      TMDMS_trop= (/ TMDMS*MWS/MWDMS-TMDMS_strat/)
+      print("  Saving TMDMS_trop ...")
+      tempfile->TMDMS_trop = TMDMS_trop    
+
+      TMH2SO4_strat=TMH2SO4_strat*MWS/MWH2SO4
+      TMH2SO4@units = "kgS/m2"
+      TMH2SO4_strat@long_name="H2SO4 stratospheric column burden"
+      TMH2SO4_strat@method="scaled to mol wt S"
+      print("  Saving TMH2SO4_strat ...")
+  ;    printVarSummary(TMH2SO4_strat)
+      tempfile->TMH2SO4_strat = TMH2SO4_strat
+      TMH2SO4_trop=TMH2SO4 ; get metadata
+      TMH2SO4_trop= (/ TMH2SO4*MWS/MWH2SO4-TMH2SO4_strat/)
+      print("  Saving TMH2SO4_trop ...")
+      tempfile->TMH2SO4_trop = TMH2SO4_trop 
+
+      append=True
     end if
-    nLat=dimsizes(tropP&lat)
-    nLon=dimsizes(tropP&lon)
-;    printVarSummary(cellMass)
-    print("calculating TMso4_strat ...")
-    do j = 0,nLat-1
-      do m = 0,nLon-1
-        tp = tropP(0,j,m)
-        if (tropP@units.eq."Pa") then 
-          tp = (/ tp/100.0 /)
-          tp@units="hPa"
-        end if
-        TMso4_strat(:,j,m)   = dim_sum(cellMass_so4 (time|:, lat|j, lon|m, {lev|:tp}))
-        TMSO2_strat(:,j,m)   = dim_sum(cellMass_so2 (time|:, lat|j, lon|m, {lev|:tp}))
-        TMOCS_strat(:,j,m)   = dim_sum(cellMass_ocs (time|:, lat|j, lon|m, {lev|:tp}))
-        TMDMS_strat(:,j,m)   = dim_sum(cellMass_dms (time|:, lat|j, lon|m, {lev|:tp}))
-        TMH2SO4_strat(:,j,m) = dim_sum(cellMass_h2so4 (time|:, lat|j, lon|m, {lev|:tp}))
-     end do
-    end do    
-    delete(cellMass_so4)
-    delete(cellMass_so2)
-    delete(cellMass_ocs)
-    delete(cellMass_dms)
-    delete(cellMass_h2so4)
-    
-    TMso4_strat=TMso4_strat*MWS/MWNH4HSO4
-    TMso4@units = "kgS/m2"
-    TMso4_strat@long_name="SO4 stratospheric column burden"
-    TMso4_strat@method="scaled by 32.065/115.108999 to adjust mol wt NH4HSO4 to H2SO4"
-    print("  Saving TMso4_strat ...")
-;    printVarSummary(TMso4_strat)
-    tempfile->TMso4_strat = TMso4_strat
-    TMso4_trop=TMso4 ; get metadata
-    TMso4_trop= (/ TMso4-TMso4_strat/)
-    print("  Saving TMso4_trop ...")
-    tempfile->TMso4_trop = TMso4_trop 
-       
-    TMSO2_strat=TMSO2_strat*MWS/MWSO2
-    TMSO2@units = "kgS/m2"
-    TMSO2_strat@long_name="SO2 stratospheric column burden"
-    TMSO2_strat@method="scaled to mol wt S"
-    print("  Saving TMSO2_strat ...")
-;    printVarSummary(TMSO2_strat)
-    tempfile->TMSO2_strat = TMSO2_strat
-    TMSO2_trop=TMSO2 ; get metadata
-    TMSO2_trop= (/ TMSO2*MWS/MWSO2-TMSO2_strat/)
-    print("  Saving TMSO2_trop ...")
-    tempfile->TMSO2_trop = TMSO2_trop    
-     
-    TMOCS_strat=TMOCS_strat*MWS/MWOCS
-    TMOCS@units = "kgS/m2"
-    TMOCS_strat@long_name="OCS stratospheric column burden"
-    TMOCS_strat@method="scaled to mol wt S"
-    print("  Saving TMOCS_strat ...")
-;    printVarSummary(TMOCS_strat)
-    tempfile->TMOCS_strat = TMOCS_strat
-    TMOCS_trop=TMOCS ; get metadata
-    TMOCS_trop= (/ TMOCS*MWS/MWOCS-TMOCS_strat/)
-    print("  Saving TMOCS_OCS ...")
-    tempfile->TMOCS_trop = TMOCS_trop 
-       
-    TMDMS_strat=TMDMS_strat*MWS/MWDMS
-    TMDMS@units = "kgS/m2"
-    TMDMS_strat@long_name="DMS stratospheric column burden"
-    TMDMS_strat@method="scaled to mol wt S"
-    print("  Saving TMDMS_strat ...")
-;    printVarSummary(TMDMS_strat)
-    tempfile->TMDMS_strat = TMDMS_strat
-    TMDMS_trop=TMDMS ; get metadata
-    TMDMS_trop= (/ TMDMS*MWS/MWDMS-TMDMS_strat/)
-    print("  Saving TMDMS_trop ...")
-    tempfile->TMDMS_trop = TMDMS_trop    
-    
-    TMH2SO4_strat=TMH2SO4_strat*MWS/MWH2SO4
-    TMH2SO4@units = "kgS/m2"
-    TMH2SO4_strat@long_name="H2SO4 stratospheric column burden"
-    TMH2SO4_strat@method="scaled to mol wt S"
-    print("  Saving TMH2SO4_strat ...")
-;    printVarSummary(TMH2SO4_strat)
-    tempfile->TMH2SO4_strat = TMH2SO4_strat
-    TMH2SO4_trop=TMH2SO4 ; get metadata
-    TMH2SO4_trop= (/ TMH2SO4*MWS/MWH2SO4-TMH2SO4_strat/)
-    print("  Saving TMH2SO4_trop ...")
-    tempfile->TMH2SO4_trop = TMH2SO4_trop 
-   
-    append=True
   end if
   
   ; Calculate the atmospheric density (g/cm3) assuming an ideal gas.
@@ -602,6 +604,10 @@ else
     else    
       rootpath="/glade/scratch/mmills/archive.locked/"
       outpath="/glade/scratch/mmills/archive/"
+      exists =isfilepresent(rootpath+caseid+"/atm/hist/")
+      if (.not.exists) then
+        rootpath="/glade/p/cesm/wawg_dev/mmills/archive/"
+      end if
     end if
   end if
   
