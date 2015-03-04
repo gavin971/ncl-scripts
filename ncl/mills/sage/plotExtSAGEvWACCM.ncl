@@ -13,6 +13,14 @@ print("caseid="+caseid)
 ostype=getenv("OSTYPE")
 host=getenv("HOSTNAME")
 
+rootpath="/glade/scratch/mmills/archive/"
+subdir="/atm/proc/h0zm/"
+
+exists =isfilepresent(rootpath+caseid+subdir)
+if (.not.exists) then
+  rootpath="/glade/p/cesm/wawg_dev/mmills/archive/"
+end if
+
 sagepath="/glade/p/work/mmills/data/SAGE_II_v7.00/CCMI_Filled_Data_V2/netCDF/"
 if (ostype.eq."darwin") then
   sagepath="/Volumes/Data/Data/SAGE2/SAGE_II_v7.00/CCMI_Filled_Data_V2/netCDF/"
@@ -34,9 +42,6 @@ sagedate=ext1020s&time
 sage1991=ind(floattoint(sagedate).eq.1991)
 sageD1=sage1991(4)
 print(sageD1+" "+sagedate(sageD1))
-
-rootpath="/glade/scratch/mmills/archive/"
-subdir="/atm/proc/h0zm/"
 
 infiles=systemfunc("ls "+rootpath+caseid+subdir+"*.nc")
 history=addfiles(infiles,"r")
