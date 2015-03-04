@@ -14,13 +14,17 @@ if  [ -n "$caseid" ] ; then
     if [[ $machine =~ 'yslogin' || $machine =~ 'geyser' || $machine =~ 'caldera' ]];then
 #      rootpath='/glade/p/cesm/wawg/mmills/run'
       rootpath='/glade/scratch/mmills/archive'
+      mamdir=$rootpath'/'$caseid'/atm/proc/h0mam/'
+      if [[ ! -e $mamdir ]] ; then
+        rootpath='/glade/p/cesm/wawg_dev/mmills/archive'
+      fi
     fi
     
   fi
 
-  mamdir=$rootpath'/'$caseid'/'$runname'/atm/proc/h0mam/'
-  h0dir1=$rootpath'/'$caseid'/'$runname'/atm/hist/'
-  h0dir2=$rootpath'.locked/'$caseid'/'$runname'/atm/hist/'
+  mamdir=$rootpath'/'$caseid'/atm/proc/h0mam/'
+  h0dir1=$rootpath'/'$caseid'/atm/hist/'            
+  h0dir2=$rootpath'.locked/'$caseid'/atm/hist/'
   
   echo " "
   echo "cd $mamdir"

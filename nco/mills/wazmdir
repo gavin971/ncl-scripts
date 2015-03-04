@@ -18,6 +18,10 @@ if  [ -n "$caseid" ] ; then
     if [[ $machine =~ 'yslogin' || $machine =~ 'geyser' || $machine =~ 'caldera' ]];then
 #      rootpath='/glade/p/cesm/wawg/mmills/run'
       rootpath='/glade/scratch/mmills/archive'
+      casedir=$rootpath'/'$caseid'/'
+      if [[ ! -e $casedir ]] ; then
+        rootpath='/glade/p/cesm/wawg_dev/mmills/archive'
+      fi
     fi
 
 #    if [[ $machine =~ 'geyser' ]];then
