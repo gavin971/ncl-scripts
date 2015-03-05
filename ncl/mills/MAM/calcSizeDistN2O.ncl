@@ -4,13 +4,14 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 undef("calcSizeDistN2O")
 procedure calcSizeDistN2O(caseid:string, dgVar:string, yearPattern:string,\
-                          yearString:string)
+                          yearString:string, hem:string)
 
 ; input variables
 ;    caseid      : e.g "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003"  
 ;    dgVar       : "dgnumwet" or "dgnd_a0"
 ;    yearPattern : e.g. "199[23]"
 ;    yearString  : e.g. "1992-93"
+;    hem         : hemisphere, e.g. "NH", "global"
 ;    N2Oppb      : N2O bounds in descending order, e.g. (/ 300, 250, 200, 150, 100, 50 /)
 
 ; output variables
@@ -23,6 +24,19 @@ begin
   sqrt2pi=sqrt(2*pi)
 
   rootpath = "/glade/scratch/mmills/archive/"
+  exists =isfilepresent(rootpath+caseid+"/atm/proc/h0zm/")
+  if (.not.exists) then
+    rootpath="/glade/p/cesm/wawg_dev/mmills/archive/"
+  end if
+
+  if (hem.eq."NH") then
+    lat1=0
+    lat2=90
+  else
+    lat1=-90
+    lat2=90
+  end if  
+  
 
   N2Oppb = (/ 300, 250, 200, 150, 100, 50 /)
   N2Oppb@long_name="N2O boundaries"
@@ -60,7 +74,7 @@ begin
   
   dVdlog10Dp_std=dVdlog10Dp_avg
   
-  outfilename=rootpath+caseid+"/atm/proc/SizeDistN2O_"+yearString+".nc"
+  outfilename=rootpath+caseid+"/atm/proc/SizeDistN2O_"+yearString+"_"+hem+".nc"
   dum=systemfunc("rm "+outfilename)
   outfile=addfile(outfilename,"c")
 
@@ -86,18 +100,18 @@ begin
   print("reading num_a3")
   num_a3 = addfiles_GetVar(history, historyNames, "num_a3")
 
-  dg1=ndtooned(dgnum1)
-  dg2=ndtooned(dgnum2)
-  dg3=ndtooned(dgnum3)
+  dg1=ndtooned(dgnum1(:,:,{lat1:lat2}))
+  dg2=ndtooned(dgnum2(:,:,{lat1:lat2}))
+  dg3=ndtooned(dgnum3(:,:,{lat1:lat2}))
 
-  n1=ndtooned(num_a1)
-  n2=ndtooned(num_a2)
-  n3=ndtooned(num_a3)
+  n1=ndtooned(num_a1(:,:,{lat1:lat2}))
+  n2=ndtooned(num_a2(:,:,{lat1:lat2}))
+  n3=ndtooned(num_a3(:,:,{lat1:lat2}))
 
-  printVarSummary(N2O)
-  ds=dimsizes(N2O)
+  printVarSummary(N2O(:,:,{lat1:lat2})) ; [time | 24] x [lev | 70] x [lat | 96]
+  ds=dimsizes(N2O(:,:,{lat1:lat2}))
 
-  N2O_1D = ndtooned(N2O)
+  N2O_1D = ndtooned(N2O(:,:,{lat1:lat2}))
   N2Obounds=N2Oppb*1.e-9
   N2Obounds@units=N2O@units
   N2Obounds@long_name="N2O boundaries"
@@ -188,14 +202,16 @@ end
 ;caseid = "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.005.18-20km"
 ;caseid = "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.004.expfix"
 caseid = "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.006.0-15N"
-yearPattern = "199[23]"
-yearString = "1992-1993"
+;yearPattern = "199[23]"
+;yearString = "1992-1993"
 ;yearPattern = "199[67]"
 ;yearString = "1996-1997"
-;yearPattern = "200[23]"
-;yearString = "2002-2003"
+yearPattern = "200[23]"
+yearString = "2002-2003"
+
+hem="NH"
 
 ;dgVar = "dgnumwet"
 dgVar = "dgnd_a0"
-calcSizeDistN2O(caseid, dgVar, yearPattern, yearString)
+calcSizeDistN2O(caseid, dgVar, yearPattern, yearString, hem)
 

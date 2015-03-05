@@ -60,7 +60,7 @@ begin
   
   do i = 0, nCases-1
   
-    a=addfile(rootpath+caseid(i)+"/atm/proc/SizeDistN2O_"+yearString(i)+".nc","r")
+    a=addfile(rootpath+caseid(i)+"/atm/proc/SizeDistN2O_"+yearString(i)+"_NH.nc","r")
     if (i.eq.0) then
       DpMean=a->diameter
       nBins=dimsizes(DpMean)
@@ -83,7 +83,7 @@ begin
   
   datestr = systemfunc("date +%y%m%d_%H%M")
               
-  pdffile="SizeDistN2O_multi_"+caseid(0)+"_"+yearString(0)+"_c"+datestr
+  pdffile="SizeDistN2O_multi_"+caseid(0)+"_"+yearString(0)+"_NH_c"+datestr
   wks   = gsn_open_wks ("pdf", "$IMAGE_PATH/"+pdffile)                   ; open workstation
   res@vpHeightF             = 0.4              ; change aspect ratio
   res@vpWidthF              = 0.7

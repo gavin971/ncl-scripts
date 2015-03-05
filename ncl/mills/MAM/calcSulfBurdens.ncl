@@ -31,6 +31,10 @@ else
   rootpath=getenv("rootpath")
   if (ismissing(rootpath)) then
     rootpath="/glade/scratch/mmills/archive/"
+    exists =isfilepresent(rootpath+caseid+"/atm/proc/h0gm/"+caseid+".cam.h0.globavg.nc")
+    if (.not.exists) then
+      rootpath="/glade/p/cesm/wawg_dev/mmills/archive/"
+    end if
   end if
   gmdir=rootpath+"/"+caseid+"/atm/proc/h0gm/"
   filename=caseid+".cam.h0.globavg.nc"
