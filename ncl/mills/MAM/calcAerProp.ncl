@@ -582,116 +582,161 @@ begin
     end if
   end if
   
-  delete(tempfile)
   delete(history)
   
   if (append) then
+    tempfile->sigmag=sigma
     command="ncks -A "+mamdir+"temp.nc "+mamdir+filename
     print(command)
     a=systemfunc(command)
   end if
+  
+  delete(tempfile)
+  
 end
 
 ;===============================================================================
 
 caseid=getenv("caseid")
-print(caseid)
+widths=getenv("widths")
 
 if (ismissing(caseid)) then
-  print("missing environment variable caseid, quitting")
+  print("FATAL: missing environment variable caseid")
+  exit
+else 
+  print("caseid: "+caseid)
+end if
+
+if (ismissing(widths)) then
+  print("FATAL: missing environment variable widths")
+  exit
+else 
+  print("widths: "+widths)
+end if
+
+if (widths.eq."default") then
+  sigma=(/1.8, 1.6, 1.8/) ; default MAM3 widths
+else if (widths.eq."strat006") then
+  sigma=(/1.6, 1.6, 1.2/) ; MAM3 widths used in case b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.006.0-15N
+else if (widths.eq."strat010") then
+  sigma=(/1.6, 1.6, 1.6/) ; MAM3 widths used in case b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.010.0-15N.10Tg.mode3sig1.6
+else if (widths.eq."strat011") then
+  sigma=(/1.8, 1.6, 1.6/) ; MAM3 widths used in case b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.011.0-15N.10Tg.def1mode3sig1.6
 else
-  print("caseid:"+caseid)
-  rootpath=getenv("rootpath")
-  host   = systemfunc("hostname")
-  print("host="+host)
-  if (ismissing(rootpath)) then
-    if (isStrSubset(host,"lfe")) then
-      rootpath = "/lou/s2m/mjmills2/csm/"
-      outpath = "/lou/s2m/mjmills2/csm/"
-    else    
-      rootpath="/glade/scratch/mmills/archive.locked/"
-      outpath="/glade/scratch/mmills/archive/"
-      exists =isfilepresent(rootpath+caseid+"/atm/hist/")
-      if (.not.exists) then
-        rootpath="/glade/p/cesm/wawg_dev/mmills/archive/"
-        outpath="/glade/p/cesm/wawg_dev/mmills/archive/"
-      end if
+  nmodes=str_fields_count (widths,",")
+  if (nmodes.ne.3) then
+    print("FATAL: Illegal value for environment variable widths: "+widths)
+    print("Preset options:")
+    print(" setenv widths default  -> 1.8, 1.6, 1.8")
+    print(" setenv widths strat006 -> 1.6, 1.6, 1.2 (used in case b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.006.0-15N)")
+    print(" setenv widths strat010 -> 1.6, 1.6, 1.2 (used in case b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.010.0-15N.10Tg.mode3sig1.6)")
+    print(" setenv widths strat011 -> 1.6, 1.6, 1.2 (used in case b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.011.0-15N.10Tg.def1mode3sig1.6)")
+    print("Or use a custom comma separated string format, e.g.:")
+    print(" setenv widths 1.8,1.6,1.2")
+    exit
+  else ; custom comma separated string format
+    sigma=stringtofloat((/str_get_field(widths,1,","),str_get_field(widths,2,","),str_get_field(widths,3,",")/))
+  end if
+end if
+end if
+end if
+end if
+
+sigma!0="mode"
+sigma@long_name="geometric standard deviation of aerosol modes"
+print("sigma: "+sigma)
+
+rootpath=getenv("rootpath")
+host   = systemfunc("hostname")
+print("host="+host)
+if (ismissing(rootpath)) then
+  if (isStrSubset(host,"lfe")) then
+    rootpath = "/lou/s2m/mjmills2/csm/"
+    outpath = "/lou/s2m/mjmills2/csm/"
+  else    
+    rootpath="/glade/scratch/mmills/archive.locked/"
+    outpath="/glade/scratch/mmills/archive/"
+    exists =isfilepresent(rootpath+caseid+"/atm/hist/")
+    if (.not.exists) then
+      rootpath="/glade/p/cesm/wawg_dev/mmills/archive/"
+      outpath="/glade/p/cesm/wawg_dev/mmills/archive/"
     end if
   end if
-  
-  hnum=getenv("hnum")
-  if (ismissing(hnum)) then
-    hnum="h0"
-  end if
-  mamdir=outpath+"/"+caseid+"/atm/proc/"+hnum+"mam/"
-  sigma=(/1.6, 1.6, 1.2/)
+end if
 
-  rundir=getenv("rundir") ; use output from run directory or archive?
-  if (ismissing(rundir)) then ; use output from archive
-    copypattern=rootpath+caseid+"/atm/hist/*"+hnum+"*"
-    print("copying from archive:"+copypattern)
-  else ; use output from run directory
-    copypattern="/glade/scratch/mmills/"+caseid+"/run/"+caseid+".cam."+hnum+"*"
-    print("copying from run dir:"+copypattern)
-  end if
+hnum=getenv("hnum")
+if (ismissing(hnum)) then
+  hnum="h0"
+end if
+mamdir=outpath+"/"+caseid+"/atm/proc/"+hnum+"mam/"
 
-  print("===========================================================")
-  print("mkdir -p "+mamdir)
-  mkdir=systemfunc("mkdir -p "+mamdir)
-  print("===========================================================")
-  StartYearMonth=getenv("startym")
-  print("StartYearMonth="+StartYearMonth)
-  if (ismissing(StartYearMonth)) then
-    cpcmd="cp -n -v "+copypattern+" "+mamdir ; don't overwrite
-    ;cpcmd="cp -v "+copypattern+" "+mamdir ; overwrite
+
+rundir=getenv("rundir") ; use output from run directory or archive?
+if (ismissing(rundir)) then ; use output from archive
+  copypattern=rootpath+caseid+"/atm/hist/*"+hnum+"*"
+  print("copying from archive:"+copypattern)
+else ; use output from run directory
+  copypattern="/glade/scratch/mmills/"+caseid+"/run/"+caseid+".cam."+hnum+"*"
+  print("copying from run dir:"+copypattern)
+end if
+
+print("===========================================================")
+print("mkdir -p "+mamdir)
+mkdir=systemfunc("mkdir -p "+mamdir)
+print("===========================================================")
+StartYearMonth=getenv("startym")
+print("StartYearMonth="+StartYearMonth)
+if (ismissing(StartYearMonth)) then
+  cpcmd="cp -n -v "+copypattern+" "+mamdir ; don't overwrite
+  ;cpcmd="cp -v "+copypattern+" "+mamdir ; overwrite
+  print(cpcmd)
+  cp=systemfunc(cpcmd)
+  print(cp)
+else
+  filelist=systemfunc("ls "+copypattern)
+;    print(filelist)
+  ds=dimsizes(filelist)
+  filelistind=0
+  do i=0,ds-1
+    if(isStrSubset(filelist(i),StartYearMonth)) then
+      filelistind=i
+      break
+    end if
+  end do
+  print("filelistind="+filelistind)
+  print("ds="+ds)
+;    print(filelist(filelistind:))
+  do i=filelistind,ds-1
+    cpcmd="cp -n -v "+filelist(i)+" "+mamdir ; don't overwrite
     print(cpcmd)
     cp=systemfunc(cpcmd)
-    print(cp)
-  else
-    filelist=systemfunc("ls "+copypattern)
-;    print(filelist)
-    ds=dimsizes(filelist)
-    filelistind=0
-    do i=0,ds-1
-      if(isStrSubset(filelist(i),StartYearMonth)) then
-        filelistind=i
-        break
-      end if
-    end do
-    print("filelistind="+filelistind)
-    print("ds="+ds)
-;    print(filelist(filelistind:))
-    do i=filelistind,ds-1
-      cpcmd="cp -n -v "+filelist(i)+" "+mamdir ; don't overwrite
-      print(cpcmd)
-      cp=systemfunc(cpcmd)
-      print(cp)    
-    end do
-  end if
-  print("===========================================================")
-  historyNames=systemfunc("ls "+mamdir+" |grep "+caseid)
-  print(historyNames)
-  nfiles=dimsizes(historyNames)
-  print("===========================================================")
-
-  do i = 0,nfiles-1
-    i1=i+1
-    print("===========================================================")
-    print("File "+i1+" of "+nfiles+":"+historyNames(i))
-    calcAerProp(mamdir,historyNames(i),sigma)
-    print("===========================================================")
+    print(cp)    
   end do
-    
-  command="rm "+mamdir+"temp.nc"
+end if
+print("===========================================================")
+historyNames=systemfunc("ls "+mamdir+" |grep "+caseid)
+print(historyNames)
+nfiles=dimsizes(historyNames)
+print("===========================================================")
+
+do i = 0,nfiles-1
+  i1=i+1
+  print("===========================================================")
+  print("File "+i1+" of "+nfiles+":"+historyNames(i))
+  calcAerProp(mamdir,historyNames(i),sigma)
+  print("===========================================================")
+end do
+
+command="rm "+mamdir+"temp.nc"
+print(command)
+a=systemfunc(command)
+
+delete(command)
+delete(a)
+if (isStrSubset(host,"geyser")) then
+  command="bsub -n 1 -q geyser -W 24:00 -P P93300007 /glade/u/home/mmills/scripts/nco/wazmdir"
   print(command)
   a=systemfunc(command)
-  
-  delete(command)
-  delete(a)
-  if (isStrSubset(host,"geyser")) then
-    command="bsub -n 1 -q geyser -W 24:00 -P P93300007 /glade/u/home/mmills/scripts/nco/wazmdir"
-    print(command)
-    a=systemfunc(command)
-  end if
-    
 end if
+
+quit
