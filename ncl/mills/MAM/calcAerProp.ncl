@@ -55,6 +55,22 @@ begin
   P0 	= history->P0
   PS 	= history->PS
   
+  if (isfilevar(history,"sigmag")) then
+    print(history->sigmag)
+    do i=0,dimsizes(sigma)-1
+      if (history->sigmag(i).ne.sigma(i)) then
+        mode=i+1
+        print("FATAL: history sigmag does not match sigma for mode "+mode)
+        print(history->sigmag(i)+" "+sigma(i))
+        exit
+      end if
+    end do
+  else
+    print("  Saving sigmag")
+    tempfile->sigmag = sigma
+    append=True  
+  end if
+  
   if (isfilevar(history,"so4")) then
     print("  Reading so4 ...")
     so4 = history->so4
@@ -585,7 +601,6 @@ begin
   delete(history)
   
   if (append) then
-    tempfile->sigmag=sigma
     command="ncks -A "+mamdir+"temp.nc "+mamdir+filename
     print(command)
     a=systemfunc(command)
