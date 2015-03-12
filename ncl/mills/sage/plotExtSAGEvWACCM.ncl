@@ -18,8 +18,16 @@ subdir="/atm/proc/h0zm/"
 
 exists =isfilepresent(rootpath+caseid+subdir)
 if (.not.exists) then
+  print("Missing: "+rootpath+caseid+subdir)
   rootpath="/glade/p/cesm/wawg_dev/mmills/archive/"
 end if
+
+exists =isfilepresent(rootpath+caseid+subdir)
+if (.not.exists) then
+  print("Missing: "+rootpath+caseid+subdir)
+  exit
+end if
+print("Rootpath: "+rootpath+caseid+subdir)
 
 sagepath="/glade/p/work/mmills/data/SAGE_II_v7.00/CCMI_Filled_Data_V2/netCDF/"
 if (ostype.eq."darwin") then
