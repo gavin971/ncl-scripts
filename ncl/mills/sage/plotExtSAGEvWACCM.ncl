@@ -25,6 +25,7 @@ end if
 exists =isfilepresent(rootpath+caseid+subdir)
 if (.not.exists) then
   print("Missing: "+rootpath+caseid+subdir)
+  print("FATAL: check caseid="+caseid)
   exit
 end if
 print("Rootpath: "+rootpath+caseid+subdir)

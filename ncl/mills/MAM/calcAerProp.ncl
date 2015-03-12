@@ -666,16 +666,30 @@ host   = systemfunc("hostname")
 print("host="+host)
 if (ismissing(rootpath)) then
   if (isStrSubset(host,"lfe")) then
+  
     rootpath = "/lou/s2m/mjmills2/csm/"
     outpath = "/lou/s2m/mjmills2/csm/"
+    
   else    
+  
     rootpath="/glade/scratch/mmills/archive.locked/"
     outpath="/glade/scratch/mmills/archive/"
+    
     exists =isfilepresent(rootpath+caseid+"/atm/hist/")
     if (.not.exists) then
+      print("Missing: "+rootpath+caseid+"/atm/hist/")
       rootpath="/glade/p/cesm/wawg_dev/mmills/archive/"
       outpath="/glade/p/cesm/wawg_dev/mmills/archive/"
     end if
+    
+    exists =isfilepresent(rootpath+caseid+"/atm/hist/")
+    if (.not.exists) then
+      print("Missing: "+rootpath+caseid+"/atm/hist/")
+      print("FATAL: check caseid="+caseid)
+      exit
+    end if
+    print("Rootpath: "+rootpath+caseid+"/atm/hist/")
+    
   end if
 end if
 

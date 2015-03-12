@@ -24,10 +24,20 @@ begin
   sqrt2pi=sqrt(2*pi)
 
   rootpath = "/glade/scratch/mmills/archive/"
+  
   exists =isfilepresent(rootpath+caseid+"/atm/proc/h0zm/")
   if (.not.exists) then
+    print("Missing: "+rootpath+caseid+"/atm/proc/h0zm/")
     rootpath="/glade/p/cesm/wawg_dev/mmills/archive/"
   end if
+  
+  exists =isfilepresent(rootpath+caseid+"/atm/proc/h0zm/")
+  if (.not.exists) then
+    print("Missing: "+rootpath+caseid+"/atm/proc/h0zm/")
+    print("FATAL: check caseid="+caseid)
+    exit
+  end if
+  print("Rootpath: "+rootpath+caseid+"/atm/proc/h0zm/")
 
   if (hem.eq."NH") then
     lat1=0

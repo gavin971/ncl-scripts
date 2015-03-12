@@ -12,10 +12,20 @@ print("caseid="+caseid)
 
 rootpath="/glade/scratch/mmills/archive/"
 subdir="/atm/proc/h0zm/"
+
 exists =isfilepresent(rootpath+caseid+subdir)
 if (.not.exists) then
+  print("Missing: "+rootpath+caseid+subdir)
   rootpath="/glade/p/cesm/wawg_dev/mmills/archive/"
 end if
+
+exists =isfilepresent(rootpath+caseid+subdir)
+if (.not.exists) then
+  print("Missing: "+rootpath+caseid+subdir)
+  print("FATAL: check caseid="+caseid)
+  exit
+end if
+print("Rootpath: "+rootpath+caseid+subdir)
 
 filelist=systemfunc("ls "+rootpath+caseid+subdir+"*.nc")
 ds=dimsizes(filelist)
