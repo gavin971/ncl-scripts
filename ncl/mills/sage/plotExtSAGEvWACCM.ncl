@@ -15,6 +15,10 @@ host=getenv("HOSTNAME")
 
 rootpath="/glade/scratch/mmills/archive/"
 subdir="/atm/proc/h0zm/"
+exists =isfilepresent(rootpath+caseid+subdir)
+if (.not.exists) then
+  rootpath="/glade/p/cesm/wawg_dev/mmills/archive/"
+end if
 
 exists =isfilepresent(rootpath+caseid+subdir)
 if (.not.exists) then
