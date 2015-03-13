@@ -5,6 +5,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
 datapath=getenv("DATA_PATH")
 rootpath=datapath+"/Deshler2014/US_Laramie_41N_105W/Nr_Stratosphere/"
+outfile=datapath+"/Deshler2014/US_Laramie_41N_105W.nc"
 
 print("ls "+rootpath)
 filenames=systemfunc("ls "+rootpath)
@@ -15,17 +16,24 @@ alt=fspan(0.5,40,nalts)
 alt!0="alt"
 alt@units="km"
 
-Nave=new((/9,nalts/),"float")
+bin=(/0.,0.15,0.19,0.25,0.30,0.49,0.78,0.95,1.08,1.20,1.80,2.00,2.47,4.10/)
+bin@units="um"
+bin@long_name="minimum radius"
+nbins=dimsizes(bin)
+
+Nave=new((/nbins,nalts/),"float")
 Nave!0="bin"
 Nave!1="alt"
+Nave&bin=bin
 Nave&alt=alt
 Nave=0.0
 
 Nsig=Nave
 
-Nk=new((/9,nalts/),"integer")
+Nk=new((/nbins,nalts/),"integer")
 Nk!0="bin"
 Nk!1="alt"
+Nk&bin=bin
 Nk&alt=alt
 Nk=0
 
@@ -48,6 +56,7 @@ do f = 0,nfiles-1
   nalt_f=dimsizes(alt_f)
   a1=alt_f(0)
   a2=alt_f(nalt_f-1)
+  print("a1="+a1+" a2="+a2)
 
   cn=tofloat(str_get_field(lines(nhead:),5," "))
 ;  print(alt_f+" "+cn)
@@ -60,29 +69,45 @@ do f = 0,nfiles-1
   do c=0,ncols-6
     lim = str_get_field(lines(nhead-2),6+c," ")
     print("c="+c+" lim="+lim)
-    if (lim.eq."N(r>0.15") then
+    delete(bin)
+    if (lim.eq."N(r>0.15".or.lim.eq."N(r>0.16".or.lim.eq."N(r>0.14".or.lim.eq."N(r>0.13") then
       bin=1
     end if
     if (lim.eq."N(r>0.19") then
       bin=2
     end if
-    if (lim.eq."N(r>0.25") then
+    if (lim.eq."N(r>0.25".or.lim.eq."N(r>0.24".or.lim.eq."N(r>0.26") then
       bin=3
     end if
     if (lim.eq."N(r>0.30") then
       bin=4
     end if
-    if (lim.eq."N(r>0.49") then
+    if (lim.eq."N(r>0.49".or.lim.eq."N(r>0.52".or.lim.eq."N(r>0.50") then
       bin=5
     end if
     if (lim.eq."N(r>0.78") then
       bin=6
     end if
-    if (lim.eq."N(r>1.08") then
+    if (lim.eq."N(r>0.95".or.lim.eq."N(r>0.96") then
       bin=7
     end if
-    if (lim.eq."N(r>2.00") then
+    if (lim.eq."N(r>1.08".or.lim.eq."N(r>1.05") then
       bin=8
+    end if
+    if (lim.eq."N(r>1.20") then
+      bin=9
+    end if
+    if (lim.eq."N(r>1.80".or.lim.eq."N(r>1.70") then
+      bin=10
+    end if
+    if (lim.eq."N(r>2.00".or.lim.eq."N(r>1.93") then
+      bin=11
+    end if
+    if (lim.eq."N(r>2.47".or.lim.eq."N(r>2.76") then
+      bin=12
+    end if
+    if (lim.eq."N(r>4.10".or.lim.eq."N(r>4.70") then
+      bin=13
     end if
     print("bin "+bin)
     
@@ -96,3 +121,15 @@ do f = 0,nfiles-1
   delete(alt_f)
   delete(cn)
 end do
+
+Nsig=where(Nk.gt.0,sqrt(Nsig/Nk),Nsig@_FillValue)
+
+print("rm "+outfile)
+rm=system_func("rm "+outfile)
+print("creating "+outfile)
+ncid=addfile(outfile,"c")
+print("saving Nave...")
+ncid->Nave=Nave
+print("saving Nsig...")
+ncid->Nsig=Nsig
+
