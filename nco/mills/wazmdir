@@ -118,7 +118,11 @@ if  [ -n "$caseid" ] ; then
 
   done
   
-  ~/scripts/nco/globavg
+  if [[ $machine =~ 'yslogin' || $machine =~ 'geyser' || $machine =~ 'caldera' ]];then
+    bsub -n 1 -q geyser -W 24:00 -P P93300007 /glade/u/home/mmills/scripts/nco/globavg
+  else
+    ~/scripts/nco/globavg
+  fi
   
 else
   echo "caseid is not set"
