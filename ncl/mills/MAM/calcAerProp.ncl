@@ -766,6 +766,11 @@ if (isStrSubset(host,"geyser")) then
   command="bsub -n 1 -q geyser -W 24:00 -P P93300007 /glade/u/home/mmills/scripts/nco/wazmdir"
   print(command)
   a=systemfunc(command)
+  print(a)
+  command="bsub -n 1 -q geyser -W 24:00 -P P93300007 /glade/u/home/mmills/scripts/nco/lnh0mam"
+  print(command)
+  b=systemfunc(command)
+  print(b)
 end if
 
 quit
