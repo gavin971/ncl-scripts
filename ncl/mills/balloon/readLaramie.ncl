@@ -11,11 +11,34 @@ filenames=systemfunc("ls "+rootpath)
 ;nfiles=dimsizes(filenames)
 ;filedates=toint(str_get_cols(filenames,0,7))
 fileyears=toint(str_get_cols(filenames,0,3))
-startyear=1999
-endyear=2008
+
+startyear=getenv("startyear")
+endyear=getenv("endyear")
+
+if (ismissing(startyear)) then
+  startyear=1999
+end if  
+
+if (ismissing(endyear)) then
+  endyear=2008
+end if
+
+if (startyear.gt.endyear) then
+  print("FATAL: startyear = "+startyear+" > endyear = "+endyear)
+  exit
+end if
+
+print("startyear = "+startyear+", endyear = "+endyear)
+
+if (startyear.eq.endyear) then
+  rangestr=startyear
+else
+  rangestr=startyear+"-"+endyear
+end if
+
 selectfiles=filenames(ind(fileyears.ge.startyear.and.fileyears.le.endyear))
 nfiles=dimsizes(selectfiles)
-outfile=datapath+"/Deshler2014/US_Laramie_41N_105W_"+startyear+"-"+endyear+".nc"
+outfile=datapath+"/Deshler2014/US_Laramie_41N_105W_"+rangestr+".nc"
 
 minalt=0
 maxalt=40
@@ -157,11 +180,11 @@ print("=======================================================================")
 do k=0,nalts-1
   print(sprintf("%4.1f",alt(k))+" "+sprinti("%3.0i",Nk(0,k))+\
      "  |  "+sprintf("%3.2e",Nmedian(0,k))+" "+sprintf("%3.2e",Nmedian(1,k))+" "+sprintf("%3.2e",Nmedian(2,k))+\
-     " "+sprintf("%3.2e",Nmedian(3,k))+" "+sprintf("%3.2e",Nmedian(4,k))+" "+sprintf("%3.2e",Nmedian(5,k))+\
-     "  |  "+sprintf("%3.2e",Nmin(0,k))+" "+sprintf("%3.2e",Nmin(1,k))+" "+sprintf("%3.2e",Nmin(2,k))+\
-     " "+sprintf("%3.2e",Nmin(3,k))+" "+sprintf("%3.2e",Nmin(4,k))+" "+sprintf("%3.2e",Nmin(5,k))+\
-     "  |  "+sprintf("%3.2e",Nmax(0,k))+" "+sprintf("%3.2e",Nmax(1,k))+" "+sprintf("%3.2e",Nmax(2,k))+\
-     " "+sprintf("%3.2e",Nmax(3,k))+" "+sprintf("%3.2e",Nmax(4,k))+" "+sprintf("%3.2e",Nmax(5,k)))
+     " "+sprintf("%3.2e",Nmedian(3,k))+" "+sprintf("%3.2e",Nmedian(4,k))+" "+sprintf("%3.2e",Nmedian(5,k)));+\
+;     "  |  "+sprintf("%3.2e",Nmin(0,k))+" "+sprintf("%3.2e",Nmin(1,k))+" "+sprintf("%3.2e",Nmin(2,k))+\
+;     " "+sprintf("%3.2e",Nmin(3,k))+" "+sprintf("%3.2e",Nmin(4,k))+" "+sprintf("%3.2e",Nmin(5,k))+\
+;     "  |  "+sprintf("%3.2e",Nmax(0,k))+" "+sprintf("%3.2e",Nmax(1,k))+" "+sprintf("%3.2e",Nmax(2,k))+\
+;     " "+sprintf("%3.2e",Nmax(3,k))+" "+sprintf("%3.2e",Nmax(4,k))+" "+sprintf("%3.2e",Nmax(5,k)))
 end do
 
 print("=======================================================================")

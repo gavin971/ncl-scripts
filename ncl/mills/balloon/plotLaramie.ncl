@@ -7,9 +7,31 @@ load "$CODE_PATH/ncl/lib/boxplot_vertical.ncl"
 begin
   datapath=getenv("DATA_PATH")
   imagepath=getenv("IMG_PATH")
-  startyear=1999
-  endyear=2008
-  infile=datapath+"/Deshler2014/US_Laramie_41N_105W_"+startyear+"-"+endyear+".nc"
+  startyear=getenv("startyear")
+  endyear=getenv("endyear")
+  
+  if (ismissing(startyear)) then
+    startyear=1999
+  end if  
+  
+  if (ismissing(endyear)) then
+    endyear=2008
+  end if
+  
+  if (startyear.gt.endyear) then
+    print("FATAL: startyear = "+startyear+" > endyear = "+endyear)
+    exit
+  end if
+  
+  print("startyear = "+startyear+", endyear = "+endyear)
+  
+  if (startyear.eq.endyear) then
+    rangestr=startyear
+  else
+    rangestr=startyear+"-"+endyear
+  end if
+  
+  infile=datapath+"/Deshler2014/US_Laramie_41N_105W_"+rangestr+".nc"
 
   print("opening "+infile)
   ncid=addfile(infile,"r")
@@ -49,8 +71,9 @@ begin
   xval(0:nbins-1,:,3)=where(N75pct(0:nbins-1,mink:maxk).ge.minv,N75pct(0:nbins-1,mink:maxk),minv)
   xval(0:nbins-1,:,4)=where(Nmax(0:nbins-1,mink:maxk).ge.minv,Nmax(0:nbins-1,mink:maxk),minv)
 
-
-  pdffile=imagepath+"/US_Laramie_41N_105W_"+startyear+"-"+endyear
+  print("mkdir "+imagepath+"/balloon")
+  cmd=systemfunc("mkdir "+imagepath+"/balloon")
+  pdffile=imagepath+"/balloon/US_Laramie_41N_105W_"+rangestr
   print("rm "+pdffile+".pdf")
   rm=systemfunc("rm "+pdffile+".pdf")
   wks = gsn_open_wks("pdf",pdffile)
@@ -59,7 +82,7 @@ begin
 ;**********************************************
   res            = True                         ; plot mods desired
 ;  res@tmYLLabels = (/"Control","-2Xna","2Xna"/) ; labels for each box
-  res@tiMainString = "Laramie (41N, 105W), "+startyear+"-"+endyear
+  res@tiMainString = "Laramie (41N, 105W), "+rangestr
 ;  res@trXLog=True
 ;**********************************************
 ; resources for polylines that draws the boxes
