@@ -94,7 +94,7 @@ begin
 ;**********************************************  
   opti          = True			
   opti@boxWidth = .25				; Width of box (y units)
-  boxColors = (/"black","red","green4","blue","orchid","cyan4"/)  	; Color of box(es)
+  boxColors = (/"black","red","green4","blue","orchid","orange","cyan4","grey"/)  	; Color of box(es)
   opti@boxColors = boxColors(0:nbins-1)
 ;***********************************************
   plot = boxplot_vertical(wks,xval,alt,opti,res,llres)	; All 3 options used...

@@ -12,8 +12,8 @@ filenames=systemfunc("ls "+rootpath)
 ;filedates=toint(str_get_cols(filenames,0,7))
 fileyears=toint(str_get_cols(filenames,0,3))
 
-startyear=getenv("startyear")
-endyear=getenv("endyear")
+startyear=stringtoint(getenv("startyear"))
+endyear=stringtoint(getenv("endyear"))
 
 if (ismissing(startyear)) then
   startyear=1999
@@ -48,7 +48,8 @@ alt!0="alt"
 alt@units="km"
 
 ;bin=(/0.,0.15,0.19,0.25,0.30,0.49,0.78,0.95,1.08,1.20,1.80,2.00,2.47,4.10,4.70,9.50,15.0/)
-bin=(/0.,0.15,0.25,0.30,0.49,0.78/)
+;bin=(/0.,0.15,0.25,0.30,0.49,0.78/)
+bin=(/0.,0.15,0.25,0.30,0.49,0.62,0.78,1.08/)
 bin@units="um"
 bin@long_name="minimum radius"
 nbins=dimsizes(bin)
@@ -103,7 +104,7 @@ do f = 0,nfiles-1
     print("c="+c+" lim="+lim+" val="+val)
     
     do ibin=0,nbins-1
-      if (val.eq.bin(ibin)) then
+      if (abs(val-bin(ibin)).le.0.03) then
         print("ibin "+ibin+", bin="+bin(ibin))
         N(ibin,{a1:a2},f)=tofloat(str_get_field(lines(nhead:),CNcol+c," "))
       end if
@@ -176,11 +177,19 @@ print("saving Nk...")
 ncid->Nk=Nk
   
 print("=======================================================================")
-
+header="Alt   Nk  |  "
+do b=0,nbins-1
+  header=header+sprintf("%4.2f",bin(b))+"     "
+end do
+print((/header/))
 do k=0,nalts-1
-  print(sprintf("%4.1f",alt(k))+" "+sprinti("%3.0i",Nk(0,k))+\
-     "  |  "+sprintf("%3.2e",Nmedian(0,k))+" "+sprintf("%3.2e",Nmedian(1,k))+" "+sprintf("%3.2e",Nmedian(2,k))+\
-     " "+sprintf("%3.2e",Nmedian(3,k))+" "+sprintf("%3.2e",Nmedian(4,k))+" "+sprintf("%3.2e",Nmedian(5,k)));+\
+  if (alt(k).ge.9.5.and.alt(k).le.31.0) then
+    line=sprintf("%4.1f",alt(k))+" "+sprinti("%3.0i",Nk(0,k))+"  |  "
+    do b=0,nbins-1
+      line=line+sprintf("%3.2e",Nmedian(b,k))+" "
+    end do
+    print((/line/))
+  end if
 ;     "  |  "+sprintf("%3.2e",Nmin(0,k))+" "+sprintf("%3.2e",Nmin(1,k))+" "+sprintf("%3.2e",Nmin(2,k))+\
 ;     " "+sprintf("%3.2e",Nmin(3,k))+" "+sprintf("%3.2e",Nmin(4,k))+" "+sprintf("%3.2e",Nmin(5,k))+\
 ;     "  |  "+sprintf("%3.2e",Nmax(0,k))+" "+sprintf("%3.2e",Nmax(1,k))+" "+sprintf("%3.2e",Nmax(2,k))+\
