@@ -3,6 +3,7 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 
+printflag=False
 caseid=getenv("caseid")
 
 if (ismissing(caseid)) then
@@ -36,8 +37,7 @@ else
   rangestr=startyear+"-"+endyear
 end if
 
-pi      = 4.0 * atan(1.0) 
-sqrt2pi=sqrt(2*pi)
+sqrt2=sqrt(2.0)
 
 rootpath = "/glade/scratch/mmills/archive/"
 
@@ -58,6 +58,7 @@ print("Rootpath: "+rootpath+caseid+"/atm/proc/h0mam/")
 historyNames=systemfunc("ls "+rootpath+caseid+"/atm/proc/h0mam/")
 print("historyNames:"+dimsizes(historyNames))
 
+; select only files between startyear and endyear
 col1=strlen(caseid+".cam.h0.")
 col2=col1+3
 year=stringtointeger(str_get_cols(historyNames,col1,col2))
@@ -68,7 +69,7 @@ print("historyNames2:"+dimsizes(historyNames2))
 history = addfiles(rootpath+caseid+"/atm/proc/h0mam/"+historyNames2, "r")
 ListSetType(history, "cat")
 
-if isfilevar(history(0),"sigmag") then
+if isfilevar(history[0],"sigmag") then
   print("reading sigmag")
   sigmag=history[0]->sigmag
   print(sigmag)
@@ -77,34 +78,108 @@ else
   print("sigmag not found. Using standard mode widths:")
   print(sigmag)
 end if
+logsigmag=log(sigmag)
 
-print("reading date")
-date = history[:]->date
-year = floattointeger(yyyymmdd_to_yyyyfrac(date,0.0)-1./24.)
-;di=ind(year.ge.startyear.and.year.le.endyear)
+;print("reading date")
+;date = history[:]->date
+;year = floattointeger(yyyymmdd_to_yyyyfrac(date,0.0)-1./24.)
+;di=ind(year.ge.startyear.and.year.le.endyear) 
+
+; Laramie (41N, 105W)
+lat1=41
+lon1=360-105
 
 print("reading dgnumwet1") ; (time, lev, lat, lon)
-dgnumwet1 = history[:]->dgnumwet1(:,:,{41},{105})
+dgnumwet1 = history[:]->dgnumwet1(:,:,{lat1},{lon1}); Aerosol mode wet diameter in meters
 ;printVarSummary(dgnumwet1)
 print("reading dgnumwet2")
-dgnumwet2 = history[:]->dgnumwet2(:,:,{41},{105})
+dgnumwet2 = history[:]->dgnumwet2(:,:,{lat1},{lon1})
 ;printVarSummary(dgnumwet2)
 print("reading dgnumwet3")
-dgnumwet3 = history[:]->dgnumwet3(:,:,{41},{105})
+dgnumwet3 = history[:]->dgnumwet3(:,:,{lat1},{lon1})
 ;printVarSummary(dgnumwet3)
 print("reading num_a1")
-num_a1 = history[:]->num_a1(:,:,{41},{105})
+num_a1 = history[:]->num_a1(:,:,{lat1},{lon1}) ; aerosol number concentration in /kg air
 ;printVarSummary(num_a1)
 print("reading num_a2")
-num_a2 = history[:]->num_a2(:,:,{41},{105})
+num_a2 = history[:]->num_a2(:,:,{lat1},{lon1})
 ;printVarSummary(num_a2)
 print("reading num_a3")
-num_a3 = history[:]->num_a3(:,:,{41},{105})
+num_a3 = history[:]->num_a3(:,:,{lat1},{lon1})
 ;printVarSummary(num_a3)
 
+print("reading arhomass")
+arhomass = history[:]->arhomass(:,:,{lat1},{lon1}) ; air density in g/cm3
 
-bin=(/0.,0.15,0.25,0.30,0.49,0.62,0.78,1.08/)
+diminq=dimsizes(dgnumwet1)
+ntimes=diminq(0)
+nlev=diminq(1)
+
+; convert #/kg air to #/cm3
+num_a1=num_a1*arhomass/1.e3
+num_a2=num_a2*arhomass/1.e3
+num_a3=num_a3*arhomass/1.e3
+
+bin=(/0.01,0.15,0.25,0.30,0.49,0.62,0.78,1.08/)
 bin@units="um"
 bin@long_name="minimum radius"
 nbins=dimsizes(bin)
+
+; diameter = 2* radius, 1e-6 m/um
+dbin=bin*2e-6
+
+nd=new((/ntimes,nlev,nbins/),"float")
+print("calculating number densities")
+do t =0,ntimes-1
+  t1=t+1
+  print("time "+t1+" of "+ntimes)
+  do k =0,nlev-1
+    do b=0,nbins-1
+      e1 = erf(log(dbin(b)/dgnumwet1(t,k)/sqrt2/logsigmag(0)))
+      e2 = erf(log(dbin(b)/dgnumwet2(t,k)/sqrt2/logsigmag(1)))
+      e3 = erf(log(dbin(b)/dgnumwet3(t,k)/sqrt2/logsigmag(2)))
+      n1 = num_a1(t,k)*(0.5-0.5*e1)
+      n2 = num_a2(t,k)*(0.5-0.5*e2)
+      n3 = num_a3(t,k)*(0.5-0.5*e3)
+      nd(t,k,b) = n1 + n2 + n3
+      if (k.eq.45..and.printflag) then
+        print("  ")
+        print("lev="+dgnumwet1&lev(k))
+        print("calculating population with radius larger than "+bin(b)+" um")
+        print("diameter larger than "+dbin(b)+" m")
+        print("dgnumwet (m), mode1:"+ dgnumwet1(t,k)+" mode2:"+dgnumwet2(t,k)+" mode3:"+dgnumwet3(t,k))
+        print("sigmag:"+sigmag(0)+" "+sigmag(1)+" "+sigmag(2))
+        print("lnsigmag:"+logsigmag(0)+" "+logsigmag(1)+" "+logsigmag(2))
+        print("sqrt2:"+sqrt2)
+        print("number density (/cm3), mode1:"+num_a1(t,k)+" mode2:"+num_a2(t,k)+" mode3:"+num_a3(t,k))
+        print("erf, mode1:"+e1+" mode2:"+e2+" mode3:"+e3)
+        print("population above threshold, mode1:"+n1+" mode2="+n2+" mode3="+n3)
+        print("total population="+nd(t,k,b))
+      end if
+    end do
+  end do
+end do
+
+ndbin=dim_avg_n(nd,0)
+ndbin!0="lev"
+ndbin!1="bin"
+ndbin&lev=dgnumwet1&lev
+ndbin&bin=bin
+
+ndbin@long_name="aerosol number density larger than bin threshold"
+ndbin@units="cm-3"
+
+print(typeof(ndbin&lev))
+print(typeof(ndbin))
+
+print(sprintf("%3.2e",ndbin&lev)+" "+sprintf("%3.2e",ndbin(:,0))+" "+\
+      sprintf("%3.2e",ndbin(:,1))+" "+sprintf("%3.2e",ndbin(:,2))+" "+sprintf("%3.2e",ndbin(:,3)))
+
+outfile=rootpath+caseid+"/atm/proc/"+caseid+".US_Laramie_41N_105W_"+rangestr+".nc"
+print("rm "+outfile)
+a=systemfunc("rm "+outfile)
+print("creating "+outfile)
+ncid=addfile(outfile,"c")
+print("saving ncid")
+ncid->ndbin=ndbin
 
