@@ -646,11 +646,12 @@ else
     print(" setenv widths strat006 -> 1.6, 1.6, 1.2 (used in case b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.006.0-15N)")
     print(" setenv widths strat010 -> 1.6, 1.6, 1.2 (used in case b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.010.0-15N.10Tg.mode3sig1.6)")
     print(" setenv widths strat011 -> 1.6, 1.6, 1.2 (used in case b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.011.0-15N.10Tg.def1mode3sig1.6)")
-    print("Or use a custom comma separated string format, e.g.:")
+    print("Or use a custom string with fields separated by commas or minus signs, e.g.:")
     print(" setenv widths 1.8,1.6,1.2")
+    print(" setenv widths 1.6-1.6-1.8")
     exit
   else ; custom comma separated string format
-    sigma=stringtofloat((/str_get_field(widths,1,","),str_get_field(widths,2,","),str_get_field(widths,3,",")/))
+    sigma=stringtofloat((/str_get_field(widths,1,",-"),str_get_field(widths,2,",-"),str_get_field(widths,3,",-")/))
   end if
 end if
 end if

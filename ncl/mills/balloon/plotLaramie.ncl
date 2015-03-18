@@ -7,30 +7,14 @@ load "$CODE_PATH/ncl/lib/boxplot_vertical.ncl"
 begin
   datapath=getenv("DATA_PATH")
   imagepath=getenv("IMG_PATH")
-  startyear=getenv("startyear")
-  endyear=getenv("endyear")
+  rangestr=getenv("rangestr")
   caseid=getenv("caseid")
   
-  if (ismissing(startyear)) then
-    startyear=1999
+  if (ismissing(rangestr)) then
+    rangestr="1999-2008"
   end if  
-  
-  if (ismissing(endyear)) then
-    endyear=2008
-  end if
-  
-  if (startyear.gt.endyear) then
-    print("FATAL: startyear = "+startyear+" > endyear = "+endyear)
-    exit
-  end if
-  
-  print("startyear = "+startyear+", endyear = "+endyear)
-  
-  if (startyear.eq.endyear) then
-    rangestr=startyear
-  else
-    rangestr=startyear+"-"+endyear
-  end if
+    
+  print("Laramie range: "+rangestr)
   
   infile=datapath+"/Deshler2014/US_Laramie_41N_105W_"+rangestr+".nc"
 
@@ -77,7 +61,14 @@ begin
   cmd=systemfunc("mkdir "+imagepath+"/balloon")
   pdffile=imagepath+"/balloon/US_Laramie_41N_105W_"+rangestr
   if .not.ismissing(caseid) then
-    pdffile=pdffile+"."+caseid
+    modelrange=getenv("modelrange")
+    if ismissing(modelrange) then
+      modelrange=rangestr
+      pdffile=pdffile+"."+caseid
+    else
+      pdffile=pdffile+"."+caseid+"_"+modelrange
+    end if
+    print("model using year(s) "+rangestr+" from case "+caseid)
   end if
   print("rm "+pdffile+".pdf")
   rm=systemfunc("rm "+pdffile+".pdf")
@@ -88,6 +79,10 @@ begin
   res            = True                         ; plot mods desired
 ;  res@tmYLLabels = (/"Control","-2Xna","2Xna"/) ; labels for each box
   res@tiMainString = "Laramie (41N, 105W), "+rangestr
+  res@tiMainOffsetYF    = 0.02
+  res@tiMainFontHeightF = 0.035
+  res@tiYAxisString = "Altitude (km)"
+  res@tiXAxisString = "Number concentration (cm-3)"
 ;  res@trXLog=True
 ;**********************************************
 ; resources for polylines that draws the boxes
@@ -107,7 +102,10 @@ begin
   
   
   if .not.ismissing(caseid) then
-    modelfile=caseid+".US_Laramie_41N_105W_"+rangestr+".nc"
+    plot1 = boxplot_vertical(wks,xval,alt,opti,res,llres)	
+    plot2 = boxplot_vertical(wks,xval,alt,opti,res,llres)	
+    plot3 = boxplot_vertical(wks,xval,alt,opti,res,llres)	
+    modelfile=caseid+".US_Laramie_41N_105W_"+modelrange+".nc"
     rootpath = "/glade/scratch/mmills/archive/"
 
     exists =isfilepresent(rootpath+caseid+"/atm/proc/"+modelfile)
@@ -123,6 +121,9 @@ begin
       print("opening "+rootpath+caseid+"/atm/proc/"+modelfile)
       ncid=addfile(rootpath+caseid+"/atm/proc/"+modelfile,"r")
       ndbin=ncid->ndbin
+      nd1bin=ncid->nd1bin
+      nd2bin=ncid->nd2bin
+      nd3bin=ncid->nd3bin
       Z3=ncid->Z3
       modalt=Z3/1e3
       print(xval&bin)
@@ -135,11 +136,51 @@ begin
       res@gsnDraw=False
       res@gsnFrame=False
       overlay(plot,gsn_csm_xy(wks,ndbin(bin|:,lev|:),modalt,res))
+      overlay(plot1,gsn_csm_xy(wks,nd1bin(bin|:,lev|:),modalt,res))
+      overlay(plot2,gsn_csm_xy(wks,nd2bin(bin|:,lev|:),modalt,res))
+      overlay(plot3,gsn_csm_xy(wks,nd3bin(bin|:,lev|:),modalt,res))
+;
+; Create a string to put at the top, using a slightly
+; smaller font height than the axis titles.
+;
+      txres = True
+      txres@txFontColor="black"
+      txres@txFontHeightF = 0.015  ; font smaller. default big
+      txidc = gsn_create_text(wks, caseid+", "+modelrange, txres)
+      amres                  = True
+      amres@amOrthogonalPosF = -0.53   ; Top of plot plus a little extra                                     ; to stay out of the tickmarks.
+      amres@amJust           = "BottomCenter"
+      amres@amParallelPosF   = 0.0   ; Centered
+      annoidl = gsn_add_annotation(plot, txidc, amres)
+      txres@txFontHeightF = 0.02  ; font smaller. default big
+      txidc = gsn_create_text(wks, "model mode 1, accumulation", txres)
+      annoidl1 = gsn_add_annotation(plot1, txidc, amres)
+      txidc = gsn_create_text(wks, "model mode 2, Aitken", txres)
+      annoidl2 = gsn_add_annotation(plot2, txidc, amres)
+      txidc = gsn_create_text(wks, "model mode 3, coarse", txres)
+      annoidl3 = gsn_add_annotation(plot3, txidc, amres)
+;      print((/ndbin&bin/))
+;      print(sprintf("%3.1f",modalt)+" "+sprintf("%3.2e",ndbin(:,0))+" "+sprintf("%3.2e",ndbin(:,1))+" "+\
+;        sprintf("%3.2e",ndbin(:,2))+" "+sprintf("%3.2e",ndbin(:,3))+" "+sprintf("%3.2e",ndbin(:,4))+" "+\
+;        sprintf("%3.2e",ndbin(:,5))+" "+sprintf("%3.2e",ndbin(:,6))+" "+sprintf("%3.2e",ndbin(:,7)))
+      
     end if
   end if
 
   print("drawing plot...")
   draw(plot)                                     ; box plot does not call
+  print("framing wks...")
+  frame(wks)                                    ; these for you
+  print("drawing plot 1...")
+  draw(plot1)                                     ; box plot does not call
+  print("framing wks...")
+  frame(wks)                                    ; these for you
+  print("drawing plot 2...")
+  draw(plot2)                                     ; box plot does not call
+  print("framing wks...")
+  frame(wks)                                    ; these for you
+  print("drawing plot 3...")
+  draw(plot3)                                     ; box plot does not call
   print("framing wks...")
   frame(wks)                                    ; these for you
 
