@@ -9,6 +9,7 @@ begin
   imagepath=getenv("IMG_PATH")
   startyear=getenv("startyear")
   endyear=getenv("endyear")
+  caseid=getenv("caseid")
   
   if (ismissing(startyear)) then
     startyear=1999
@@ -47,6 +48,7 @@ begin
   N75pct=ncid->N75pct
   print("reading Nk...")
   Nk=ncid->Nk
+  delete(ncid)
   
   diminq=dimsizes(Nmedian)
   nbins=diminq(0)
@@ -74,6 +76,9 @@ begin
   print("mkdir "+imagepath+"/balloon")
   cmd=systemfunc("mkdir "+imagepath+"/balloon")
   pdffile=imagepath+"/balloon/US_Laramie_41N_105W_"+rangestr
+  if .not.ismissing(caseid) then
+    pdffile=pdffile+"."+caseid
+  end if
   print("rm "+pdffile+".pdf")
   rm=systemfunc("rm "+pdffile+".pdf")
   wks = gsn_open_wks("pdf",pdffile)
@@ -94,11 +99,45 @@ begin
 ;**********************************************  
   opti          = True			
   opti@boxWidth = .25				; Width of box (y units)
-  boxColors = (/"black","red","green4","blue","orchid","orange","cyan4","grey"/)  	; Color of box(es)
+;  boxColors = (/"black","red","green4","blue","orchid","orange","cyan4","grey"/)  	; Color of box(es)
+  boxColors = (/"black","red","green4","blue","orchid","transparent","cyan4","transparent"/)  	; Color of box(es)
   opti@boxColors = boxColors(0:nbins-1)
 ;***********************************************
   plot = boxplot_vertical(wks,xval,alt,opti,res,llres)	; All 3 options used...
   
+  
+  if .not.ismissing(caseid) then
+    modelfile=caseid+".US_Laramie_41N_105W_"+rangestr+".nc"
+    rootpath = "/glade/scratch/mmills/archive/"
+
+    exists =isfilepresent(rootpath+caseid+"/atm/proc/"+modelfile)
+    if (.not.exists) then
+      print("Missing: "+rootpath+caseid+"/atm/proc/"+modelfile)
+      rootpath="/glade/p/cesm/wawg_dev/mmills/archive/"
+    end if
+
+    exists =isfilepresent(rootpath+caseid+"/atm/proc/"+modelfile)
+    if (.not.exists) then
+      print("Missing: "+rootpath+caseid+"/atm/proc/"+modelfile)
+    else
+      print("opening "+rootpath+caseid+"/atm/proc/"+modelfile)
+      ncid=addfile(rootpath+caseid+"/atm/proc/"+modelfile,"r")
+      ndbin=ncid->ndbin
+      Z3=ncid->Z3
+      modalt=Z3/1e3
+      print(xval&bin)
+      print(ndbin&bin)
+      print("overlaying plot...")
+      res@xyMonoDashPattern=True
+      res@xyLineThicknessF=3.0
+      res@xyLineColors=boxColors
+      res@xyMonoLineColor=False
+      res@gsnDraw=False
+      res@gsnFrame=False
+      overlay(plot,gsn_csm_xy(wks,ndbin(bin|:,lev|:),modalt,res))
+    end if
+  end if
+
   print("drawing plot...")
   draw(plot)                                     ; box plot does not call
   print("framing wks...")

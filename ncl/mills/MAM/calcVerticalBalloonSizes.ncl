@@ -110,6 +110,8 @@ num_a3 = history[:]->num_a3(:,:,{lat1},{lon1})
 
 print("reading arhomass")
 arhomass = history[:]->arhomass(:,:,{lat1},{lon1}) ; air density in g/cm3
+print("reading Z3")
+Z3 = history[:]->Z3(:,:,{lat1},{lon1}) ; geopotential height (m)
 
 diminq=dimsizes(dgnumwet1)
 ntimes=diminq(0)
@@ -128,7 +130,7 @@ nbins=dimsizes(bin)
 ; diameter = 2* radius, 1e-6 m/um
 dbin=bin*2e-6
 
-nd=new((/ntimes,nlev,nbins/),"float")
+nd=new((/nlev,nbins,ntimes/),"float")
 print("calculating number densities")
 do t =0,ntimes-1
   t1=t+1
@@ -141,7 +143,7 @@ do t =0,ntimes-1
       n1 = num_a1(t,k)*(0.5-0.5*e1)
       n2 = num_a2(t,k)*(0.5-0.5*e2)
       n3 = num_a3(t,k)*(0.5-0.5*e3)
-      nd(t,k,b) = n1 + n2 + n3
+      nd(k,b,t) = n1 + n2 + n3
       if (k.eq.45..and.printflag) then
         print("  ")
         print("lev="+dgnumwet1&lev(k))
@@ -160,7 +162,7 @@ do t =0,ntimes-1
   end do
 end do
 
-ndbin=dim_avg_n(nd,0)
+ndbin=dim_avg(nd)
 ndbin!0="lev"
 ndbin!1="bin"
 ndbin&lev=dgnumwet1&lev
@@ -169,8 +171,7 @@ ndbin&bin=bin
 ndbin@long_name="aerosol number density larger than bin threshold"
 ndbin@units="cm-3"
 
-print(typeof(ndbin&lev))
-print(typeof(ndbin))
+Z3av=dim_avg_Wrap(Z3(lev|:,time|:))
 
 print(sprintf("%3.2e",ndbin&lev)+" "+sprintf("%3.2e",ndbin(:,0))+" "+\
       sprintf("%3.2e",ndbin(:,1))+" "+sprintf("%3.2e",ndbin(:,2))+" "+sprintf("%3.2e",ndbin(:,3)))
@@ -180,6 +181,8 @@ print("rm "+outfile)
 a=systemfunc("rm "+outfile)
 print("creating "+outfile)
 ncid=addfile(outfile,"c")
+print("saving Z3")
+ncid->Z3=Z3av
 print("saving ncid")
 ncid->ndbin=ndbin
 
