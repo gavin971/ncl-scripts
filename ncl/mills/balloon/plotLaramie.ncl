@@ -79,8 +79,8 @@ begin
   res            = True                         ; plot mods desired
 ;  res@tmYLLabels = (/"Control","-2Xna","2Xna"/) ; labels for each box
   res@tiMainString = "Laramie (41N, 105W), "+rangestr
-  res@tiMainOffsetYF    = 0.02
-  res@tiMainFontHeightF = 0.035
+;  res@tiMainOffsetYF    = 0.02
+;  res@tiMainFontHeightF = 0.035
   res@tiYAxisString = "Altitude (km)"
   res@tiXAxisString = "Number concentration (cm-3)"
 ;  res@trXLog=True
@@ -97,14 +97,23 @@ begin
 ;  boxColors = (/"black","red","green4","blue","orchid","orange","cyan4","grey"/)  	; Color of box(es)
   boxColors = (/"black","red","green4","blue","orchid","transparent","cyan4","transparent"/)  	; Color of box(es)
   opti@boxColors = boxColors(0:nbins-1)
-;***********************************************
-  plot = boxplot_vertical(wks,xval,alt,opti,res,llres)	; All 3 options used...
+;***********************************************  
   
-  
-  if .not.ismissing(caseid) then
-    plot1 = boxplot_vertical(wks,xval,alt,opti,res,llres)	
-    plot2 = boxplot_vertical(wks,xval,alt,opti,res,llres)	
-    plot3 = boxplot_vertical(wks,xval,alt,opti,res,llres)	
+  if ismissing(caseid) then
+    plot = boxplot_vertical(wks,xval,alt,opti,res,llres)	; All 3 options used...
+    print("drawing plot...")
+    draw(plot)                                     ; box plot does not call
+    print("framing wks...")
+    frame(wks)                                    ; these for you    
+  else
+    plot = new(4, graphic)    
+    plot(0) = 	boxplot_vertical(wks,xval,alt,opti,res,llres)
+    res@tiMainString = "Model mode 1, accumulation"
+    plot(1) = 	boxplot_vertical(wks,xval,alt,opti,res,llres)
+    res@tiMainString = "Model mode 2, Aitken"
+    plot(2) = 	boxplot_vertical(wks,xval,alt,opti,res,llres)
+    res@tiMainString = "Model mode 3, coarse"
+    plot(3) = 	boxplot_vertical(wks,xval,alt,opti,res,llres)
     modelfile=caseid+".US_Laramie_41N_105W_"+modelrange+".nc"
     rootpath = "/glade/scratch/mmills/archive/"
 
@@ -117,6 +126,10 @@ begin
     exists =isfilepresent(rootpath+caseid+"/atm/proc/"+modelfile)
     if (.not.exists) then
       print("Missing: "+rootpath+caseid+"/atm/proc/"+modelfile)
+      print("drawing plot...")
+      draw(plot)                                     ; box plot does not call
+      print("framing wks...")
+      frame(wks)                                    ; these for you  
     else
       print("opening "+rootpath+caseid+"/atm/proc/"+modelfile)
       ncid=addfile(rootpath+caseid+"/atm/proc/"+modelfile,"r")
@@ -135,54 +148,44 @@ begin
       res@xyMonoLineColor=False
       res@gsnDraw=False
       res@gsnFrame=False
-      overlay(plot,gsn_csm_xy(wks,ndbin(bin|:,lev|:),modalt,res))
-      overlay(plot1,gsn_csm_xy(wks,nd1bin(bin|:,lev|:),modalt,res))
-      overlay(plot2,gsn_csm_xy(wks,nd2bin(bin|:,lev|:),modalt,res))
-      overlay(plot3,gsn_csm_xy(wks,nd3bin(bin|:,lev|:),modalt,res))
+      overlay(plot(0),gsn_csm_xy(wks,ndbin(bin|:,lev|:),modalt,res))
+      overlay(plot(1),gsn_csm_xy(wks,nd1bin(bin|:,lev|:),modalt,res))
+      overlay(plot(2),gsn_csm_xy(wks,nd2bin(bin|:,lev|:),modalt,res))
+      overlay(plot(3),gsn_csm_xy(wks,nd3bin(bin|:,lev|:),modalt,res))
 ;
 ; Create a string to put at the top, using a slightly
 ; smaller font height than the axis titles.
 ;
-      txres = True
-      txres@txFontColor="black"
-      txres@txFontHeightF = 0.015  ; font smaller. default big
-      txidc = gsn_create_text(wks, caseid+", "+modelrange, txres)
-      amres                  = True
-      amres@amOrthogonalPosF = -0.53   ; Top of plot plus a little extra                                     ; to stay out of the tickmarks.
-      amres@amJust           = "BottomCenter"
-      amres@amParallelPosF   = 0.0   ; Centered
-      annoidl = gsn_add_annotation(plot, txidc, amres)
-      txres@txFontHeightF = 0.02  ; font smaller. default big
-      txidc = gsn_create_text(wks, "model mode 1, accumulation", txres)
-      annoidl1 = gsn_add_annotation(plot1, txidc, amres)
-      txidc = gsn_create_text(wks, "model mode 2, Aitken", txres)
-      annoidl2 = gsn_add_annotation(plot2, txidc, amres)
-      txidc = gsn_create_text(wks, "model mode 3, coarse", txres)
-      annoidl3 = gsn_add_annotation(plot3, txidc, amres)
+;      txres = True
+;      txres@txFontColor="black"
+;      txres@txFontHeightF = 0.015  ; font smaller. default big
+;      txidc = gsn_create_text(wks, caseid+", "+modelrange, txres)
+;      amres                  = True
+;      amres@amOrthogonalPosF = -0.53   ; Top of plot plus a little extra                                     ; to stay out of the tickmarks.
+;      amres@amJust           = "BottomCenter"
+;      amres@amParallelPosF   = 0.0   ; Centered
+;      annoidl = gsn_add_annotation(plot(0), txidc, amres)
+;      txres@txFontHeightF = 0.02  ; font smaller. default big
+;      txidc = gsn_create_text(wks, "model mode 1, accumulation", txres)
+;      annoidl1 = gsn_add_annotation(plot(1), txidc, amres)
+;      txidc = gsn_create_text(wks, "model mode 2, Aitken", txres)
+;      annoidl2 = gsn_add_annotation(plot(2), txidc, amres)
+;      txidc = gsn_create_text(wks, "model mode 3, coarse", txres)
+;      annoidl3 = gsn_add_annotation(plot(3), txidc, amres)
 ;      print((/ndbin&bin/))
 ;      print(sprintf("%3.1f",modalt)+" "+sprintf("%3.2e",ndbin(:,0))+" "+sprintf("%3.2e",ndbin(:,1))+" "+\
 ;        sprintf("%3.2e",ndbin(:,2))+" "+sprintf("%3.2e",ndbin(:,3))+" "+sprintf("%3.2e",ndbin(:,4))+" "+\
 ;        sprintf("%3.2e",ndbin(:,5))+" "+sprintf("%3.2e",ndbin(:,6))+" "+sprintf("%3.2e",ndbin(:,7)))
+
+      resP                       = True
+      resP@gsnMaximize           = True            ; expand plot size to maximum
+      resP@gsnPaperOrientation   = "portrait"
+      resP@txString   = caseid+", "+modelrange
+
+      gsn_panel(wks, plot, (/ 2, 2 /), resP)
       
     end if
   end if
-
-  print("drawing plot...")
-  draw(plot)                                     ; box plot does not call
-  print("framing wks...")
-  frame(wks)                                    ; these for you
-  print("drawing plot 1...")
-  draw(plot1)                                     ; box plot does not call
-  print("framing wks...")
-  frame(wks)                                    ; these for you
-  print("drawing plot 2...")
-  draw(plot2)                                     ; box plot does not call
-  print("framing wks...")
-  frame(wks)                                    ; these for you
-  print("drawing plot 3...")
-  draw(plot3)                                     ; box plot does not call
-  print("framing wks...")
-  frame(wks)                                    ; these for you
 
   print("deleting wks...")
   delete(wks)
