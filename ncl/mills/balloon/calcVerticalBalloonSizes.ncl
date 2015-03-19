@@ -151,6 +151,16 @@ do t =0,ntimes-1
   t1=t+1
   print("time "+t1+" of "+ntimes)
   do k =0,nlev-1
+    if (k.eq.45..and.printflag) then
+      print("  ")
+      print("==============================================================")
+      print("  ")
+      print("lev="+dgnumwet1&lev(k)+", alt="+Z3(t,k)+" m")
+      print("dgnumwet (m), a1:"+ sprintf("%3.2e",dgnumwet1(t,k))+" a2:"+sprintf("%3.2e",dgnumwet2(t,k))+" a3:"+sprintf("%3.2e",dgnumwet3(t,k)))
+      print("dgn  dry (m), a1:"+ sprintf("%3.2e",dgnd_a01(t,k))+" a2:"+sprintf("%3.2e",dgnd_a02(t,k))+" a3:"+sprintf("%3.2e",dgnd_a03(t,k)))
+      print("sigmag:"+sigmag(0)+" "+sigmag(1)+" "+sigmag(2))
+      print("lnsigmag:"+sprintf("%3.2e",logsigmag(0))+" "+sprintf("%3.2e",logsigmag(1))+" "+sprintf("%3.2e",logsigmag(2)))
+    end if
     do b=0,nbins-1
       e1 = erf(log(dbin(b)/dgnumwet1(t,k)/sqrt2/logsigmag(0)))
       e2 = erf(log(dbin(b)/dgnumwet2(t,k)/sqrt2/logsigmag(1)))
@@ -161,18 +171,11 @@ do t =0,ntimes-1
       nd(k,b,t) = nd1(k,b,t) + nd2(k,b,t) + nd3(k,b,t)
       if (k.eq.45..and.printflag) then
         print("  ")
-        print("lev="+dgnumwet1&lev(k)+", alt="+Z3(t,k)+" m")
-        print("calculating population with radius larger than "+bin(b)+" um")
-        print("diameter larger than "+dbin(b)+" m")
-        print("dgnumwet (m), mode1:"+ dgnumwet1(t,k)+" mode2:"+dgnumwet2(t,k)+" mode3:"+dgnumwet3(t,k))
-        print("dgn  dry (m), mode1:"+ dgnd_a01(t,k)+" mode2:"+dgnd_a02(t,k)+" mode3:"+dgnd_a03(t,k))
-        print("sigmag:"+sigmag(0)+" "+sigmag(1)+" "+sigmag(2))
-        print("lnsigmag:"+logsigmag(0)+" "+logsigmag(1)+" "+logsigmag(2))
-        print("sqrt2:"+sqrt2)
-        print("number density (/cm3), mode1:"+num_a1(t,k)+" mode2:"+num_a2(t,k)+" mode3:"+num_a3(t,k))
-        print("erf, mode1:"+e1+" mode2:"+e2+" mode3:"+e3)
-        print("population above threshold, mode1:"+nd1(k,b,t)+" mode2="+nd2(k,b,t)+" mode3="+nd3(k,b,t))
-        print("total population="+nd(k,b,t))
+        print("radius > "+bin(b)+" um, diam > "+dbin(b)+" m")
+        print("nd (/cm3), a1:"+sprintf("%3.2e",num_a1(t,k))+" a2:"+sprintf("%3.2e",num_a2(t,k))+" a3:"+sprintf("%3.2e",num_a3(t,k)))
+        print("erf, a1:"+sprintf("%3.2e",e1)+" a2:"+sprintf("%3.2e",e2)+" a3:"+sprintf("%3.2e",e3))
+        print("nd(r>ro), a1:"+sprintf("%3.2e",nd1(k,b,t))+" a2="+sprintf("%3.2e",nd2(k,b,t))+\
+              " a3="+sprintf("%3.2e",nd3(k,b,t))+" tot="+sprintf("%3.2e",nd(k,b,t)))
       end if
     end do
   end do
@@ -200,8 +203,19 @@ nd3bin@long_name="aerosol mode 3 number density larger than bin threshold"
 
 Z3av=dim_avg_Wrap(Z3(lev|:,time|:))
 
+if (printflag) then
+print("  ")
+print("==============================================================")
+print("  ")
+print("  "+bin(0)+"     "+bin(1)+"     "+bin(2)+"     "+bin(3)+"      "+bin(4)+"     "+bin(5)+"     "+bin(6)+"     "+bin(7))
+print("  ")
 print(sprintf("%3.2e",ndbin&lev)+" "+sprintf("%3.2e",ndbin(:,0))+" "+\
-      sprintf("%3.2e",ndbin(:,1))+" "+sprintf("%3.2e",ndbin(:,2))+" "+sprintf("%3.2e",ndbin(:,3)))
+      sprintf("%3.2e",ndbin(:,1))+" "+sprintf("%3.2e",ndbin(:,2))+" "+\
+      sprintf("%3.2e",ndbin(:,3))+" "+sprintf("%3.2e",ndbin(:,4))+" "+\
+      sprintf("%3.2e",ndbin(:,6))+" "+sprintf("%3.2e",ndbin(:,7)))
+print("  ")
+print("==============================================================")
+end if
 
 outfile=rootpath+caseid+"/atm/proc/"+caseid+".US_Laramie_41N_105W_"+rangestr+".nc"
 print("rm "+outfile)
