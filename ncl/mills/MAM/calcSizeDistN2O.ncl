@@ -35,7 +35,7 @@ begin
   if (.not.exists) then
     print("Missing: "+rootpath+caseid+"/atm/proc/h0zm/")
     print("FATAL: check caseid="+caseid)
-    exit
+    status_exit(1)
   end if
   print("Rootpath: "+rootpath+caseid+"/atm/proc/h0zm/")
 
@@ -136,7 +136,7 @@ begin
     if (N2Oppb(n).le.N2Oppb(n+1)) then
       print("calcSizeDistN2O error: N2Oppb must be in descending order. Aborting.")
       print(N2Oppb)
-      exit
+      status_exit(1)
     end if
     
     iN2O = ind(N2O_1D.lt.N2Obounds(n).and.N2O_1D.gt.N2Obounds(n+1))

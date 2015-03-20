@@ -9,7 +9,7 @@ caseid=getenv("caseid")
 
 if (ismissing(caseid)) then
   print("FATAL: caseid environment variable not set")
-  exit
+  status_exit(1)
 else
   print("caseid: "+caseid)
 end if
@@ -27,7 +27,7 @@ end if
 
 if (startyear.gt.endyear) then
   print("FATAL: startyear = "+startyear+" > endyear = "+endyear)
-  exit
+  status_exit(1)
 end if
 
 print("startyear = "+startyear+", endyear = "+endyear)
@@ -52,7 +52,7 @@ exists =isfilepresent(rootpath+caseid+"/atm/proc/h0mam/")
 if (.not.exists) then
   print("Missing: "+rootpath+caseid+"/atm/proc/h0mam/")
   print("FATAL: check caseid="+caseid)
-  exit
+  status_exit(1)
 end if
 print("Rootpath: "+rootpath+caseid+"/atm/proc/h0mam/")
 

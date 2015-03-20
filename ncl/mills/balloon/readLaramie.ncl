@@ -25,7 +25,7 @@ end if
 
 if (startyear.gt.endyear) then
   print("FATAL: startyear = "+startyear+" > endyear = "+endyear)
-  exit
+  status_exit(1)
 end if
 
 print("startyear = "+startyear+", endyear = "+endyear)

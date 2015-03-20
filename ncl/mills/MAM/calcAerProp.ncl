@@ -62,7 +62,7 @@ begin
         mode=i+1
         print("FATAL: history sigmag does not match sigma for mode "+mode)
         print(history->sigmag(i)+" "+sigma(i))
-        exit
+        status_exit(1)
       end if
     end do
   else
@@ -617,14 +617,14 @@ widths=getenv("widths")
 
 if (ismissing(caseid)) then
   print("FATAL: missing environment variable caseid")
-  exit
+  status_exit(1)
 else 
   print("caseid: "+caseid)
 end if
 
 if (ismissing(widths)) then
   print("FATAL: missing environment variable widths")
-  exit
+  status_exit(1)
 else 
   print("widths: "+widths)
 end if
@@ -649,7 +649,7 @@ else
     print("Or use a custom string with fields separated by commas or minus signs, e.g.:")
     print(" setenv widths 1.8,1.6,1.2")
     print(" setenv widths 1.6-1.6-1.8")
-    exit
+    status_exit(1)
   else ; custom comma separated string format
     sigma=stringtofloat((/str_get_field(widths,1,",-"),str_get_field(widths,2,",-"),str_get_field(widths,3,",-")/))
   end if
@@ -687,7 +687,7 @@ if (ismissing(rootpath)) then
     if (.not.exists) then
       print("Missing: "+rootpath+caseid+"/atm/hist/")
       print("FATAL: check caseid="+caseid)
-      exit
+      status_exit(1)
     end if
     print("Rootpath: "+rootpath+caseid+"/atm/hist/")
     
