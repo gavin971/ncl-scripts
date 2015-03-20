@@ -638,7 +638,7 @@ else if (widths.eq."strat010") then
 else if (widths.eq."strat011") then
   sigma=(/1.8, 1.6, 1.6/) ; MAM3 widths used in case b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.011.0-15N.10Tg.def1mode3sig1.6
 else
-  nmodes=str_fields_count (widths,",")
+  nmodes=str_fields_count (widths,",-")
   if (nmodes.ne.3) then
     print("FATAL: Illegal value for environment variable widths: "+widths)
     print("Preset options:")
