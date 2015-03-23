@@ -76,6 +76,8 @@ if isfilevar(history[0],"sigmag") then
   print(sigmag)
 else
   sigmag=(/1.6, 1.6, 1.2/) ; geometric standard deviations for 3 MAM3 modes
+  sigmag!0="mode"
+  sigmag@long_name="geometric standard deviation of aerosol modes"
   print("sigmag not found. Using standard mode widths:")
   print(sigmag)
 end if
@@ -222,6 +224,8 @@ print("rm "+outfile)
 a=systemfunc("rm "+outfile)
 print("creating "+outfile)
 ncid=addfile(outfile,"c")
+print("saving sigmag")
+ncid->sigmag=sigmag
 print("saving Z3")
 ncid->Z3=Z3av
 print("saving ndbin")

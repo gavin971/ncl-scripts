@@ -106,14 +106,6 @@ begin
     print("framing wks...")
     frame(wks)                                    ; these for you    
   else
-    plot = new(4, graphic)    
-    plot(0) = 	boxplot_vertical(wks,xval,alt,opti,res,llres)
-    res@tiMainString = "Model mode 1, accumulation"
-    plot(1) = 	boxplot_vertical(wks,xval,alt,opti,res,llres)
-    res@tiMainString = "Model mode 2, Aitken"
-    plot(2) = 	boxplot_vertical(wks,xval,alt,opti,res,llres)
-    res@tiMainString = "Model mode 3, coarse"
-    plot(3) = 	boxplot_vertical(wks,xval,alt,opti,res,llres)
     modelfile=caseid+".US_Laramie_41N_105W_"+modelrange+".nc"
     rootpath = "/glade/scratch/mmills/archive/"
 
@@ -133,6 +125,15 @@ begin
     else
       print("opening "+rootpath+caseid+"/atm/proc/"+modelfile)
       ncid=addfile(rootpath+caseid+"/atm/proc/"+modelfile,"r")
+
+      if isfilevar(ncid,"sigmag") then
+        print("reading sigmag...")
+        sigmag=ncid->sigmag
+        sigmastr=", ~F33~s~F~~B~g~N~="+sigmag
+      else
+        sigmastr=(/"","",""/)
+      end if
+
       ndbin=ncid->ndbin
       nd1bin=ncid->nd1bin
       nd2bin=ncid->nd2bin
@@ -141,7 +142,16 @@ begin
       modalt=Z3/1e3
       print(xval&bin)
       print(ndbin&bin)
+      
       print("overlaying plot...")
+      plot = new(4, graphic)    
+      plot(0) = 	boxplot_vertical(wks,xval,alt,opti,res,llres)
+      res@tiMainString = "Model mode 1, accumulation"+sigmastr(0)
+      plot(1) = 	boxplot_vertical(wks,xval,alt,opti,res,llres)
+      res@tiMainString = "Model mode 2, Aitken"+sigmastr(1)
+      plot(2) = 	boxplot_vertical(wks,xval,alt,opti,res,llres)
+      res@tiMainString = "Model mode 3, coarse"+sigmastr(2)
+      plot(3) = 	boxplot_vertical(wks,xval,alt,opti,res,llres)     
       res@xyMonoDashPattern=True
       res@xyLineThicknessF=3.0
       res@xyLineColors=boxColors
@@ -189,5 +199,5 @@ begin
 
   print("deleting wks...")
   delete(wks)
-  print(pdffile+".pdf")
+  print("evince "+pdffile+".pdf")
 end 
