@@ -20,7 +20,7 @@ else
     depstr=" -w "+depjob
   end if
   do i = 0, resubmit
-    command="cd /glade/p/work/mmills/case/"+caseid+"/ ; bsub"+depstr+" < +caseid+".run"
+    command="cd /glade/p/work/mmills/case/"+caseid+"/ ; bsub"+depstr+" < "+caseid+".run"
     print((/command/))
     a=systemfunc(command)
     print((/a/)) ;      Job <980757> is submitted to queue <regular>.
