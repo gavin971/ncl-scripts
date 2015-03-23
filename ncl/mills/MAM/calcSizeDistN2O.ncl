@@ -3,14 +3,11 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 undef("calcSizeDistN2O")
-procedure calcSizeDistN2O(caseid:string, dgVar:string, yearPattern:string,\
-                          yearString:string, hem:string)
+procedure calcSizeDistN2O(caseid:string, startyear:integer, endyear:integer, hem:string)
 
 ; input variables
 ;    caseid      : e.g "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003"  
-;    dgVar       : "dgnumwet" or "dgnd_a0"
-;    yearPattern : e.g. "199[23]"
-;    yearString  : e.g. "1992-93"
+;    startyear, endyear : integer year range, e.g. 1992, 1993
 ;    hem         : hemisphere, e.g. "NH", "global"
 ;    N2Oppb      : N2O bounds in descending order, e.g. (/ 300, 250, 200, 150, 100, 50 /)
 
@@ -22,6 +19,19 @@ procedure calcSizeDistN2O(caseid:string, dgVar:string, yearPattern:string,\
 begin
   pi      = 4.0 * atan(1.0) 
   sqrt2pi=sqrt(2*pi)
+
+  if (startyear.gt.endyear) then
+    print("FATAL: startyear = "+startyear+" > endyear = "+endyear)
+    status_exit(1)
+  end if
+
+  print("startyear = "+startyear+", endyear = "+endyear)
+
+  if (startyear.eq.endyear) then
+    rangestr=startyear
+  else
+    rangestr=startyear+"-"+endyear
+  end if
 
   rootpath = "/glade/scratch/mmills/archive/"
   
@@ -84,31 +94,41 @@ begin
   
   dVdlog10Dp_std=dVdlog10Dp_avg
   
-  outfilename=rootpath+caseid+"/atm/proc/SizeDistN2O_"+yearString+"_"+hem+".nc"
+  outfilename=rootpath+caseid+"/atm/proc/SizeDistN2O_"+rangestr+"_"+hem+".nc"
   dum=systemfunc("rm "+outfilename)
   outfile=addfile(outfilename,"c")
 
-  historyPattern=rootpath+caseid+"/atm/proc/h0zm/*.cam.h0zm."+yearPattern+"*"
-  historyNames = systemfunc("ls " + historyPattern)
-  history = addfiles(historyNames, "r")
-  ListSetType(history, "cat")
+  historyPattern=rootpath+caseid+"/atm/proc/h0zm/"
+  historyNames1 = systemfunc("ls " + historyPattern)
+  ; select only files between startyear and endyear
+  col1=strlen(caseid+".cam.h0zm.")
+  col2=col1+3
+  yearstr=str_get_cols(historyNames1,col1,col2)
+;  print(yearstr+" : "+historyNames1)
+  year=stringtointeger(yearstr)
+  yi=ind(year.ge.startyear.and.year.le.endyear)
+  historyNames=historyNames1(yi)
   print("historyNames:"+dimsizes(historyNames))
+
+  history = addfiles(rootpath+caseid+"/atm/proc/h0zm/"+historyNames, "r")
+  ListSetType(history, "cat")
+
   print("reading N2O")
-  N2O = addfiles_GetVar(history, historyNames, "N2O")
+  N2O = history[:]->N2O
 
   ; dry diameter not saved, but wet should be the same as dry for these runs
-  print("reading "+dgVar+"1")
-  dgnum1 = addfiles_GetVar(history, historyNames, dgVar+"1")
-  print("reading "+dgVar+"2")
-  dgnum2 = addfiles_GetVar(history, historyNames, dgVar+"2")
-  print("reading "+dgVar+"3")
-  dgnum3 = addfiles_GetVar(history, historyNames, dgVar+"3")
+  print("reading dgnd_a01")
+  dgnum1 = history[:]->dgnd_a01
+  print("reading dgnd_a02")
+  dgnum2 = history[:]->dgnd_a02
+  print("reading dgnd_a03")
+  dgnum3 = history[:]->dgnd_a03
   print("reading num_a1")
-  num_a1 = addfiles_GetVar(history, historyNames, "num_a1")
+  num_a1 = history[:]->num_a1
   print("reading num_a2")
-  num_a2 = addfiles_GetVar(history, historyNames, "num_a2")
+  num_a2 = history[:]->num_a2
   print("reading num_a3")
-  num_a3 = addfiles_GetVar(history, historyNames, "num_a3")
+  num_a3 = history[:]->num_a3
 
   dg1=ndtooned(dgnum1(:,:,{lat1:lat2}))
   dg2=ndtooned(dgnum2(:,:,{lat1:lat2}))
@@ -196,33 +216,30 @@ begin
   
 end
 
-;caseid = "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003"
-;yearPattern = "200[67]"
-;yearString = "2006-07"
+caseid=getenv("caseid")
 
-;caseid = "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003"
-;caseid = "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001"
+if (ismissing(caseid)) then
+  print("FATAL: caseid environment variable not set")
+  status_exit(1)
+else
+  print("caseid: "+caseid)
+end if
 
-;caseid = "b.e12.B55TRW5CN.f19_g16.Pin20Tg.22-26km.1col.QBOon.001"
-;caseid = "f.e12.FSDW5.f19_f19.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001"
-;caseid = "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002"
-;caseid = "f.e12.FSDW5.f19_f19.Pin20Tg.19-27km.0-20N.120E.QBOon.001"
-;caseid = "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001"
-;caseid = "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001"
-;caseid = "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.005.18-20km"
-;caseid = "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.004.expfix"
-;caseid = "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.006.0-15N"
-caseid = "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.010.0-15N.mode3sig1.6"
-yearPattern = "199[23]"
-yearString = "1992-1993"
-;yearPattern = "199[67]"
-;yearString = "1996-1997"
-;yearPattern = "200[23]"
-;yearString = "2002-2003"
+; Standard year ranges: 1992-1993, 1996-1997, 1999-2000, 2002-2003
+startyear=stringtoint(getenv("startyear"))
+endyear=stringtoint(getenv("endyear"))
+
+if (ismissing(startyear)) then
+  startyear=1992
+end if  
+
+if (ismissing(endyear)) then
+  endyear=1993
+end if
 
 hem="NH"
 
 ;dgVar = "dgnumwet"
-dgVar = "dgnd_a0"
-calcSizeDistN2O(caseid, dgVar, yearPattern, yearString, hem)
+;dgVar = "dgnd_a0"
+calcSizeDistN2O(caseid, startyear, endyear, hem)
 

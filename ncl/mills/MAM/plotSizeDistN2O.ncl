@@ -3,54 +3,14 @@ load "$NCARG_ROOT/lib/ncarg/nclex/gsun/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 begin
-  rootpath = "/glade/scratch/mmills/archive/"
   res=True
   
-;  caseid = (/  \
-;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003", \
-;;              "b.e12.B55TRW5CN.f19_g16.Pin15Tg.16-20km.QBOon.001", \
-;              "b.e12.B55TRW5CN.f19_g16.Pin10Tg.20-25km.15S-15N.zavg.QBOon.003", \
-;              "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
-;  caseid = (/  \
-;              "f.e12.FSDW5.f19_f19.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
-;              "f.e12.FSDW5.f19_f19.Pin15Tg.20-27km.0-18N.96-118E.QBOon.001", \
-;              "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
-;  caseid = (/  \
-;              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002", \
-;              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.QBOon.002", \
-;              "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
-;  caseid = (/  \
-;              "f.e12.FSDW5.f19_f19.Pin20Tg.19-27km.0-20N.120E.QBOon.001", \
-;              "f.e12.FSDW5.f19_f19.Pin20Tg.19-27km.0-20N.120E.QBOon.001", \
-;              "b.e12.BRCP45W5CN.f19_g16.MAMstratchem.003" /)
-;  yearString = (/ "1991_06-12", "1992", "2006-07" /)
-
-;  caseid = (/  \
-;              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001", \
-;              "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001", \
-;              "f.e12.FSDW5.f19_f19.Pin10Tg.20-25km.15S-15N.zavg.a3dgnl44.001", \
-;              "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001" \
-;               /)
-;  yearString = (/ "1992-93", "1992-93", "1996-97", "1996-97" /)
-;  res@xyMonoLineColor = False
-;  res@xyLineColors    = (/"red","red","green3","green3","blue"/)
-;  res@xyMonoDashPattern = False
-;  res@xyDashPatterns = (/1,0,1,0,0/)
-
-;  caseid = (/  \
-;               "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001", \
-;              "f.e12.FSDW5.f19_f19.Pin15Tg.19-27km.0N-20N.120E.a3dgnl44.001" \
-;               /)  
-;  caseid = (/  \
-;               "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.005.18-20km", \
-;              "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.004.expfix" \
-;               /)  
   caseid = (/  \
-             "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.006.0-15N", \
-             "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.006.0-15N", \
-             "b.e13.B20TRW5TCN.f19_g16.beta13_stratmodal.006.0-15N" \
+             "b.e13.BHISTW5TCN.f19_g16.beta17_stratmam.001", \
+             "b.e13.BHISTW5TCN.f19_g16.beta17_stratmam.001", \
+             "b.e13.BHISTW5TCN.f19_g16.beta17_stratmam.001" \
                /)  
-  yearString = (/ "1992-1993", "1996-1997", "2002-2003" /)
+  yearString = (/ "1992-1993", "1996-1997", "1989-1990" /)
   res@xyMonoLineColor = False
   res@xyLineColors    = (/"red","green3", "black"/)
   res@xyMonoDashPattern = False
@@ -59,6 +19,14 @@ begin
   nCases = dimsizes(caseid)
   
   do i = 0, nCases-1
+
+    rootpath = "/glade/scratch/mmills/archive/"
+    exists =isfilepresent(rootpath+caseid(i)+"/atm/proc/SizeDistN2O_"+yearString(i)+"_NH.nc")
+    if (.not.exists) then
+      print("Missing: "+rootpath+caseid(i)+"/atm/proc/h0zm/SizeDistN2O_"+yearString(i)+"_NH.nc")
+      rootpath="/glade/p/cesm/wawg_dev/mmills/archive/"
+    end if
+    print("Rootpath: "+rootpath+caseid+"/atm/proc/h0zm/")
   
     a=addfile(rootpath+caseid(i)+"/atm/proc/SizeDistN2O_"+yearString(i)+"_NH.nc","r")
     if (i.eq.0) then

@@ -91,3 +91,4 @@ delete(plot)
 plot = gsn_csm_lat_time(wks,AODUVst(lat|:, time|:),res)
 delete(plot)
 
+print("evince "+pdffile+".pdf")
